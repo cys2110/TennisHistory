@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics
 from .serializers import TournamentSerializer, PlayerSerializer, EditionSerializer, EntrySerializer, MatchScoreSerializer
 from .models import Tournament, Player, Edition, Entry, MatchScore
+from django.utils import timezone
 
 class TournamentList(generics.ListCreateAPIView):
     queryset = Tournament.objects.all()
@@ -26,6 +27,19 @@ class EditionList(generics.ListCreateAPIView):
 class EditionDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Edition.objects.all()
     serializer_class = EditionSerializer
+
+class UpcomingEditionList(generics.ListAPIView):
+    serializer_class = EditionSerializer
+
+    def get_queryset(self):
+        return Edition.objects.filter(start_date__gte = timezone.now())
+
+class EditionsByYear(generics.ListAPIView):
+    serializer_class = EditionSerializer
+
+    def get_queryset(self):
+        year = self.kwargs['year']
+        return Edition.objects.filter(year = year)
 
 class EntryList(generics.ListCreateAPIView):
     queryset = Entry.objects.all()

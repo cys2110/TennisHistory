@@ -19,7 +19,7 @@ class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
 
     p1_no_id = serializers.PrimaryKeyRelatedField(
         queryset = Entry.objects.all(),
-        source = 'entry'
+        source = 'p1_no'
     )
 
     p1 = serializers.HyperlinkedRelatedField(
@@ -29,7 +29,7 @@ class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
 
     p1_id = serializers.PrimaryKeyRelatedField(
         queryset = Player.objects.all(),
-        source = 'player'
+        source = 'p1'
     )
 
     p2_no = serializers.HyperlinkedRelatedField(
@@ -39,7 +39,7 @@ class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
 
     p2_no_id = serializers.PrimaryKeyRelatedField(
         queryset = Entry.objects.all(),
-        source = 'entry'
+        source = 'p2_no'
     )
 
     p2 = serializers.HyperlinkedRelatedField(
@@ -49,7 +49,7 @@ class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
 
     p2_id = serializers.PrimaryKeyRelatedField(
         queryset = Player.objects.all(),
-        source = 'player'
+        source = 'p2'
     )
 
     winner_id = serializers.HyperlinkedRelatedField(
@@ -59,7 +59,7 @@ class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
 
     winner_id_id = serializers.PrimaryKeyRelatedField(
         queryset = Player.objects.all(),
-        source = 'player'
+        source = 'winner_id'
     )
 
     class Meta:
@@ -102,12 +102,12 @@ class EditionSerializer(serializers.HyperlinkedModelSerializer):
         read_only = True
     )
 
-    winner = serializers.HyperlinkedRelatedField(
+    tournament = serializers.HyperlinkedRelatedField(
         view_name = 'tournament-detail',
         read_only = True
     )
 
-    winner_id = serializers.PrimaryKeyRelatedField(
+    tournament_id = serializers.PrimaryKeyRelatedField(
         queryset = Tournament.objects.all(),
         source = 'tournament'
     )
@@ -119,8 +119,12 @@ class EditionSerializer(serializers.HyperlinkedModelSerializer):
 
     winner_id = serializers.PrimaryKeyRelatedField(
         queryset = Player.objects.all(),
-        source = 'player'
+        source = 'winner'
     )
+
+    winner_name = serializers.CharField(source='winner.full_name', read_only = True)
+    winner_country = serializers.CharField(source='winner.country', read_only = True)
+    winner_headshot = serializers.CharField(source='winner.headshot', read_only = True)
 
     finalist = serializers.HyperlinkedRelatedField(
         view_name = 'player-detail',
@@ -129,12 +133,16 @@ class EditionSerializer(serializers.HyperlinkedModelSerializer):
 
     finalist_id = serializers.PrimaryKeyRelatedField(
         queryset = Player.objects.all(),
-        source = 'player'
+        source = 'finalist'
     )
+
+    finalist_name = serializers.CharField(source='finalist.full_name', read_only = True)
+    finalist_country = serializers.CharField(source='finalist.country', read_only = True)
+    finalist_headshot = serializers.CharField(source='finalist.headshot', read_only = True)
 
     class Meta:
         model = Edition
-        fields = ('id', 'edition_no', 'tournament', 'tournament_id', 'sponsor_name', 'year', 'start_date', 'end_date', 'category', 'currency', 'pm', 'tfc', 'supervisors', 'venue', 'city', 'country', 'environment', 'surface', 'hard_type', 'winner', 'winner_id', 'finalist', 'finalist_id', 'final_score', 'winner_pm', 'winner_pts', 'finalist_pm', 'finalist_pts', 'semifinalist_pm', 'semifinalist_pts', 'quarterfinalist_pm', 'quarterfinalist_pts', 'r16_pm', 'r16_pts', 'r32_pm', 'r32_pts', 'r64_pm', 'r64_pts', 'r128_pm', 'r128_pts', 'entries')
+        fields = ('id', 'edition_no', 'tournament', 'tournament_id', 'tournament_name', 'sponsor_name', 'year', 'start_date', 'end_date', 'category', 'currency', 'pm', 'tfc', 'supervisors', 'venue', 'city', 'country', 'environment', 'surface', 'hard_type', 'winner', 'winner_id', 'winner_name', 'winner_country', 'winner_headshot', 'finalist', 'finalist_id', 'finalist_name', 'finalist_country', 'finalist_headshot', 'final_score', 'winner_pm', 'winner_pts', 'finalist_pm', 'finalist_pts', 'semifinalist_pm', 'semifinalist_pts', 'quarterfinalist_pm', 'quarterfinalist_pts', 'r16_pm', 'r16_pts', 'r32_pm', 'r32_pts', 'r64_pm', 'r64_pts', 'r128_pm', 'r128_pts', 'entries')
 
 class PlayerSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
