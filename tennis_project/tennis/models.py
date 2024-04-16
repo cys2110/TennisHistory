@@ -7,6 +7,8 @@ class CategoryChoices(models.TextChoices):
     ATP500 = '500', 'ATP 500'
     ATP1000 = '1000', 'ATP Masters 1000'
     GS = 'GS', 'Grand Slam'
+    F = 'F', 'Finals'
+    T = 'T', 'Team'
 
 class CurrencyChoices(models.TextChoices):
     AUD = 'AUD', 'A$'
@@ -122,6 +124,8 @@ class Player(models.Model):
     hopman_years = ArrayField(models.IntegerField(null=True, blank=True), null=True, blank=True)
     gs_cup_round = models.CharField(max_length=3, choices=RoundChoices.choices, null=True, blank=True)
     gs_cup_years = ArrayField(models.IntegerField(null=True, blank=True), null=True, blank=True)
+    wct_round = models.CharField(max_length=3, choices=RoundChoices.choices, null=True, blank=True)
+    wct_years = ArrayField(models.IntegerField(null=True, blank=True), null=True, blank=True)
 
     def __str__(self):
         return self.full_name
@@ -178,6 +182,7 @@ class Entry(models.Model):
     wd = models.CharField(null=True, blank=True)
     ret = models.CharField(null=True, blank=True)
     wo = models.CharField(null=True, blank=True)
+    lda = models.IntegerField(null=True, blank=True)
     defaulted = models.CharField(null=True, blank=True)
     points = models.IntegerField(null=True, blank=True)
     pm = models.IntegerField(null=True, blank=True)

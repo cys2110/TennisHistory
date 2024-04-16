@@ -35,13 +35,13 @@ const router = createRouter({
       component: ResultsArchive
     },
     {
-      path: '/tournaments/:id',
+      path: '/tournaments/:name/:id',
       name: 'Tournament',
       props: true,
       component: Tournament
     },
     {
-      path: '/tournaments/:id/:year/:editionid',
+      path: '/tournaments/:name/:id/:editionId',
       component: EditionLayout,
       props: true,
       children: [
@@ -69,7 +69,7 @@ const router = createRouter({
       ]
     },
     {
-      path: '/players/:id',
+      path: '/players/:name/:id',
       component: PlayerLayout,
       props: true,
       children: [
@@ -101,23 +101,23 @@ const router = createRouter({
       ]
     },
     {
-      path: '/h2h/:player1Id/:player2Id',
+      path: '/h2h/:player1Name/:player1Id/:player2Name/:player2Id',
       name: 'H2H',
       component: H2H,
       props: true
     },
     {
-      path: 'login',
+      path: '/login',
       name: 'Login',
       component: Login
     },
     {
-      path: 'signup',
+      path: '/signup',
       name: 'Signup',
       component: Signup
     },
     {
-      path: 'users/:username',
+      path: '/users/:username',
       component: UserLayout,
       props: true,
       children: [

@@ -15,7 +15,6 @@ onMounted(() => {
     PlayerService.getPlayerById(props.id)
     .then(response => {
         player.value = response.data
-        console.log(player.value)
     })
     .catch(error => console.log(error))
 })

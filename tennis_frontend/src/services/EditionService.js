@@ -10,10 +10,16 @@ const apiClient = axios.create({
 })
 
 export default {
+    getEditionById(id) {
+        return apiClient.get('/edition-no/' + id)
+    },
     getUpcomingEditions() {
         return apiClient.get('upcoming')
     },
     getEditionsByYear(year) {
         return apiClient.get('year/' + year)
+    },
+    getEditionsByPlayer(player) {
+        return apiClient.get('player/' + player)
     }
 }

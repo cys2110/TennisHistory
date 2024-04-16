@@ -71,3 +71,30 @@ export function surface (surface) {
         return 'Hard'
     }
 }
+
+export function joinArray (array) {
+    return array.join(', ')
+}
+
+export function groupObjectsByKey(array, key) {
+    const groupedArrays = {};
+    
+    array.forEach(obj => {
+      const value = obj[key];
+      if (!groupedArrays[value]) {
+        groupedArrays[value] = [obj];
+      } else {
+        groupedArrays[value].push(obj);
+      }
+    });
+    
+    return groupedArrays;
+}
+
+export function tiebreak (matchScore, tiebreakScore) {
+    if (matchScore === 6) {
+        return tiebreakScore
+    } else {
+        return
+    }
+}

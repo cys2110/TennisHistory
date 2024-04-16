@@ -32,14 +32,15 @@ class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
         source = 'p1'
     )
 
+    p1_name = serializers.CharField(source='p1.full_name', read_only = True)
+    p1_country = serializers.CharField(source='p1.country', read_only = True)
+    p1_headshot = serializers.CharField(source='p1.headshot', read_only = True)
+    p1_seed = serializers.CharField(source='p1_no.seed', read_only = True)
+    p1_status = serializers.CharField(source='p1_no.status', read_only = True)
+
     p2_no = serializers.HyperlinkedRelatedField(
         view_name = 'entry-detail',
         read_only = True
-    )
-
-    p2_no_id = serializers.PrimaryKeyRelatedField(
-        queryset = Entry.objects.all(),
-        source = 'p2_no'
     )
 
     p2 = serializers.HyperlinkedRelatedField(
@@ -51,6 +52,17 @@ class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
         queryset = Player.objects.all(),
         source = 'p2'
     )
+
+    p2_no_id = serializers.PrimaryKeyRelatedField(
+        queryset = Entry.objects.all(),
+        source = 'p2_no'
+    )
+
+    p2_name = serializers.CharField(source='p2.full_name', read_only = True)
+    p2_country = serializers.CharField(source='p2.country', read_only = True)
+    p2_headshot = serializers.CharField(source='p2.headshot', read_only = True)
+    p2_seed = serializers.CharField(source='p2_no.seed', read_only = True)
+    p2_status = serializers.CharField(source='p2_no.status', read_only = True)
 
     winner_id = serializers.HyperlinkedRelatedField(
         view_name = 'player-detail',
@@ -64,7 +76,7 @@ class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = MatchScore
-        fields = ('id', 'edition', 'edition_id', 'round', 'match_no', 'p1_no', 'p1_no_id', 'p1', 'p1_id', 'p2_no', 'p2_no_id', 'p2', 'p2_id', 'winner_id', 'winner_id_id', 'duration_mins', 'incomplete', 'umpire', 'date', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p1' )
+        fields = ('id', 'edition', 'edition_id', 'round', 'match_no', 'p1_no', 'p1_no_id', 'p1', 'p1_id', 'p1_name', 'p1_headshot', 'p1_country', 'p1_seed', 'p1_status', 'p2_no', 'p2_no_id', 'p2', 'p2_id', 'p2_name', 'p2_country', 'p2_headshot', 'p2_seed', 'p2_status', 'winner_id', 'winner_id_id', 'duration_mins', 'incomplete', 'umpire', 'date', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p1' )
 
 class EntrySerializer(serializers.HyperlinkedModelSerializer):
     matches = MatchScoreSerializer(
@@ -92,9 +104,13 @@ class EntrySerializer(serializers.HyperlinkedModelSerializer):
         source = 'player'
     )
 
+    player_name = serializers.CharField(source='player.full_name', read_only = True)
+    player_country = serializers.CharField(source='player.country', read_only = True)
+    player_headshot = serializers.CharField(source='player.headshot', read_only = True)
+
     class Meta:
         model = Entry
-        fields = ('id', 'entry_no', 'edition', 'edition_id', 'player', 'player_id', 'rank', 'seed', 'status', 'wd', 'ret', 'wo', 'defaulted', 'points', 'pm', 'matches')
+        fields = ('id', 'entry_no', 'edition', 'edition_id', 'player', 'player_id', 'player_name', 'player_country', 'player_headshot', 'rank', 'seed', 'status', 'wd', 'ret', 'wo', 'defaulted', 'lda', 'points', 'pm', 'matches')
 
 class EditionSerializer(serializers.HyperlinkedModelSerializer):
     entries = EntrySerializer(
