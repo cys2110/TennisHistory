@@ -1,11 +1,8 @@
 <script setup>
 import BaseInput from '@/components/BaseForm/BaseInput.vue';
 import SignupService from '@/services/SignupService';
-import { useLogin, useUserStore } from '@/stores/user';
 import { ref } from 'vue';
-
-const store = useUserStore()
-const loginStore = useLogin()
+import { RouterLink } from 'vue-router';
 
 const initialForm = {
     username: '',
@@ -17,8 +14,9 @@ const loginForm = ref(initialForm)
 const submitForm = () => {
     SignupService.login(loginForm.value)
     .then(response => {
-        store.setTokens(response.data.access, response.data.refresh)
-        loginStore.setLoggedIn()
+        localStorage.setItem('accessToken', response.data.access)
+        localStorage.setItem('refreshToken', response.data.refresh)
+        localStorage.setItem('loggedIn', true)
         loginForm.value = initialForm
     })
     .catch(error => console.log(error))
@@ -30,5 +28,6 @@ const submitForm = () => {
         <BaseInput type="text" placeholder="Username" v-model="loginForm.username" />
         <BaseInput type="text" placeholder="Password" v-model="loginForm.password" />
         <button type="submit">Submit</button>
+        <RouterLink :to="{name: 'Profile', params: {username: 'test', id: 10}}">Profile</RouterLink>
     </form>
 </template>

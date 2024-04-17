@@ -2,7 +2,6 @@
 import SignupService from '@/services/SignupService';
 import BaseInput from '@/components/BaseForm/BaseInput.vue';
 import { ref } from 'vue';
-import { useUserStore, useLogin } from '@/stores/user';
 
 const initialForm = {
     username: '',
@@ -13,8 +12,6 @@ const initialForm = {
 }
 
 const submitForm = ref(initialForm)
-const tokenStore = useUserStore()
-const loggedInStore = useLogin()
 const emptyFields = ref(null)
 const matchingPw = ref(null)
 const validPw = ref(null)
@@ -48,8 +45,9 @@ const handleSubmit = () => {
     if (emptyFields !== false && matchingPw && validPw) {
         SignupService.signup(submitForm.value)
         .then(response => {
-            tokenStore.setTokens(response.data.access, response.data.refresh)
-            loggedInStore.setLoggedIn()
+            localStorage.setItem('accessToken', response.data.access)
+            localStorage.setItem('refreshToken', response.data.refresh)
+            localStorage.setItem('loggedIn', true)
         })
         .catch(error => {
             if (error.response.data.username && error.response.data.username[0] === "A user with that username already exists.") {

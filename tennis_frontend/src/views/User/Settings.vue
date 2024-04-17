@@ -1,3 +1,83 @@
-<script setup></script>
+<script setup>
+import { ref } from 'vue';
+import InputWithLabel from '@/components/BaseForm/InputWithLabel.vue';
+import UserService from '@/services/UserService';
 
-<template></template>
+const props = defineProps(['user'])
+const editMode = ref(false)
+const editForm = ref({...props.user, password: ''})
+const confirmPw = ref(null)
+const validPw = ref(null)
+const matchedPw = ref(null)
+
+const testPw = () => {
+    const hasSpecialCharacter = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(editForm.value.password)
+    validPw.value = hasSpecialCharacter
+}
+
+const matchPw = () => {
+    if (editForm.value.password === confirmPw.value) {
+        matchedPw.value = true
+    } else {
+        matchedPw.value = false
+    }
+}
+
+const submitForm = () => {
+    if (editForm.value.password === '') {
+        delete editForm.value.password
+    }
+    if (validPw && matchedPw) {
+        UserService.edit(props.user.id, editForm.value)
+        .then(() => {
+            editMode.value = false
+            window.location.reload()
+        })
+        .catch(error => console.log(error))
+    }
+}
+
+const deleteAccount = () => {
+    UserService.delete(props.user.id)
+    .then(() => {
+        console.log('user deleted')
+    })
+    .catch(error => console.log(error))
+}
+</script>
+
+<template>
+    <div class="view-account">
+        <button v-if="!editMode" @click="editMode = true">Edit account</button>
+        <button v-if="editMode" @click="submitForm">Save changes</button>
+        <button v-if="editMode" @click="editMode = false">Cancel</button>
+        <button @click="deleteAccount">Delete account</button>
+
+        <div class="view" v-if="!editMode">
+            <dl>
+                <dt>Username</dt>
+                <dd>{{ user.username }}</dd>
+                
+                <dt>Name</dt>
+                <dd>{{ user.first_name }} {{ user.last_name }}</dd>
+
+                <dt>Email</dt>
+                <dd>{{ user.email }}</dd>
+
+                <dt>Password</dt>
+                <dd><input type="password" readonly :value="user.password" /></dd>
+            </dl>
+        </div>
+        <div class="edit" v-else>
+            <form>
+                <InputWithLabel type="text" label="First Name" v-model="editForm.first_name" />
+                <InputWithLabel type="text" label="Last Name" v-model="editForm.last_name" />
+                <InputWithLabel type="email" label="Email" v-model="editForm.email" />
+                <InputWithLabel type="password" label="Password" v-model="editForm.password" @blur="testPw, matchPw" />
+                <InputWithLabel type="password" label="Confirm Password" v-model="confirmPw" @blur="matchPw" />
+            </form>
+            <div v-if="matchedPw === false">Passwords must match.</div>
+            <div v-if="validPw === false">Password must have at least one number and one special character.</div>
+        </div>
+    </div>
+</template>

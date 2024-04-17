@@ -117,7 +117,7 @@ const router = createRouter({
       component: Signup
     },
     {
-      path: '/users/:username',
+      path: '/users/:id/:username',
       component: UserLayout,
       props: true,
       children: [
@@ -132,7 +132,7 @@ const router = createRouter({
           component: Settings
         },
         {
-          path: 'predictions/:id',
+          path: 'predictions/:edition',
           name: 'Prediction',
           component: Prediction,
           props: true

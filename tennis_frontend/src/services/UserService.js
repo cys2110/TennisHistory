@@ -1,11 +1,8 @@
 import axios from 'axios';
-import { useUserStore } from '@/stores/user';
-import { ref } from 'vue';
-
-const store = useUserStore()
+import { useRouter } from 'vue-router';
 
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8000/users/',
+    baseURL: 'http://localhost:8000/',
     withCredentials: false,
     headers: {
         Accept: 'application/json',
@@ -13,8 +10,46 @@ const apiClient = axios.create({
     }
 })
 
+apiClient.interceptors.request.use(
+    async config => {
+        const accessToken = localStorage.getItem('accessToken')
+        const refreshToken = localStorage.getItem('refreshToken')
+
+        if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`
+            return config
+        }
+
+        if (refreshToken) {
+            try {
+                const response = await axios.post('api/token/refresh/', {refreshToken})
+                const newAccessToken = response.data.access
+                localStorage.setItem('accessToken', newAccessToken)
+                config.headers.Authorization = `Bearer ${newAccessToken}`
+            } catch (error) {
+                console.error(error)
+                const router = useRouter()
+                router.push({name: 'Login'})
+            }
+        }
+
+        console.error('No access token or refresh token available')
+    },
+    error => {
+        const router = useRouter()
+        router.push({name: 'Login'})
+        return Promise.reject(error)
+    }
+)
+
 export default {
-    login(user) {
-        return apiClient.post('' + id)
+    login(id) {
+        return apiClient.get('users/' + id + '/')
+    },
+    edit(id, user) {
+        return apiClient.patch('users/' + id + '/', user)
+    },
+    delete(id) {
+        return apiClient.delete('users/' + id + '/')
     }
 }

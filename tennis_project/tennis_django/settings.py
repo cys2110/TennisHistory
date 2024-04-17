@@ -77,7 +77,8 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOW_HEADERS = [
-    'Content-Type',  # Allow the 'Content-Type' header
+    'Content-Type',
+    'Authorization'
 ]
 
 MIDDLEWARE = [

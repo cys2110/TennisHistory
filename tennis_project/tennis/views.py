@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.contrib.auth.hashers import make_password
 from .serializers import TournamentSerializer, PlayerSerializer, EditionSerializer, EntrySerializer, MatchScoreSerializer, PredictionSerializer, UserSerializer
 from .models import Tournament, Player, Edition, Entry, MatchScore, Prediction
 from django.contrib.auth.models import User
@@ -127,21 +128,12 @@ class UserList(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data.get('username')
-        password = serializer.validated_data.get('password')
-        email = serializer.validated_data.get('email')
-        first_name = serializer.validated_data.get('first_name')
-        last_name = serializer.validated_data.get('last_name')
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name
-        )
+        user = serializer.save()
 
+        # Generate refresh and access tokens
         refresh = RefreshToken.for_user(user)
 
+        # Construct response data
         response_data = {
             'user': serializer.data,
             'refresh': str(refresh),
