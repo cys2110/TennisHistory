@@ -1,10 +1,11 @@
 <script setup>
 import BaseInput from '@/components/BaseForm/BaseInput.vue';
-import UserService from '@/services/UserService';
-import { useUserStore } from '@/stores/user';
+import SignupService from '@/services/SignupService';
+import { useLogin, useUserStore } from '@/stores/user';
 import { ref } from 'vue';
 
 const store = useUserStore()
+const loginStore = useLogin()
 
 const initialForm = {
     username: '',
@@ -14,11 +15,11 @@ const initialForm = {
 const loginForm = ref(initialForm)
 
 const submitForm = () => {
-    UserService.login(loginForm.value)
+    SignupService.login(loginForm.value)
     .then(response => {
-        store.setTokens(response.data)
+        store.setTokens(response.data.access, response.data.refresh)
+        loginStore.setLoggedIn()
         loginForm.value = initialForm
-        console.log(store.tokens)
     })
     .catch(error => console.log(error))
 }

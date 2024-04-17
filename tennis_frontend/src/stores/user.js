@@ -2,9 +2,19 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue'
 
 export const useUserStore = defineStore('user', () => {
-    const tokens = ref(null)
-    function setTokens(value) {
-        tokens.value = value
+    const accessToken = ref(null)
+    const refreshToken = ref(null)
+    function setTokens(access, refresh) {
+        accessToken.value = access
+        refreshToken.value = refresh
     }
-    return { tokens, setTokens }
+    return { accessToken, refreshToken, setTokens }
+})
+
+export const useLogin = defineStore('loggedIn', () => {
+    const loggedIn = ref(false)
+    function setLoggedIn(value) {
+        loggedIn.value = !loggedIn.value
+    }
+    return { loggedIn, setLoggedIn }
 })

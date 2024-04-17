@@ -231,3 +231,33 @@ class MatchScore(models.Model):
         indexes = [
             models.Index(fields=['edition', 'p1_no', 'p1', 'p2_no', 'p2'])
         ]
+
+class Prediction(models.Model):
+    user = models.ForeignKey('auth.User', related_name='user_predictions', on_delete=models.CASCADE)
+    match = models.ForeignKey(MatchScore, on_delete=models.CASCADE, related_name='match_predictions')
+    p1 = models.ForeignKey(Player, on_delete=models.SET_NULL, related_name='p1_predictions', null=True, blank=True)
+    p2 = models.ForeignKey(Player, on_delete=models.SET_NULL, related_name='p2_predictions', null=True, blank=True)
+    winner = models.ForeignKey(Player, on_delete=models.SET_NULL, related_name='winner_predictions', null=True, blank=True)
+    s1p1 = models.IntegerField(null=True, blank=True)
+    s1p2 = models.IntegerField(null=True, blank=True)
+    t1p1 = models.IntegerField(null=True, blank=True)
+    t1p2 = models.IntegerField(null=True, blank=True)
+    s2p1 = models.IntegerField(null=True, blank=True)
+    s2p2 = models.IntegerField(null=True, blank=True)
+    t2p1 = models.IntegerField(null=True, blank=True)
+    t2p2 = models.IntegerField(null=True, blank=True)
+    s3p1 = models.IntegerField(null=True, blank=True)
+    s3p2 = models.IntegerField(null=True, blank=True)
+    t3p1 = models.IntegerField(null=True, blank=True)
+    t3p2 = models.IntegerField(null=True, blank=True)
+    s4p1 = models.IntegerField(null=True, blank=True)
+    s4p2 = models.IntegerField(null=True, blank=True)
+    t4p1 = models.IntegerField(null=True, blank=True)
+    t4p2 = models.IntegerField(null=True, blank=True)
+    s5p1 = models.IntegerField(null=True, blank=True)
+    s5p2 = models.IntegerField(null=True, blank=True)
+    t5p1 = models.IntegerField(null=True, blank=True)
+    t5p2 = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user} {self.edition}"

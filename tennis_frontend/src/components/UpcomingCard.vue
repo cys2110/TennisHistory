@@ -14,7 +14,7 @@ const startDate = new Date(props.edition.start_date)
         <div class="card-column" v-if="edition.category"><img :src="categorySrc(edition.category)" class="filter" alt="edition.category" /></div>
         <div class="card-column">
             <div class="wide-card-heading" v-if="edition.sponsor_name">{{ edition.sponsor_name }}</div>
-            <div class="wide-card-heading"><RouterLink :to="{name: 'Tournament', params: {id: edition.tournament_id }}" class="hover-link">{{ edition.tournament_name }}</RouterLink></div>
+            <div class="wide-card-heading"><RouterLink :to="{name: 'Tournament', params: {name: edition.tournament_name, id: edition.tournament_id }}" class="hover-link">{{ edition.tournament_name }}</RouterLink></div>
             <div class="wide-card-subheading">{{ edition.city }} | {{ formattedDates(edition.start_date, edition.end_date) }}</div>
         </div>
         <div class="right card-column">

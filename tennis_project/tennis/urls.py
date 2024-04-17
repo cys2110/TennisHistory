@@ -20,5 +20,9 @@ urlpatterns = [
     path('entries/edition/<int:edition>', views.EntryByEdition.as_view(), name='entry-by-edition'),
     path('match-scores/', views.MatchScoreList.as_view(), name='matchscore_list'),
     path('match-score/<int:pk>', views.MatchScoreDetail.as_view(), name='match-score-detail'),
-    path('match-scores/edition/<int:edition>', views.MatchByEdition.as_view(), name='matches-by-edition')
+    path('match-scores/edition/<int:edition>', views.MatchByEdition.as_view(), name='matches-by-edition'),
+    path('users/', views.UserList.as_view(), name='user_list'),
+    path('users/<int:pk>/', views.UserDetail.as_view(), name='user_detail'),
+    path('predictions/update/<int:pk>', views.PredictionsUpdate.as_view(), name='prediction-update'),
+    path('predictions/<int:user>/<int:edition>', views.PredictionsByUserAndEdition.as_view(), name='predictions-list')
 ]

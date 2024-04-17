@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Tournament, Player, Edition, Entry, MatchScore
+from .models import Tournament, Player, Edition, Entry, MatchScore, Prediction
+from django.contrib.auth.models import User
 
 class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
     edition_id = serializers.PrimaryKeyRelatedField(
@@ -178,3 +179,48 @@ class TournamentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Tournament
         fields = ('id', 'name', 'start_year', 'end_year', 'website', 'editions')
+
+class PredictionSerializer(serializers.HyperlinkedModelSerializer):
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset = User.objects.all(),
+        source = 'user'
+    )
+
+    edition = serializers.IntegerField(source='match.edition', read_only = True)
+    round = serializers.IntegerField(source='match.round', read_only = True)
+    match_no = serializers.IntegerField(source='match.match_no', read_only = True)
+
+    p1_id = serializers.PrimaryKeyRelatedField(
+        queryset = Player.objects.all(),
+        source = 'p1'
+    )
+    p1_name = serializers.CharField(source='p1.full_name', read_only = True)
+    p1_country = serializers.CharField(source='p1.country', read_only = True)
+    p1_headshot = serializers.CharField(source='p1.headshot', read_only = True)
+
+    p2_id = serializers.PrimaryKeyRelatedField(
+        queryset = Player.objects.all(),
+        source = 'p2'
+    )
+    p2_name = serializers.CharField(source='p2.full_name', read_only = True)
+    p2_country = serializers.CharField(source='p2.country', read_only = True)
+    p2_headshot = serializers.CharField(source='p2.headshot', read_only = True)
+
+    winner_id = serializers.PrimaryKeyRelatedField(
+        queryset = Player.objects.all(),
+        source = 'winner'
+    )
+
+    class Meta:
+        model = Prediction
+        fields = ('id', 'user_id', 'edition', 'round', 'match_no', 'p1_id', 'p1_name', 'p1_country', 'p1_headshot', 'p2_id', 'p2_name', 'p2_country', 'p2_headshot', 'winner_id', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p2' )
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    predictions = PredictionSerializer(
+        many = True,
+        read_only = True
+    )
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'password', 'email', 'first_name', 'last_name', 'predictions')
