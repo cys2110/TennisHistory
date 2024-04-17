@@ -52,7 +52,7 @@ class UpcomingEditionList(generics.ListAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        return Edition.objects.filter(start_date__gte = timezone.now())
+        return Edition.objects.filter(end_date__gte = timezone.now())
 
 class EditionsByYear(generics.ListAPIView):
     serializer_class = EditionSerializer

@@ -34,8 +34,10 @@ watch(searchYear, () => {
     if (searchYear.value !== '') {
         EditionService.getEditionsByYear(searchYear.value)
         .then(response => {
-            results.value = response.data
-            console.log(results.value)
+            const sorted = response.data.toSorted((a, b) => {
+                return a.start_date.localeCompare(b.start_date)
+            })
+            results.value = sorted
         })
         .catch(error => console.log(error))
     }
@@ -50,9 +52,9 @@ watch(searchYear, () => {
             <div class="dropdown">
                 <div class="dropdown-search">
                     <button>
-                        <span><BaseInput type="text" placeholder="Year" v-model="searchYear" @input="dropdownVisible = true" /></span>
-                        <span v-if="dropdownVisible"><FontAwesomeIcon :icon="faChevronUp" @click.stop="toggleDropdown" /></span>
-                        <span v-else><FontAwesomeIcon :icon="faChevronDown" @click.stop="toggleDropdown" /></span>
+                        <span class="dropdown-input-container"><input class="dropdown-input" type="text" placeholder="Year" v-model="searchYear" @input="dropdownVisible = true" /></span>
+                        <span v-if="dropdownVisible" class="dropdown-icon-container"><FontAwesomeIcon class="dropdown-icon" :icon="faChevronUp" @click.stop="toggleDropdown" /></span>
+                        <span v-else class="dropdown-icon-container"><FontAwesomeIcon class="dropdown-icon" :icon="faChevronDown" @click.stop="toggleDropdown" /></span>
                     </button>
                 </div>
                 <div class="dropdown-menu" v-show="dropdownVisible">
@@ -66,3 +68,63 @@ watch(searchYear, () => {
         <div class="results-wrapper" v-else>No data available yet</div>
     </main>
 </template>
+
+<style scoped>
+.view-heading {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+button {
+    max-width: fit-content;
+    border-radius: 15px;
+    border: 1px solid var(--blue-border);
+    background-color: transparent;
+    height: 2rem;
+}
+
+.dropdown {
+    max-width: fit-content;
+    position: relative
+}
+
+.dropdown-input {
+    border: none;
+    outline: none;
+    background-color: transparent;
+    width: 75px;
+    color: var(--color-text);
+    padding: 5px
+}
+
+.dropdown-icon {
+    color: var(--color-text);
+    cursor: pointer;
+    padding-right: 5px
+}
+
+.dropdown-menu-item {
+    list-style: none;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--blue-border);
+    border-radius: 10px;
+    margin-top: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    z-index: 999;
+    position: absolute;
+    width: 100%;
+    background: var(--color-background);
+}
+
+.dropdown-menu::-webkit-scrollbar {
+    display: none;
+}
+</style>

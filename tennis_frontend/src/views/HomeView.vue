@@ -20,6 +20,6 @@ onMounted(() => {
         <div class="results-wrapper" v-if="upcoming.length > 0">
             <UpcomingCard v-for="edition in upcoming" :edition="edition" :key="edition.id" />
         </div>
-        <div class="results-wrapper" v-else>There are no upcoming tournaments</div>
+        <div class="loading results-wrapper" v-else>Loading...</div>
     </main>
 </template>

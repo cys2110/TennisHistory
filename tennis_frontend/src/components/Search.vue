@@ -17,9 +17,7 @@ const submitSearch = () => {
     .then(response => {
         submittedSearch.value = true
         tournamentResults.value = response.data.tournaments
-        console.log(tournamentResults.value)
         playerResults.value = response.data.players
-        console.log(playerResults.value)
     })
     .catch(error => console.log(error))
 }

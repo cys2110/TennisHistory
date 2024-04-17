@@ -72,6 +72,30 @@ export function surface (surface) {
     }
 }
 
+export function hardType (type) {
+    if (type === 'L') {
+        return 'Laykold'
+    } else if (type === 'PC') {
+        return 'Plexicushion'
+    } else if (type === 'PP') {
+        return 'Plexipave'
+    } else if (type === 'A') {
+        return 'Acrylic on wood'
+    } else if (type === 'G') {
+        return 'Greenset'
+    } else if (type === 'RA') {
+        return 'Rebound ace'
+    } else if (type === 'O') {
+        return 'Opticourt'
+    } else if (type === 'R') {
+        return 'Rukort'
+    } else if (type === 'DT') {
+        return 'Decoturf'
+    } else if (type === 'SM') {
+        return 'SportMaster'
+    }
+}
+
 export function joinArray (array) {
     return array.join(', ')
 }
