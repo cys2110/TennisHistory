@@ -11,9 +11,15 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
 
 # Quick-start development settings - unsuitable for production
@@ -47,6 +53,7 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
          'rest_framework.permissions.AllowAny',
+         'rest_framework_simplejwt.authentication.JWTAuthentication',
 ]
 }
 
@@ -106,8 +113,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'tennis',
-        'PASSWORD': 'tennispw',
-        'HOST': 'tennisdatabase.cb0omuw0wo0s.us-east-2.rds.amazonaws.com',
+        'PASSWORD': os.environ.get('DATABASE_PW'),
+        'HOST': os.environ.get('DATABASE_URL'),
         'PORT': '5432',
     }
 }

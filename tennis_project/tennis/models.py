@@ -226,3 +226,8 @@ class MatchScore(models.Model):
 
     def __str__(self):
         return f"{self.edition} {self.round} {self.match_no}"
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['edition', 'p1_no', 'p1', 'p2_no', 'p2'])
+        ]

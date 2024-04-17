@@ -2,29 +2,14 @@ from rest_framework import serializers
 from .models import Tournament, Player, Edition, Entry, MatchScore
 
 class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
-    edition = serializers.HyperlinkedRelatedField(
-        view_name = 'edition-detail',
-        read_only = True
-    )
-
     edition_id = serializers.PrimaryKeyRelatedField(
         queryset = Edition.objects.all(),
         source = 'edition'
     )
 
-    p1_no = serializers.HyperlinkedRelatedField(
-        view_name = 'entry-detail',
-        read_only = True
-    )
-
     p1_no_id = serializers.PrimaryKeyRelatedField(
         queryset = Entry.objects.all(),
         source = 'p1_no'
-    )
-
-    p1 = serializers.HyperlinkedRelatedField(
-        view_name = 'player-detail',
-        read_only = True
     )
 
     p1_id = serializers.PrimaryKeyRelatedField(
@@ -37,16 +22,6 @@ class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
     p1_headshot = serializers.CharField(source='p1.headshot', read_only = True)
     p1_seed = serializers.CharField(source='p1_no.seed', read_only = True)
     p1_status = serializers.CharField(source='p1_no.status', read_only = True)
-
-    p2_no = serializers.HyperlinkedRelatedField(
-        view_name = 'entry-detail',
-        read_only = True
-    )
-
-    p2 = serializers.HyperlinkedRelatedField(
-        view_name = 'player-detail',
-        read_only = True
-    )
 
     p2_id = serializers.PrimaryKeyRelatedField(
         queryset = Player.objects.all(),
@@ -64,11 +39,6 @@ class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
     p2_seed = serializers.CharField(source='p2_no.seed', read_only = True)
     p2_status = serializers.CharField(source='p2_no.status', read_only = True)
 
-    winner_id = serializers.HyperlinkedRelatedField(
-        view_name = 'player-detail',
-        read_only = True
-    )
-
     winner_id_id = serializers.PrimaryKeyRelatedField(
         queryset = Player.objects.all(),
         source = 'winner_id'
@@ -76,7 +46,41 @@ class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = MatchScore
-        fields = ('id', 'edition', 'edition_id', 'round', 'match_no', 'p1_no', 'p1_no_id', 'p1', 'p1_id', 'p1_name', 'p1_headshot', 'p1_country', 'p1_seed', 'p1_status', 'p2_no', 'p2_no_id', 'p2', 'p2_id', 'p2_name', 'p2_country', 'p2_headshot', 'p2_seed', 'p2_status', 'winner_id', 'winner_id_id', 'duration_mins', 'incomplete', 'umpire', 'date', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p1' )
+        fields = ('id', 'edition', 'edition_id', 'round', 'match_no', 'p1_no_id', 'p1_id', 'p1_name', 'p1_headshot', 'p1_country', 'p1_seed', 'p1_status', 'p2_no_id', 'p2_id', 'p2_name', 'p2_country', 'p2_headshot', 'p2_seed', 'p2_status', 'winner_id_id', 'duration_mins', 'incomplete', 'umpire', 'date', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p1' )
+
+    def get_p1_data(self, obj):
+        if obj.p1:
+            p1_data = {
+                'id': obj.p1_id,
+                'name': obj.p1.full_name,
+                'country': obj.p1.country,
+                'headshot': obj.p1.headshot,
+                'seed': obj.p1_no.seed if obj.p1_no else None,
+                'status': obj.p1_no.status if obj.p1_no else None,
+            }
+            return p1_data
+        else:
+            return None
+
+    def get_p2_data(self, obj):
+        if obj.p2:
+            p2_data = {
+                'id': obj.p2_id,
+                'name': obj.p2.full_name,
+                'country': obj.p2.country,
+                'headshot': obj.p2.headshot,
+                'seed': obj.p2_no.seed if obj.p2_no else None,
+                'status': obj.p2_no.status if obj.p2_no else None,
+            }
+            return p2_data
+        else:
+            return None
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['p1_data'] = self.get_p1_data(instance)
+        representation['p2_data'] = self.get_p2_data(instance)
+        return representation
 
 class EntrySerializer(serializers.HyperlinkedModelSerializer):
     matches = MatchScoreSerializer(

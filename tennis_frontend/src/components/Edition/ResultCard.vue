@@ -8,6 +8,8 @@ const props = defineProps(['match'])
 const winner = ref(null)
 const loser = ref(null)
 
+console.log(props.match)
+
 if (props.match.winner_id_id === props.match.p1_id) { 
     winner.value = 'p1'
     loser.value = 'p2'
@@ -15,8 +17,6 @@ if (props.match.winner_id_id === props.match.p1_id) {
     winner.value = 'p2'
     loser.value = 'p1'
 }
-
-console.log(props.match)
 
 const hour = Math.floor(props.match.duration_mins / 60)
 const minutes = props.match.duration_mins % 60
