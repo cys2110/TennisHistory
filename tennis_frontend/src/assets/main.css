@@ -189,3 +189,10 @@ background-size: 100% 0.1em;
   transform: translateX(-1px) translateY(-1px);
   box-shadow: 1.5px 1.5px 0px 0px var(--color-border);
 }
+
+.card-component {
+  display: flex;
+  flex-direction: row;
+  padding: 0.25rem;
+  align-items: center;
+}

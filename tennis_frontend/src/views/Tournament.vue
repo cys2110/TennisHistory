@@ -37,4 +37,16 @@ onMounted(() => {
             <TournamentCard v-for="edition in tournament.editions" :edition="edition" :key="edition.id" />
         </div>
     </main>
+    <div v-else class="loading">Loading</div>
 </template>
+
+<style scoped>
+.view-heading, .viewcards {
+    display: flex;
+    flex-direction: row
+}
+
+h1 {
+    margin-right: 0.5rem;
+}
+</style>
