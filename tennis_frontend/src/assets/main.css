@@ -1,35 +1,23 @@
 @import './base.css';
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
-}
-
-a,
-.green {
+a {
+  color: var(--blue-link);
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+.hover-link {
+  color: var(--blue-link);
+  text-decoration: none;
+  background-image: linear-gradient(var(--blue-link), var(--blue-link));
+  background-size: 0% 0.1em;
+  background-position-y: 105%;
+  background-position-x: 50%;
+  background-repeat: no-repeat;
+  transition: background-size 0.4s ease-in-out;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+.hover-link:hover,
+.hover-link:focus,
+.hover-link:active {
+background-size: 100% 0.1em;
 }

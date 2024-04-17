@@ -17,4 +17,15 @@ import Footer from './components/Footer.vue';
 </template>
 
 <style scoped>
+.header {
+  position: fixed;
+  top: 0;
+  padding: 2rem;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: var(--header-background);
+  z-index: 400;
+}
 </style>

@@ -51,5 +51,8 @@ export default {
     },
     delete(id) {
         return apiClient.delete('users/' + id + '/')
+    },
+    username(username) {
+        return apiClient.get('user/username/' + username + '/')
     }
 }

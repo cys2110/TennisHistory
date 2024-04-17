@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from django.contrib.auth.hashers import make_password
-from .serializers import TournamentSerializer, PlayerSerializer, EditionSerializer, EntrySerializer, MatchScoreSerializer, PredictionSerializer, UserSerializer
-from .models import Tournament, Player, Edition, Entry, MatchScore, Prediction
+from rest_framework import filters
+from .serializers import TournamentSerializer, PlayerSerializer, EditionSerializer, EntrySerializer, MatchScoreSerializer, UserSerializer, LikedEditionSerializer, LikedPlayerSerializer, LikedTournamentSerializer
+from .models import Tournament, Player, Edition, Entry, MatchScore, LikedEditions, LikedPlayer, LikedTournaments
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models import Q
@@ -106,20 +106,6 @@ class MatchByEdition(generics.ListAPIView):
         edition = self.kwargs['edition']
         return MatchScore.objects.filter(edition_id = edition)
 
-class PredictionsByUserAndEdition(generics.ListCreateAPIView):
-    serializer_class = PredictionSerializer
-    permission_classes = [AllowAny]
-
-    def get_queryset(self):
-        user = self.kwargs['user']
-        edition = self.kwargs['edition']
-        return Prediction.objects.filter(Q(user = user) & Q(edition = edition))
-
-class PredictionsUpdate(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Prediction.objects.all()
-    serializer_class = PredictionSerializer
-    permission_classes = [AllowAny]
-
 class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -130,10 +116,8 @@ class UserList(generics.ListCreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        # Generate refresh and access tokens
         refresh = RefreshToken.for_user(user)
 
-        # Construct response data
         response_data = {
             'user': serializer.data,
             'refresh': str(refresh),
@@ -145,6 +129,81 @@ class UserList(generics.ListCreateAPIView):
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+class UserByUsername(generics.ListAPIView):
+    serializer_class = UserSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        return User.objects.filter(username = username)
+
+class LikedPlayerList(generics.ListCreateAPIView):
+    serializer_class = LikedPlayerSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return LikedPlayer.objects.filter(user=user)
+
+class LikedPlayerDetail(generics.DestroyAPIView):
+    queryset = LikedPlayer.objects.all()
+    serializer_class = LikedPlayerSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+class LikedTournamentList(generics.ListCreateAPIView):
+    serializer_class = LikedTournamentSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return LikedTournaments.objects.filter(user=user)
+
+class LikedTournamentDetail(generics.DestroyAPIView):
+    queryset = LikedTournaments.objects.all()
+    serializer_class = LikedTournamentSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+class LikedEditionsList(generics.ListCreateAPIView):
+    serializer_class = LikedEditionSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return LikedEditions.objects.filter(user=user)
+
+class LikedEditionDetail(generics.DestroyAPIView):
+    queryset = LikedEditions.objects.all()
+    serializer_class = LikedEditionSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+class SearchView(generics.ListAPIView):
+    serializer_class = None
+    queryset = None
+
+    def get_queryset(self):
+        search = self.kwargs['search']
+        queryset = {
+            'players': Player.objects.filter(full_name__icontains = search),
+            'tournaments': Tournament.objects.filter(name__icontains = search)
+        }
+        return queryset
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        player_serializer = PlayerSerializer(queryset['players'], many=True, context={'request': request})
+        tournament_serializer = TournamentSerializer(queryset['tournaments'], many=True, context={'request': request})
+        serialized_data = {
+            'players': player_serializer.data,
+            'tournaments': tournament_serializer.data
+        }
+        return Response(serialized_data)

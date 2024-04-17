@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Tournament, Player, Edition, Entry, MatchScore, Prediction
+from .models import Tournament, Player, Edition, Entry, MatchScore, LikedPlayer, LikedEditions, LikedTournaments
 from django.contrib.auth.models import User
 
 class MatchScoreSerializer(serializers.HyperlinkedModelSerializer):
@@ -180,69 +180,83 @@ class TournamentSerializer(serializers.HyperlinkedModelSerializer):
         model = Tournament
         fields = ('id', 'name', 'start_year', 'end_year', 'website', 'editions')
 
-class PredictionSerializer(serializers.HyperlinkedModelSerializer):
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset = User.objects.all(),
-        source = 'user'
-    )
-
-    edition = serializers.IntegerField(source='match.edition', read_only = True)
-    round = serializers.IntegerField(source='match.round', read_only = True)
-    match_no = serializers.IntegerField(source='match.match_no', read_only = True)
-
-    p1_id = serializers.PrimaryKeyRelatedField(
-        queryset = Player.objects.all(),
-        source = 'p1'
-    )
-    p1_name = serializers.CharField(source='p1.full_name', read_only = True)
-    p1_country = serializers.CharField(source='p1.country', read_only = True)
-    p1_headshot = serializers.CharField(source='p1.headshot', read_only = True)
-
-    p2_id = serializers.PrimaryKeyRelatedField(
-        queryset = Player.objects.all(),
-        source = 'p2'
-    )
-    p2_name = serializers.CharField(source='p2.full_name', read_only = True)
-    p2_country = serializers.CharField(source='p2.country', read_only = True)
-    p2_headshot = serializers.CharField(source='p2.headshot', read_only = True)
-
-    winner_id = serializers.PrimaryKeyRelatedField(
-        queryset = Player.objects.all(),
-        source = 'winner'
-    )
-
-    class Meta:
-        model = Prediction
-        fields = ('id', 'user_id', 'edition', 'round', 'match_no', 'p1_id', 'p1_name', 'p1_country', 'p1_headshot', 'p2_id', 'p2_name', 'p2_country', 'p2_headshot', 'winner_id', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p2' )
-
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    predictions = PredictionSerializer(
-        many = True,
-        read_only = True
-    )
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'password', 'email', 'first_name', 'last_name', 'predictions')
+        fields = ('id', 'username', 'password', 'email', 'first_name', 'last_name')
     
     def create(self, validated_data):
-        # Extract password from validated data
         password = validated_data.pop('password', None)
-        # Create user instance
         user = User.objects.create(**validated_data)
-        # Set password for the user
         if password:
             user.set_password(password)
             user.save()
         return user
 
     def update(self, instance, validated_data):
-        # Extract password from validated data
         password = validated_data.pop('password', None)
-        # Update user instance
         user = super().update(instance, validated_data)
-        # Set password for the user
         if password:
             user.set_password(password)
             user.save()
         return user
+
+class LikedPlayerSerializer(serializers.HyperlinkedModelSerializer):
+    player_id = serializers.PrimaryKeyRelatedField(
+        queryset = Player.objects.all(),
+        source = 'player'
+    )
+
+    player_name = serializers.CharField(source = 'player.full_name', read_only = True)
+    player_country = serializers.CharField(source='player.country', read_only = True)
+    player_headshot = serializers.CharField(source='player.headshot', read_only = True)
+
+    user_id = serializers.PrimaryKeyRelatedField (
+        queryset = User.objects.all(),
+        source = 'user'
+    )
+
+    class Meta:
+        model = LikedPlayer
+        fields = ('id', 'user_id', 'player_id', 'player_name', 'player_country', 'player_headshot', 'liked_at')
+
+class LikedTournamentSerializer(serializers.HyperlinkedModelSerializer):
+    tournament_id = serializers.PrimaryKeyRelatedField(
+        queryset = Tournament.objects.all(),
+        source = 'tournament'
+    )
+
+    tournament_name = serializers.CharField(source = 'tournament.name', read_only = True)
+    tournament_end = serializers.IntegerField(source = 'tournament.end_year', read_only = True)
+
+    user_id = serializers.PrimaryKeyRelatedField (
+        queryset = User.objects.all(),
+        source = 'user'
+    )
+
+    class Meta:
+        model = LikedTournaments
+        fields = ('id', 'user_id', 'tournament_id', 'tournament_name', 'tournament_end', 'liked_at')
+
+class LikedEditionSerializer(serializers.HyperlinkedModelSerializer):
+    edition_id = serializers.PrimaryKeyRelatedField(
+        queryset = Edition.objects.all(),
+        source = 'edition'
+    )
+
+    tournament_name = serializers.CharField(source = 'edition.tournament_name', read_only = True)
+    edition_name = serializers.CharField(source='edition.sponsor_name', read_only = True)
+    edition_city = serializers.CharField(source='edition.city', read_only = True)
+    edition_country = serializers.CharField(source='edition.country', read_only = True)
+    edition_start = serializers.CharField(source='edition.start_date', read_only = True)
+    edition_end = serializers.CharField(source='edition.end_date', read_only = True)
+
+    user_id = serializers.PrimaryKeyRelatedField (
+        queryset = User.objects.all(),
+        source = 'user'
+    )
+
+    class Meta:
+        model = LikedEditions
+        fields = ('id', 'user_id', 'edition_id', 'tournament_name', 'edition_name', 'edition_city', 'edition_country', 'edition_start', 'edition_end', 'liked_at')

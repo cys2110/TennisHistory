@@ -23,6 +23,12 @@ urlpatterns = [
     path('match-scores/edition/<int:edition>', views.MatchByEdition.as_view(), name='matches-by-edition'),
     path('users/', views.UserList.as_view(), name='user_list'),
     path('users/<int:pk>/', views.UserDetail.as_view(), name='user_detail'),
-    path('predictions/update/<int:pk>', views.PredictionsUpdate.as_view(), name='prediction-update'),
-    path('predictions/<int:user>/<int:edition>', views.PredictionsByUserAndEdition.as_view(), name='predictions-list')
+    path('user/username/<str:username>/', views.UserByUsername.as_view(), name='username_detail'),
+    path('likes/players/', views.LikedPlayerList.as_view(), name='liked-player-list'),
+    path('likes/players/<int:pk>/', views.LikedPlayerDetail.as_view(), name='liked-player-detail'),
+    path('likes/tournaments/', views.LikedTournamentList.as_view(), name='liked-tournament-list'),
+    path('likes/tournaments/<int:pk>/', views.LikedTournamentDetail.as_view(), name='liked-tournament-detail'),
+    path('likes/editions/', views.LikedEditionsList.as_view(), name='liked-edition-list'),
+    path('likes/editions/<int:pk>/', views.LikedEditionDetail.as_view(), name='liked-edition-detail'),
+    path('search/<str:search>', views.SearchView.as_view(), name='search-results')
 ]

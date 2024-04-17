@@ -47,7 +47,9 @@ const handleSubmit = () => {
         .then(response => {
             localStorage.setItem('accessToken', response.data.access)
             localStorage.setItem('refreshToken', response.data.refresh)
-            localStorage.setItem('loggedIn', true)
+            localStorage.setItem('username', response.data.user.username)
+            localStorage.setItem('userId', response.data.user.id)
+            submitForm.value = initialForm
         })
         .catch(error => {
             if (error.response.data.username && error.response.data.username[0] === "A user with that username already exists.") {

@@ -19,7 +19,6 @@ import Signup from '@/views/User/Signup.vue'
 import UserLayout from '@/views/User/UserLayout.vue'
 import Profile from '@/views/User/Profile.vue'
 import Settings from '@/views/User/Settings.vue'
-import Prediction from '@/views/User/Prediction.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -101,7 +100,7 @@ const router = createRouter({
       ]
     },
     {
-      path: '/h2h/:player1Name/:player1Id/:player2Name/:player2Id',
+      path: '/h2h',
       name: 'H2H',
       component: H2H,
       props: true
@@ -130,12 +129,6 @@ const router = createRouter({
           path: 'settings',
           name: 'Settings',
           component: Settings
-        },
-        {
-          path: 'predictions/:edition',
-          name: 'Prediction',
-          component: Prediction,
-          props: true
         }
       ]
     }
