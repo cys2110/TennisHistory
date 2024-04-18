@@ -44,36 +44,55 @@ const selectRound = (round) => {
 <template>
     <main>
         <div class="navigator">
-            <button v-if="edition.entries.length > 64">R128</button>
-            <button v-if="edition.entries.length > 32">R64</button>
-            <button>R32</button>
-            <button>R16</button>
-            <button>QF</button>
-            <button>SF</button>
-            <button>F</button>
+            <button v-if="edition.entries.length > 64" :class="{'active-button': selectedRound === 128}" @click="selectRound(128)">R128</button>
+            <button v-if="edition.entries.length > 32" :class="{'active-button': selectedRound === 64}" @click="selectRound(64)">R64</button>
+            <button :class="{'active-button': selectedRound === 32}" @click="selectRound(32)">R32</button>
+            <button :class="{'active-button': selectedRound === 16}" @click="selectRound(16)">R16</button>
+            <button :class="{'active-button': selectedRound === 8}" @click="selectRound(8)">QF</button>
+            <button :class="{'active-button': selectedRound === 4}" @click="selectRound(4)">SF</button>
+            <button :class="{'active-button': selectedRound === 2}" @click="selectRound(2)">F</button>
         </div>
         <div class="draw-wrapper">
-            <div class="round-wrapper" v-if="edition.entries.length > 64">
+            <div class="round-wrapper" v-if="edition.entries.length > 64" v-show="selectedRound >= 128">
                 <DrawCard v-for="match in r128Matches" :key="match.id" :match="match" />
             </div>
-            <div class="round-wrapper" v-if="edition.entries.length > 32">
+            <div class="round-wrapper" v-if="edition.entries.length > 32" v-show="selectedRound >= 64">
                 <DrawCard v-for="match in r64Matches" :key="match.id" :match="match" />
             </div>
-            <div class="round-wrapper">
+            <div class="round-wrapper" v-show="selectedRound >= 32">
                 <DrawCard v-for="match in r32Matches" :key="match.id" :match="match" />
             </div>
-            <div class="round-wrapper">
+            <div class="round-wrapper" v-show="selectedRound >= 16">
                 <DrawCard v-for="match in r16Matches" :key="match.id" :match="match" />
             </div>
-            <div class="round-wrapper">
+            <div class="round-wrapper" v-show="selectedRound >= 8">
                 <DrawCard v-for="match in qfMatches" :key="match.id" :match="match" />
             </div>
-            <div class="round-wrapper">
+            <div class="round-wrapper" v-show="selectedRound >= 4">
                 <DrawCard v-for="match in sfMatches" :key="match.id" :match="match" />
             </div>
-            <div class="round-wrapper">
+            <div class="round-wrapper" v-show="selectedRound >= 2">
                 <DrawCard :match="final[0]" />
             </div>
         </div>
     </main>
 </template>
+
+<style scoped>
+button {
+    border-radius: 50%;
+    height: 3rem;
+    width: 3rem;
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+    cursor: pointer;
+    border: 2px solid var(--color-border);
+    background-color: var(--color-background-mute);
+    color: var(--color-text)
+}
+
+.active-button {
+    border: 2px solid var(--blue-border);
+    color: var(--color-heading)
+}
+</style>

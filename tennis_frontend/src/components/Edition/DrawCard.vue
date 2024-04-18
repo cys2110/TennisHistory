@@ -2,28 +2,33 @@
 import { headshot, flagSrc, tiebreak } from '../utils';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCheck } from '@fortawesome/pro-duotone-svg-icons';
+import { useRouter, RouterLink } from 'vue-router';
 
 const props = defineProps(['match'])
+const router = useRouter()
 
-console.log(props.match)
+const navigate = (id, name) => {
+    router.push({name: 'PlayerOverview', params: {id: id, name: name}})
+}
+
 </script>
 
 <template>
     <div class="draw-card-wrapper">
         <div class="card-component">
             <div class="component-column">
-                <div class="component-row"><img v-if="match.p1_headshot === 'True'" :src="headshot(match.p1_id)" class="headshot" /></div>
-                <div class="component-row"><img v-if="match.p2_headshot === 'True'" :src="headshot(match.p2_id)" class="headshot" /></div>
+                <div class="component-row"><img v-if="match.p1_headshot === 'True'" :src="headshot(match.p1_id)" class="headshot" @click="navigate(match.p1_id, match.p1_name)" /></div>
+                <div class="component-row"><img v-if="match.p2_headshot === 'True'" :src="headshot(match.p2_id)" class="headshot" @click="navigate(match.p2_id, match.p2_name)" /></div>
             </div>
             <div class="component-column">
                 <div class="component-row"><img v-if="match.p1_country" :src="flagSrc(match.p1_country)" class="mini-flag" /></div>
                 <div class="component-row"><img v-if="match.p2_country" :src="flagSrc(match.p2_country)" class="mini-flag" /></div>
             </div>
             <div class="component-column">
-                <div class="component-row" v-if="match.p1_name">{{ match.p1_name }}</div>
+                <div class="component-row" v-if="match.p1_name"><RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {id: match.p1_id, name: match.p1_name}}" >{{ match.p1_name }}</RouterLink></div>
                 <div class="component-row" v-else-if="match.incomplete === 'B'">Bye</div>
                 <div class="component-row" v-else>Player 1</div>
-                <div class="component-row" v-if="match.p2_name">{{ match.p2_name }}</div>
+                <div class="component-row" v-if="match.p2_name"><RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {id: match.p2_id, name: match.p2_name}}" >{{ match.p2_name }}</RouterLink></div>
                 <div class="component-row" v-else-if="match.incomplete === 'B'">Bye</div>
                 <div class="component-row" v-else>Player 2</div>
             </div>
@@ -54,9 +59,9 @@ console.log(props.match)
                 </div>
             </div>
             <div class="card-component">
-                <div class="right-side" v-if="match.incomplete === 'R'">Retired</div>
-                <div class="right-side" v-else-if="match.incomplete === 'WO'">Walkover</div>
-                <div class="right-side" v-else-if="match.incomplete === 'D'">Default</div>
+                <div class="right" v-if="match.incomplete === 'R'">Retired</div>
+                <div class="right" v-else-if="match.incomplete === 'WO'">Walkover</div>
+                <div class="right" v-else-if="match.incomplete === 'D'">Default</div>
             </div>
         </div>
     </div>

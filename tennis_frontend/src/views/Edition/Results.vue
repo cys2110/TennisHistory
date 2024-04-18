@@ -74,3 +74,16 @@ r128Matches.value = r128Array
         </div>
     </main>
 </template>
+
+<style scoped>
+main {
+    display: flex;
+    flex-direction: column;
+    margin: 30px;
+}
+
+.result-card-container {
+    display: flex;
+    flex-flow: row wrap;
+}
+</style>
