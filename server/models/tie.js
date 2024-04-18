@@ -13,7 +13,7 @@ module.exports = (sequelize, models) => {
             primaryKey: true,
             autoIncrement: true
         },
-        round: DataTypes.ENUM('QF', 'SF', 'HCF', 'F', 'G'),
+        round: DataTypes.STRING,
         country1: DataTypes.STRING(3),
         coutrny2: DataTypes.STRING(3),
         winner: DataTypes.STRING(3),
@@ -22,9 +22,9 @@ module.exports = (sequelize, models) => {
         venue: DataTypes.STRING,
         city: DataTypes.STRING,
         country: DataTypes.STRING(3),
-        environment: DataTypes.ENUM('I', 'O'),
-        surface: DataTypes.ENUM('Cl', 'C', 'G', 'H'),
-        hard_type: DataTypes.ENUM('L', 'PC', 'PP', 'A', 'G', 'RA', 'O', 'R' ,'DT', 'SM'),
+        environment: DataTypes.ENUM('Indoor', 'Outdoor'),
+        surface: DataTypes.ENUM('Clay', 'Carpet', 'Grass', 'Hard'),
+        hard_type: DataTypes.STRING,
         score: DataTypes.STRING
     },
     {

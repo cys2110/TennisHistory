@@ -5,9 +5,9 @@ module.exports = (sequelize, models) => {
         static associate () {
             const { Player, Edition, Entry } = models
             MatchScore.belongsTo(Edition)
-            MatchScore.belongsTo(Entry, {foreignKey: {name: 'p1_no', type: DataTypes.INTEGER}})
+            MatchScore.belongsTo(Entry, {foreignKey: {name: 'p1_no'}})
             MatchScore.belongsTo(Player, {foreignKey: {name: 'p1', type: DataTypes.STRING}})
-            MatchScore.belongsTo(Entry, {foreignKey: {name: 'p2_no', type: DataTypes.INTEGER}})
+            MatchScore.belongsTo(Entry, {foreignKey: {name: 'p2_no'}})
             MatchScore.belongsTo(Player, {foreignKey: {name: 'p2', type: DataTypes.STRING}})
             MatchScore.belongsTo(Player, {foreignKey: {name: 'winner_id', type: DataTypes.STRING}})
         }
@@ -18,7 +18,7 @@ module.exports = (sequelize, models) => {
             primaryKey: true,
             autoIncrement: true
         },
-        round: DataTypes.ENUM('128', '64', '32', '16', 'QF', 'SF', 'F', 'W', 'RR', 'G', 'S', 'B', 'A'),
+        round: DataTypes.STRING,
         match_no: DataTypes.INTEGER,
         duration_mins: DataTypes.INTEGER,
         incomplete: DataTypes.ENUM('B', 'D', 'R', 'WO'),

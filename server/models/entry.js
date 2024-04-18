@@ -6,7 +6,8 @@ module.exports = (sequelize, models) => {
             const { Player, Edition, MatchScore } = models
             Entry.belongsTo(Edition)
             Entry.belongsTo(Player)
-            Entry.hasMany(MatchScore)
+            Entry.hasMany(MatchScore, {foreignKey: 'p1_no'})
+            Entry.hasMany(MatchScore, {foreignKey: 'p2_no'})
         }
     }
     Entry.init({
@@ -15,13 +16,10 @@ module.exports = (sequelize, models) => {
             primaryKey: true,
             autoIncrement: true
         },
-        entry_no: {
-            type: DataTypes.INTEGER,
-            allowNull: false
-        },
+        entry_no: DataTypes.INTEGER,
         rank: DataTypes.INTEGER,
         seed: DataTypes.INTEGER,
-        status: DataTypes.ENUM('A', 'LL', 'PR', 'Q', 'SE', 'WC'),
+        status: DataTypes.ENUM('Alt', 'LL', 'PR', 'Q', 'SE', 'WC'),
         wd: DataTypes.STRING,
         ret: DataTypes.STRING,
         wo: DataTypes.STRING,

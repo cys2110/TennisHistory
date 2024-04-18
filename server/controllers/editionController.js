@@ -1,5 +1,5 @@
 const db = require('../models')
-const Edition = db.edition
+const Edition = db.Edition
 const Op = db.Sequelize.Op
 
 exports.create = (req, res) => {

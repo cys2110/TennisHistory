@@ -10,7 +10,7 @@ app.use(bodyParser.json())
 app.use(logger('dev'))
 
 const db = require('./models')
-// db.sequelize.sync({force: true})
+// db.sequelize.sync({alter: true})
 //     .then(() => {
 //         console.log('Synced db')
 //     })
@@ -22,8 +22,12 @@ const tournamentController = require('./controllers/tournamentController')
 const editionController = require('./controllers/editionController')
 
 app.get('/', (req, res) => res.send('This is the root!'))
+
+// Tournament endpoints
+app.get('/tournaments', tournamentController.findAll)
 app.post('/tournaments', tournamentController.create)
 
+// Edition endpoints
 app.post('/editions', editionController.create)
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
