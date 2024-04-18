@@ -1,3 +1,5 @@
 <script setup></script>
 
-<template></template>
+<template>
+    <div class="loading">Under construction</div>
+</template>
