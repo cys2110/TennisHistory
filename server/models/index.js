@@ -12,14 +12,20 @@ const db = {}
 db.Sequelize = Sequelize
 db.sequelize = sequelize
 
-db.tournament = require('./tournament')(sequelize, Sequelize)
-db.player = require('./player')(sequelize, Sequelize)
-db.edition = require('./edition')(sequelize, Sequelize)
-db.entry = require('./entry')(sequelize, Sequelize)
-db.matchScore = require('./matchScore')(sequelize, Sequelize)
-db.wlIndex = require('./wlindex')(sequelize, Sequelize)
-db.playerStat = require('./playerStat')(sequelize, Sequelize)
-db.matchStat = require('./matchStat')(sequelize, Sequelize)
-db.tie = require('./tie')(sequelize, Sequelize)
+db.Tournament = require('./tournament')(sequelize, db)
+db.Player = require('./player')(sequelize, db)
+db.Edition = require('./edition')(sequelize, db)
+db.Entry = require('./entry')(sequelize, db)
+db.MatchScore = require('./matchScore')(sequelize, db)
+db.WlIndex = require('./wlindex')(sequelize, db)
+db.PlayerStat = require('./playerStat')(sequelize, db)
+db.MatchStat = require('./matchStat')(sequelize, db)
+db.Tie = require('./tie')(sequelize, db)
+
+Object.keys(db).forEach(modelName => {
+    if (db[modelName].associate) {
+        db[modelName].associate(db);
+    }
+});
 
 module.exports = db

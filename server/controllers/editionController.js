@@ -1,5 +1,5 @@
 const db = require('../models')
-const Tournament = db.tournament
+const Edition = db.edition
 const Op = db.Sequelize.Op
 
 exports.create = (req, res) => {
@@ -10,15 +10,15 @@ exports.create = (req, res) => {
         return
     }
 
-    const tourney = req.body
+    const edition = req.body
 
-    Tournament.create(tourney)
+    Edition.create(edition)
     .then(response => res.send(response))
     .catch(error => res.status(500).send(error.message))
 }
 
-exports.findAll = (req, res) => {
-    Tournament.findAll({})
-    .then(response => res.send(response))
-    .catch(error => res.status(500).send(error.message))
-}
+// exports.findAll = (req, res) => {
+//     Tournament.findAll({})
+//     .then(response => res.send(response))
+//     .catch(error => res.status(500).send(error.message))
+// }

@@ -1,15 +1,15 @@
 const { DataTypes, Model } = require('sequelize');
-const { sequelize, edition, entry, player} = require('.');
 
-module.exports = () => {
+module.exports = (sequelize, models) => {
     class MatchScore extends Model {
-        static associate (models) {
-            MatchScore.belongsTo(edition, {targetKey: 'edition_no', foreignKey: 'edition'})
-            MatchScore.belongsTo(entry, {foreignKey: {name: 'p1_no', type: DataTypes.STRING}})
-            MatchScore.belongsTo(player, {foreignKey: {name: 'p1', type: DataTypes.STRING}})
-            MatchScore.belongsTo(entry, {foreignKey: {name: 'p2_no', type: DataTypes.STRING}})
-            MatchScore.belongsTo(player, {foreignKey: {name: 'p2', type: DataTypes.STRING}})
-            MatchScore.belongsTo(player, {foreignKey: {name: 'winner_id', type: DataTypes.STRING}})
+        static associate () {
+            const { Player, Edition, Entry } = models
+            MatchScore.belongsTo(Edition)
+            MatchScore.belongsTo(Entry, {foreignKey: {name: 'p1_no', type: DataTypes.INTEGER}})
+            MatchScore.belongsTo(Player, {foreignKey: {name: 'p1', type: DataTypes.STRING}})
+            MatchScore.belongsTo(Entry, {foreignKey: {name: 'p2_no', type: DataTypes.INTEGER}})
+            MatchScore.belongsTo(Player, {foreignKey: {name: 'p2', type: DataTypes.STRING}})
+            MatchScore.belongsTo(Player, {foreignKey: {name: 'winner_id', type: DataTypes.STRING}})
         }
     }
     MatchScore.init({
@@ -18,10 +18,10 @@ module.exports = () => {
             primaryKey: true,
             autoIncrement: true
         },
-        round: DataTypes.ENUM(),
+        round: DataTypes.ENUM('128', '64', '32', '16', 'QF', 'SF', 'F', 'W', 'RR', 'G', 'S', 'B', 'A'),
         match_no: DataTypes.INTEGER,
         duration_mins: DataTypes.INTEGER,
-        incomplete: DataTypes.ENUM(),
+        incomplete: DataTypes.ENUM('B', 'D', 'R', 'WO'),
         umpire: DataTypes.STRING,
         date: DataTypes.DATEONLY,
         s1p1: DataTypes.INTEGER,

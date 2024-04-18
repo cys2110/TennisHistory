@@ -1,10 +1,10 @@
 const { DataTypes, Model } = require('sequelize');
-const { sequelize, edition} = require('.');
 
-module.exports = () => {
+module.exports = (sequelize, models) => {
     class Tie extends Model {
-        static associate (models) {
-            Tie.belongsTo(edition, {targetKey: 'edition_no', foreignKey: 'edition'})
+        static associate () {
+            const { Edition } = models
+            Tie.belongsTo(Edition)
         }
     }
     Tie.init({

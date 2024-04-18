@@ -1,14 +1,14 @@
 const { DataTypes, Model } = require('sequelize');
-const { sequelize, matchScore, player, entry} = require('.');
 
-module.exports = () => {
+module.exports = (sequelize, models) => {
     class MatchStat extends Model {
-        static associate (models) {
-            MatchStat.belongsTo(matchScore, {foreignKey: 'match_id'})
-            MatchStat.belongsTo(player, {foreignKey: {name: 'p1', type: DataTypes.STRING}})
-            MatchStat.belongsTo(player, {foreignKey: {name: 'p2', type: DataTypes.STRING}})
-            MatchStat.belongsTo(entry, {foreignKey: 'p1_no'})
-            MatchStat.belongsTo(entry, {foreignKey: 'p2_no'})
+        static associate () {
+            const { Player, Entry, MatchScore } = models
+            MatchStat.belongsTo(MatchScore)
+            MatchStat.belongsTo(Player, {foreignKey: {name: 'p1', type: DataTypes.STRING}})
+            MatchStat.belongsTo(Player, {foreignKey: {name: 'p2', type: DataTypes.STRING}})
+            MatchStat.belongsTo(Entry, {foreignKey: 'p1_no'})
+            MatchStat.belongsTo(Entry, {foreignKey: 'p2_no'})
         }
     }
     MatchStat.init({

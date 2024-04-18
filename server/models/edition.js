@@ -1,15 +1,15 @@
 const { DataTypes, Model } = require('sequelize');
-const { sequelize, tournament, player, entry, matchScore, tie} = require('.');
 
-module.exports = () => {
+module.exports = (sequelize, models) => {
     class Edition extends Model {
-        static associate (models) {
-            Edition.belongsTo(tournament, {foreignKey: 'tournament_id'})
-            Edition.belongsTo(player, {foreignKey: {name: 'winner_id', type: DataTypes.STRING}})
-            Edition.belongsTo(player, {foreignKey: {name: 'finalist_id', type: DataTypes.STRING}})
-            Edition.hasMany(entry)
-            Edition.hasMany(matchScore)
-            Edition.hasMany(tie)
+        static associate () {
+            const { Player, Tournament, Entry, MatchScore, Tie } = models
+            Edition.belongsTo(Tournament)
+            Edition.belongsTo(Player, {foreignKey: {name: 'winner_id', type: DataTypes.STRING}})
+            Edition.belongsTo(Player, {foreignKey: {name: 'finalist_id', type: DataTypes.STRING}})
+            Edition.hasMany(Entry)
+            Edition.hasMany(MatchScore)
+            Edition.hasMany(Tie)
         }
     }
     Edition.init({

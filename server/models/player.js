@@ -1,14 +1,17 @@
 const { DataTypes, Model } = require('sequelize');
-const { sequelize, edition, entry, matchScore} = require('.');
-const wlindex = require('./wlindex');
 
-module.exports = () => {
+module.exports = (sequelize, models) => {
     class Player extends Model {
-        static associate (models) {
-            Player.hasMany(edition)
-            Player.hasMany(entry)
-            Player.hasMany(matchScore)
-            Player.hasOne(wlindex)
+        static associate () {
+        const { Edition, Entry, MatchScore, WlIndex, PlayerStat } = models
+            Player.hasMany(Edition, {foreignKey: 'winner_id'})
+            Player.hasMany(Edition, {foreignKey: 'finalist_id'})
+            Player.hasMany(Entry)
+            Player.hasMany(MatchScore, {foreignKey: 'p1'})
+            Player.hasMany(MatchScore, {foreignKey: 'p2'})
+            Player.hasMany(MatchScore, {foreignKey: 'winner_id'})
+            Player.hasOne(WlIndex)
+            Player.hasMany(PlayerStat)
         }
         getFullName() {
             return [this.first_name, this.last_name].join(' ')
@@ -41,8 +44,6 @@ module.exports = () => {
         height_cm: DataTypes.INTEGER,
         height_ft: DataTypes.INTEGER,
         coaches: DataTypes.ARRAY(DataTypes.STRING),
-        preferred_surfaces: DataTypes.ARRAY(DataTypes.ENUM('Cl', 'C', 'G', 'H')),
-        age_started: DataTypes.INTEGER,
         career_high: DataTypes.INTEGER,
         ch_date: DataTypes.DATEONLY,
         pm_USD: DataTypes.INTEGER,

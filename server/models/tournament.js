@@ -1,10 +1,10 @@
 const { DataTypes, Model } = require('sequelize');
-const { sequelize, edition} = require('.');
 
-module.exports = () => {
+module.exports = (sequelize, models) => {
     class Tournament extends Model {
-        static associate (models) {
-            Tournament.hasMany(edition)
+        static associate () {
+            const { Edition } = models
+            Tournament.hasMany(Edition)
         }
     }
     Tournament.init({
