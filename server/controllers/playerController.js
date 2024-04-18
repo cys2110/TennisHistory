@@ -1,27 +1,25 @@
 const db = require('../models')
-const Tournament = db.Tournament
+const Player = db.Player
 const Op = db.Sequelize.Op
 
-exports.create = (req, res) => {
+// create
+exports.create = (req,res) => {
     if (!req.body.id) {
         res.status(400).send({
             message: 'Id needs to be completed'
         })
         return
     }
+    const player = req.body
 
-    const tourney = req.body
-
-    Tournament.create(tourney)
+    Player.create(player)
     .then(response => res.send(response))
     .catch(error => res.status(500).send(error.message))
 }
 
 exports.findById = (req, res) => {
     const { id } = req.params
-    Tournament.findByPk(id)
+    Player.findByPk(id)
     .then(response => res.send(response))
     .catch(error => res.status(500).send(error.message))
 }
-
-// search

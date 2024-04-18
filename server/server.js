@@ -20,14 +20,23 @@ const db = require('./models')
 
 const tournamentController = require('./controllers/tournamentController')
 const editionController = require('./controllers/editionController')
+const playerController = require('./controllers/playerController')
 
 app.get('/', (req, res) => res.send('This is the root!'))
 
+// Player endpoints
+app.get('/players/id/:id', playerController.findById)
+app.post('/players', playerController.create)
+
 // Tournament endpoints
-app.get('/tournaments', tournamentController.findAll)
+app.get('/tournaments/id/:id', tournamentController.findById)
 app.post('/tournaments', tournamentController.create)
 
 // Edition endpoints
+app.get('/editions/id/:id', editionController.findById)
+app.get('/editions/upcoming', editionController.findUpcoming)
+app.get('/editions/year/:year', editionController.findByYear)
+app.get('/editions/player/:player', editionController.findByPlayer)
 app.post('/editions', editionController.create)
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))

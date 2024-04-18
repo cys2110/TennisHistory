@@ -23,6 +23,8 @@ module.exports = (sequelize, models) => {
             allowNull: false,
             unique: true
         },
+        sponsor_name: DataTypes.STRING,
+        year: DataTypes.INTEGER,
         start_date: DataTypes.DATEONLY,
         end_date: DataTypes.DATEONLY,
         category: DataTypes.STRING,

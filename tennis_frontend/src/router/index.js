@@ -14,11 +14,6 @@ import Results from '@/views/Edition/Results.vue'
 import Draw from '@/views/Edition/Draw.vue'
 import MatchStats from '@/views/Edition/MatchStats.vue'
 import H2H from '@/views/Player/H2H.vue'
-import Login from '@/views/User/Login.vue'
-import Signup from '@/views/User/Signup.vue'
-import UserLayout from '@/views/User/UserLayout.vue'
-import Profile from '@/views/User/Profile.vue'
-import Settings from '@/views/User/Settings.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -104,33 +99,6 @@ const router = createRouter({
       name: 'H2H',
       component: H2H,
       props: true
-    },
-    {
-      path: '/login',
-      name: 'Login',
-      component: Login
-    },
-    {
-      path: '/signup',
-      name: 'Signup',
-      component: Signup
-    },
-    {
-      path: '/users/:id/:username',
-      component: UserLayout,
-      props: true,
-      children: [
-        {
-          path: '',
-          name: 'Profile',
-          component: Profile
-        },
-        {
-          path: 'settings',
-          name: 'Settings',
-          component: Settings
-        }
-      ]
     }
   ]
 })
