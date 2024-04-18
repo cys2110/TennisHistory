@@ -1,9 +1,12 @@
 <script setup>
 import EditionService from '@/services/EditionService';
 import { onMounted, ref } from 'vue';
-import { groupObjectsByKey, surface, environment } from '@/components/utils';
+import { groupObjectsByKey, surface, environment, hardType } from '@/components/utils';
+import { RouterLink } from 'vue-router';
 
 const props = defineProps(['player'])
+const finalsArray = ref([])
+const titlesArray = ref([])
 const finals = ref({})
 const titles = ref({})
 const selection = ref('Titles')
@@ -11,13 +14,12 @@ const selection = ref('Titles')
 onMounted(() => {
     EditionService.getEditionsByPlayer(props.player.id)
     .then(response => {
-        const finalsArray = response.data.filter(edition => edition.finalist_id === props.player.id)
-        const groupedFinals = groupObjectsByKey(finalsArray, 'year')
+        finalsArray.value = response.data.filter(edition => edition.finalist_id === props.player.id)
+        const groupedFinals = groupObjectsByKey(finalsArray.value, 'year')
         finals.value = groupedFinals
-        console.log(finals.value)
 
-        const titlesArray = response.data.filter(edition => edition.winner_id === props.player.id)
-        const groupedTitles = groupObjectsByKey(titlesArray, 'year')
+        titlesArray.value = response.data.filter(edition => edition.winner_id === props.player.id)
+        const groupedTitles = groupObjectsByKey(titlesArray.value, 'year')
         titles.value = groupedTitles
     })
     .catch(error => console.log(error))
@@ -33,7 +35,7 @@ onMounted(() => {
             </select>
         </div>
         <div v-if="selection === 'Titles'">
-            <table v-if="titles">
+            <table v-if="titlesArray.length > 0">
                 <thead>
                     <tr>
                         <th>Year</th>
@@ -49,13 +51,13 @@ onMounted(() => {
                         <td class="column">
                             <div v-for="tournament in year">
                                 <span v-if="tournament.sponsor_name">{{ tournament.sponsor_name }} | </span>
-                                <span>{{ tournament.tournament_name }}</span>
+                                <span><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: tournament.tournament_id, name: tournament.tournament_name}}">{{ tournament.tournament_name }}</RouterLink></span>
                             </div>
                         </td>
                         <td class="column">
                             <div v-for="tournament in year">
                                 <span>{{ environment(tournament.environment) }} {{ surface(tournament.surface) }}</span>
-                                <span v-if="tournament.hard_type">({{ tournament.hard_type }})</span>
+                                <span v-if="tournament.hard_type"> ({{ hardType(tournament.hard_type) }})</span>
                             </div>
                         </td>
                     </tr>
@@ -64,7 +66,7 @@ onMounted(() => {
             <div v-else>None</div>
         </div>
         <div v-if="selection === 'Finals'">
-            <table v-if="finals">
+            <table v-if="finalsArray.length > 0">
                 <thead>
                     <tr>
                         <th>Year</th>
@@ -86,7 +88,7 @@ onMounted(() => {
                         <td class="column">
                             <div v-for="tournament in year">
                                 <span>{{ environment(tournament.environment) }} {{ surface(tournament.surface) }}</span>
-                                <span v-if="tournament.hard_type">({{ tournament.hard_type }})</span>
+                                <span v-if="tournament.hard_type"> ({{ hardType(tournament.hard_type) }})</span>
                             </div>
                         </td>
                     </tr>
@@ -96,3 +98,24 @@ onMounted(() => {
         </div>
     </main>
 </template>
+
+<style scoped>
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+}
+
+.dropdown {
+    margin-left: auto;
+}
+
+.dropdown-selection {
+    background-color: transparent;
+    color: var(--color-text);
+    padding: 0.25rem;
+    border-radius: 1rem;
+    border: 2px solid var(--blue-border);
+}
+</style>

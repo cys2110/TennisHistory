@@ -2,14 +2,17 @@
 import PlayerService from '@/services/PlayerService';
 import { onMounted, ref, watch } from 'vue';
 import { flagSrc, formatDate, formatCurrency, gladiator, headshot } from '@/components/utils';
-import { useRoute, useRouter, RouterView } from 'vue-router';
+import { useRoute, useRouter, RouterView, RouterLink } from 'vue-router';
 
 const props = defineProps(['id'])
 const player = ref(null)
 const router = useRouter()
 const route = useRoute()
-
 const currentTab = ref(route.name)
+
+const setCurrentTab = (tabName) => {
+    currentTab.value = tabName
+}
 
 onMounted(() => {
     PlayerService.getPlayerById(props.id)
@@ -62,10 +65,88 @@ watch(() => router.currentRoute.value.params.id, () => {
         </div>
 
         <div class="tabs">
-            <div :class="{'tab': true, 'active-tab': currentTab === 'PlayerOverview'}">Overview</div>
-            <div :class="{'tab': true, 'active-tab': currentTab === 'Titles'}">Titles and Finals</div>
+            <div :class="{'tab': true, 'active-tab': currentTab === 'PlayerOverview'}"><RouterLink class="tab-link" :to="{name: 'PlayerOverview'}" @click="setCurrentTab('PlayerOverview')">Overview</RouterLink></div>
+            <div :class="{'tab': true, 'active-tab': currentTab === 'Titles'}"><RouterLink class="tab-link" :to="{name: 'Titles'}" @click="setCurrentTab('Titles')">Titles and Finals</RouterLink></div>
         </div>
 
         <RouterView v-if="player" :player="player" />
     </div>
+    <div v-else>Loading...</div>
 </template>
+
+<style scoped>
+h1 {
+    font-size: xx-large;
+    font-weight: bolder;
+}
+
+.heading-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.headings {
+    flex-grow: 3;
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+    width: 100%
+}
+
+.heading {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.badge {
+    background-color: var(--blue-border);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    border-radius: 2rem;
+    width: 5rem;
+    margin-top: 1rem;
+}
+
+.flag {
+    border-radius: 20%;
+    margin-left: 2rem;
+    width: 3rem;
+}
+
+.stats-container {
+    display: flex;
+    flex-direction: row;
+    margin-top: 3rem;
+    background-color: var(--blue-border);
+    justify-content: space-evenly;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-radius: 10rem;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.picture {
+    border-radius: 50%;
+    max-height: 20rem;
+}
+
+.bold {
+    font-weight: bold;
+    font-size: x-large;
+}
+</style>

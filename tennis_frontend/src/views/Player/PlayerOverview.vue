@@ -86,52 +86,52 @@ const bh = computed(() => {
                 <tbody>
                     <tr v-if="player.ao_round">
                         <td>Australian Open</td>
-                        <td>{{ player.ao_round }}</td>
+                        <td class="centred">{{ player.ao_round }}</td>
                         <td>{{ joinArray(player.ao_years) }}</td>
                     </tr>
                     <tr v-if="player.rg_round">
                         <td>Roland Garros</td>
-                        <td>{{ player.rg_round }}</td>
+                        <td class="centred">{{ player.rg_round }}</td>
                         <td>{{ joinArray(player.rg_years) }}</td>
                     </tr>
                     <tr v-if="player.wimbledon_round">
                         <td>Wimbledon</td>
-                        <td>{{ player.wimbledon_round }}</td>
+                        <td class="centred">{{ player.wimbledon_round }}</td>
                         <td>{{ joinArray(player.wimbledon_years) }}</td>
                     </tr>
                     <tr v-if="player.uso_round">
                         <td>US Open</td>
-                        <td>{{ player.uso_round }}</td>
+                        <td class="centred">{{ player.uso_round }}</td>
                         <td>{{ joinArray(player.uso_years) }}</td>
                     </tr>
                     <tr v-if="player.finals_round">
                         <td>Year-end Finals</td>
-                        <td>{{ player.finals_round }}</td>
+                        <td class="centred">{{ player.finals_round }}</td>
                         <td>{{ joinArray(player.finals_years) }}</td>
                     </tr>
                     <tr v-if="player.olympics_round">
                         <td>Olympics</td>
-                        <td>{{ player.olympics_round }}</td>
+                        <td class="centred">{{ player.olympics_round }}</td>
                         <td>{{ joinArray(player.olympics_years) }}</td>
                     </tr>
                     <tr v-if="player.davis_round">
                         <td>Davis Cup</td>
-                        <td>{{ player.davis_round }}</td>
+                        <td class="centred">{{ player.davis_round }}</td>
                         <td>{{ joinArray(player.davis_years) }}</td>
                     </tr>
                     <tr v-if="player.hopman_round">
                         <td>Hopman</td>
-                        <td>{{ player.hopman_round }}</td>
+                        <td class="centred">{{ player.hopman_round }}</td>
                         <td>{{ joinArray(player.hopman_years) }}</td>
                     </tr>
                     <tr v-if="player.gs_cup_round">
                         <td>Grand Slam Cup</td>
-                        <td>{{ player.gs_cup_round }}</td>
+                        <td class="centred">{{ player.gs_cup_round }}</td>
                         <td>{{ joinArray(player.gs_cup_years) }}</td>
                     </tr>
                     <tr v-if="player.wct_round">
                         <td>WCT Finals</td>
-                        <td>{{ player.wct_round }}</td>
+                        <td class="centred">{{ player.wct_round }}</td>
                         <td>{{ joinArray(player.wct_years) }}</td>
                     </tr>
                 </tbody>
@@ -139,3 +139,15 @@ const bh = computed(() => {
         </div>
     </main>
 </template>
+
+<style scoped>
+main {
+    display: flex;
+    flex-direction: column;
+}
+
+.major-table {
+    align-self: center;
+    margin-top: 3rem;
+}
+</style>

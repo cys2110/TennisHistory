@@ -48,10 +48,12 @@ const deleteAccount = () => {
 
 <template>
     <div class="view-account">
-        <button v-if="!editMode" @click="editMode = true">Edit account</button>
-        <button v-if="editMode" @click="submitForm">Save changes</button>
-        <button v-if="editMode" @click="editMode = false">Cancel</button>
-        <button @click="deleteAccount">Delete account</button>
+        <div class="buttons">
+            <button v-if="!editMode" @click="editMode = true">Edit account</button>
+            <button v-if="editMode" @click="submitForm">Save changes</button>
+            <button v-if="editMode" @click="editMode = false">Cancel</button>
+            <button @click="deleteAccount">Delete account</button>
+        </div>
 
         <div class="view" v-if="!editMode">
             <dl>
@@ -65,7 +67,7 @@ const deleteAccount = () => {
                 <dd>{{ user.email }}</dd>
 
                 <dt>Password</dt>
-                <dd><input type="password" readonly :value="user.password" /></dd>
+                <dd><input type="password" readonly disabled :value="user.password" /></dd>
             </dl>
         </div>
         <div class="edit" v-else>
@@ -81,3 +83,49 @@ const deleteAccount = () => {
         </div>
     </div>
 </template>
+
+<style>
+.view-account {
+    display: flex;
+    flex-direction: column;
+}
+
+.buttons {
+    margin-left: auto;
+}
+
+button {
+    border-radius: 50%;
+    height: 4rem;
+    width: 4rem;
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+    cursor: pointer;
+    border: 2px solid var(--blue-border);
+    background-color: var(--color-background-mute);
+    color: var(--color-text)
+}
+
+dt {
+    font-weight: bold;
+    margin-top: 0.25rem;
+}
+
+dd {
+    padding-left: 3rem;
+    margin-bottom: 0.25rem;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form > input {
+    margin: 0.5rem;
+    background-color: transparent;
+    outline: transparent;
+    border: none;
+    color: var(--color-text);
+}
+</style>

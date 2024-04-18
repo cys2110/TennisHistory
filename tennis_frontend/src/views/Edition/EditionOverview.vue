@@ -266,28 +266,3 @@ onMounted(() => {
         </div>
     </main>
 </template>
-
-<style scoped>
-table {
-    border-collapse: collapse;
-    border-radius: 20px;
-}
-
-thead {
-    background-color: var(--color-background-mute);
-    border-radius: 20px;
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border)
-}
-
-th {
-    border: none;
-    padding: 2px
-}
-
-td {
-    padding: 5px;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-</style>
