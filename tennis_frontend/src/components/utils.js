@@ -52,50 +52,6 @@ export function formatCurrency (currency, number) {
     return number.toLocaleString('en-GB', {style: 'currency', currency: currency})
 }
 
-export function environment (environment) {
-    if (environment === 'O') {
-        return 'Outdoor'
-    } else {
-        return 'Indoor'
-    }
-}
-
-export function surface (surface) {
-    if (surface === 'Cl') {
-        return 'Clay'
-    } else if (surface === 'C') {
-        return 'Carpet'
-    } else if (surface === 'G') {
-        return 'Grass'
-    } else {
-        return 'Hard'
-    }
-}
-
-export function hardType (type) {
-    if (type === 'L') {
-        return 'Laykold'
-    } else if (type === 'PC') {
-        return 'Plexicushion'
-    } else if (type === 'PP') {
-        return 'Plexipave'
-    } else if (type === 'A') {
-        return 'Acrylic on wood'
-    } else if (type === 'G') {
-        return 'Greenset'
-    } else if (type === 'RA') {
-        return 'Rebound ace'
-    } else if (type === 'O') {
-        return 'Opticourt'
-    } else if (type === 'R') {
-        return 'Rukort'
-    } else if (type === 'DT') {
-        return 'Decoturf'
-    } else if (type === 'SM') {
-        return 'SportMaster'
-    }
-}
-
 export function joinArray (array) {
     return array.join(', ')
 }

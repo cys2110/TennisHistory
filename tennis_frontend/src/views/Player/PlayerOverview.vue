@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { formatDate, surface, joinArray } from '@/components/utils';
+import { formatDate, joinArray } from '@/components/utils';
 
 const props = defineProps(['player'])
 
@@ -14,11 +14,6 @@ const yearsActive = computed(() => {
 
 const height = computed(() => {
     return `${props.player.height_cm}cm (${props.player.height_ft})`
-})
-
-const surfaces = computed(() => {
-    const array = props.player.preferred_surfaces.map(preference => surface(preference))
-    return array.join(', ')
 })
 
 const rh = computed(() => {
@@ -48,11 +43,6 @@ const bh = computed(() => {
                     <span>Height</span>
                     <span>{{ height }}</span>
                 </div>
-                <div class="detail" v-if="player.preferred_surfaces.length > 0">
-                    <span v-if="player.preferred_surfaces.length === 1">Preferred surface</span>
-                    <span v-else>Preferred surfaces</span>
-                    <span>{{ surfaces }}</span>
-                </div>
             </div>
             <div class="details-column">
                 <div class="detail" v-if="player.rh || player.rh === false">
@@ -67,10 +57,6 @@ const bh = computed(() => {
                     <span v-if="player.coaches.length === 1">Coach</span>
                     <span v-else>Coaches</span>
                     <span>{{ joinArray(player.coaches) }}</span>
-                </div>
-                <div class="detail" v-if="player.age_started">
-                    <span>Age started</span>
-                    <span>{{ player.age_started }}</span>
                 </div>
             </div>
         </div>

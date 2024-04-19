@@ -102,7 +102,8 @@ exports.findByPlayer = (req, res) => {
         where: {
             [Op.or]: [{winner_id: player}, {finalist_id: player}]
         },
-        order: [['start_date', 'ASC']]
+        order: [['start_date', 'ASC']],
+        include: db.Tournament
     })
     .then(response => res.send(response))
     .catch(error => res.status(500).send(error.message))
