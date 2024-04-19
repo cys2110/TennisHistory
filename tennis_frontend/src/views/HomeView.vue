@@ -7,9 +7,7 @@ const upcoming = ref([])
 
 onMounted(() => {
     EditionService.getUpcomingEditions()
-    .then(response => {
-        upcoming.value = response.data
-    })
+    .then(response => upcoming.value = response.data)
     .catch(error => console.log(error))
 })
 </script>

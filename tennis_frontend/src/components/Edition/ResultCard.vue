@@ -8,14 +8,30 @@ import { RouterLink, useRouter } from 'vue-router';
 const props = defineProps(['match'])
 const router = useRouter()
 const winner = ref(null)
+const winPlayer = ref(null)
 const loser = ref(null)
+const losePlayer = ref(null)
+const winEntry = ref(null)
+const loseEntry = ref(null)
 
-if (props.match.winner_id_id === props.match.p1_id) { 
-    winner.value = 'p1'
-    loser.value = 'p2'
+if (props.match.winner_id === props.match.p1) { 
+    winner.value = props.match.player1
+    winPlayer.value = 'p1'
+    winEntry.value = props.match.entry1
+    if (props.match.incomplete !== 'B') {
+        loser.value = props.match.player2
+        losePlayer.value = 'p2'
+        loseEntry.value = props.match.entry2
+    }
 } else {
-    winner.value = 'p2'
-    loser.value = 'p1'
+    winner.value = props.match.player2
+    winPlayer.value = 'p2'
+    winEntry.value = props.match.entry2
+    if (props.match.incomplete !== 'B') {
+        loser.value = props.match.player1
+        losePlayer.value = 'p1'
+        loseEntry.value = props.match.entry1
+    }
 }
 
 const hour = Math.floor(props.match.duration_mins / 60)
@@ -28,22 +44,22 @@ const navigate = (id, name) => {
 }
 
 const winnerStatus = computed(() => {
-    if (props.match[winner.value + '_seed'] && props.match[winner.value + '_status']) {
-        return `(${props.match[winner.value + '_seed']} ${props.match[winner.value + '_status']})`
-    } else if (props.match[winner.value + '_seed']) {
-        return `(${props.match[winner.value + '_seed']})`
+    if (winEntry.value.seed && winEntry.value.status) {
+        return `(${winEntry.value.seed} ${winEntry.value.status})`
+    } else if (winEntry.value.seed) {
+        return `(${winEntry.value.seed})`
     } else {
-        return `(${props.match[winner.value + '_status']})`
+        return `(${winEntry.value.status})`
     }
 })
 
 const loserStatus = computed(() => {
-    if (props.match[loser.value + '_seed'] && props.match[loser.value + '_status']) {
-        return `(${props.match[loser.value + '_seed']} ${props.match[loser.value + '_status']})`
-    } else if (props.match[loser.value + '_seed']) {
-        return `(${props.match[loser.value + '_seed']})`
+    if (loseEntry.value.seed && loseEntry.value.status) {
+        return `(${loseEntry.value.seed} ${loseEntry.value.status})`
+    } else if (loseEntry.value.seed) {
+        return `(${loseEntry.value.seed})`
     } else {
-        return `(${props.match[loser.value + '_status']})`
+        return `(${loseEntry.value.status})`
     }
 })
 </script>
@@ -56,22 +72,23 @@ const loserStatus = computed(() => {
         </div>
         <div class="card-component">
             <div class="component-column">
-                <div class="component-row"><img v-if="match[winner + '_headshot'] === 'True'" :src="headshot(match[winner + '_id'])" class="headshot" @click="navigate(match[winner + '_id'], match[winner + '_name'])" /></div>
-                <div class="component-row"><img v-if="match[loser + '_headshot'] === 'True'" :src="headshot(match[loser + '_id'])" class="headshot" @click="navigate(match[loser + '_id'], match[loser + '_name'])" /></div>
+                <div class="component-row"><img v-if="winner.headshot" :src="headshot(winner.id)" class="headshot" @click="navigate(winner.id, winner.full_name)" /></div>
+                <div class="component-row"><img v-if="loser && loser.headshot" :src="headshot(loser.id)" class="headshot" @click="navigate(loser.id, loser.full_name)" /></div>
             </div>
             <div class="component-column">
-                <div class="component-row"><img :src="flagSrc(match[winner + '_country'])" class="mini-flag" /></div>
-                <div class="component-row"><img v-if="match.incomplete !== 'B'" :src="flagSrc(match[loser + '_country'])" class="mini-flag" /></div>
+                <div class="component-row"><img :src="flagSrc(winner.country)" class="mini-flag" /></div>
+                <div class="component-row"><img v-if="match.incomplete !== 'B'" :src="flagSrc(loser.country)" class="mini-flag" /></div>
             </div>
             <div class="component-column">
                 <div class="component-row">
-                    <RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {id: match[winner + '_id'], name: match[winner + '_name']}}">{{ match[winner + '_name'] }}</RouterLink>
-                    <span v-if="match[winner + '_seed'] || match[winner + '_status']" class="small">{{ winnerStatus }}</span>
+                    <RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {id: winner.id, name: winner.full_name}}">{{ winner.full_name }}</RouterLink>
+                    <span v-if="winEntry.seed || winEntry.status" class="small">{{ winnerStatus }}</span>
                 </div>
-                <div class="component-row">
-                    <RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {id: match[loser + '_id'], name: match[loser + '_name']}}">{{ match[loser+ '_name'] }}</RouterLink>
-                    <span v-if="match[loser + '_seed'] || match[loser + '_status']" class="small">{{ loserStatus }}</span>
+                <div class="component-row" v-if="match.incomplete !== 'B'">
+                    <RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {id: loser.id, name: loser.full_name}}">{{ loser.full_name }}</RouterLink>
+                    <span v-if="loseEntry.seed || loseEntry.status" class="small">{{ loserStatus }}</span>
                 </div>
+                <div class="component-row" v-else>Bye</div>
             </div>
             <div class="component-column">
                 <div class="component-row"><FontAwesomeIcon :icon="faCheck" /></div>
@@ -80,42 +97,42 @@ const loserStatus = computed(() => {
             <div class="score">
                 <div class="component-column" v-if="match.s1p1">
                     <div class="component-row">
-                        {{ match['s1' + winner] }}<sup v-if="match['t1' + winner]">{{ tiebreak(match['s1' + winner], match['t1' + winner]) }}</sup>
+                        {{ match['s1' + winPlayer] }}<sup v-if="match['t1' + winPlayer]">{{ tiebreak(match['s1' + winPlayer], match['t1' + winPlayer]) }}</sup>
                     </div>
                     <div class="component-row">
-                        {{ match['s1' + loser] }}<sup v-if="match['t1' + loser]">{{ tiebreak(match['s1' + loser], match['t1' + loser]) }}</sup>
+                        {{ match['s1' + losePlayer] }}<sup v-if="match['t1' + losePlayer]">{{ tiebreak(match['s1' + losePlayer], match['t1' + losePlayer]) }}</sup>
                     </div>
                 </div>
                 <div class="component-column" v-if="match.s2p1">
                     <div class="component-row">
-                        {{ match['s2' + winner] }}<sup v-if="match['t2' + winner]">{{ tiebreak(match['s2' + winner], match['t2' + winner]) }}</sup>
+                        {{ match['s2' + winPlayer] }}<sup v-if="match['t2' + winPlayer]">{{ tiebreak(match['s2' + winPlayer], match['t2' + winPlayer]) }}</sup>
                     </div>
                     <div class="component-row">
-                        {{ match['s2' + loser] }}<sup v-if="match['t2' + loser]">{{ tiebreak(match['s2' + loser], match['t2' + loser]) }}</sup>
+                        {{ match['s2' + losePlayer] }}<sup v-if="match['t2' + losePlayer]">{{ tiebreak(match['s2' + losePlayer], match['t2' + losePlayer]) }}</sup>
                     </div>
                 </div>
                 <div class="component-column" v-if="match.s3p1">
                     <div class="component-row">
-                        {{ match['s3' + winner] }}<sup v-if="match['t3' + winner]">{{ tiebreak(match['s3' + winner], match['t3' + winner]) }}</sup>
+                        {{ match['s3' + winPlayer] }}<sup v-if="match['t3' + winPlayer]">{{ tiebreak(match['s3' + winPlayer], match['t3' + winPlayer]) }}</sup>
                     </div>
                     <div class="component-row">
-                        {{ match['s3' + loser] }}<sup v-if="match['t3' + loser]">{{ tiebreak(match['s3' + loser], match['t3' + loser]) }}</sup>
+                        {{ match['s3' + losePlayer] }}<sup v-if="match['t3' + losePlayer]">{{ tiebreak(match['s3' + losePlayer], match['t3' + losePlayer]) }}</sup>
                     </div>
                 </div>
                 <div class="component-column" v-if="match.s4p1">
                     <div class="component-row">
-                        {{ match['s4' + winner] }}<sup v-if="match['t4' + winner]">{{ tiebreak(match['s4' + winner], match['t4' + winner]) }}</sup>
+                        {{ match['s4' + winPlayer] }}<sup v-if="match['t4' + winPlayer]">{{ tiebreak(match['s4' + winPlayer], match['t4' + winPlayer]) }}</sup>
                     </div>
                     <div class="component-row">
-                        {{ match['s4' + loser] }}<sup v-if="match['t4' + loser]">{{ tiebreak(match['s4' + loser], match['t4' + loser]) }}</sup>
+                        {{ match['s4' + losePlayer] }}<sup v-if="match['t4' + losePlayer]">{{ tiebreak(match['s4' + losePlayer], match['t4' + losePlayer]) }}</sup>
                     </div>
                 </div>
                 <div class="component-column" v-if="match.s5p1">
                     <div class="component-row">
-                        {{ match['s5' + winner] }}<sup v-if="match['t5' + winner]">{{ tiebreak(match['s5' + winner], match['t5' + winner]) }}</sup>
+                        {{ match['s5' + winPlayer] }}<sup v-if="match['t5' + winPlayer]">{{ tiebreak(match['s5' + winPlayer], match['t5' + winPlayer]) }}</sup>
                     </div>
                     <div class="component-row">
-                        {{ match['s5' + loser] }}<sup v-if="match['t5' + loser]">{{ tiebreak(match['s5' + loser], match['t5' + loser]) }}</sup>
+                        {{ match['s5' + losePlayer] }}<sup v-if="match['t5' + losePlayer]">{{ tiebreak(match['s5' + losePlayer], match['t5' + losePlayer]) }}</sup>
                     </div>
                 </div>
             </div>

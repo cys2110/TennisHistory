@@ -6,8 +6,8 @@ module.exports = (sequelize, models) => {
             const { Player, Edition, MatchScore } = models
             Entry.belongsTo(Edition)
             Entry.belongsTo(Player)
-            Entry.hasMany(MatchScore, {foreignKey: 'p1_no'})
-            Entry.hasMany(MatchScore, {foreignKey: 'p2_no'})
+            Entry.hasMany(MatchScore, {foreignKey: 'p1_no', as: 'entry1'})
+            Entry.hasMany(MatchScore, {foreignKey: 'p2_no', as: 'entry2'})
         }
     }
     Entry.init({

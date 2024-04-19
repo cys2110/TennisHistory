@@ -5,10 +5,10 @@ module.exports = (sequelize, models) => {
         static associate () {
             const { Player, Edition, Entry } = models
             MatchScore.belongsTo(Edition)
-            MatchScore.belongsTo(Entry, {foreignKey: {name: 'p1_no'}})
-            MatchScore.belongsTo(Player, {foreignKey: {name: 'p1', type: DataTypes.STRING}})
-            MatchScore.belongsTo(Entry, {foreignKey: {name: 'p2_no'}})
-            MatchScore.belongsTo(Player, {foreignKey: {name: 'p2', type: DataTypes.STRING}})
+            MatchScore.belongsTo(Entry, {foreignKey: {name: 'p1_no'}, as: 'entry1'})
+            MatchScore.belongsTo(Player, {foreignKey: {name: 'p1', type: DataTypes.STRING}, as: 'player1'})
+            MatchScore.belongsTo(Entry, {foreignKey: {name: 'p2_no'}, as: 'entry2'})
+            MatchScore.belongsTo(Player, {foreignKey: {name: 'p2', type: DataTypes.STRING}, as: 'player2'})
             MatchScore.belongsTo(Player, {foreignKey: {name: 'winner_id', type: DataTypes.STRING}})
         }
     }

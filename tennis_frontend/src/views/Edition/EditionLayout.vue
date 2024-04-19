@@ -3,7 +3,6 @@ import EditionService from '@/services/EditionService';
 import { onMounted, ref } from 'vue';
 import { categorySrc, formattedDates, flagSrc } from '@/components/utils';
 import { useRoute, RouterLink } from 'vue-router';
-import MatchScoreService from '@/services/MatchScoreService';
 
 const props = defineProps(['editionId'])
 const edition = ref(null)
@@ -19,9 +18,7 @@ onMounted(() => {
     EditionService.getEditionById(props.editionId)
     .then (response => {
         edition.value = response.data
-        MatchScoreService.getMatchesByEdition(edition.value.id)
-        .then (response => matches.value = response.data)
-        .catch (error => console.log(error))
+        matches.value = response.data.MatchScores
     })
     .catch(error => console.log(error))
 })
@@ -32,7 +29,7 @@ onMounted(() => {
         <div class="heading-container">
             <div class="category"><img class="filter" :src="categorySrc(edition.category)" /></div>
             <div class="heading">
-                <h1><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: edition.tournament_id, name: edition.tournament_name}}">{{ edition.tournament_name }}</RouterLink></h1>
+                <h1><RouterLink class="hover-link" :to="{name: 'Tournament', params: {name: edition.Tournament.name, id: edition.TournamentId}}">{{ edition.Tournament.name }}</RouterLink></h1>
                 <div class="sub-heading" v-if="edition.sponsor_name">{{ edition.sponsor_name }}</div>
                 <div class="sub-heading">{{ formattedDates(edition.start_date, edition.end_date) }}</div>
             </div>
@@ -45,5 +42,5 @@ onMounted(() => {
         </div>
         <RouterView :edition="edition" :matches="matches"/>
     </div>
-    <div v-else class="loading">Loading</div>
+    <div v-else class="loading">Loading...</div>
 </template>

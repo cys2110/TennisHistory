@@ -23,6 +23,7 @@ const editionController = require('./controllers/editionController')
 const playerController = require('./controllers/playerController')
 
 app.get('/', (req, res) => res.send('This is the root!'))
+app.get('/search/:search', tournamentController.search)
 
 // Player endpoints
 app.get('/players/id/:id', playerController.findById)
@@ -33,7 +34,7 @@ app.get('/tournaments/id/:id', tournamentController.findById)
 app.post('/tournaments', tournamentController.create)
 
 // Edition endpoints
-app.get('/editions/id/:id', editionController.findById)
+app.get('/editions/id/:edition', editionController.findByEditionNo)
 app.get('/editions/upcoming', editionController.findUpcoming)
 app.get('/editions/year/:year', editionController.findByYear)
 app.get('/editions/player/:player', editionController.findByPlayer)

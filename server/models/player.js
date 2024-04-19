@@ -4,17 +4,14 @@ module.exports = (sequelize, models) => {
     class Player extends Model {
         static associate () {
         const { Edition, Entry, MatchScore, WlIndex, PlayerStat } = models
-            Player.hasMany(Edition, {foreignKey: 'winner_id'})
-            Player.hasMany(Edition, {foreignKey: 'finalist_id'})
+            Player.hasMany(Edition, {foreignKey: 'winner_id', as: 'winner'})
+            Player.hasMany(Edition, {foreignKey: 'finalist_id', as: 'finalist'})
             Player.hasMany(Entry)
-            Player.hasMany(MatchScore, {foreignKey: 'p1'})
-            Player.hasMany(MatchScore, {foreignKey: 'p2'})
+            Player.hasMany(MatchScore, {foreignKey: 'p1', as: 'player1'})
+            Player.hasMany(MatchScore, {foreignKey: 'p2', as: 'player2'})
             Player.hasMany(MatchScore, {foreignKey: 'winner_id'})
             Player.hasOne(WlIndex)
             Player.hasMany(PlayerStat)
-        }
-        getFullName() {
-            return [this.first_name, this.last_name].join(' ')
         }
     }
     Player.init({
@@ -29,6 +26,15 @@ module.exports = (sequelize, models) => {
         last_name: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        full_name: {
+            type: DataTypes.VIRTUAL,
+            get() {
+                return `${this.first_name} ${this.last_name}`
+            },
+            set(value) {
+                throw new Error ('Do not try to set the `full_name` value!')
+            }
         },
         status: DataTypes.BOOLEAN,
         turned_pro: DataTypes.INTEGER,

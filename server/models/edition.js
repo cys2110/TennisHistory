@@ -5,8 +5,8 @@ module.exports = (sequelize, models) => {
         static associate () {
             const { Player, Tournament, Entry, MatchScore, Tie } = models
             Edition.belongsTo(Tournament)
-            Edition.belongsTo(Player, {foreignKey: {name: 'winner_id', type: DataTypes.STRING}})
-            Edition.belongsTo(Player, {foreignKey: {name: 'finalist_id', type: DataTypes.STRING}})
+            Edition.belongsTo(Player, {foreignKey: {name: 'winner_id', type: DataTypes.STRING}, as: 'winner'})
+            Edition.belongsTo(Player, {foreignKey: {name: 'finalist_id', type: DataTypes.STRING}, as: 'finalist'})
             Edition.hasMany(Entry)
             Edition.hasMany(MatchScore)
             Edition.hasMany(Tie)

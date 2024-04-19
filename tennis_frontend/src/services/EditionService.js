@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8000/editions/',
+    baseURL: 'http://localhost:8080/editions/',
     withCredentials: false,
     headers: {
         Accept: 'application/json',
@@ -11,7 +11,7 @@ const apiClient = axios.create({
 
 export default {
     getEditionById(id) {
-        return apiClient.get('/' + id)
+        return apiClient.get('id/' + id)
     },
     getUpcomingEditions() {
         return apiClient.get('upcoming')

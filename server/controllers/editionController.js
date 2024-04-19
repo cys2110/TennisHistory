@@ -10,9 +10,60 @@ exports.create = (req, res) => {
     .catch(error => res.status(500).send(error.message))
 }
 
-exports.findById = (req, res) => {
-    const { id } = req.params
-    Edition.findByPk(id)
+exports.findByEditionNo = (req, res) => {
+    const { edition } = req.params
+    Edition.findOne({
+        where: {
+            edition_no: edition
+        },
+        include: [
+            {
+                model: db.Player,
+                as: 'winner',
+                attributes: ['id', 'first_name', 'last_name', 'full_name', 'headshot', 'country']
+            },
+            {
+                model: db.Player,
+                as: 'finalist',
+                attributes: ['id', 'first_name', 'last_name', 'full_name', 'headshot', 'country']
+            },
+            {
+                model: db.Entry,
+                include: {
+                    model: db.Player,
+                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'headshot', 'country']
+                },
+            },
+            {
+                model: db.MatchScore,
+                include: [
+                    {
+                        model: db.Player,
+                        as: 'player1',
+                        attributes: ['id', 'first_name', 'last_name', 'headshot', 'country', 'full_name']
+                    },
+                    {
+                        model: db.Player,
+                        as: 'player2',
+                        attributes: ['id', 'first_name', 'last_name', 'full_name', 'headshot', 'country']
+                    },
+                    {
+                        model: db.Entry,
+                        as: 'entry1',
+                        attributes: ['seed', 'status']
+                    },
+                    {
+                        model: db.Entry,
+                        as: 'entry2',
+                        attributes: ['seed', 'status']
+                    }
+                ]
+            },
+            {
+                model: db.Tournament
+            }
+        ]
+    })
     .then(response => res.send(response))
     .catch(error => res.status(500).send(error.message))
 }
@@ -22,10 +73,11 @@ exports.findUpcoming = (req, res) => {
     Edition.findAll({
         where: {
             end_date: {
-                [Op.gt]: currentDate
+                [Op.gte]: currentDate
             }
         },
-        order: [['end_date', 'ASC']]
+        order: [['end_date', 'ASC']],
+        include: db.Tournament
     })
     .then(response => res.send(response))
     .catch(error => res.status(500).send(error.message))
