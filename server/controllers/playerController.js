@@ -2,7 +2,6 @@ const db = require('../models')
 const Player = db.Player
 const Op = db.Sequelize.Op
 
-// create
 exports.create = (req,res) => {
     if (!req.body.id) {
         res.status(400).send({

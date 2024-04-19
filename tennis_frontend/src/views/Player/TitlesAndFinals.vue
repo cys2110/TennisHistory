@@ -1,7 +1,7 @@
 <script setup>
 import EditionService from '@/services/EditionService';
 import { onMounted, ref } from 'vue';
-import { groupObjectsByKey, surface, environment, hardType } from '@/components/utils';
+import { groupObjectsByKey } from '@/components/utils';
 import { RouterLink } from 'vue-router';
 
 const props = defineProps(['player'])
@@ -51,13 +51,13 @@ onMounted(() => {
                         <td class="column">
                             <div v-for="tournament in year">
                                 <span v-if="tournament.sponsor_name">{{ tournament.sponsor_name }} | </span>
-                                <span><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: tournament.tournament_id, name: tournament.tournament_name}}">{{ tournament.tournament_name }}</RouterLink></span>
+                                <span><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: tournament.TournamentId, name: tournament.Tournament.name}}">{{ tournament.Tournament.name }}</RouterLink></span>
                             </div>
                         </td>
                         <td class="column">
                             <div v-for="tournament in year">
-                                <span>{{ environment(tournament.environment) }} {{ surface(tournament.surface) }}</span>
-                                <span v-if="tournament.hard_type"> ({{ hardType(tournament.hard_type) }})</span>
+                                <span>{{ tournament.environment }} {{ tournament.surface }}</span>
+                                <span v-if="tournament.hard_type"> ({{ tournament.hard_type }})</span>
                             </div>
                         </td>
                     </tr>
@@ -82,13 +82,13 @@ onMounted(() => {
                         <td class="column">
                             <div v-for="tournament in year">
                                 <span v-if="tournament.sponsor_name">{{ tournament.sponsor_name }} | </span>
-                                <span>{{ tournament.tournament_name }}</span>
+                                <span><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: tournament.TournamentId, name: tournament.Tournament.name}}">{{ tournament.Tournament.name }}</RouterLink></span>
                             </div>
                         </td>
                         <td class="column">
                             <div v-for="tournament in year">
-                                <span>{{ environment(tournament.environment) }} {{ surface(tournament.surface) }}</span>
-                                <span v-if="tournament.hard_type"> ({{ hardType(tournament.hard_type) }})</span>
+                                <span>{{ tournament.environment }} {{ tournament.surface }}</span>
+                                <span v-if="tournament.hard_type"> ({{ tournament.hard_type }})</span>
                             </div>
                         </td>
                     </tr>

@@ -67,6 +67,7 @@ watch(() => router.currentRoute.value.params.id, () => {
         <div class="tabs">
             <div :class="{'tab': true, 'active-tab': currentTab === 'PlayerOverview'}"><RouterLink class="tab-link" :to="{name: 'PlayerOverview'}" @click="setCurrentTab('PlayerOverview')">Overview</RouterLink></div>
             <div :class="{'tab': true, 'active-tab': currentTab === 'Titles'}"><RouterLink class="tab-link" :to="{name: 'Titles'}" @click="setCurrentTab('Titles')">Titles and Finals</RouterLink></div>
+            <div :class="{'tab': true, 'active-tab': currentTab === 'WL Index'}"><RouterLink class="tab-link" :to="{name: 'WLIndex'}" @click="setCurrentTab('WL Index')">Win-loss Index</RouterLink></div>
         </div>
 
         <RouterView v-if="player" :player="player" />

@@ -90,6 +90,7 @@ const router = createRouter({
         {
           path: 'wl-index',
           name: 'WLIndex',
+          props: true,
           component: WLIndex
         }
       ]
