@@ -31,17 +31,17 @@ endDate < currentDate ? display.value = true : display.value = false
 
 <template>
     <div class="card-container">
-        <div class="centred card-heading"><RouterLink class="hover-link" :to="{name: 'EditionOverview', params: {id: edition.tournament_id, name: edition.tournament_name, editionId: edition.id}}">{{ edition.year }}</RouterLink></div>
+        <div class="centred card-heading"><RouterLink class="hover-link" :to="{name: 'EditionOverview', params: {editionId: edition.edition_no}}">{{ edition.year }}</RouterLink></div>
         <div class="card-component">
-            <div class="card-detail"><img v-if="edition.winner && edition.winner_headshot" :src="headshot(edition.winner_id)" class="headshot" :alt="edition.winner_name" /></div>
-            <div class="card-detail"><img v-if="edition.winner" :src="flagSrc(edition.winner_country)" class="mini-flag" :alt="edition.winner_country" /></div>
-            <div class="card-detail"><RouterLink v-if="edition.winner" class="hover-link" :to="{name: 'PlayerOverview', params: {id: edition.winner_id, name:edition.winner_name}}">{{ edition.winner_name }}</RouterLink></div>
+            <div class="card-detail"><img v-if="edition.winner && edition.winner.headshot" :src="headshot(edition.winner_id)" class="headshot" :alt="edition.winner.full_name" /></div>
+            <div class="card-detail"><img v-if="edition.winner" :src="flagSrc(edition.winner.country)" class="mini-flag" :alt="edition.winner.country" /></div>
+            <div class="card-detail"><RouterLink v-if="edition.winner" class="hover-link" :to="{name: 'PlayerOverview', params: {id: edition.winner_id, name:edition.winner.full_name}}">{{ edition.winner.full_name }}</RouterLink></div>
         </div>
         <div class="centred card-component" v-if="edition.winner">d.</div>
         <div class="card-component">
-            <div class="card-detail"><img v-if="edition.finalist && edition.finalist_headshot" :src="headshot(edition.finalist_id)" class="headshot" :alt="edition.finalist_name" /></div>
-            <div class="card-detail"><img v-if="edition.finalist" :src="flagSrc(edition.finalist_country)" class="mini-flag" :alt="finalist_country" /></div>
-            <div class="card-detail"><RouterLink v-if="edition.finalist" class="hover-link" :to="{name: 'PlayerOverview', params: {id: edition.finalist_id, name:edition.finalist_name}}">{{ edition.finalist_name }}</RouterLink></div>
+            <div class="card-detail"><img v-if="edition.finalist && edition.finalist.headshot" :src="headshot(edition.finalist_id)" class="headshot" :alt="edition.finalist.full_name" /></div>
+            <div class="card-detail"><img v-if="edition.finalist" :src="flagSrc(edition.finalist.country)" class="mini-flag" :alt="edition.finalist.country" /></div>
+            <div class="card-detail"><RouterLink v-if="edition.finalist" class="hover-link" :to="{name: 'PlayerOverview', params: {id: edition.finalist_id, name:edition.finalist.full_name}}">{{ edition.finalist.full_name }}</RouterLink></div>
         </div>
         <div class="centred card-component" v-if="edition.winner">{{ score }}</div>
     </div>

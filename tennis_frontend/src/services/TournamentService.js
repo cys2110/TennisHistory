@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8000/tournaments/',
+    baseURL: 'http://localhost:8080/tournaments/',
     withCredentials: false,
     headers: {
         Accept: 'application/json',
@@ -11,6 +11,6 @@ const apiClient = axios.create({
 
 export default {
     getTournamentById(id) {
-        return apiClient.get('' + id)
+        return apiClient.get('id/' + id)
     }
 }

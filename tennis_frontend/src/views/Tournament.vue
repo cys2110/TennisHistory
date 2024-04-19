@@ -20,9 +20,7 @@ const years = computed(() => {
 
 onMounted(() => {
     TournamentService.getTournamentById(props.id)
-    .then(response => {
-        tournament.value = response.data
-})
+    .then(response => tournament.value = response.data)
     .catch(error => console.log(error))
 })
 </script>
@@ -34,7 +32,7 @@ onMounted(() => {
         </div>
         <div class="view-subheading">{{ years }}</div>
         <div class="view-cards">
-            <TournamentCard v-for="edition in tournament.editions" :edition="edition" :key="edition.id" />
+            <TournamentCard v-for="edition in tournament.Editions" :edition="edition" :key="edition.id" />
         </div>
     </main>
     <div v-else class="loading">Loading</div>

@@ -1,24 +1,12 @@
 <script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faHouse, faCircleUser, faMagnifyingGlass } from '@fortawesome/pro-solid-svg-icons'
+import { faHouse, faMagnifyingGlass } from '@fortawesome/pro-solid-svg-icons'
 import { faCalendar } from '@fortawesome/pro-regular-svg-icons'
-import { faPersonToPortal, faPeopleArrows } from '@fortawesome/pro-duotone-svg-icons'
+import { faPeopleArrows } from '@fortawesome/pro-duotone-svg-icons'
 import { ref } from 'vue'
-import { useLogin } from '@/stores/user'
 import Search from './Search.vue'
 
-const store = useLogin()
-const username = ref(localStorage.username)
-const userId = ref(localStorage.userId)
 const openSearch = ref(false)
-
-const logOut = () => {
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-    localStorage.removeItem('username')
-    localStorage.removeItem('userId')
-    store.setLoggedIn(false)
-}
 
 const toggleSearch = () => {
     openSearch.value = !openSearch.value
@@ -33,9 +21,6 @@ const toggleSearch = () => {
         <RouterLink :to="{name: 'home'}"><FontAwesomeIcon class="navIcon" :icon="faHouse" /></RouterLink>
         <RouterLink :to="{name: 'Results Archive'}"><FontAwesomeIcon class="navIcon" :icon="faCalendar" /></RouterLink>
         <RouterLink :to="{name: 'H2H'}"><FontAwesomeIcon class="navIcon" :icon="faPeopleArrows" /></RouterLink>
-        <RouterLink v-if="!store.loggedIn" :to="{name: 'Login'}"><FontAwesomeIcon class="navIcon" :icon="faCircleUser" /></RouterLink>
-        <RouterLink v-if="store.loggedIn" :to="{name: 'Profile', params: {id: userId, username: username}}"><FontAwesomeIcon class="navIcon" :icon="faCircleUser" /></RouterLink>
-        <FontAwesomeIcon v-if="store.loggedIn" class="navIcon" :icon="faPersonToPortal" @click="logOut" />
         <FontAwesomeIcon class="navIcon" :icon="faMagnifyingGlass" @click="toggleSearch" />
     </div>
     <div class="search-container" v-if="openSearch" >

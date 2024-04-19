@@ -17,24 +17,24 @@ const navigate = (id, name) => {
     <div class="draw-card-wrapper">
         <div class="card-component">
             <div class="component-column">
-                <div class="component-row"><img v-if="match.p1_headshot === 'True'" :src="headshot(match.p1_id)" class="headshot" @click="navigate(match.p1_id, match.p1_name)" /></div>
-                <div class="component-row"><img v-if="match.p2_headshot === 'True'" :src="headshot(match.p2_id)" class="headshot" @click="navigate(match.p2_id, match.p2_name)" /></div>
+                <div class="component-row"><img v-if="match.player1 && match.player1.headshot" :src="headshot(match.p1)" class="headshot" @click="navigate(match.p1, match.player1.full_name)" /></div>
+                <div class="component-row"><img v-if="match.player2 && match.player2.headshot" :src="headshot(match.p2)" class="headshot" @click="navigate(match.p2, match.player2.full_name)" /></div>
             </div>
             <div class="component-column">
-                <div class="component-row"><img v-if="match.p1_country" :src="flagSrc(match.p1_country)" class="mini-flag" /></div>
-                <div class="component-row"><img v-if="match.p2_country" :src="flagSrc(match.p2_country)" class="mini-flag" /></div>
+                <div class="component-row"><img v-if="match.player1" :src="flagSrc(match.player1.country)" class="mini-flag" /></div>
+                <div class="component-row"><img v-if="match.player2" :src="flagSrc(match.player2.country)" class="mini-flag" /></div>
             </div>
             <div class="component-column">
-                <div class="component-row" v-if="match.p1_name"><RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {id: match.p1_id, name: match.p1_name}}" >{{ match.p1_name }}</RouterLink></div>
+                <div class="component-row" v-if="match.player1"><RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {id: match.p1, name: match.player1.full_name}}" >{{ match.player1.full_name }}</RouterLink></div>
                 <div class="component-row" v-else-if="match.incomplete === 'B'">Bye</div>
                 <div class="component-row" v-else>Player 1</div>
-                <div class="component-row" v-if="match.p2_name"><RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {id: match.p2_id, name: match.p2_name}}" >{{ match.p2_name }}</RouterLink></div>
+                <div class="component-row" v-if="match.player2"><RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {id: match.p2, name: match.player2.full_name}}" >{{ match.player2.full_name }}</RouterLink></div>
                 <div class="component-row" v-else-if="match.incomplete === 'B'">Bye</div>
                 <div class="component-row" v-else>Player 2</div>
             </div>
             <div class="component-column">
-                <div class="component-row"><FontAwesomeIcon v-if="match.winner_id_id === match.p1_id" :icon="faCheck" /></div>
-                <div class="component-row"><FontAwesomeIcon v-if="match.winner_id_id === match.p2_id" :icon="faCheck" /></div>
+                <div class="component-row"><FontAwesomeIcon v-if="match.winner_id === match.p1" :icon="faCheck" /></div>
+                <div class="component-row"><FontAwesomeIcon v-if="match.winner_id === match.p2" :icon="faCheck" /></div>
             </div>
             <div class="score">
                 <div class="component-column" v-if="match.s1p1">

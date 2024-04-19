@@ -1,5 +1,4 @@
 <script setup>
-import BaseInput from '@/components/BaseForm/BaseInput.vue';
 import { computed, onMounted, ref, watch } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/pro-duotone-svg-icons'
@@ -33,12 +32,7 @@ onMounted(() => {
 watch(searchYear, () => {
     if (searchYear.value !== '') {
         EditionService.getEditionsByYear(searchYear.value)
-        .then(response => {
-            const sorted = response.data.toSorted((a, b) => {
-                return a.start_date.localeCompare(b.start_date)
-            })
-            results.value = sorted
-        })
+        .then(response => results.value = response.data)
         .catch(error => console.log(error))
     }
 }, {immediate: true})
