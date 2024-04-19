@@ -13,7 +13,7 @@ module.exports = (sequelize, models) => {
             primaryKey: true,
             autoIncrement: true
         },
-        surface: DataTypes.ENUM('Clay', 'Carpet', 'Grass', 'Hard'),
+        surface: DataTypes.ENUM('All', 'Clay', 'Carpet', 'Grass', 'Hard'),
         career: DataTypes.BOOLEAN,
         year: DataTypes.INTEGER,
         aces: DataTypes.INTEGER,

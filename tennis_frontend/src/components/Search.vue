@@ -35,12 +35,12 @@ const closeSearch = () => {
             <div class="results">
                 <h1>Tournaments</h1>
                 <div v-if="tournamentResults.length === 0">No results matching search</div>
-                <div v-else v-for="result in tournamentResults" :key="result.id"><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: result.id, name: result.name}}">{{ result.name }}</RouterLink></div>
+                <div v-else v-for="result in tournamentResults" :key="result.id"><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: result.id, name: result.name}}" @click="closeSearch">{{ result.name }}</RouterLink></div>
             </div>
             <div class="results">
                 <h1>Players</h1>
                 <div v-if="playerResults.length === 0">No results matching search</div>
-                <div v-else v-for="result in playerResults" :key="result.id"><RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {name: result.full_name, id: result.id}}">{{ result.full_name }}</RouterLink></div>
+                <div v-else v-for="result in playerResults" :key="result.id"><RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {name: result.full_name, id: result.id}}" @click="closeSearch">{{ result.full_name }}</RouterLink></div>
             </div>
         </div>
     </div>

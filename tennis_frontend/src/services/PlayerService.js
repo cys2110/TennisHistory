@@ -12,5 +12,8 @@ const apiClient = axios.create({
 export default {
     getPlayerById(id) {
         return apiClient.get('id/' + id)
+    },
+    getPlayerStats(id) {
+        return apiClient.get('stats/' + id)
     }
 }
