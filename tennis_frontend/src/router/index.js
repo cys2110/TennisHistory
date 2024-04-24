@@ -8,10 +8,7 @@ import TitlesAndFinals from '@/views/Player/TitlesAndFinals.vue'
 import Activity from '@/views/Player/Activity.vue'
 import Stats from '@/views/Player/Stats.vue'
 import WLIndex from '@/views/Player/WLIndex.vue'
-import EditionLayout from '@/views/Edition/EditionLayout.vue'
-import EditionOverview from '@/views/Edition/EditionOverview.vue'
-import Results from '@/views/Edition/Results.vue'
-import Draw from '@/views/Edition/Draw.vue'
+import Edition from '@/views/Edition.vue'
 import MatchStats from '@/views/Edition/MatchStats.vue'
 import H2H from '@/views/Player/H2H.vue'
 
@@ -36,24 +33,10 @@ const router = createRouter({
     },
     {
       path: '/tournaments/:name/:id/:editionId',
-      component: EditionLayout,
+      component: Edition,
+      name: 'Edition',
       props: true,
       children: [
-        {
-          path: '',
-          name: 'EditionOverview',
-          component: EditionOverview
-        },
-        {
-          path: 'results',
-          name: 'Results',
-          component: Results
-        },
-        {
-          path: 'draw',
-          name: 'Draw',
-          component: Draw
-        },
         {
           path: 'matches/:matchId',
           name: 'MatchStats',

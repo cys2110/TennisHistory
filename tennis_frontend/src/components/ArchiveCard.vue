@@ -27,9 +27,7 @@ const navigate = (slug) => {
                 </v-col>
                 <v-col cols="3">
                     <v-chip-group variant="outlined" v-if="currentDate > startDate">
-                        <v-chip @click="navigate('EditionOverview')">Overview</v-chip>
-                        <v-chip @click="navigate('Results')">Results</v-chip>
-                        <v-chip @click="navigate('Draw')">Draw</v-chip>
+                        <v-chip @click="navigate('Edition')">Overview</v-chip>
                     </v-chip-group>
                 </v-col>
             </v-row>
