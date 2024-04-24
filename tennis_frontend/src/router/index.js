@@ -2,15 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Tournament from '@/views/Tournament.vue'
 import ResultsArchive from '@/views/ResultsArchive.vue'
-import PlayerLayout from '@/views/Player/PlayerLayout.vue'
-import PlayerOverview from '@/views/Player/PlayerOverview.vue'
-import TitlesAndFinals from '@/views/Player/TitlesAndFinals.vue'
-import Activity from '@/views/Player/Activity.vue'
-import Stats from '@/views/Player/Stats.vue'
-import WLIndex from '@/views/Player/WLIndex.vue'
+import Player from '@/views/Player.vue'
 import Edition from '@/views/Edition.vue'
 import MatchStats from '@/views/Edition/MatchStats.vue'
-import H2H from '@/views/Player/H2H.vue'
+import H2H from '@/views/H2H.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -47,36 +42,8 @@ const router = createRouter({
     },
     {
       path: '/players/:name/:id',
-      component: PlayerLayout,
-      props: true,
-      children: [
-        {
-          path: '',
-          name: 'PlayerOverview',
-          component: PlayerOverview
-        },
-        {
-          path: 'titles-and-finals',
-          name: 'Titles',
-          component: TitlesAndFinals
-        },
-        {
-          path: 'activity',
-          name: 'Activity',
-          component: Activity
-        },
-        {
-          path: 'stats',
-          name: 'PlayerStats',
-          component: Stats
-        },
-        {
-          path: 'wl-index',
-          name: 'WLIndex',
-          props: true,
-          component: WLIndex
-        }
-      ]
+      component: Player,
+      props: true
     },
     {
       path: '/h2h',

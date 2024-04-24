@@ -10,6 +10,7 @@ const titlesArray = ref([])
 const finals = ref({})
 const titles = ref({})
 const selection = ref('Titles')
+const items = ['Titles', 'Finals']
 
 onMounted(() => {
     EditionService.getEditionsByPlayer(props.player.id)
@@ -27,14 +28,13 @@ onMounted(() => {
 </script>
 
 <template>
-    <main>
-        <div class="dropdown">
-            <select v-model="selection" class="dropdown-selection">
-                <option value="Titles">Titles</option>
-                <option value="Finals">Finals</option>
-            </select>
-        </div>
-        <div v-if="selection === 'Titles'">
+    <v-container>
+        <v-row>
+            <v-col>
+                <v-combobox variant="outlined" v-model="selection" :items="items"></v-combobox>
+            </v-col>
+        </v-row>
+        <v-row v-if="selection === 'Titles'">
             <table v-if="titlesArray.length > 0">
                 <thead>
                     <tr>
@@ -63,9 +63,9 @@ onMounted(() => {
                     </tr>
                 </tbody>
             </table>
-            <div v-else>None</div>
-        </div>
-        <div v-if="selection === 'Finals'">
+            <div v-else>No titles won</div>
+        </v-row>
+        <v-row v-if="selection === 'Finals'">
             <table v-if="finalsArray.length > 0">
                 <thead>
                     <tr>
@@ -94,28 +94,7 @@ onMounted(() => {
                     </tr>
                 </tbody>
             </table>
-            <div v-else>None</div>
-        </div>
-    </main>
+            <div v-else>No finals competed in</div>
+        </v-row>
+    </v-container>
 </template>
-
-<style scoped>
-main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem;
-}
-
-.dropdown {
-    margin-left: auto;
-}
-
-.dropdown-selection {
-    background-color: transparent;
-    color: var(--color-text);
-    padding: 0.25rem;
-    border-radius: 1rem;
-    border: 2px solid var(--blue-border);
-}
-</style>

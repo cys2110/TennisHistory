@@ -45,14 +45,3 @@ onMounted(() => {
         <div v-else class="text-h3">No data available yet</div>
     </v-sheet>
 </template>
-
-<style scoped>
-.view-heading, .viewcards {
-    display: flex;
-    flex-direction: row
-}
-
-h1 {
-    margin-right: 0.5rem;
-}
-</style>

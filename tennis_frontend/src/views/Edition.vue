@@ -10,7 +10,7 @@ import DrawWindow from '@/components/Edition/DrawWindow.vue';
 const props = defineProps(['editionId'])
 const edition = ref(null)
 const matches = ref([])
-const tab = ref('draw')
+const tab = ref('overview')
 
 onMounted(() => {
     EditionService.getEditionById(props.editionId)
@@ -40,7 +40,7 @@ onMounted(() => {
             </v-row>
             <v-row>
                 <v-col>
-                    <v-toolbar  color="indigo-accent-4" rounded="xl">
+                    <v-toolbar color="indigo-accent-4" rounded="xl">
                         <v-tabs v-model="tab">
                             <v-tab value="overview">Overview</v-tab>
                             <v-tab value="results">Results</v-tab>

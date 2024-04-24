@@ -14,8 +14,12 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="wl-index">
-        <div class="heading index-row">Match Record</div>
+    <v-container>
+        <v-row>
+            <v-col>
+                <div class="text-6">Match Record</div>
+            </v-col>
+        </v-row>
         <IndexItem :win="index.overall_w" :loss="index.overall_l">
             <template #metric>Overall</template>
             <template #titles> ({{ index.overall_titles }} <span v-if="index.overall_titles === 1">title</span><span v-else>titles</span>)</template>
@@ -79,35 +83,5 @@ onMounted(() => {
         <IndexItem :win="index.lh_w" :loss="index.lh_l">
             <template #metric>vs. left-handers</template>
         </IndexItem>
-    </div>
+    </v-container>
 </template>
-
-<style scoped>
-div {
-    padding-top: 0.1rem;
-    padding-bottom: 0.1rem;
-}
-.wl-index {
-    display: flex;
-    flex-direction: column;
-    margin: 1rem auto;
-    align-content: center;
-    width: 95%;
-    border: 1px transparent;
-    border-radius: 10rem;
-}
-
-.heading {
-    justify-content: center;
-    background-color: var(--header-background);
-    border-radius: 10rem;
-    font-weight: bold;
-    padding-left: 0;
-}
-
-.index-row {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-}
-</style>

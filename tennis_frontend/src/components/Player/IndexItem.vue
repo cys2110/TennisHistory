@@ -14,17 +14,25 @@ const index = computed(() => {
 </script>
 
 <template>
-    <div class="index-row">
-        <div class="index-meter"><v-progress-linear rounded :height="20" color="green-darken-4" reverse :model-value="meter(win)"><p>{{ win }}</p></v-progress-linear></div>
-        <div class="index-component">
-            <div class="index-heading">
-                <slot name="metric"></slot>
-            </div>
-            <div class="index-subheading">{{ index }}
+    <v-row>
+        <v-col><v-progress-linear rounded :height="20" color="green-darken-4" reverse :model-value="meter(win)"><p>{{ win }}</p></v-progress-linear></v-col>
+        <v-col>
+            <slot name="metric"></slot>
+            <div>{{ index }}
                 <slot name="titles"></slot>
             </div>
+        </v-col>
+        <v-col><v-progress-linear rounded :height="20" color="green-darken-4" :model-value="meter(loss)"><p>{{ loss }}</p></v-progress-linear></v-col>
+    </v-row>
+    <div class="index-row">
+        <div class="index-meter"></div>
+        <div class="index-component">
+            <div class="index-heading">
+                
+            </div>
+            
         </div>
-        <div class="index-meter"><v-progress-linear rounded :height="20" color="green-darken-4" :model-value="meter(loss)"><p>{{ loss }}</p></v-progress-linear></div>
+        <div class="index-meter"></div>
     </div>
 </template>
 
