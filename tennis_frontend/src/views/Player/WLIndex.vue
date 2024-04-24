@@ -6,21 +6,9 @@ import { onMounted, ref } from 'vue';
 const props = defineProps(['id'])
 const index = ref({})
 
-const indices = (win, loss) => {
-    const decimal = win / (win + loss);
-    return isNaN(decimal) ? 'N/A' : parseFloat(decimal.toFixed(3));
-}
-
-const meter = (value, win, loss) => {
-    return `${(value / (win + loss)) * 100}%`
-}
-
 onMounted(() => {
     PlayerService.getPlayerStats(props.id)
-    .then(response => {
-        index.value = response.data
-        console.log(index.value)
-    })
+    .then(response => index.value = response.data )
     .catch(error => console.log(error))
 })
 </script>

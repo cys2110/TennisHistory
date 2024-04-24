@@ -1,4 +1,9 @@
 @import './base.css';
+@import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+
+.v-application {
+  font-family: Inter, sans-serif !important;
+}
 
 a {
   color: var(--blue-link);

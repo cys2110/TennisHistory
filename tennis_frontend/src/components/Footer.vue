@@ -1,66 +1,23 @@
 <script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
+const links = ['About', 'Terms', 'ATP', 'ITF']
 </script>
 
 <template>
-    <div class="footer-wrapper">
-        <div class="footer-column">
-            <div class="heading">Credits</div>
-            <div>Claire Sheridan</div>
-            <div><a href="https://github.com/cys2110" target="_blank"><FontAwesomeIcon :icon="faGithub" class="icon" /></a> | <a href="www.linkedin.com/in/claire-y-sheridan" target="_blank"><FontAwesomeIcon :icon="faLinkedin" class="icon" /></a></div>
-            <div></div>
+    <v-footer class="d-flex flex-column bg-indigo-darken-4">
+        <div class="d-flex w-100 align-center justify-center px-4">
+
+        <v-btn
+            v-for="link in links"
+            :key="link"
+            class="mx-2"
+            color="white"
+            rounded="xl"
+            variant="text"
+        >{{ link }}</v-btn>
         </div>
-        <div class="footer-column">
-            <div class="heading">About</div>
-            <div>Rules</div>
-            <div>Terms and Conditions</div>
+
+        <div class="px-4 py-2 text-center w-100">
+            Created by <a class="text-green-darken-3" href="https://www.claire-sheridan.com" target="_blank">Claire Sheridan</a> using Vuetify
         </div>
-        <div class="footer-column">
-            <div class="heading">Related Links</div>
-            <a href="https://www.atptour.com/en" target="_blank" class="link hover-link">ATP</a>
-            <a href="https://www.itftennis.com/en/" target="_blank" class="link hover-link">ITF</a>
-        </div>
-    </div>
+  </v-footer>
 </template>
-
-<style scoped>
-.footer-wrapper {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    background: var(--header-background);
-    padding: 1rem;
-    margin-top: 2rem;
-}
-
-.footer-column {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-}
-
-.footer-column > div {
-    line-height: 2rem;
-}
-
-.icon {
-    cursor: pointer;
-    color: var(--color-text);
-    font-size: large;
-}
-
-.link {
-    color: var(--color-text);
-}
-
-.heading {
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: large;
-}
-</style>

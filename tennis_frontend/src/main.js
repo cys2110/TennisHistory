@@ -8,15 +8,35 @@ import router from './router'
 
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { aliases, fa } from 'vuetify/iconsets/fa-svg'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fad } from '@fortawesome/pro-duotone-svg-icons'
+import { fas } from '@fortawesome/pro-solid-svg-icons'
+import { far } from '@fortawesome/pro-regular-svg-icons'
+import { fab } from '@fortawesome/free-brands-svg-icons'
+import { mdi } from 'vuetify/iconsets/mdi'
 
 const vuetify = createVuetify({
-    components,
-    directives
+    theme: {
+      defaultTheme: 'dark'
+    },
+    icons: {
+      defaultSet: 'fa',
+      aliases,
+      sets: {
+        fa,
+        mdi
+      }
+    },
 })
 
 const app = createApp(App)
+app.component('font-awesome-icon', FontAwesomeIcon)
+library.add(fas)
+library.add(fab)
+library.add(far)
+library.add(fad)
 
 app.use(createPinia())
 app.use(router)

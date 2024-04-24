@@ -1,9 +1,9 @@
 export function headshot(player) {
-    return new URL(`https://www.atptour.com/-/media/alias/player-headshot/${player}`)
+    return new URL(`https://www.atptour.com/-/media/alias/player-headshot/${player}`).href
 }
 
 export function gladiator(player) {
-    return new URL(`https://www.atptour.com/-/media/alias/player-gladiator-headshot/${player}`)
+    return new URL(`https://www.atptour.com/-/media/alias/player-gladiator-headshot/${player}`).href
 }
 
 export function flagSrc (country) {

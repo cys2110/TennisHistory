@@ -1,8 +1,6 @@
 <script setup>
 import TournamentService from '@/services/TournamentService';
 import { onMounted, ref, computed } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faArrowUpRightFromSquare } from '@fortawesome/pro-duotone-svg-icons';
 import TournamentCard from '@/components/TournamentCard.vue';
 
 const props = defineProps(['id'])
@@ -26,16 +24,26 @@ onMounted(() => {
 </script>
 
 <template>
-    <main v-if="tournament">
-        <div class="view-heading">
-            <h1>{{ tournament.name }}</h1> <a v-if="tournament.website" :href="tournament.website" target="_blank"><FontAwesomeIcon :icon="faArrowUpRightFromSquare" /></a>
-        </div>
-        <div class="view-subheading">{{ years }}</div>
-        <div class="view-cards">
-            <TournamentCard v-for="edition in tournament.Editions" :edition="edition" :key="edition.id" />
-        </div>
-    </main>
-    <div v-else class="loading">Loading</div>
+    <v-sheet class="bg-transparent my-10 pa-3 w-75 mx-auto">
+        <v-container v-if="tournament">
+            <v-row>
+                <v-col class="d-flex">
+                    <div class="text-h3">{{ tournament.name }}</div> <a v-if="tournament.website" :href="tournament.website" target="_blank"><v-icon icon="fad fa-arrow-up-right-from-square"></v-icon></a>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col>
+                    <div class="text-subtitle-1">{{ years }}</div>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="5">
+                    <TournamentCard v-for="edition in tournament.Editions" :edition="edition" :key="edition.id" />
+                </v-col>
+            </v-row>
+        </v-container>
+        <div v-else class="text-h3">No data available yet</div>
+    </v-sheet>
 </template>
 
 <style scoped>
