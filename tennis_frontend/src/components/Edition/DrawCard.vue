@@ -12,7 +12,7 @@ const navigate = (id, name) => {
 </script>
 
 <template>
-    <v-card class="ma-3" variant="outlined" rounded="xl">
+    <v-card class="ma-3" variant="elevated" rounded="xl" color="indigo-darken-4">
         <v-container>
             <v-row class="flex-nowrap">
                 <v-col class="d-flex align-center">

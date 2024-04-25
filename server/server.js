@@ -33,10 +33,11 @@ app.get('/players/id/:id', playerController.findById)
 app.post('/players', playerController.create)
 
 // WL Index endpoints
-app.get('/players/stats/:player', wlIndexController.findByPlayer)
+app.get('/players/wlindex/:player', wlIndexController.findByPlayer)
 app.post('/wlindex', wlIndexController.create)
 
 // Player Stats endpoints
+app.get('/players/stats/:player', playerStatsController.findPlayerStat)
 app.post('/player-stats', playerStatsController.create)
 
 // Tournament endpoints

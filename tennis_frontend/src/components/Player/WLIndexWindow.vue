@@ -7,17 +7,20 @@ const props = defineProps(['id'])
 const index = ref({})
 
 onMounted(() => {
-    PlayerService.getPlayerStats(props.id)
-    .then(response => index.value = response.data )
+    PlayerService.getPlayerIndex(props.id)
+    .then(response => {
+        index.value = response.data
+        console.log(index.value)
+    } )
     .catch(error => console.log(error))
 })
 </script>
 
 <template>
-    <v-container>
+    <v-container class="w-75">
         <v-row>
-            <v-col>
-                <div class="text-6">Match Record</div>
+            <v-col class="bg-indigo-darken-4 rounded-t-xl">
+                <div class="text-h6 text-center font-weight-bold">Match Record</div>
             </v-col>
         </v-row>
         <IndexItem :win="index.overall_w" :loss="index.overall_l">
@@ -32,7 +35,11 @@ onMounted(() => {
             <template #metric>ATP Masters 1000</template>
             <template #titles> ({{ index.masters_titles }} <span v-if="index.masters_titles === 1">title</span><span v-else>titles</span>)</template>
         </IndexItem>
-        <div class="heading index-row">Pressure points</div>
+        <v-row>
+            <v-col class="bg-indigo-darken-4">
+                <div class="text-h6 text-center font-weight-bold">Pressure points</div>
+            </v-col>
+        </v-row>
         <IndexItem :win="index.tb_w" :loss="index.tb_l">
             <template #metric>Tiebreaks</template>
         </IndexItem>
@@ -48,7 +55,11 @@ onMounted(() => {
         <IndexItem :win="index.set5_w" :loss="index.set5_l">
             <template #metric>5th set record</template>
         </IndexItem>
-        <div class="heading index-row">Environment</div>
+        <v-row>
+            <v-col class="bg-indigo-darken-4">
+                <div class="text-h6 text-center font-weight-bold">Environment</div>
+            </v-col>
+        </v-row>
         <IndexItem :win="index.cl_w" :loss="index.cl_l">
             <template #metric>Clay</template>
             <template #titles> ({{ index.cl_titles }} <span v-if="index.cl_titles === 1">title</span><span v-else>titles</span>)</template>
@@ -73,7 +84,11 @@ onMounted(() => {
             <template #metric>Outdoor</template>
             <template #titles> ({{ index.o_titles }} <span v-if="index.o_titles === 1">title</span><span v-else>titles</span>)</template>
         </IndexItem>
-        <div class="heading index-row">Other</div>
+        <v-row>
+            <v-col class="bg-indigo-darken-4">
+                <div class="text-h6 text-center font-weight-bold">Other</div>
+            </v-col>
+        </v-row>
         <IndexItem :win="index.l1_w" :loss="index.l1_l">
             <template #metric>After losing 1st set</template>
         </IndexItem>

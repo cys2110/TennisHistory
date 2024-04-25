@@ -62,67 +62,67 @@ const bh = computed(() => {
         </v-row>
         <v-row>
             <v-col>
-                <table>
+                <v-table v-if="player.ao_round || player.rg_round || player.wimbledon_round || player.uso_round || player.finals_round || player.davis_round || player.hopman_round || player.olympics_round || player.wct_round || player.gs_cup_round" class="w-75 mx-auto rounded-xl">
                     <thead>
-                        <tr>
-                            <th>Tournament</th>
-                            <th>Best Result</th>
-                            <th>Year(s) achieved</th>
+                        <tr class="bg-indigo-accent-1">
+                            <th class="font-weight-bold text-center">Tournament</th>
+                            <th class="font-weight-bold text-center">Best Result</th>
+                            <th class="font-weight-bold">Year(s) achieved</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="player.ao_round">
-                            <td>Australian Open</td>
+                            <td class="text-center">Australian Open</td>
                             <td class="text-center">{{ player.ao_round }}</td>
                             <td>{{ joinArray(player.ao_years) }}</td>
                         </tr>
                         <tr v-if="player.rg_round">
-                            <td>Roland Garros</td>
+                            <td class="text-center">Roland Garros</td>
                             <td class="text-center">{{ player.rg_round }}</td>
                             <td>{{ joinArray(player.rg_years) }}</td>
                         </tr>
                         <tr v-if="player.wimbledon_round">
-                            <td>Wimbledon</td>
+                            <td class="text-center">Wimbledon</td>
                             <td class="text-center">{{ player.wimbledon_round }}</td>
                             <td>{{ joinArray(player.wimbledon_years) }}</td>
                         </tr>
                         <tr v-if="player.uso_round">
-                            <td>US Open</td>
+                            <td class="text-center">US Open</td>
                             <td class="text-center">{{ player.uso_round }}</td>
                             <td>{{ joinArray(player.uso_years) }}</td>
                         </tr>
                         <tr v-if="player.finals_round">
-                            <td>Year-end Finals</td>
+                            <td class="text-center">Year-end Finals</td>
                             <td class="text-center">{{ player.finals_round }}</td>
                             <td>{{ joinArray(player.finals_years) }}</td>
                         </tr>
                         <tr v-if="player.olympics_round">
-                            <td>Olympics</td>
+                            <td class="text-center">Olympics</td>
                             <td class="text-center">{{ player.olympics_round }}</td>
                             <td>{{ joinArray(player.olympics_years) }}</td>
                         </tr>
                         <tr v-if="player.davis_round">
-                            <td>Davis Cup</td>
+                            <td class="text-center">Davis Cup</td>
                             <td class="text-center">{{ player.davis_round }}</td>
                             <td>{{ joinArray(player.davis_years) }}</td>
                         </tr>
                         <tr v-if="player.hopman_round">
-                            <td>Hopman</td>
+                            <td class="text-center">Hopman</td>
                             <td class="text-center">{{ player.hopman_round }}</td>
                             <td>{{ joinArray(player.hopman_years) }}</td>
                         </tr>
                         <tr v-if="player.gs_cup_round">
-                            <td>Grand Slam Cup</td>
+                            <td class="text-center">Grand Slam Cup</td>
                             <td class="text-center">{{ player.gs_cup_round }}</td>
                             <td>{{ joinArray(player.gs_cup_years) }}</td>
                         </tr>
                         <tr v-if="player.wct_round">
-                            <td>WCT Finals</td>
+                            <td class="text-center">WCT Finals</td>
                             <td class="text-center">{{ player.wct_round }}</td>
                             <td>{{ joinArray(player.wct_years) }}</td>
                         </tr>
                     </tbody>
-                </table>
+                </v-table>
             </v-col>
         </v-row>
     </v-container>

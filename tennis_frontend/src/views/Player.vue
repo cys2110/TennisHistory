@@ -6,6 +6,7 @@ import { flagSrc, formatDate, formatCurrency, gladiator, headshot } from '@/comp
 import { useRouter } from 'vue-router';
 import TitlesWindow from '@/components/Player/TitlesWindow.vue';
 import WLIndexWindow from '@/components/Player/WLIndexWindow.vue';
+import StatsWindow from '@/components/Player/StatsWindow.vue';
 
 const props = defineProps(['id'])
 const player = ref(null)
@@ -29,7 +30,7 @@ watch(() => router.currentRoute.value.params.id, () => {
     <v-sheet class="bg-transparent my-10 pa-3 w-75 mx-auto">
         <v-container v-if="player">
             <v-row>
-                <v-col cols="8" class="d-flex flex-column">
+                <v-col cols="10" class="d-flex flex-column justify-space-evenly">
                     <div class="d-flex">
                         <div class="text-h4">{{ player.first_name }} {{ player.last_name.toUpperCase() }}</div>
                         <div>
@@ -39,7 +40,7 @@ watch(() => router.currentRoute.value.params.id, () => {
                     <div class="my-2">
                         <v-chip v-if="player.status" variant="elevated" color="indigo-accent-4">Active</v-chip>
                     </div>
-                    <div class="d-flex align-self-center my-2 align-space-between bg-indigo-accent-4 rounded-pill py-5 px-10">
+                    <div class="d-flex align-self-center my-2 align-space-between justify-space-around bg-indigo-accent-4 rounded-pill py-5 w-100">
                         <div class="d-flex flex-column mx-2 align-center justify-center">
                             <div class="text-h4">{{ player.career_high }}</div>
                             <div class="subtitle-1">{{ formatDate(player.ch_date) }}</div>
@@ -60,13 +61,13 @@ watch(() => router.currentRoute.value.params.id, () => {
                     </div>
                 </v-col>
                 <v-col v-if="player.gladiator || player.headshot">
-                    <!-- <v-img v-if="player.gladiator" :src="gladiator(player.id)" :alt="player.full_name" rounded="xl" style="height: 40%"></v-img>
-                    <v-img v-else :src="headshot(player.id)" rounded="circle" style="height: 40%" :alt="player.full_name"></v-img> -->
+                    <v-img v-if="player.gladiator" :src="gladiator(player.id)" :alt="player.full_name" rounded="xl"></v-img>
+                    <v-img v-else :src="headshot(player.id)" rounded="circle" :alt="player.full_name"></v-img>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col>
-                    <v-toolbar color="indigo-accent-4" rounded="xl">
+                    <v-toolbar color="indigo-accent-4" class="rounded-t-xl">
                         <v-tabs v-model="tab">
                             <v-tab value="overview">Overview</v-tab>
                             <v-tab value="activity">Activity</v-tab>
@@ -81,16 +82,18 @@ watch(() => router.currentRoute.value.params.id, () => {
                 <v-col>
                     <v-window v-model="tab">
                         <v-window-item value="overview">
-                            <OverviewWindow />
+                            <OverviewWindow :player/>
                         </v-window-item>
                         <v-window-item value="activity"></v-window-item>
                         <v-window-item value="titles">
-                            <TitlesWindow />
+                            <TitlesWindow :player />
                         </v-window-item>
                         <v-window-item value="wlIndex">
-                            <WLIndexWindow />
+                            <WLIndexWindow :id="player.id" />
                         </v-window-item>
-                        <v-window-item value="stats"></v-window-item>
+                        <v-window-item value="stats">
+                            <StatsWindow :player />
+                        </v-window-item>
                     </v-window>
                 </v-col>
             </v-row>

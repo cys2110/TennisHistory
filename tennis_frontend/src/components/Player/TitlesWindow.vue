@@ -31,30 +31,30 @@ onMounted(() => {
     <v-container>
         <v-row>
             <v-col>
-                <v-combobox variant="outlined" v-model="selection" :items="items"></v-combobox>
+                <v-combobox variant="outlined" v-model="selection" :items="items" style="width: 10%;" density="compact"></v-combobox>
             </v-col>
         </v-row>
         <v-row v-if="selection === 'Titles'">
-            <table v-if="titlesArray.length > 0">
+            <v-table v-if="titlesArray.length > 0" class="w-75 mx-auto rounded-xl">
                 <thead>
-                    <tr>
-                        <th>Year</th>
-                        <th>No. of titles</th>
-                        <th>Tournaments</th>
-                        <th>Surface</th>
+                    <tr class="bg-indigo-accent-1">
+                        <th class="font-weight-bold text-center">Year</th>
+                        <th class="font-weight-bold text-center">No. of titles</th>
+                        <th class="font-weight-bold text-center">Tournaments</th>
+                        <th class="font-weight-bold text-center">Surface</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="year in titles">
-                        <td>{{ year[0].year }}</td>
-                        <td>{{ year.length }}</td>
-                        <td class="column">
+                        <td class="text-center">{{ year[0].year }}</td>
+                        <td class="text-center">{{ year.length }}</td>
+                        <td class="text-center">
                             <div v-for="tournament in year">
                                 <span v-if="tournament.sponsor_name">{{ tournament.sponsor_name }} | </span>
                                 <span><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: tournament.TournamentId, name: tournament.Tournament.name}}">{{ tournament.Tournament.name }}</RouterLink></span>
                             </div>
                         </td>
-                        <td class="column">
+                        <td class="text-center">
                             <div v-for="tournament in year">
                                 <span>{{ tournament.environment }} {{ tournament.surface }}</span>
                                 <span v-if="tournament.hard_type"> ({{ tournament.hard_type }})</span>
@@ -62,30 +62,30 @@ onMounted(() => {
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            <div v-else>No titles won</div>
+            </v-table>
+            <div v-else class="text-subtitle-1">No titles won</div>
         </v-row>
         <v-row v-if="selection === 'Finals'">
-            <table v-if="finalsArray.length > 0">
+            <v-table v-if="finalsArray.length > 0" class="w-75 mx-auto rounded-xl">
                 <thead>
-                    <tr>
-                        <th>Year</th>
-                        <th>No. of finals</th>
-                        <th>Tournaments</th>
-                        <th>Surface</th>
+                    <tr class="bg-indigo-accent-1">
+                        <th class="font-weight-bold text-center">Year</th>
+                        <th class="font-weight-bold text-center">No. of finals</th>
+                        <th class="font-weight-bold text-center">Tournaments</th>
+                        <th class="font-weight-bold text-center">Surface</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="year in finals">
-                        <td>{{ year[0].year }}</td>
-                        <td>{{ year.length }}</td>
-                        <td class="column">
+                        <td class="text-center">{{ year[0].year }}</td>
+                        <td class="text-center">{{ year.length }}</td>
+                        <td class="text-center">
                             <div v-for="tournament in year">
                                 <span v-if="tournament.sponsor_name">{{ tournament.sponsor_name }} | </span>
                                 <span><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: tournament.TournamentId, name: tournament.Tournament.name}}">{{ tournament.Tournament.name }}</RouterLink></span>
                             </div>
                         </td>
-                        <td class="column">
+                        <td class="text-center">
                             <div v-for="tournament in year">
                                 <span>{{ tournament.environment }} {{ tournament.surface }}</span>
                                 <span v-if="tournament.hard_type"> ({{ tournament.hard_type }})</span>
@@ -93,8 +93,8 @@ onMounted(() => {
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            <div v-else>No finals competed in</div>
+            </v-table>
+            <div v-else class="text-subtitle-1">No finals competed in</div>
         </v-row>
     </v-container>
 </template>

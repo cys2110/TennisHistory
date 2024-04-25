@@ -40,7 +40,7 @@ onMounted(() => {
             </v-row>
             <v-row>
                 <v-col>
-                    <v-toolbar color="indigo-accent-4" rounded="lg">
+                    <v-toolbar color="indigo-accent-4" class="rounded-t-xl">
                         <v-tabs v-model="tab">
                             <v-tab value="overview">Overview</v-tab>
                             <v-tab value="results">Results</v-tab>

@@ -13,7 +13,10 @@ export default {
     getPlayerById(id) {
         return apiClient.get('id/' + id)
     },
-    getPlayerStats(id) {
-        return apiClient.get('stats/' + id)
+    getPlayerIndex(id) {
+        return apiClient.get('wlindex/' + id)
+    },
+    getPlayerStats(id, year, surface) {
+        return apiClient.get('stats/' + id + `?year=${year}&surface=${surface}`)
     }
 }

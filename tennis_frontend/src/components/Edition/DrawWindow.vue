@@ -36,7 +36,7 @@ const selectedRound = ref(parseInt(props.edition.type_of_draw))
       <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="edition.type_of_draw === '128' && selectedRound >= 128">
         <DrawCard v-for="match in r128Array" :key="match.id" :match="match" />
       </v-col>
-      <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="(edition.type_of_draw === '128' || edition.type_of_draw) === '64' && selectedRound >= 64">
+      <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="(edition.type_of_draw === '128' || edition.type_of_draw === '64') && selectedRound >= 64">
         <DrawCard v-for="match in r64Array" :key="match.id" :match="match" />
       </v-col>
       <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >= 32">
