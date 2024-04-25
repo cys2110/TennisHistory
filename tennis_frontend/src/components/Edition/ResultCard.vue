@@ -38,7 +38,7 @@ const formattedMinutes = minutes < 10 ? '0' + minutes : minutes
 const duration = computed(() => `${hour}:${formattedMinutes}`)
 
 const navigate = (id, name) => {
-    router.push({name: 'PlayerOverview', params: {id: id, name: name}})
+    router.push({name: 'Player', params: {id: id, name: name}})
 }
 
 const winnerStatus = computed(() => {
@@ -63,84 +63,60 @@ const loserStatus = computed(() => {
 </script>
 
 <template>
-    <v-card variant="tonal" class="ma-3" style="width: 45%;">
+    <v-card variant="elevated" class="ma-3 mx-auto" color="indigo-darken-4" style="width: 40%;" rounded="xl">
         <v-container>
-            <v-row>
+            <v-row class="flex-nowrap">
                 <v-col v-if="match.date">
                     Date: {{ formatDate(match.date) }}
                 </v-col>
-                <v-col v-if="match.duration_mins">
+                <v-col v-if="match.duration_mins" class="text-right">
                     Duration: {{ duration }}
                 </v-col>
             </v-row>
             <v-row>
-                <v-col cols="2">
-                    <v-avatar v-if="winner.headshot">
+                <v-col class="d-flex align-center">
+                    <v-avatar v-if="winner.headshot" variant="outlined">
                         <v-img :src="headshot(winner.id)" @click="navigate(winner.id, winner.full_name)"></v-img>
                     </v-avatar>
+                    <v-img :src="flagSrc(winner.country)" max-width="50" rounded="lg" class="mx-2"></v-img>
+                    <RouterLink class="hover-link" :to="{name: 'Player', params: {id: winner.id, name: winner.full_name}}">{{ winner.full_name }}</RouterLink>
+                    <span v-if="winEntry.seed || winEntry.status" class="small">&nbsp;{{ winnerStatus }}</span>
                 </v-col>
-                <v-col cols="2">
-                    <v-img :src="flagSrc(winner.country)" class="mini-flag"></v-img>
+                <v-col cols='1'>
+                    <v-icon icon="fad fa-check" size="small"></v-icon>
                 </v-col>
-                <v-col>
-                    <RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {id: winner.id, name: winner.full_name}}">{{ winner.full_name }}</RouterLink>
-                    <span v-if="winEntry.seed || winEntry.status" class="small">{{ winnerStatus }}</span>
-                </v-col>
-                <v-col cols=1>
-                    <v-icon icon="fad fa-check"></v-icon>
-                </v-col>
-                <v-col cols="1" v-if="match.s1p1">
-                    {{ match['s1' + winPlayer] }}<sup v-if="match['t1' + winPlayer]">{{ tiebreak(match['s1' + winPlayer], match['t1' + winPlayer]) }}</sup>
-                </v-col>
-                <v-col cols="1" v-if="match.s2p1">
-                    {{ match['s2' + winPlayer] }}<sup v-if="match['t2' + winPlayer]">{{ tiebreak(match['s2' + winPlayer], match['t2' + winPlayer]) }}</sup>
-                </v-col>
-                <v-col cols="1" v-if="match.s3p1">
-                    {{ match['s3' + winPlayer] }}<sup v-if="match['t3' + winPlayer]">{{ tiebreak(match['s3' + winPlayer], match['t3' + winPlayer]) }}</sup>
-                </v-col>
-                <v-col cols="1" v-if="match.s4p1">
-                    {{ match['s4' + winPlayer] }}<sup v-if="match['t4' + winPlayer]">{{ tiebreak(match['s4' + winPlayer], match['t4' + winPlayer]) }}</sup>
-                </v-col>
-                <v-col cols="1" v-if="match.s5p1">
-                    {{ match['s5' + winPlayer] }}<sup v-if="match['t5' + winPlayer]">{{ tiebreak(match['s5' + winPlayer], match['t5' + winPlayer]) }}</sup>
+                <v-col cols="3" class="d-flex align-center justify-space-evenly">
+                    <div v-if="match.s1p1">{{ match['s1' + winPlayer] }}<sup v-if="match['t1' + winPlayer]">{{ tiebreak(match['s1' + winPlayer], match['t1' + winPlayer]) }}</sup></div>
+                    <div v-if="match.s2p1">{{ match['s2' + winPlayer] }}<sup v-if="match['t2' + winPlayer]">{{ tiebreak(match['s2' + winPlayer], match['t2' + winPlayer]) }}</sup></div>
+                    <div v-if="match.s3p1">{{ match['s3' + winPlayer] }}<sup v-if="match['t3' + winPlayer]">{{ tiebreak(match['s3' + winPlayer], match['t3' + winPlayer]) }}</sup></div>
+                    <div v-if="match.s4p1">{{ match['s4' + winPlayer] }}<sup v-if="match['t4' + winPlayer]">{{ tiebreak(match['s4' + winPlayer], match['t4' + winPlayer]) }}</sup></div>
+                    <div cols="1" v-if="match.s5p1">{{ match['s5' + winPlayer] }}<sup v-if="match['t5' + winPlayer]">{{ tiebreak(match['s5' + winPlayer], match['t5' + winPlayer]) }}</sup></div>
                 </v-col>
             </v-row>
             <v-row>
-                <v-col cols=2>
-                    <v-avatar v-if="loser && loser.headshot">
+                <v-col v-if="match.incomplete !== 'B'" class="d-flex align-center">
+                    <v-avatar v-if="loser && loser.headshot" variant="outlined">
                         <v-img :src="headshot(loser.id)" @click="navigate(loser.id, loser.full_name)"></v-img>
                     </v-avatar>
+                    <v-img :src="flagSrc(loser.country)" max-width="50" rounded="lg" class="mx-2"></v-img>
+                    <RouterLink class="hover-link" :to="{name: 'Player', params: {id: loser.id, name: loser.full_name}}">{{ loser.full_name }}</RouterLink>
+                    <span v-if="loseEntry.seed || loseEntry.status" class="small">&nbsp;{{ loserStatus }}</span>
                 </v-col>
-                <v-col cols=2>
-                    <v-img v-if="match.incomplete !== 'B'" :src="flagSrc(loser.country)" class="mini-flag"></v-img>
-                </v-col>
-                <v-col v-if="match.incomplete !== 'B'">
-                    <RouterLink v-if="match.incomplete !== 'B'" class="hover-link" :to="{name: 'PlayerOverview', params: {id: loser.id, name: loser.full_name}}">{{ loser.full_name }}</RouterLink>
-                    <span v-if="loseEntry.seed || loseEntry.status" class="small">{{ loserStatus }}</span>
-                </v-col>
-                <v-col v-else>Bye</v-col>
+                <v-col v-else class="text-center">Bye</v-col>
                 <v-col cols="1"></v-col>
-                <v-col cols="1" v-if="match.s1p1">
-                    {{ match['s1' + losePlayer] }}<sup v-if="match['t1' + losePlayer]">{{ tiebreak(match['s1' + losePlayer], match['t1' + losePlayer]) }}</sup>
-                </v-col>
-                <v-col cols="1" v-if="match.s2p1">
-                    {{ match['s2' + losePlayer] }}<sup v-if="match['t2' + losePlayer]">{{ tiebreak(match['s2' + losePlayer], match['t2' + losePlayer]) }}</sup>
-                </v-col>
-                <v-col cols="1" v-if="match.s3p1">
-                    {{ match['s3' + losePlayer] }}<sup v-if="match['t3' + losePlayer]">{{ tiebreak(match['s3' + losePlayer], match['t3' + losePlayer]) }}</sup>
-                </v-col>
-                <v-col cols="1" v-if="match.s4p1">
-                    {{ match['s4' + losePlayer] }}<sup v-if="match['t4' + losePlayer]">{{ tiebreak(match['s4' + losePlayer], match['t4' + losePlayer]) }}</sup>
-                </v-col>
-                <v-col cols="1" v-if="match.s5p1">
-                    {{ match['s5' + losePlayer] }}<sup v-if="match['t5' + losePlayer]">{{ tiebreak(match['s5' + losePlayer], match['t5' + losePlayer]) }}</sup>
+                <v-col cols="3" class="d-flex align-center justify-space-evenly">
+                    <div v-if="match.s1p1">{{ match['s1' + losePlayer] }}<sup v-if="match['t1' + losePlayer]">{{ tiebreak(match['s1' + losePlayer], match['t1' + losePlayer]) }}</sup></div>
+                    <div v-if="match.s2p1">{{ match['s2' + losePlayer] }}<sup v-if="match['t2' + losePlayer]">{{ tiebreak(match['s2' + losePlayer], match['t2' + losePlayer]) }}</sup></div>
+                    <div v-if="match.s3p1">{{ match['s3' + losePlayer] }}<sup v-if="match['t3' + losePlayer]">{{ tiebreak(match['s3' + losePlayer], match['t3' + losePlayer]) }}</sup></div>
+                    <div v-if="match.s4p1">{{ match['s4' + losePlayer] }}<sup v-if="match['t4' + losePlayer]">{{ tiebreak(match['s4' + losePlayer], match['t4' + losePlayer]) }}</sup></div>
+                    <div v-if="match.s5p1">{{ match['s5' + losePlayer] }}<sup v-if="match['t5' + losePlayer]">{{ tiebreak(match['s5' + losePlayer], match['t5' + losePlayer]) }}</sup></div>
                 </v-col>
             </v-row>
-            <v-row>
+            <v-row class="flex-nowrap">
                 <v-col v-if="match.incomplete === 'R'">Retired</v-col>
                 <v-col v-else-if="match.incomplete === 'WO'">Walkover</v-col>
                 <v-col v-else-if="match.incomplete === 'D'">Default</v-col>
-                <v-col v-if="match.umpire">Umpire: {{ match.umpire }}</v-col>
+                <v-col v-if="match.umpire" class="text-right">Umpire: {{ match.umpire }}</v-col>
             </v-row>
         </v-container>
     </v-card>

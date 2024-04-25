@@ -19,10 +19,7 @@
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 
-  --blue-border: #121FFF;
-  --blue-link: #304FFE;
-  --blur-background: rgba(23, 26, 219, 0.5);
-  --header-background: #0c15bc;
+  --blue-link: #8C9EFF;
 }
 
 :root {

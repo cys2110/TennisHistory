@@ -35,12 +35,12 @@ onMounted(() => {
                     <div class="text-subtitle-1">{{ formattedDates(edition.start_date, edition.end_date) }}</div>
                 </v-col>
                 <v-col cols="2">
-                    <v-img class="flag" :src="flagSrc(edition.country)"></v-img>
+                    <v-img rounded="xl" :src="flagSrc(edition.country)"></v-img>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col>
-                    <v-toolbar color="indigo-accent-4" rounded="xl">
+                    <v-toolbar color="indigo-accent-4" rounded="lg">
                         <v-tabs v-model="tab">
                             <v-tab value="overview">Overview</v-tab>
                             <v-tab value="results">Results</v-tab>

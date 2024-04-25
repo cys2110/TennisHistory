@@ -4,16 +4,17 @@ import { ref } from 'vue';
 
 const props = defineProps(['edition', 'matches'])
 
-const finalArray = props.matches.filter(match => match.round === 'F')
-const sfArray = props.matches.filter(match => match.round === 'SF')
-const qfArray = props.matches.filter(match => match.round === 'QF')
-const r16Array = props.matches.filter(match => match.round === '16')
-const r32Array = props.matches.filter(match => match.round === '32')
-const r64Array = props.matches.filter(match => match.round === '64')
-const r128Array = props.matches.filter(match => match.round === '128')
-const round = props.edition.type_of_draw === 128 ? 128 :
-  props.edition.type_of_draw === 64 ? 64 : 32
-const selectedRound = ref(round)
+const sortedMatches = props.matches.toSorted((a, b) => {
+  return a.id - b.id
+})
+const finalArray = sortedMatches.filter(match => match.round === 'F')
+const sfArray = sortedMatches.filter(match => match.round === 'SF')
+const qfArray = sortedMatches.filter(match => match.round === 'QF')
+const r16Array = sortedMatches.filter(match => match.round === '16')
+const r32Array = sortedMatches.filter(match => match.round === '32')
+const r64Array = sortedMatches.filter(match => match.round === '64')
+const r128Array = sortedMatches.filter(match => match.round === '128')
+const selectedRound = ref(parseInt(props.edition.type_of_draw))
 </script>
 
 <template>
@@ -32,25 +33,25 @@ const selectedRound = ref(round)
       </v-col>
     </v-row>
     <v-row class="overflow-x-auto">
-      <v-col cols="5" class="d-flex flex-column justify-space-around" v-if="edition.type_of_draw === '128' && selectedRound >= 128">
+      <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="edition.type_of_draw === '128' && selectedRound >= 128">
         <DrawCard v-for="match in r128Array" :key="match.id" :match="match" />
       </v-col>
-      <v-col cols="5" class="d-flex flex-column justify-space-around" v-if="(edition.type_of_draw === '128' || edition.type_of_draw) === '64' && selectedRound >= 64">
+      <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="(edition.type_of_draw === '128' || edition.type_of_draw) === '64' && selectedRound >= 64">
         <DrawCard v-for="match in r64Array" :key="match.id" :match="match" />
       </v-col>
-      <v-col cols="5" class="d-flex flex-column justify-space-around" v-if="selectedRound >= 32">
+      <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >= 32">
         <DrawCard v-for="match in r32Array" :key="match.id" :match="match" />
       </v-col>
-      <v-col cols="5" class="d-flex flex-column justify-space-around" v-if="selectedRound >= 16">
+      <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >= 16">
         <DrawCard v-for="match in r16Array" :key="match.id" :match="match" />
       </v-col>
-      <v-col cols="5" class="d-flex flex-column justify-space-around" v-if="selectedRound >=8">
+      <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >=8">
         <DrawCard v-for="match in qfArray" :key="match.id" :match="match" />
       </v-col>
-      <v-col cols="5" class="d-flex flex-column justify-space-around" v-if="selectedRound >= 4">
+      <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >= 4">
         <DrawCard v-for="match in sfArray" :key="match.id" :match="match" />
       </v-col>
-      <v-col cols="5" class="d-flex flex-column justify-space-around" v-if="selectedRound >=2">
+      <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >=2">
         <DrawCard v-for="match in finalArray" :key="match.id" :match="match" />
       </v-col>
     </v-row>

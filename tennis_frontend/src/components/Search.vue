@@ -37,7 +37,7 @@ const submitSearch = () => {
                 <v-list-item v-else v-for="result in tournamentResults" :key="result.id"><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: result.id, name: result.name}}" >{{ result.name }}</RouterLink></v-list-item>
                 <v-list-subheader prepend-icon="fad fa-people-pants-simple">Players</v-list-subheader>
                 <v-list-item v-if="playerResults.length === 0">No results matching search</v-list-item>
-                <v-list-item v-else v-for="result in playerResults" :key="result.id"><RouterLink class="hover-link" :to="{name: 'PlayerOverview', params: {id: result.id, name: result.full_name}}" >{{ result.full_name }}</RouterLink></v-list-item>
+                <v-list-item v-else v-for="result in playerResults" :key="result.id"><RouterLink class="hover-link" :to="{name: 'Player', params: {id: result.id, name: result.full_name}}" >{{ result.full_name }}</RouterLink></v-list-item>
             </v-list>
         </v-card-text>
     </v-card>

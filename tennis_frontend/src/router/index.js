@@ -4,7 +4,7 @@ import Tournament from '@/views/Tournament.vue'
 import ResultsArchive from '@/views/ResultsArchive.vue'
 import Player from '@/views/Player.vue'
 import Edition from '@/views/Edition.vue'
-import MatchStats from '@/views/Edition/MatchStats.vue'
+import MatchStats from '@/views/MatchStats.vue'
 import H2H from '@/views/H2H.vue'
 
 const router = createRouter({
@@ -43,6 +43,7 @@ const router = createRouter({
     {
       path: '/players/:name/:id',
       component: Player,
+      name: 'Player',
       props: true
     },
     {

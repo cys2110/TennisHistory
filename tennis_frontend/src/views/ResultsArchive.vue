@@ -25,12 +25,19 @@ watch(searchYear, () => {
                     <div class="text-h3">Results Archive</div>
                 </v-col>
                 <v-col>
-                    <v-combobox variant="outlined" v-model="searchYear" :items="years"></v-combobox>
+                    <v-combobox
+                        variant="underlined"
+                        class="ml-auto"
+                        v-model="searchYear"
+                        :items="years"
+                        style="width: 15%;"
+                    >
+                    </v-combobox>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col>
-                    <div v-if="results.length > 0" class="my-10">
+                    <div v-if="results.length > 0">
                         <ArchiveCard v-for="result in results" :key="result.id" :edition="result" />
                     </div>
                     <div class="text-subtitle-1 my-5" v-else>No data available yet</div>

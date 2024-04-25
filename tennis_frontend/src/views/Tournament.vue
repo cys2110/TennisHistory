@@ -37,7 +37,7 @@ onMounted(() => {
                 </v-col>
             </v-row>
             <v-row>
-                <v-col cols="5">
+                <v-col cols="3">
                     <TournamentCard v-for="edition in tournament.Editions" :edition="edition" :key="edition.id" />
                 </v-col>
             </v-row>

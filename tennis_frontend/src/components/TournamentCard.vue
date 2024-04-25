@@ -30,7 +30,7 @@ endDate < currentDate ? display.value = true : display.value = false
 </script>
 
 <template>
-  <v-card variant="outlined" rounded="xl" color="indigo-accent-4">
+  <v-card variant="outlined" rounded="xl" color="indigo-accent-1">
     <v-container>
       <v-row>
         <v-col>
@@ -38,37 +38,31 @@ endDate < currentDate ? display.value = true : display.value = false
         </v-col>
       </v-row>
       <v-row class="align-center">
-        <v-spacer></v-spacer>
-        <v-col cols="1">
-          <v-avatar><v-img v-if="edition.winner && edition.winner.headshot" :src="headshot(edition.winner_id)" :alt="edition.winner.full_name" :eager="true"></v-img></v-avatar>
+        <v-col class="d-flex justify-space-evenly align-center">
+          <v-avatar size="x-large">
+            <v-img v-if="edition.winner && edition.winner.headshot" :src="headshot(edition.winner_id)" :alt="edition.winner.full_name" :eager="true"></v-img>
+          </v-avatar>
+          <v-img v-if="edition.winner" :src="flagSrc(edition.winner.country)" rounded="lg" max-width="50" :alt="edition.winner.country"></v-img>
+          <div class="text-subtitle-1"><RouterLink v-if="edition.winner" class="hover-link" :to="{name: 'Player', params: {id: edition.winner_id, name:edition.winner.full_name}}">{{ edition.winner.full_name }}</RouterLink></div>
         </v-col>
-        <v-spacer></v-spacer>
-        <v-col cols="2">
-          <v-img v-if="edition.winner" :src="flagSrc(edition.winner.country)" class="mini-flag" :alt="edition.winner.country"></v-img>
-        </v-col>
-        <v-col cols="6"><RouterLink v-if="edition.winner" class="hover-link" :to="{name: 'PlayerOverview', params: {id: edition.winner_id, name:edition.winner.full_name}}">{{ edition.winner.full_name }}</RouterLink></v-col>
-        <v-spacer></v-spacer>
       </v-row>
       <v-row>
         <v-col class="text-center">d.</v-col>
       </v-row>
       <v-row>
-        <v-spacer></v-spacer>
-        <v-col cols="1">
-          <v-avatar>
+        <v-col class="d-flex justify-space-evenly align-center">
+          <v-avatar size="x-large" variant="outlined">
             <v-img v-if="edition.finalist && edition.finalist.headshot" :src="headshot(edition.finalist_id)" :alt="edition.finalist.full_name"></v-img>
           </v-avatar>
+          <v-img v-if="edition.finalist" :src="flagSrc(edition.finalist.country)" max-width="50" rounded="lg" :alt="edition.finalist.country"></v-img>
+          <div class="text-subtitle-1">
+            <RouterLink v-if="edition.finalist" class="hover-link" :to="{name: 'Player', params: {id: edition.finalist_id, name:edition.finalist.full_name}}">{{ edition.finalist.full_name }}</RouterLink>
+          </div>
         </v-col>
-        <v-spacer></v-spacer>
-        <v-col cols="2">
-          <v-img v-if="edition.finalist" :src="flagSrc(edition.finalist.country)" class="mini-flag" :alt="edition.finalist.country"></v-img>
-        </v-col>
-        <v-col cols="6"><RouterLink v-if="edition.finalist" class="hover-link" :to="{name: 'PlayerOverview', params: {id: edition.finalist_id, name:edition.finalist.full_name}}">{{ edition.finalist.full_name }}</RouterLink></v-col>
-        <v-spacer></v-spacer>
       </v-row>
       <v-row>
         <v-col class="text-center">
-          <div v-if="edition.winner">{{ score }}</div>
+          <div v-if="edition.winner" class="text-h6">{{ score }}</div>
         </v-col>
       </v-row>
     </v-container>
