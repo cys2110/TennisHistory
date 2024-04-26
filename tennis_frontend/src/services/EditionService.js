@@ -21,5 +21,8 @@ export default {
     },
     getEditionsByPlayer(player) {
         return apiClient.get('player/' + player)
+    },
+    getEntriesByPlayer(player, year) {
+        return apiClient.get(`entries?player=${player}&year=${year}`)
     }
 }

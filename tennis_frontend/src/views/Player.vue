@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router';
 import TitlesWindow from '@/components/Player/TitlesWindow.vue';
 import WLIndexWindow from '@/components/Player/WLIndexWindow.vue';
 import StatsWindow from '@/components/Player/StatsWindow.vue';
+import ActivityWindow from '@/components/Player/ActivityWindow.vue';
 
 const props = defineProps(['id'])
 const player = ref(null)
@@ -84,7 +85,9 @@ watch(() => router.currentRoute.value.params.id, () => {
                         <v-window-item value="overview">
                             <OverviewWindow :player/>
                         </v-window-item>
-                        <v-window-item value="activity"></v-window-item>
+                        <v-window-item value="activity">
+                            <ActivityWindow :player />
+                        </v-window-item>
                         <v-window-item value="titles">
                             <TitlesWindow :player />
                         </v-window-item>
