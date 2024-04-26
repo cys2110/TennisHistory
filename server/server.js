@@ -56,6 +56,7 @@ app.post('/editions', editionController.create)
 app.get('/editions/entries', entryController.getEntriesByPlayer)
 
 // MatchStat endpoints
+app.get('/editions/match/:id', matchStatController.findMatch)
 app.post('/match-stats', matchStatController.create)
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))

@@ -1,28 +1,10 @@
 <script setup>
 import { ref } from 'vue';
-import { tiebreak, headshot, flagSrc } from '../utils'
+import { tiebreak, headshot, flagSrc, round } from '../utils'
 import { RouterLink } from 'vue-router';
 
 const props = defineProps(['match', 'id'])
 const opponent = ref(null)
-const round = (roundNumber) => {
-    switch (roundNumber) {
-        case '128':
-            return 'R128'
-        case '64':
-            return 'R64'
-        case '32':
-            return 'R32'
-        case '16':
-            return 'R16'
-        case 'QF':
-            return 'QF'
-        case 'SF':
-            return 'SF'
-        case 'F':
-            return 'F'
-    }
-}
 
 if (props.match.p1 === props.id && props.match.p2) {
     opponent.value = props.match.player2

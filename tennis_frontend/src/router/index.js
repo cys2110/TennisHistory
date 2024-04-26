@@ -30,15 +30,13 @@ const router = createRouter({
       path: '/tournaments/:name/:id/:editionId',
       component: Edition,
       name: 'Edition',
-      props: true,
-      children: [
-        {
-          path: 'matches/:matchId',
-          name: 'MatchStats',
-          component: MatchStats,
-          props: true
-        }
-      ]
+      props: true
+    },
+    {
+      path: '/tournaments/:name/:id/:editionId/matches/:matchId',
+      name: 'MatchStats',
+      component: MatchStats,
+      props: true
     },
     {
       path: '/players/:name/:id',

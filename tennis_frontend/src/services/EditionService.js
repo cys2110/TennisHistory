@@ -24,5 +24,8 @@ export default {
     },
     getEntriesByPlayer(player, year) {
         return apiClient.get(`entries?player=${player}&year=${year}`)
+    },
+    getMatchStats(id) {
+        return apiClient.get(`match/${id}`)
     }
 }

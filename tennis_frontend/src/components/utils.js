@@ -78,3 +78,22 @@ export function tiebreak (matchScore, tiebreakScore) {
         return
     }
 }
+
+export function round (roundNumber) {
+    switch (roundNumber) {
+        case '128':
+            return 'R128'
+        case '64':
+            return 'R64'
+        case '32':
+            return 'R32'
+        case '16':
+            return 'R16'
+        case 'QF':
+            return 'QF'
+        case 'SF':
+            return 'SF'
+        case 'F':
+            return 'F'
+    }
+}
