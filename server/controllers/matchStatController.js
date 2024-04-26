@@ -67,74 +67,76 @@ exports.findPlayerStats = async (req, res) => {
             p2: player
         }
 
-       if (surface) {
+       if (surface !== 'All') {
         whereCondition1['$MatchScore.Edition.surface$'] = surface
         whereCondition2['$MatchScore.Edition.surface$'] = surface
        }
-       if (year) {
+       if (year !== 'Career') {
         whereCondition1['$MatchScore.Edition.year$'] = year
         whereCondition2['$MatchScore.Edition.year$'] = year
        }
 
        const p1Stats = await MatchStat.findOne({
         attributes: [
-            [sequelize.fn('sum', sequelize.col('p1_aces')), 'total_aces'],
-            [sequelize.fn('sum', sequelize.col('p1_dfs')), 'total_dfs'],
-            [sequelize.fn('sum', sequelize.col('p1_serve1')), 'total_serve1'],
+            [sequelize.fn('sum', sequelize.col('p1_aces')), 'aces'],
+            [sequelize.fn('sum', sequelize.col('p1_dfs')), 'dfs'],
+            [sequelize.fn('sum', sequelize.col('p1_serve1')), 'serve1_in'],
             [sequelize.fn('sum', sequelize.col('p1_total_serve1')), 'total_serve1'],
-            [sequelize.fn('sum', sequelize.col('p1_serve1_pts_w')), 'total_serve1_pts_w'],
-            [sequelize.fn('sum', sequelize.col('p1_serve2_pts_w')), 'total_serve2_pts_w'],
-            [sequelize.fn('sum', sequelize.col('p1_serve2_pts')), 'total_serve2_pts'],
-            [sequelize.fn('sum', sequelize.col('p1_bps_saved')), 'total_bps_saved'],
-            [sequelize.fn('sum', sequelize.col('p1_bps_faced')), 'total_bps_faced'],
-            [sequelize.fn('sum', sequelize.col('p1_ret1_w')), 'total_ret1_w'],
-            [sequelize.fn('sum', sequelize.col('p1_ret1')), 'total_ret1'],
-            [sequelize.fn('sum', sequelize.col('p1_ret2_w')), 'total_ret2_w'],
-            [sequelize.fn('sum', sequelize.col('p1_ret2')), 'total_ret2'],
-            [sequelize.fn('sum', sequelize.col('p1_bp_opps')), 'total_bp_opps'],
-            [sequelize.fn('sum', sequelize.col('p1_bps_converted')), 'total_bps_converted'],
-            [sequelize.fn('sum', sequelize.col('p1_sv_pts')), 'total_sv_pts'],
-            [sequelize.fn('sum', sequelize.col('p1_sv_pts_total')), 'total_sv_pts_total'],
-            [sequelize.fn('sum', sequelize.col('p1_ret_pts')), 'total_ret_pts'],
-            [sequelize.fn('sum', sequelize.col('p1_ret_pts_total')), 'total_ret_pts_total'],
-            [sequelize.fn('sum', sequelize.col('p1_pts')), 'total_pts_w'],
+            [sequelize.fn('sum', sequelize.col('p1_serve1_pts_w')), 'serve1_pts_w'],
+            [sequelize.fn('sum', sequelize.col('p2_serve1_pts')), 'serve1_pts'],
+            [sequelize.fn('sum', sequelize.col('p1_serve2_pts_w')), 'serve2_pts_w'],
+            [sequelize.fn('sum', sequelize.col('p1_serve2_pts')), 'serve2_pts'],
+            [sequelize.fn('sum', sequelize.col('p1_bps_saved')), 'bps_saved'],
+            [sequelize.fn('sum', sequelize.col('p1_bps_faced')), 'bps_faced'],
+            [sequelize.fn('sum', sequelize.col('p1_ret1_w')), 'ret1_w'],
+            [sequelize.fn('sum', sequelize.col('p1_ret1')), 'ret1'],
+            [sequelize.fn('sum', sequelize.col('p1_ret2_w')), 'ret2_w'],
+            [sequelize.fn('sum', sequelize.col('p1_ret2')), 'ret2'],
+            [sequelize.fn('sum', sequelize.col('p1_bp_opps')), 'bp_opps'],
+            [sequelize.fn('sum', sequelize.col('p1_bps_converted')), 'bps_converted'],
+            [sequelize.fn('sum', sequelize.col('p1_sv_pts')), 'sv_pts'],
+            [sequelize.fn('sum', sequelize.col('p1_sv_pts_total')), 'sv_pts_total'],
+            [sequelize.fn('sum', sequelize.col('p1_ret_pts')), 'ret_pts'],
+            [sequelize.fn('sum', sequelize.col('p1_ret_pts_total')), 'ret_pts_total'],
+            [sequelize.fn('sum', sequelize.col('p1_pts')), 'pts_w'],
             [sequelize.fn('sum', sequelize.col('total_pts')), 'total_pts']
         ],
         where: whereCondition1,
+        include: {
+            model: db.MatchScore,
+            attributes: ['id'],
             include: {
-                model: db.MatchScore,
-                attributes: ['id'],
-                include: {
-                    model: db.Edition,
-                    as: 'Edition',
-                    attributes: ['id']
-                }
-            },
-            group: ['MatchScore.id', 'MatchScore.Edition.id']
+                model: db.Edition,
+                as: 'Edition',
+                attributes: ['id']
+            }
+        },
+        group: ['MatchScore.id', 'MatchScore.Edition.id']
        })
 
        const p2Stats = await MatchStat.findOne({
         attributes: [
-            [sequelize.fn('sum', sequelize.col('p2_aces')), 'total_aces'],
-            [sequelize.fn('sum', sequelize.col('p2_dfs')), 'total_dfs'],
-            [sequelize.fn('sum', sequelize.col('p2_serve1')), 'total_serve1'],
+            [sequelize.fn('sum', sequelize.col('p2_aces')), 'aces'],
+            [sequelize.fn('sum', sequelize.col('p2_dfs')), 'dfs'],
+            [sequelize.fn('sum', sequelize.col('p2_serve1')), 'serve1_in'],
             [sequelize.fn('sum', sequelize.col('p2_total_serve1')), 'total_serve1'],
-            [sequelize.fn('sum', sequelize.col('p2_serve1_pts_w')), 'total_serve1_pts_w'],
-            [sequelize.fn('sum', sequelize.col('p2_serve2_pts_w')), 'total_serve2_pts_w'],
-            [sequelize.fn('sum', sequelize.col('p2_serve2_pts')), 'total_serve2_pts'],
-            [sequelize.fn('sum', sequelize.col('p2_bps_saved')), 'total_bps_saved'],
-            [sequelize.fn('sum', sequelize.col('p2_bps_faced')), 'total_bps_faced'],
-            [sequelize.fn('sum', sequelize.col('p2_ret1_w')), 'total_ret1_w'],
-            [sequelize.fn('sum', sequelize.col('p2_ret1')), 'total_ret1'],
-            [sequelize.fn('sum', sequelize.col('p2_ret2_w')), 'total_ret2_w'],
-            [sequelize.fn('sum', sequelize.col('p2_ret2')), 'total_ret2'],
-            [sequelize.fn('sum', sequelize.col('p2_bp_opps')), 'total_bp_opps'],
-            [sequelize.fn('sum', sequelize.col('p2_bps_converted')), 'total_bps_converted'],
-            [sequelize.fn('sum', sequelize.col('p2_sv_pts')), 'total_sv_pts'],
-            [sequelize.fn('sum', sequelize.col('p2_sv_pts_total')), 'total_sv_pts_total'],
-            [sequelize.fn('sum', sequelize.col('p2_ret_pts')), 'total_ret_pts'],
-            [sequelize.fn('sum', sequelize.col('p2_ret_pts_total')), 'total_ret_pts_total'],
-            [sequelize.fn('sum', sequelize.col('p2_pts')), 'total_pts_w'],
+            [sequelize.fn('sum', sequelize.col('p2_serve1_pts_w')), 'serve1_pts_w'],
+            [sequelize.fn('sum', sequelize.col('p2_serve1_pts')), 'serve1_pts'],
+            [sequelize.fn('sum', sequelize.col('p2_serve2_pts_w')), 'serve2_pts_w'],
+            [sequelize.fn('sum', sequelize.col('p2_serve2_pts')), 'serve2_pts'],
+            [sequelize.fn('sum', sequelize.col('p2_bps_saved')), 'bps_saved'],
+            [sequelize.fn('sum', sequelize.col('p2_bps_faced')), 'bps_faced'],
+            [sequelize.fn('sum', sequelize.col('p2_ret1_w')), 'ret1_w'],
+            [sequelize.fn('sum', sequelize.col('p2_ret1')), 'ret1'],
+            [sequelize.fn('sum', sequelize.col('p2_ret2_w')), 'ret2_w'],
+            [sequelize.fn('sum', sequelize.col('p2_ret2')), 'ret2'],
+            [sequelize.fn('sum', sequelize.col('p2_bp_opps')), 'bp_opps'],
+            [sequelize.fn('sum', sequelize.col('p2_bps_converted')), 'bps_converted'],
+            [sequelize.fn('sum', sequelize.col('p2_sv_pts')), 'sv_pts'],
+            [sequelize.fn('sum', sequelize.col('p2_sv_pts_total')), 'sv_pts_total'],
+            [sequelize.fn('sum', sequelize.col('p2_ret_pts')), 'ret_pts'],
+            [sequelize.fn('sum', sequelize.col('p2_ret_pts_total')), 'ret_pts_total'],
+            [sequelize.fn('sum', sequelize.col('p2_pts')), 'pts_w'],
             [sequelize.fn('sum', sequelize.col('total_pts')), 'total_pts']
         ],
         where: whereCondition2,

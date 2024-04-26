@@ -22,9 +22,8 @@ const tournamentController = require('./controllers/tournamentController')
 const editionController = require('./controllers/editionController')
 const playerController = require('./controllers/playerController')
 const matchStatController = require('./controllers/matchStatController')
-const wlIndexController = require('./controllers/wlIndicesController')
-const playerStatsController = require('./controllers/playerStatController')
 const entryController = require('./controllers/entryController')
+const matchScoreController = require('./controllers/matchScoreController')
 
 app.get('/', (req, res) => res.send('This is the root!'))
 app.get('/search/:search', tournamentController.search)
@@ -32,14 +31,6 @@ app.get('/search/:search', tournamentController.search)
 // Player endpoints
 app.get('/players/id/:id', playerController.findById)
 app.post('/players', playerController.create)
-
-// WL Index endpoints
-app.get('/players/wlindex/:player', wlIndexController.findByPlayer)
-app.post('/wlindex', wlIndexController.create)
-
-// Player Stats endpoints
-app.get('/players/stats/:player', playerStatsController.findPlayerStat)
-app.post('/player-stats', playerStatsController.create)
 
 // Tournament endpoints
 app.get('/tournaments/id/:id', tournamentController.findById)
@@ -54,6 +45,10 @@ app.post('/editions', editionController.create)
 
 // Entry endpoints
 app.get('/editions/entries', entryController.getEntriesByPlayer)
+
+// MatchScore endpoints
+app.get('/h2h', matchScoreController.findH2H)
+app.get('/players/wl-index/:player', matchScoreController.wlIndex)
 
 // MatchStat endpoints
 app.get('/editions/match/:id', matchStatController.findMatch)

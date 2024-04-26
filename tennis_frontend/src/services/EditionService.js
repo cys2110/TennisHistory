@@ -27,5 +27,8 @@ export default {
     },
     getMatchStats(id) {
         return apiClient.get(`match/${id}`)
+    },
+    getPlayerStats(player, year, surface) {
+        return apiClient.get(`stats?player=${player}&year=${year}&surface=${surface}`)
     }
 }

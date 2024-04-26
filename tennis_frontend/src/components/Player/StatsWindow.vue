@@ -1,5 +1,5 @@
 <script setup>
-import PlayerService from '@/services/PlayerService';
+import EditionService from '@/services/EditionService';
 import { computed, onMounted, ref } from 'vue';
 
 const props = defineProps(['player'])
@@ -16,16 +16,14 @@ const years = computed(() => {
     return ['Career', ...yearArray]
 })
 
+const percent = (value, total) => {
+    return Math.round((value / total) * 100)
+}
+
 const getStats = () => {
-    if (selectedYear.value === 'Career') {
-        PlayerService.getPlayerStats(props.player.id, 0, selectedSurface.value)
-        .then(response => results.value = response.data)
+    EditionService.getPlayerStats(props.player.id, selectedYear.value, selectedSurface.value)
+        .then(response => results.value = response.data.stats)
         .catch(error => console.log(error))
-    } else {
-        PlayerService.getPlayerStats(props.player.id, selectedYear.value, selectedSurface.value)
-        .then(response => results.value = response.data)
-        .catch(error => console.log(error))
-    }
 }
 
 onMounted(() => {
@@ -60,10 +58,10 @@ onMounted(() => {
                             <div class="d-flex justify-space-between">
                                 <div class="text-subtitle-1">1st serve return points won</div>
                                 <div class="font-weight-bold" v-if="results === ''">0%</div>
-                                <div class="font-weight-bold" v-else>{{ results.return1_pts }}%</div>
+                                <div class="font-weight-bold" v-else>{{ percent(results.ret1_w, results.ret1) }}%</div>
                             </div>
                             <div v-if="results !== ''">
-                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="results.return1_pts"></v-progress-linear>
+                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="percent(results.ret1_w, results.ret1)"></v-progress-linear>
                             </div>
                         </div>
                     </td>
@@ -81,10 +79,10 @@ onMounted(() => {
                             <div class="d-flex justify-space-between">
                                 <div class="text-subtitle-1">2nd serve return points won</div>
                                 <div class="font-weight-bold" v-if="results === ''">0%</div>
-                                <div class="font-weight-bold" v-else>{{ results.return2_pts }}%</div>
+                                <div class="font-weight-bold" v-else>{{ percent(results.ret2_w, results.ret2) }}%</div>
                             </div>
                             <div v-if="results !== ''">
-                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="results.return2_pts"></v-progress-linear>
+                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="percent(results.ret2_w, results.ret2)"></v-progress-linear>
                             </div>
                         </div>
                     </td>
@@ -95,10 +93,10 @@ onMounted(() => {
                             <div class="d-flex justify-space-between">
                                 <div class="text-subtitle-1">1st serve</div>
                                 <div class="font-weight-bold" v-if="results === ''">0%</div>
-                                <div class="font-weight-bold" v-else>{{ results.serve1 }}%</div>
+                                <div class="font-weight-bold" v-else>{{ percent(results.serve1_in, results.total_serve1) }}%</div>
                             </div>
                             <div v-if="results !== ''">
-                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="results.return1_pts"></v-progress-linear>
+                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="percent(results.serve1_in, results.total_serve1)"></v-progress-linear>
                             </div>
                         </div>
                     </td>
@@ -116,10 +114,10 @@ onMounted(() => {
                             <div class="d-flex justify-space-between">
                                 <div class="text-subtitle-1">1st serve points won</div>
                                 <div class="font-weight-bold" v-if="results === ''">0%</div>
-                                <div class="font-weight-bold" v-else>{{ results.serve1_pts }}%</div>
+                                <div class="font-weight-bold" v-else>{{ percent(results.serve1_pts_w, results.serve1_pts) }}%</div>
                             </div>
                             <div v-if="results !== ''">
-                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="results.return1_pts"></v-progress-linear>
+                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="percent(results.serve1_pts_w, results.serve1_pts)"></v-progress-linear>
                             </div>
                         </div>
                     </td>
@@ -128,10 +126,10 @@ onMounted(() => {
                             <div class="d-flex justify-space-between">
                                 <div class="text-subtitle-1">Break points converted</div>
                                 <div class="font-weight-bold" v-if="results === ''">0%</div>
-                                <div class="font-weight-bold" v-else>{{ results.bps_converted }}%</div>
+                                <div class="font-weight-bold" v-else>{{ percent(results.bps_converted, results.bp_opps) }}%</div>
                             </div>
                             <div v-if="results !== ''">
-                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="results.return1_pts"></v-progress-linear>
+                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="percent(results.bps_converted, results.bp_opps)"></v-progress-linear>
                             </div>
                         </div>
                     </td>
@@ -142,18 +140,23 @@ onMounted(() => {
                             <div class="d-flex justify-space-between">
                                 <div class="text-subtitle-1">2nd serve points won</div>
                                 <div class="font-weight-bold" v-if="results === ''">0%</div>
-                                <div class="font-weight-bold" v-else>{{ results.serve2_pts }}%</div>
+                                <div class="font-weight-bold" v-else>{{ percent(results.serve2_pts_w, results.serve2_pts) }}%</div>
                             </div>
                             <div v-if="results !== ''">
-                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="results.return1_pts"></v-progress-linear>
+                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="percent(results.serve2_pts_w, results.serve2_pts)"></v-progress-linear>
                             </div>
                         </div>
                     </td>
                     <td>
-                        <div class="d-flex justify-space-between">
-                            <div class="text-subtitle-1">Return games played</div>
-                            <div class="font-weight-bold" v-if="results === ''">0</div>
-                            <div class="font-weight-bold" v-else>{{ results.ret_gms_played }}</div>
+                        <div class="d-flex flex-column my-2">
+                            <div class="d-flex justify-space-between">
+                                <div class="text-subtitle-1">Return points won</div>
+                                <div class="font-weight-bold" v-if="results === ''">0%</div>
+                                <div class="font-weight-bold" v-else>{{ percent(results.ret_pts, results.ret_pts_total) }}%</div>
+                            </div>
+                            <div v-if="results !== ''">
+                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="percent(results.ret_pts, results.ret_pts_total)"></v-progress-linear>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -168,12 +171,12 @@ onMounted(() => {
                     <td>
                         <div class="d-flex flex-column my-2">
                             <div class="d-flex justify-space-between">
-                                <div class="text-subtitle-1">Return games won</div>
+                                <div class="text-subtitle-1">Total points won</div>
                                 <div class="font-weight-bold" v-if="results === ''">0%</div>
-                                <div class="font-weight-bold" v-else>{{ results.ret_gms_won }}%</div>
+                                <div class="font-weight-bold" v-else>{{ percent(results.pts_w, results.total_pts) }}%</div>
                             </div>
                             <div v-if="results !== ''">
-                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="results.return1_pts"></v-progress-linear>
+                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="percent(results.pts_w, results.total_pts)"></v-progress-linear>
                             </div>
                         </div>
                     </td>
@@ -184,57 +187,10 @@ onMounted(() => {
                             <div class="d-flex justify-space-between">
                                 <div class="text-subtitle-1">Break points saved</div>
                                 <div class="font-weight-bold" v-if="results === ''">0%</div>
-                                <div class="font-weight-bold" v-else>{{ results.bps_saved }}%</div>
+                                <div class="font-weight-bold" v-else>{{ percent(results.bps_saved, results.bps_faced) }}%</div>
                             </div>
                             <div v-if="results !== ''">
-                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="results.return1_pts"></v-progress-linear>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex flex-column my-2">
-                            <div class="d-flex justify-space-between">
-                                <div class="text-subtitle-1">Return points won</div>
-                                <div class="font-weight-bold" v-if="results === ''">0%</div>
-                                <div class="font-weight-bold" v-else>{{ results.ret_pts_won }}%</div>
-                            </div>
-                            <div v-if="results !== ''">
-                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="results.return1_pts"></v-progress-linear>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="d-flex justify-space-between">
-                            <div class="text-subtitle-1">Service games played</div>
-                            <div class="font-weight-bold" v-if="results === ''">0</div>
-                            <div class="font-weight-bold" v-else>{{ results.sv_gms_played }}</div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex flex-column my-2">
-                            <div class="d-flex justify-space-between">
-                                <div class="text-subtitle-1">Total points won</div>
-                                <div class="font-weight-bold" v-if="results === ''">0%</div>
-                                <div class="font-weight-bold" v-else>{{ results.pts_won }}%</div>
-                            </div>
-                            <div v-if="results !== ''">
-                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="results.return1_pts"></v-progress-linear>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="d-flex flex-column my-2">
-                            <div class="d-flex justify-space-between">
-                                <div class="text-subtitle-1">Service games won</div>
-                                <div class="font-weight-bold" v-if="results === ''">0%</div>
-                                <div class="font-weight-bold" v-else>{{ results.sv_gms_won }}%</div>
-                            </div>
-                            <div v-if="results !== ''">
-                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="results.return1_pts"></v-progress-linear>
+                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="percent(results.bps_saved, results.bps_faced)"></v-progress-linear>
                             </div>
                         </div>
                     </td>
@@ -246,10 +202,10 @@ onMounted(() => {
                             <div class="d-flex justify-space-between">
                                 <div class="text-subtitle-1">Total service points won</div>
                                 <div class="font-weight-bold" v-if="results === ''">0%</div>
-                                <div class="font-weight-bold" v-else>{{ results.sv_pts_won }}%</div>
+                                <div class="font-weight-bold" v-else>{{ percent(results.total_sv_pts, results.total_sv_pts_total) }}%</div>
                             </div>
                             <div v-if="results !== ''">
-                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="results.return1_pts"></v-progress-linear>
+                                <v-progress-linear rounded :height="20" color="green-accent-4" class="bg-green-darken-4" :model-value="percent(results.sv_pts, results.sv_pts_total)"></v-progress-linear>
                             </div>
                         </div>
                     </td>

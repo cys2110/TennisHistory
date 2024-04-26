@@ -6,7 +6,7 @@ import StatItemPercent from '@/components/Edition/StatItemPercent.vue';
 import StatServiceItem from '@/components/Edition/StatServiceItem.vue';
 import { computed, onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
-import { flagSrc, headshot, formattedDates, formatDate, tiebreak } from '@/components/utils';
+import { flagSrc, headshot, formattedDates, formatDate } from '@/components/utils';
 
 const props = defineProps(['matchId'])
 const match = ref(null)
@@ -70,6 +70,7 @@ onMounted(() => {
         const minutes = match.value.MatchScore.duration_mins % 60
         const formattedMinutes = minutes < 10 ? '0' + minutes : minutes
         duration.value = `${hour}:${formattedMinutes}`
+        console.log(match.value)
     })
     .catch(error => console.log(error))
 })
@@ -222,7 +223,7 @@ onMounted(() => {
                 <StatItem :p1="match.p1_dfs" :p2="match.p2_dfs">
                     <template #metric>Double faults</template>
                 </StatItem>
-                <DualStatItem :p1Value="match.p1_serve1" :p1Total="match.p1_serve1_pts + match.p1_serve2_pts"  :p2Value="match.p2_serve1" :p2Total="match.p2_serve1_pts + match.p2_serve2_pts">
+                <DualStatItem :p1Value="match.p1_serve1" :p1Total="match.p1_sv_pts_total"  :p2Value="match.p2_serve1" :p2Total="match.p2_sv_pts_total">
                     <template #metric>First serve</template>
                 </DualStatItem>
                 <DualStatItem :p1Value="match.p1_serve1_pts_w" :p1Total="match.p1_serve1_pts" :p2Value="match.p2_serve1_pts_w" :p2Total="match.p2_serve1_pts">
@@ -243,16 +244,16 @@ onMounted(() => {
                     <v-col class="font-weight-bold text-center text-h6">RETURN STATS</v-col>
                     <v-divider thickness="3"></v-divider>
                 </v-row>
-                <DualStatItem :p2Value="match.p1_serve1_pts - match.p1_serve1_pts_w" :p2Total="match.p1_serve1_pts" :p1Value="match.p2_serve1_pts - match.p2_serve1_pts_w" :p1Total="match.p2_serve1_pts">
+                <DualStatItem :p2Value="match.p2_ret1_w" :p2Total="match.p2_ret1" :p1Value="match.p1_ret1_w" :p1Total="match.p1_ret1">
                     <template #metric>1st serve return points won</template>
                 </DualStatItem>
-                <DualStatItem :p1Value="match.p2_serve2_pts - match.p2_serve2_pts_w" :p1Total="match.p2_serve2_pts" :p2Value="match.p1_serve2_pts - match.p1_serve2_pts_w" :p2Total="match.p1_serve2_pts">
+                <DualStatItem :p1Value="match.p1_ret2_w" :p1Total="match.p1_ret2" :p2Value="match.p2_ret2_w" :p2Total="match.p2_ret2">
                     <template #metric>2nd serve return points won</template>
                 </DualStatItem>
-                <DualStatItem :p1Value="match.p2_bps_faced - match.p2_bps_saved" :p1Total="match.p2_bps_faced" :p2Value="match.p1_bps_faced - match.p1_bps_saved" :p2Total="match.p1_bps_faced">
+                <DualStatItem :p1Value="match.p1_bps_converted" :p1Total="match.p1_bp_opps" :p2Value="match.p2_bps_converted" :p2Total="match.p2_bp_opps">
                     <template #metric>Break points converted</template>
                 </DualStatItem>
-                <StatItem :p1="match.p2_sv_gms" :p2="match.p1_sv_gms">
+                <StatItem :p1="match.p1_ret_gms" :p2="match.p2_ret_gms">
                     <template #metric>Return games played</template>
                 </StatItem>
             </div>
@@ -270,10 +271,10 @@ onMounted(() => {
                 <StatItem v-if="match.p1_ues" :p1="match.p1_ues" :p2="match.p2_ues">
                     <template #metric>Unforced errors</template>
                 </StatItem>
-                <DualStatItem :p1Value="match.p1_sv_pts" :p1Total="match.p1_serve1_pts + match.p1_serve2_pts" :p2Value="match.p2_sv_pts" :p2Total="match.p2_serve1_pts + match.p2_serve2_pts">
+                <DualStatItem :p1Value="match.p1_sv_pts" :p1Total="match.p1_sv_pts_total" :p2Value="match.p2_sv_pts" :p2Total="match.p2_sv_pts_total">
                     <template #metric>Service points won</template>
                 </DualStatItem>
-                <DualStatItem :p1Value="(match.p2_serve1_pts + match.p2_serve2_pts) - match.p2_sv_pts" :p1Total="match.p2_serve1_pts + match.p2_serve2_pts" :p2Value="(match.p1_serve1_pts + match.p1_serve2_pts) - match.p1_sv_pts" :p2Total="match.p1_serve1_pts + match.p1_serve2_pts">
+                <DualStatItem :p1Value="match.p1_ret_pts" :p1Total="match.p1_ret_pts_total" :p2Value="match.p2_ret_pts" :p2Total="match.p2_ret_pts_total">
                     <template #metric>Return points won</template>
                 </DualStatItem>
                 <StatItemPercent :p1Value="match.p1_pts" :total="match.total_pts">

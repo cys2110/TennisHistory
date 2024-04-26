@@ -45,10 +45,9 @@ const router = createRouter({
       props: true
     },
     {
-      path: '/h2h',
+      path: '/h2h/',
       name: 'H2H',
-      component: H2H,
-      props: true
+      component: H2H
     }
   ]
 })
