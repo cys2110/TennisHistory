@@ -10,7 +10,7 @@ app.use(bodyParser.json())
 app.use(logger('dev'))
 
 const db = require('./models')
-// db.PlayerStat.sync({alter: true})
+// db.MatchStat.sync({force: true})
 //     .then(() => {
 //         console.log('Synced db')
 //     })
@@ -57,6 +57,7 @@ app.get('/editions/entries', entryController.getEntriesByPlayer)
 
 // MatchStat endpoints
 app.get('/editions/match/:id', matchStatController.findMatch)
+app.get('/editions/stats', matchStatController.findPlayerStats)
 app.post('/match-stats', matchStatController.create)
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
