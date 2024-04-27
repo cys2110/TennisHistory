@@ -1,9 +1,8 @@
 <script setup>
 import PlayerService from '@/services/PlayerService';
 import OverviewWindow from '@/components/Player/OverviewWindow.vue';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import { flagSrc, formatDate, formatCurrency, gladiator, headshot } from '@/components/utils';
-import { useRouter } from 'vue-router';
 import TitlesWindow from '@/components/Player/TitlesWindow.vue';
 import WLIndexWindow from '@/components/Player/WLIndexWindow.vue';
 import StatsWindow from '@/components/Player/StatsWindow.vue';
@@ -11,7 +10,6 @@ import ActivityWindow from '@/components/Player/ActivityWindow.vue';
 
 const props = defineProps(['id'])
 const player = ref(null)
-const router = useRouter()
 const tab = ref('overview')
 
 onMounted(() => {
@@ -20,10 +18,6 @@ onMounted(() => {
         player.value = response.data
     })
     .catch(error => console.log(error))
-})
-
-watch(() => router.currentRoute.value.params.id, () => {
-        window.location.reload()
 })
 </script>
 

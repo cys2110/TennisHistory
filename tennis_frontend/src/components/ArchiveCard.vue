@@ -8,7 +8,7 @@ const currentDate = new Date()
 const startDate = new Date(props.edition.start_date)
 
 const navigate = () => {
-    router.push({name: 'Edition', params: {id: props.edition.TournamentId, name: props.edition.Tournament.name, editionId: props.edition.edition_no}})
+    router.push({name: 'Edition', params: {id: props.edition.TournamentId, name: props.edition.Tournament.name, year: props.edition.year, editionId: props.edition.edition_no}})
 }
 
 </script>

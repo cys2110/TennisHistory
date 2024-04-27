@@ -22,3 +22,12 @@ exports.findById = (req, res) => {
     .then(response => res.send(response))
     .catch(error => res.status(500).send(error.message))
 }
+
+exports.findByName = (req, res) => {
+    const { player } = req.params
+    Player.findAll({
+        where: db.sequelize.literal(`first_name || ' ' || last_name ILIKE '%${player}%'`)
+    })
+    .then(response => res.send(response))
+    .catch(error => res.status(500).send(error.message))
+}

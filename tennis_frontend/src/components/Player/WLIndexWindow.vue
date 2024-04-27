@@ -4,55 +4,54 @@ import PlayerService from '@/services/PlayerService';
 import { onMounted, ref } from 'vue';
 
 const props = defineProps(['id'])
-const index = ref({})
+const index = ref(null)
 
 onMounted(() => {
     PlayerService.getPlayerIndex(props.id)
     .then(response => {
-        index.value = response.data
-        console.log(index.value)
+        index.value = response.data[0]
     } )
     .catch(error => console.log(error))
 })
 </script>
 
 <template>
-    <v-container class="w-75">
+    <v-container class="w-75" v-if="index">
         <v-row>
             <v-col class="bg-indigo-darken-4 rounded-t-xl">
                 <div class="text-h6 text-center font-weight-bold">Match Record</div>
             </v-col>
         </v-row>
-        <IndexItem :win="index.overall_w" :loss="index.overall_l">
+        <IndexItem :win="index.overallWins" :total="index.overallTotal">
             <template #metric>Overall</template>
-            <template #titles> ({{ index.overall_titles }} <span v-if="index.overall_titles === 1">title</span><span v-else>titles</span>)</template>
+            <template #titles> ({{ index.overallTitles }} <span v-if="index.overallTitles = 1">title</span><span v-else>titles</span>)</template>
         </IndexItem>
-        <IndexItem :win="index.gs_w" :loss="index.gs_l">
+        <IndexItem :win="index.gsWins" :total="index.gsTotal">
             <template #metric>Grand Slams</template>
-            <template #titles> ({{ index.gs_titles }} <span v-if="index.gs_titles === 1">title</span><span v-else>titles</span>)</template>
+            <template #titles> ({{ index.gsTitles }} <span v-if="index.gsTitles = 1">title</span><span v-else>titles</span>)</template>
         </IndexItem>
-        <IndexItem :win="index.masters_w" :loss="index.masters_l">
+        <IndexItem :win="index.mastersWins" :total="index.mastersTotal">
             <template #metric>ATP Masters 1000</template>
-            <template #titles> ({{ index.masters_titles }} <span v-if="index.masters_titles === 1">title</span><span v-else>titles</span>)</template>
+            <template #titles> ({{ index.mastersTitles }} <span v-if="index.mastersTitles = 1">title</span><span v-else>titles</span>)</template>
         </IndexItem>
         <v-row>
             <v-col class="bg-indigo-darken-4">
                 <div class="text-h6 text-center font-weight-bold">Pressure points</div>
             </v-col>
         </v-row>
-        <IndexItem :win="index.tb_w" :loss="index.tb_l">
+        <IndexItem :win="parseInt(index.p1tb1Wins) + parseInt(index.p1tb2Wins) + parseInt(index.p1tb3Wins) + parseInt(index.p1tb4Wins) + parseInt(index.p1tb5Wins) + parseInt(index.p2tb1Wins) + parseInt(index.p2tb2Wins) + parseInt(index.p2tb3Wins) + parseInt(index.p2tb4Wins) + parseInt(index.p2tb5Wins)" :total="parseInt(index.total1Tbs) + parseInt(index.total2Tbs) + parseInt(index.total3Tbs) + parseInt(index.total4Tbs) + parseInt(index.total5Tbs)">
             <template #metric>Tiebreaks</template>
         </IndexItem>
-        <IndexItem :win="index.v10_w" :loss="index.v10_l">
+        <IndexItem :win="parseInt(index.v10Wins1) + parseInt(index.v10Wins2)" :total="parseInt(index.v10Total1) + parseInt(index.v10Total2)">
             <template #metric>Versus Top 10</template>
         </IndexItem>
-        <IndexItem :win="index.finals_w" :loss="index.finals_l">
+        <IndexItem :win="index.overallTitles" :total="index.finalsTotal">
             <template #metric>Finals</template>
         </IndexItem>
-        <IndexItem :win="index.deciders_w" :loss="index.deciders_l">
+        <IndexItem :win="index.decidersWins" :total="index.decidersTotal">
             <template #metric>Deciding set</template>
         </IndexItem>
-        <IndexItem :win="index.set5_w" :loss="index.set5_l">
+        <IndexItem :win="index.set5Wins" :total="index.set5Total">
             <template #metric>5th set record</template>
         </IndexItem>
         <v-row>
@@ -60,42 +59,45 @@ onMounted(() => {
                 <div class="text-h6 text-center font-weight-bold">Environment</div>
             </v-col>
         </v-row>
-        <IndexItem :win="index.cl_w" :loss="index.cl_l">
+        <IndexItem :win="index.clayWins" :total="index.clayTotal">
             <template #metric>Clay</template>
-            <template #titles> ({{ index.cl_titles }} <span v-if="index.cl_titles === 1">title</span><span v-else>titles</span>)</template>
+            <template #titles> ({{ index.clayTitles }} <span v-if="index.clayTitles === 1">title</span><span v-else>titles</span>)</template>
         </IndexItem>
-        <IndexItem :win="index.g_w" :loss="index.g_l">
+        <IndexItem :win="index.grassWins" :total="index.grassTotal">
             <template #metric>Grass</template>
-            <template #titles> ({{ index.g_titles }} <span v-if="index.g_titles === 1">title</span><span v-else>titles</span>)</template>
+            <template #titles> ({{ index.grassTitles }} <span v-if="index.grassTitles === 1">title</span><span v-else>titles</span>)</template>
         </IndexItem>
-        <IndexItem :win="index.h_w" :loss="index.h_l">
+        <IndexItem :win="index.hardWins" :total="index.hardTotal">
             <template #metric>Hard</template>
-            <template #titles> ({{ index.h_titles }} <span v-if="index.h_titles === 1">title</span><span v-else>titles</span>)</template>
+            <template #titles> ({{ index.hardTitles }} <span v-if="index.hardTitles === 1">title</span><span v-else>titles</span>)</template>
         </IndexItem>
-        <IndexItem :win="index.c_w" :loss="index.c_l">
+        <IndexItem :win="index.carpetWins" :total="index.carpetTotal">
             <template #metric>Carpet**</template>
-            <template #titles> ({{ index.c_titles }} <span v-if="index.c_titles === 1">title</span><span v-else>titles</span>)</template>
+            <template #titles> ({{ index.carpetTitles }} <span v-if="index.carpetTitles === 1">title</span><span v-else>titles</span>)</template>
         </IndexItem>
-        <IndexItem :win="index.i_w" :loss="index.i_l">
+        <IndexItem :win="index.indoorWins" :total="index.indoorTotal">
             <template #metric>Indoor</template>
-            <template #titles> ({{ index.i_titles }} <span v-if="index.i_titles === 1">title</span><span v-else>titles</span>)</template>
+            <template #titles> ({{ index.indoorTitles }} <span v-if="index.indoorTitles === 1">title</span><span v-else>titles</span>)</template>
         </IndexItem>
-        <IndexItem :win="index.o_w" :loss="index.o_l">
+        <IndexItem :win="index.outdoorWins" :total="index.outdoorTotal">
             <template #metric>Outdoor</template>
-            <template #titles> ({{ index.o_titles }} <span v-if="index.o_titles === 1">title</span><span v-else>titles</span>)</template>
+            <template #titles> ({{ index.outdoorTitles }} <span v-if="index.outdoorTitles === 1">title</span><span v-else>titles</span>)</template>
         </IndexItem>
         <v-row>
             <v-col class="bg-indigo-darken-4">
                 <div class="text-h6 text-center font-weight-bold">Other</div>
             </v-col>
         </v-row>
-        <IndexItem :win="index.l1_w" :loss="index.l1_l">
+        <IndexItem :win="index.win1Wins" :total="index.win1Total">
+            <template #metric>After winning 1st set</template>
+        </IndexItem>
+        <IndexItem :win="index.lose1Wins" :total="index.lose1Total">
             <template #metric>After losing 1st set</template>
         </IndexItem>
-        <IndexItem :win="index.rh_w" :loss="index.rh_l">
+        <IndexItem :win="parseInt(index.rhWins1) + parseInt(index.rhWins2)" :total="parseInt(index.rhTotal1) + parseInt(index.rhTotal2)">
             <template #metric>vs. right-handers</template>
         </IndexItem>
-        <IndexItem :win="index.lh_w" :loss="index.lh_l">
+        <IndexItem :win="parseInt(index.lhWins1) + parseInt(index.lhWins2)" :total="parseInt(index.lhTotal1) + parseInt(index.lhTotal2)">
             <template #metric>vs. left-handers</template>
         </IndexItem>
     </v-container>

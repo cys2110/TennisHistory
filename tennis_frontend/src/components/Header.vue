@@ -1,4 +1,5 @@
 <script setup>
+import H2HScrim from './H2HScrim.vue';
 import Search from './Search.vue'
 </script>
 
@@ -7,11 +8,20 @@ import Search from './Search.vue'
         <v-app-bar-title class="custom-font text-h4">Tennis History</v-app-bar-title>
         <v-btn icon="fas fa-house" href="/"></v-btn>
         <v-btn icon="far fa-calendar" href="/results-archive"></v-btn>
-        <v-btn icon="fad fa-people-arrows"></v-btn>
+        <v-btn icon="fad fa-people-arrows" rounded="xl">
+            <v-icon icon="fad fa-people-arrows"></v-icon>
+            <v-dialog activator="parent" transition="v-fade-transition">
+                <template v-slot:default="{ isActive }">
+                    <H2HScrim @close="isActive.value = false" />
+                </template>
+            </v-dialog>
+        </v-btn>
         <v-btn rounded="xl">
             <v-icon icon="fas fa-magnifying-glass"></v-icon>
             <v-dialog activator="parent" transition="dialog-bottom-transition">
-                <Search />
+                <template v-slot:default="{ isActive }">
+                    <Search @close="isActive.value = false" />
+                </template>
             </v-dialog>
         </v-btn>
     </v-app-bar>

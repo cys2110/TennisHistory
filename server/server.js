@@ -30,6 +30,7 @@ app.get('/search/:search', tournamentController.search)
 
 // Player endpoints
 app.get('/players/id/:id', playerController.findById)
+app.get('/players/name/:player', playerController.findByName)
 app.post('/players', playerController.create)
 
 // Tournament endpoints

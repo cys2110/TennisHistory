@@ -18,36 +18,61 @@ const router = createRouter({
     {
       path: '/results-archive',
       name: 'Results Archive',
-      component: ResultsArchive
+      component: ResultsArchive,
+      beforeEnter: (to, from, next) => {
+        document.title = `Results Archive | Tennis History`;
+        next();
+      }
     },
     {
       path: '/tournaments/:name/:id',
       name: 'Tournament',
       props: true,
-      component: Tournament
+      component: Tournament,
+      beforeEnter: (to, from, next) => {
+        document.title = `${to.params.name} | Tennis History`;
+        next();
+      }
     },
     {
-      path: '/tournaments/:name/:id/:editionId',
+      path: '/tournaments/:name/:id/:year/:editionId',
       component: Edition,
       name: 'Edition',
-      props: true
+      props: true,
+      beforeEnter: (to, from, next) => {
+        document.title = `${to.params.name} ${to.params.year} | Tennis History`;
+        next();
+      }
     },
     {
-      path: '/tournaments/:name/:id/:editionId/matches/:matchId',
+      path: '/tournaments/:name/:id/:year/:editionId/matches/:matchId',
       name: 'MatchStats',
       component: MatchStats,
-      props: true
+      props: true,
+      beforeEnter: (to, from, next) => {
+        document.title = `${to.params.name} ${to.params.year} | Tennis History`;
+        next();
+      }
     },
     {
       path: '/players/:name/:id',
       component: Player,
       name: 'Player',
-      props: true
+      props: true,
+      beforeEnter: (to, from, next) => {
+        document.title = `${to.params.name} | Tennis History`;
+        next();
+      }
     },
     {
-      path: '/h2h/',
+      path: '/h2h/:p1Name/:p1Id/:p2Name/:p2Id',
       name: 'H2H',
-      component: H2H
+      component: H2H,
+      props: true,
+      beforeEnter: (to, from, next) => {
+        document.title = `${to.params.p1Name} v. ${to.params.p2Name} | Tennis History`;
+        next();
+      }
     }
   ]
 })

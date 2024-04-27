@@ -82,18 +82,18 @@ export function tiebreak (matchScore, tiebreakScore) {
 export function round (roundNumber) {
     switch (roundNumber) {
         case '128':
-            return 'R128'
+            return 'Round of 128'
         case '64':
-            return 'R64'
+            return 'Round of 64'
         case '32':
-            return 'R32'
+            return 'Round of 32'
         case '16':
-            return 'R16'
+            return 'Round of 16'
         case 'QF':
-            return 'QF'
+            return 'Quarterfinals'
         case 'SF':
-            return 'SF'
+            return 'Semifinals'
         case 'F':
-            return 'F'
+            return 'Final'
     }
 }

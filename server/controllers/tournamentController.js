@@ -51,15 +51,11 @@ exports.search = async (req, res) => {
             }
         })
         const players = await db.Player.findAll({
-            where: {
-                last_name: {
-                    [Op.iRegexp]: search
-                }
-            }
+            where: db.sequelize.literal(`first_name || ' ' || last_name ILIKE '%${search}%'`)
         })
         const response = {
-            tournaments: tournaments,
-            players: players
+            tournaments,
+            players
         }
         res.send(response)
     } catch (error) {

@@ -14,6 +14,9 @@ export default {
         return apiClient.get('id/' + id)
     },
     getPlayerIndex(id) {
-        return apiClient.get('wlindex/' + id)
+        return apiClient.get('wl-index/' + id)
+    },
+    getPlayerByName(name) {
+        return apiClient.get('name/' + name)
     }
 }

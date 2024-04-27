@@ -34,7 +34,7 @@ endDate < currentDate ? display.value = true : display.value = false
     <v-container>
       <v-row>
         <v-col>
-          <div class="text-h5 text-center"><RouterLink class="hover-link" :to="{name: 'Edition', params: {editionId: edition.edition_no}}">{{ edition.year }}</RouterLink></div>
+          <div class="text-h5 text-center"><RouterLink class="hover-link" :to="{name: 'Edition', params: {editionId: edition.edition_no, year: edition.year}}">{{ edition.year }}</RouterLink></div>
         </v-col>
       </v-row>
       <v-row class="align-center">

@@ -46,61 +46,31 @@ exports.findH2H = async (req, res) => {
                         ]
                     }
                 ]
-            }
+            },
+            include: {
+                model: db.Edition,
+                attributes: ['year', 'environment', 'surface', 'id', 'edition_no'],
+                include: {
+                    model: db.Tournament,
+                    attributes: ['id', 'name']
+                }
+            },
+            order: [[db.Edition, 'start_date', 'ASC']]
         })
 
-        const p1Wins = await MatchScore.count({
-            where: {
-                [Op.or]: [
-                    {
-                        [Op.and]: [
-                            {
-                                p1: player1,
-                                p2: player2
-                            }
-                        ]
-                    },
-                    {
-                        [Op.and]: [
-                            {
-                                p2: player1,
-                                p1: player2
-                            }
-                        ]
-                    }
-                ],
-                winner_id: player1
-            }
-        })
-
-        const p2Wins = await MatchScore.count({
-            where: {
-                [Op.or]: [
-                    {
-                        [Op.and]: [
-                            {
-                                p1: player1,
-                                p2: player2
-                            }
-                        ]
-                    },
-                    {
-                        [Op.and]: [
-                            {
-                                p2: player1,
-                                p1: player2
-                            }
-                        ]
-                    }
-                ],
-                winner_id: player2
-            }
+        const count = await MatchScore.findAll({
+            attributes: [
+                [Sequelize.literal('SUM(CASE WHEN ((p1 = :player1 AND p2 = :player2) OR (p2 = :player1 AND p1 = :player2)) AND winner_id = :player1 THEN 1 ELSE 0 END)'), 'p1Wins'],
+                [Sequelize.literal('SUM(CASE WHEN ((p1 = :player1 AND p2 = :player2) OR (p2 = :player1 AND p1 = :player2)) AND winner_id = :player2 THEN 1 ELSE 0 END)'), 'p2Wins'],
+                [Sequelize.literal('SUM(CASE WHEN (p1 = :player1 AND p2 = :player2) OR (p2 = :player1 AND p1 = :player2) THEN 1 ELSE 0 END)'), 'total'],
+            ],
+            raw: true,
+            replacements: { player1, player2 }
         })
 
         const response = {
             matches,
-            p1Wins,
-            p2Wins
+            count
         }
 
         res.send(response)

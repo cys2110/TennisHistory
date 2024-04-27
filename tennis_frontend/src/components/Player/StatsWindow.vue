@@ -32,12 +32,12 @@ onMounted(() => {
 </script>
 
 <template>
-    <v-sheet>
+    <v-sheet class="bg-transparent">
         <div class="d-flex ml-auto w-25">
             <v-select variant="outlined" density="compact" class="w-25" :items="years" v-model="selectedYear" @update:model-value="getStats"></v-select>
             <v-select variant="outlined" density="compact" class="w-25" :items="surfaces" v-model="selectedSurface" @update:model-value="getStats"></v-select>
         </div>
-        <v-table class="rounded-xl w-75 mx-auto">
+        <v-table class="rounded-xl w-75 mx-auto bg-transparent">
             <thead>
                 <tr>
                     <th class="font-weight-bold text-center text-subtitle-1">Serve</th>

@@ -6,30 +6,11 @@ import StatItemPercent from '@/components/Edition/StatItemPercent.vue';
 import StatServiceItem from '@/components/Edition/StatServiceItem.vue';
 import { computed, onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
-import { flagSrc, headshot, formattedDates, formatDate } from '@/components/utils';
+import { flagSrc, headshot, formattedDates, formatDate, round } from '@/components/utils';
 
 const props = defineProps(['matchId'])
 const match = ref(null)
 const duration = ref(null)
-
-function round (roundNumber) {
-    switch (roundNumber) {
-        case '128':
-            return 'Round of 128'
-        case '64':
-            return 'Round of 64'
-        case '32':
-            return 'Round of 32'
-        case '16':
-            return 'Round of 16'
-        case 'QF':
-            return 'Quarterfinals'
-        case 'SF':
-            return 'Semifinals'
-        case 'F':
-            return 'Final'
-    }
-}
 
 const incomplete = computed(() => {
     switch (match.value.MatchScore.incomplete) {
