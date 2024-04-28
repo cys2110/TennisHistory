@@ -39,8 +39,14 @@ onMounted(() => {
 
 <template>
     <v-sheet class="bg-transparent">
-        <v-select variant="outlined" density="compact" class="w-25" :items="years" v-model="selectedYear" @update:model-value="getActivity"></v-select>
-
+        <v-select
+            variant="outlined"
+            density="compact"
+            class="w-25"
+            :items="years"
+            v-model="selectedYear"
+            @update:model-value="getActivity"
+        />
         <div class="d-flex w-75 justify-space-evenly mx-auto my-3 rounded-lg pa-3" style="border: 2px solid #8C9EFF;">
             <div class="d-flex flex-column align-center">
                 <div class="font-weight-bold text-h6">{{ winCount ? winCount : 0 }}-{{ lossCount ? lossCount : 0 }}</div>

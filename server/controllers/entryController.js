@@ -2,15 +2,6 @@ const db = require('../models')
 const Entry = db.Entry
 const Op = db.Sequelize.Op
 
-exports.create = (req, res) => {
-
-    const entry = req.body
-
-    Entry.create(entry)
-    .then(response => res.send(response))
-    .catch(error => res.status(500).send(error.message))
-}
-
 exports.getEntriesByPlayer = async (req, res) => {
     try {
         const { player, year } = req.query
@@ -110,6 +101,7 @@ exports.getEntriesByPlayer = async (req, res) => {
         })
 
         const prizeMoney = entries.reduce((total, entry) => total + entry.pm, 0)
+
         const response = {
             wins: winCount,
             losses: loseCount,

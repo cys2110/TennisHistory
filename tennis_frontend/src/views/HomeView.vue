@@ -16,7 +16,7 @@ onMounted(() => {
     <v-sheet class="bg-transparent my-10 pa-3 w-75 mx-auto">
         <div class="text-h3">Upcoming Tournaments</div>
         <div v-if="upcoming.length > 0" class="my-10">
-            <UpcomingCard v-for="edition in upcoming" :edition="edition" :key="edition.id" />
+            <UpcomingCard v-for="edition in upcoming" :edition :key="edition.id" />
         </div>
         <div v-else class="text-subtitle-1 my-5">No upcoming tournaments</div>
     </v-sheet>

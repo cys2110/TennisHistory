@@ -54,6 +54,6 @@ const p2Meter = computed(() => {
                 </div>
             </div>
         </v-col>
-        <v-divider thickness="2"></v-divider>
+        <v-divider thickness="2"/>
     </v-row>
 </template>

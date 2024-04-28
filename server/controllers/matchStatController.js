@@ -3,14 +3,6 @@ const MatchStat = db.MatchStat
 const Op = db.Sequelize.Op
 const sequelize = db.sequelize
 
-exports.create = (req, res) => {
-    const match = req.body
-
-    MatchStat.create(match)
-    .then(response => res.send(response))
-    .catch(error => res.status(500).send(error.message))
-}
-
 exports.findMatch = (req, res) => {
     const { id } = req.params
     MatchStat.findOne({

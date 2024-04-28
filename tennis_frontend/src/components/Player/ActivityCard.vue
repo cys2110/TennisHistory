@@ -13,10 +13,14 @@ const sortedMatches = matches.toSorted((a, b) => {
 </script>
 
 <template>
-    <v-card class="ma-10 pt-9 pb-5 px-10 w-75 mx-auto" variant="elevated" color="indigo-darken-4">
+    <v-card
+        class="ma-10 pt-9 pb-5 px-10 w-75 mx-auto"
+        variant="elevated"
+        color="indigo-darken-4"
+    >
         <v-row>
             <v-col>
-                <v-img :src="categorySrc(entry.Edition.category)" class="filter" ></v-img>
+                <v-img :src="categorySrc(entry.Edition.category)" class="filter" />
             </v-col>
             <v-col cols="9">
                 <v-card-title class="text-h5">
@@ -32,7 +36,7 @@ const sortedMatches = matches.toSorted((a, b) => {
                 </v-card-subtitle>
             </v-col>
             <v-col class="d-flex align-center">
-                <v-img rounded="lg" class="border-thin" :src="flagSrc(entry.Edition.country)" :alt="entry.Edition.country"></v-img>
+                <v-img rounded="lg" class="border-thin" :src="flagSrc(entry.Edition.country)" :alt="entry.Edition.country"/>
             </v-col>
         </v-row>
         <v-row></v-row>

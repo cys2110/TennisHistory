@@ -27,7 +27,7 @@ onMounted(() => {
         <v-container v-if="edition && matches.length > 0">
             <v-row>
                 <v-col cols="2">
-                    <v-img :src="categorySrc(edition.category)" class="filter"></v-img>
+                    <v-img :src="categorySrc(edition.category)" class="filter"/>
                 </v-col>
                 <v-col class="d-flex flex-column">
                     <div class="text-h5"><RouterLink class="hover-link" :to="{name: 'Tournament', params: {name: edition.Tournament.name, id: edition.TournamentId}}">{{ edition.Tournament.name }}</RouterLink></div>
@@ -35,7 +35,7 @@ onMounted(() => {
                     <div class="text-subtitle-1">{{ formattedDates(edition.start_date, edition.end_date) }}</div>
                 </v-col>
                 <v-col cols="2">
-                    <v-img rounded="xl" :src="flagSrc(edition.country)"></v-img>
+                    <v-img rounded="xl" :src="flagSrc(edition.country)"/>
                 </v-col>
             </v-row>
             <v-row>

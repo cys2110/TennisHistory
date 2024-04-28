@@ -57,8 +57,7 @@ const navigate = (id, name) => {
                     <span>{{ formatCurrency(edition.currency, edition.tfc) }}</span>
                 </div>
                 <div class="detail" v-if="edition.supervisors.length > 0">
-                    <span v-if="edition.supervisors.length === 1" class="font-weight-bold">Supervisor</span>
-                    <span v-else class="font-weight-bold">Supervisors</span>
+                    <span class="font-weight-bold">{{ edition.supervisors.length === 1 ? 'Supervisor' : 'Supervisors' }}</span>
                     <span>{{ joinArray(edition.supervisors) }}</span>
                 </div>
             </v-col>
@@ -85,9 +84,9 @@ const navigate = (id, name) => {
                             <td class="text-center">{{ seed.seed }}</td>
                             <td class="d-flex align-center">
                                 <v-avatar variant="outlined">
-                                    <v-img v-if="seed.Player.headshot" :src="headshot(seed.PlayerId)" @click="navigate(seed.PlayerId, seed.Player.full_name)"></v-img>
+                                    <v-img v-if="seed.Player.headshot" :src="headshot(seed.PlayerId)" @click="navigate(seed.PlayerId, seed.Player.full_name)"/>
                                 </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(seed.Player.country)" rounded="lg"></v-img></div>
+                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(seed.Player.country)" rounded="lg"/></div>
                                 <RouterLink class="hover-link" :class="{'strikethrough': seed.wd}" :to="{name: 'Player', params: {id: seed.PlayerId, name: seed.Player.full_name}}">{{ seed.Player.full_name }}</RouterLink></td>
                             <td :class="{'strikethrough': seed.wd}" class="text-center">{{ seed.rank }}</td>
                         </tr>
@@ -186,9 +185,9 @@ const navigate = (id, name) => {
                                     variant="outlined"
                                     size="small"
                                 >
-                                    <v-img v-if="lda[0].Player.headshot" :src="headshot(lda[0].PlayerId)" @click="navigate(lda[0].PlayerId, lda[0].Player.full_name)"></v-img>
+                                    <v-img v-if="lda[0].Player.headshot" :src="headshot(lda[0].PlayerId)" @click="navigate(lda[0].PlayerId, lda[0].Player.full_name)"/>
                                 </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><v-img class="rounded-lg" :src="flagSrc(lda[0].Player.country)"></v-img></div>
+                                <div style="width: 10%;" class="mx-3"><v-img class="rounded-lg" :src="flagSrc(lda[0].Player.country)"/></div>
                                 <RouterLink class="hover-link" :to="{name: 'Player', params: {id: lda[0].PlayerId, name: lda[0].Player.full_name}}">{{ lda[0].Player.full_name }}</RouterLink>
                             </td>
                             <td><span v-if="lda[0].status === 'PR'">P</span>{{ lda[0].rank }}</td>
@@ -207,9 +206,9 @@ const navigate = (id, name) => {
                                     variant="outlined"
                                     size="small"
                                 >
-                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"></v-img>
+                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"/>
                                 </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(player.Player.country)" class='rounded-lg'></v-img></div>
+                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(player.Player.country)" class='rounded-lg'/></div>
                                 <RouterLink class="hover-link" :to="{name: 'Player', params: {id: player.PlayerId, name: player.Player.full_name}}">{{ player.Player.full_name }}</RouterLink>
                             </td>
                             <td></td>
@@ -228,9 +227,9 @@ const navigate = (id, name) => {
                                     variant="outlined"
                                     size="small"
                                 >
-                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"></v-img>
+                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"/>
                                 </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(player.Player.country)" class='rounded-lg'></v-img></div>
+                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(player.Player.country)" class='rounded-lg'/></div>
                                 <RouterLink class="hover-link" :to="{name: 'Player', params: {id: player.PlayerId, name: player.Player.full_name}}">{{ player.Player.full_name }}</RouterLink>
                             </td>
                             <td></td>
@@ -249,9 +248,9 @@ const navigate = (id, name) => {
                                     variant="outlined"
                                     size="small"
                                 >
-                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"></v-img>
+                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"/>
                                 </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(player.Player.country)" class='rounded-lg'></v-img></div>
+                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(player.Player.country)" class='rounded-lg'/></div>
                                 <RouterLink class="hover-link" :to="{name: 'Player', params: {id: player.PlayerId, name: player.Player.full_name}}">{{ player.Player.full_name }}</RouterLink>
                             </td>
                             <td v-if="player.wd === 'true'"></td>
@@ -271,9 +270,9 @@ const navigate = (id, name) => {
                                     variant="outlined"
                                     size="small"
                                 >
-                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"></v-img>
+                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"/>
                                 </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(player.Player.country)" class='rounded-lg'></v-img></div>
+                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(player.Player.country)" class='rounded-lg'/></div>
                                 <RouterLink class="hover-link" :to="{name: 'Player', params: {id: player.PlayerId, name: player.Player.full_name}}">{{ player.Player.full_name }}</RouterLink>
                             </td>
                             <td v-if="player.ret === 'true'"></td>
@@ -293,9 +292,9 @@ const navigate = (id, name) => {
                                     variant="outlined"
                                     size="small"
                                 >
-                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"></v-img>
+                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"/>
                                 </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(player.Player.country)" class='rounded-lg'></v-img></div>
+                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(player.Player.country)" class='rounded-lg'/></div>
                                 <RouterLink class="hover-link" :to="{name: 'Player', params: {id: player.PlayerId, name: player.Player.full_name}}">{{ player.Player.full_name }}</RouterLink>
                             </td>
                             <td v-if="player.wo === 'true'"></td>
@@ -315,13 +314,12 @@ const navigate = (id, name) => {
                                     variant="outlined"
                                     size="small"
                                 >
-                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"></v-img>
+                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"/>
                                 </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(player.Player.country)" class='rounded-lg'></v-img></div>
+                                <div style="width: 10%;" class="mx-3"><v-img :src="flagSrc(player.Player.country)" class='rounded-lg'/></div>
                                 <RouterLink class="hover-link" :to="{name: 'Player', params: {id: player.PlayerId, name: player.Player.full_name}}">{{ player.Player.full_name }}</RouterLink>
                             </td>
-                            <td v-if="player.defaulted === 'true'"></td>
-                            <td v-else>{{ player.defaulted }}</td>
+                            <td>{{ player.defaulted === 'true' ? '' : player.defaulted }}</td>
                         </tr>
                     </tbody>
                 </v-table>

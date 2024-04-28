@@ -67,8 +67,7 @@ onMounted(() => {
             <div class="text-subtitle-1">
                 <span>{{ match.MatchScore.Edition.environment }} {{ match.MatchScore.Edition.surface }} 
                     <span v-if="match.MatchScore.Edition.hard_type">({{ match.MatchScore.Edition.hard_type }})</span></span> | 
-                <span v-if="match.MatchScore.date">{{ formatDate(match.MatchScore.date) }}</span>
-                <span v-else>{{ formattedDates(match.MatchScore.Edition.start_date, match.MatchScore.Edition.end_date) }}</span>
+                <span>{{ match.MatchScore.date ?  formatDate(match.MatchScore.date) : formattedDates(match.MatchScore.Edition.start_date, match.MatchScore.Edition.end_date) }}</span>
             </div>
             <div class="text-subtitle-1"><span>{{ round(match.MatchScore.round) }}</span></div>
         </div>
@@ -86,11 +85,11 @@ onMounted(() => {
                                 v-if="match.MatchScore.player1.headshot"
                                 variant="outlined"
                             >
-                                <v-img :src="headshot(match.MatchScore.p1)" :alt="match.MatchScore.player1.full_name"></v-img>
+                                <v-img :src="headshot(match.MatchScore.p1)" :alt="match.MatchScore.player1.full_name"/>
                             </v-avatar>
                         </div>
                         <div class="mx-2">
-                            <v-img :src="flagSrc(match.MatchScore.player1.country)" :alt="match.MatchScore.player1.country" rounded="lg" width="50"></v-img>
+                            <v-img :src="flagSrc(match.MatchScore.player1.country)" :alt="match.MatchScore.player1.country" rounded="lg" width="50"/>
                         </div>
                         <div>
                             <RouterLink class="hover-link" :to="{name: 'Player', params: {id: match.MatchScore.p1, name: match.MatchScore.player1.full_name}}">{{ match.MatchScore.player1.full_name }}</RouterLink>
@@ -98,7 +97,7 @@ onMounted(() => {
                         </div>
                     </v-col>
                     <v-col cols="1">
-                        <v-icon v-if="match.MatchScore.winner_id === match.MatchScore.p1" icon="fad fa-check"></v-icon>
+                        <v-icon v-if="match.MatchScore.winner_id === match.MatchScore.p1" icon="fad fa-check"/>
                     </v-col>
                     <v-col cols="3" class="d-flex justify-space-evenly">
                         <div v-if="match.MatchScore.s1p1 || match.MatchScore.s1p1 === 0">
@@ -129,11 +128,11 @@ onMounted(() => {
                             <v-avatar
                                 variant="outlined"
                             >
-                                <v-img :src="headshot(match.MatchScore.p2)" :alt="match.MatchScore.player2.full_name"></v-img>
+                                <v-img :src="headshot(match.MatchScore.p2)" :alt="match.MatchScore.player2.full_name"/>
                             </v-avatar>
                         </div>
                         <div class="mx-2">
-                            <v-img :src="flagSrc(match.MatchScore.player2.country)" width="50" :alt="match.MatchScore.player2.country" rounded="lg"></v-img>
+                            <v-img :src="flagSrc(match.MatchScore.player2.country)" width="50" :alt="match.MatchScore.player2.country" rounded="lg"/>
                         </div>
                         <div>
                             <RouterLink class="hover-link" :to="{name: 'Player', params: {id: match.MatchScore.p2, name: match.MatchScore.player2.full_name}}">{{ match.MatchScore.player2.full_name }}</RouterLink>
@@ -141,7 +140,7 @@ onMounted(() => {
                         </div>
                     </v-col>
                     <v-col cols="1">
-                        <v-icon v-if="match.MatchScore.winner_id === match.MatchScore.p2" icon="fad fa-check"></v-icon>
+                        <v-icon v-if="match.MatchScore.winner_id === match.MatchScore.p2" icon="fad fa-check"/>
                     </v-col>
                     <v-col cols="3" class="d-flex justify-space-evenly">
                         <div v-if="match.MatchScore.s1p2 || match.MatchScore.s1p2 === 0">
@@ -180,7 +179,7 @@ onMounted(() => {
                         variant="outlined"
                         size="x-large"
                     >
-                        <v-img :src="headshot(match.MatchScore.p1)"></v-img>
+                        <v-img :src="headshot(match.MatchScore.p1)"/>
                     </v-avatar>
                     <div class="text-uppercase font-weight-bold mt-1">{{ match.MatchScore.player1.full_name }}</div>
                 </v-col>
@@ -191,11 +190,11 @@ onMounted(() => {
                         variant="outlined"
                         size="x-large"
                     >
-                        <v-img :src="headshot(match.MatchScore.p2)"></v-img>
+                        <v-img :src="headshot(match.MatchScore.p2)"/>
                     </v-avatar>
                     <div class="text-uppercase font-weight-bold mt-1">{{ match.MatchScore.player2.full_name }}</div>
                 </v-col>
-                <v-divider thickness="3"></v-divider>
+                <v-divider thickness="3"/>
             </v-row>
             <div v-if="match.p1_serve1">
                 <StatItem :p1="match.p1_aces" :p2="match.p2_aces">
@@ -223,7 +222,7 @@ onMounted(() => {
             <div v-if="match.p1_serve1_pts">
                 <v-row>
                     <v-col class="font-weight-bold text-center text-h6">RETURN STATS</v-col>
-                    <v-divider thickness="3"></v-divider>
+                    <v-divider thickness="3"/>
                 </v-row>
                 <DualStatItem :p2Value="match.p2_ret1_w" :p2Total="match.p2_ret1" :p1Value="match.p1_ret1_w" :p1Total="match.p1_ret1">
                     <template #metric>1st serve return points won</template>
@@ -241,7 +240,7 @@ onMounted(() => {
             <div v-if="match.p1_sv_pts">
                 <v-row>
                     <v-col class="font-weight-bold text-center text-h6">POINT STATS</v-col>
-                    <v-divider thickness="3"></v-divider>
+                    <v-divider thickness="3"/>
                 </v-row>
                 <DualStatItem v-if="match.p1_net_w" :p1Value="match.p1_net_w" :p1Total="match.p1_net" :p2Value="match.p2_net_w" :p2Total="match.p2_net">
                     <template #metric>Net points won</template>
@@ -265,7 +264,7 @@ onMounted(() => {
             <div v-if="match.p1_max_speed_kph">
                 <v-row>
                     <v-col class="font-weight-bold text-center text-h6">SERVICE SPEED</v-col>
-                    <v-divider thickness="3"></v-divider>
+                    <v-divider thickness="3"/>
                 </v-row>
                 <StatServiceItem :p1Kmh="match.p1_max_speed_kph" :p1Mph="match.p1_max_speed_mph" :p2Kmh="match.p2_max_speed_kph" :p2Mph="match.p2_max_speed_mph">
                     <template #metric>Max Speed</template>

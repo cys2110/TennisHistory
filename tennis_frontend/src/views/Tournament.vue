@@ -28,7 +28,7 @@ onMounted(() => {
         <v-container v-if="tournament">
             <v-row>
                 <v-col class="d-flex">
-                    <div class="text-h3">{{ tournament.name }}</div> <a v-if="tournament.website" :href="tournament.website" target="_blank"><v-icon icon="fad fa-arrow-up-right-from-square"></v-icon></a>
+                    <div class="text-h3">{{ tournament.name }}</div> <a v-if="tournament.website" :href="tournament.website" target="_blank"><v-icon icon="fad fa-arrow-up-right-from-square"/></a>
                 </v-col>
             </v-row>
             <v-row>
@@ -38,7 +38,7 @@ onMounted(() => {
             </v-row>
             <v-row>
                 <v-col cols="3">
-                    <TournamentCard v-for="edition in tournament.Editions" :edition="edition" :key="edition.id" />
+                    <TournamentCard v-for="edition in tournament.Editions" :edition :key="edition.id" />
                 </v-col>
             </v-row>
         </v-container>

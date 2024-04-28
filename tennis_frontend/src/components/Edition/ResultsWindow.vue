@@ -32,36 +32,36 @@ const tab = ref(round)
         </v-tabs>
         <v-window v-model="tab" class="mt-5" direction="vertical">
             <v-window-item v-if="finalArray.length > 0" value="final">
-                <ResultCard :match="finalArray[0]" />
+                <ResultCard :match="finalArray[0]" :edition />
             </v-window-item>
             <v-window-item v-if="sfArray.length > 0" value="sfs">
                 <div class="d-flex flex-row">
-                    <ResultCard v-for="match in sfArray" :key="match.id" :match />
+                    <ResultCard v-for="match in sfArray" :key="match.id" :match :edition/>
                 </div>
             </v-window-item>
             <v-window-item v-if="qfArray.length > 0" value="qfs">
                 <div class="d-flex flex-row flex-wrap">
-                    <ResultCard v-for="match in qfArray" :key="match.id" :match />
+                    <ResultCard v-for="match in qfArray" :key="match.id" :match :edition/>
                 </div>
             </v-window-item>
             <v-window-item v-if="r16Array.length > 0" value="r16">
                 <div class="d-flex flex-row flex-wrap">
-                    <ResultCard v-for="match in r16Array" :key="match.id" :match />
+                    <ResultCard v-for="match in r16Array" :key="match.id" :match :edition/>
                 </div>
             </v-window-item>
             <v-window-item v-if="r32Array.length > 0" value="r32">
                 <div class="d-flex flex-row flex-wrap">
-                    <ResultCard v-for="match in r32Array" :key="match.id" :match />
+                    <ResultCard v-for="match in r32Array" :key="match.id" :match :edition/>
                 </div>
             </v-window-item>
             <v-window-item v-if="r64Array.length > 0" value="r64">
                 <div class="d-flex flex-row flex-wrap">
-                    <ResultCard v-for="match in r64Array" :key="match.id" :match />
+                    <ResultCard v-for="match in r64Array" :key="match.id" :match :edition/>
                 </div>
             </v-window-item>
             <v-window-item v-if="r128Array.length > 0" value="r128">
                 <div class="d-flex flex-row flex-wrap">
-                    <ResultCard v-for="match in r128Array" :key="match.id" :match />
+                    <ResultCard v-for="match in r128Array" :key="match.id" :match :edition/>
                 </div>
             </v-window-item>
         </v-window>

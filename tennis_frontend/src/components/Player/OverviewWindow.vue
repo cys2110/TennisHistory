@@ -54,8 +54,7 @@ const bh = computed(() => {
                     <span>{{ bh }}</span>
                 </div>
                 <div class="detail" v-if="player.coaches.length > 0">
-                    <span v-if="player.coaches.length === 1">Coach</span>
-                    <span v-else>Coaches</span>
+                    <span>{{ player.coaches.length === 1 ? 'Coach' : 'Coaches' }}</span>
                     <span>{{ joinArray(player.coaches) }}</span>
                 </div>
             </v-col>

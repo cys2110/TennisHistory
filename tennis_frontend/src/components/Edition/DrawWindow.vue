@@ -34,25 +34,25 @@ const selectedRound = ref(parseInt(props.edition.type_of_draw))
     </v-row>
     <v-row class="overflow-x-auto">
       <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="edition.type_of_draw === '128' && selectedRound >= 128">
-        <DrawCard v-for="match in r128Array" :key="match.id" :match="match" />
+        <DrawCard v-for="match in r128Array" :key="match.id" :match :edition />
       </v-col>
       <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="(edition.type_of_draw === '128' || edition.type_of_draw === '64') && selectedRound >= 64">
-        <DrawCard v-for="match in r64Array" :key="match.id" :match="match" />
+        <DrawCard v-for="match in r64Array" :key="match.id" :match :edition />
       </v-col>
       <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >= 32">
-        <DrawCard v-for="match in r32Array" :key="match.id" :match="match" />
+        <DrawCard v-for="match in r32Array" :key="match.id" :match :edition />
       </v-col>
       <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >= 16">
-        <DrawCard v-for="match in r16Array" :key="match.id" :match="match" />
+        <DrawCard v-for="match in r16Array" :key="match.id" :match :edition />
       </v-col>
       <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >=8">
-        <DrawCard v-for="match in qfArray" :key="match.id" :match="match" />
+        <DrawCard v-for="match in qfArray" :key="match.id" :match :edition />
       </v-col>
       <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >= 4">
-        <DrawCard v-for="match in sfArray" :key="match.id" :match="match" />
+        <DrawCard v-for="match in sfArray" :key="match.id" :match :edition />
       </v-col>
       <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >=2">
-        <DrawCard v-for="match in finalArray" :key="match.id" :match="match" />
+        <DrawCard v-for="match in finalArray" :key="match.id" :match :edition />
       </v-col>
     </v-row>
   </v-container>

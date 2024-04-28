@@ -74,7 +74,7 @@ const submitH2H = () => {
                     </v-col>
                     <v-spacer></v-spacer>
                     <v-col cols="1" class="d-flex align-center">
-                        <v-icon icon="fad fa-right-from-line" @click="submitH2H"></v-icon>
+                        <v-icon icon="fad fa-right-from-line" @click="submitH2H"/>
                     </v-col>
             </v-row>
             <v-row>

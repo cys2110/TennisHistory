@@ -3,14 +3,6 @@ const MatchScore = db.MatchScore
 const Op = db.Sequelize.Op
 const Sequelize = db.sequelize
 
-exports.create = (req, res) => {
-    const match = req.body
-
-    MatchScore.create(match)
-    .then(response => res.send(response))
-    .catch(error => res.status(500).send(error.message))
-}
-
 exports.findByEdition = (req, res) => {
     const { edition } = req.params
     MatchScore.findAll({

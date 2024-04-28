@@ -14,9 +14,7 @@ const tab = ref('overview')
 
 onMounted(() => {
     PlayerService.getPlayerById(props.id)
-    .then(response => {
-        player.value = response.data
-    })
+    .then(response => player.value = response.data)
     .catch(error => console.log(error))
 })
 </script>
@@ -29,11 +27,21 @@ onMounted(() => {
                     <div class="d-flex">
                         <div class="text-h4">{{ player.first_name }} {{ player.last_name.toUpperCase() }}</div>
                         <div>
-                            <v-img class="flag" :src="flagSrc(player.country)" :alt="player.country"></v-img>
+                            <v-img
+                                :src="flagSrc(player.country)"
+                                :alt="player.country"
+                                class="flag"
+                            />
                         </div>
                     </div>
                     <div class="my-2">
-                        <v-chip v-if="player.status" variant="elevated" color="indigo-accent-4">Active</v-chip>
+                        <v-chip
+                            v-if="player.status"
+                            variant="elevated"
+                            color="indigo-accent-4"
+                        >
+                            Active
+                        </v-chip>
                     </div>
                     <div class="d-flex align-self-center my-2 align-space-between justify-space-around bg-indigo-accent-4 rounded-pill py-5 w-100">
                         <div class="d-flex flex-column mx-2 align-center justify-center">
@@ -56,8 +64,18 @@ onMounted(() => {
                     </div>
                 </v-col>
                 <v-col v-if="player.gladiator || player.headshot">
-                    <v-img v-if="player.gladiator" :src="gladiator(player.id)" :alt="player.full_name" rounded="xl"></v-img>
-                    <v-img v-else :src="headshot(player.id)" rounded="circle" :alt="player.full_name"></v-img>
+                    <v-img
+                        v-if="player.gladiator"
+                        :src="gladiator(player.id)"
+                        :alt="player.full_name"
+                        rounded="xl"
+                    />
+                    <v-img
+                        v-else
+                        :src="headshot(player.id)"
+                        rounded="circle"
+                        :alt="player.full_name"
+                    />
                 </v-col>
             </v-row>
             <v-row>

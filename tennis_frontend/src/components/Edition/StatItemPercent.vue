@@ -32,7 +32,8 @@ const p2Percent = computed(() => {
                     max="100"
                     color="indigo-accent-4"
                     class="bg-green-darken-3"
-                >{{ total }}
+                >
+                    {{ total }}
                 </v-progress-linear>
             </div>
         </v-col>
@@ -40,6 +41,6 @@ const p2Percent = computed(() => {
             <div :class="{'font-weight-bold': p2Percent > p1Percent}">{{ p2Value }}</div>
             <div :class="{'font-weight-bold': p2Percent > p1Percent}">({{ p2Percent }}%)</div>
         </v-col>
-        <v-divider thickness="2"></v-divider>
+        <v-divider thickness="2"/>
     </v-row>
 </template>

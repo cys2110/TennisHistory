@@ -20,13 +20,13 @@ const props = defineProps(['p1Kmh', 'p2Kmh', 'p1Mph', 'p2Mph'])
                     class="bg-green-darken-3"
                     :model-value="p1Kmh"
                     :max="p1Kmh + p2Kmh"
-                ></v-progress-linear>
+                />
             </div>
         </v-col>
         <v-col cols="2" class="d-flex flex-column align-center justify-center">
             <div :class="{'font-weight-bold': p2Kmh > p1Kmh}">{{ p2Kmh }} km/h</div>
             <div :class="{'font-weight-bold': p2Kmh > p1Kmh}">{{ p2Mph }} mph</div>
         </v-col>
-        <v-divider thickness="2"></v-divider>
+        <v-divider thickness="2"/>
     </v-row>
 </template>

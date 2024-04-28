@@ -2,14 +2,6 @@ const db = require('../models')
 const Edition = db.Edition
 const Op = db.Sequelize.Op
 
-exports.create = (req, res) => {
-    const edition = req.body
-
-    Edition.create(edition)
-    .then(response => res.send(response))
-    .catch(error => res.status(500).send(error.message))
-}
-
 exports.findByEditionNo = (req, res) => {
     const { edition } = req.params
     Edition.findOne({

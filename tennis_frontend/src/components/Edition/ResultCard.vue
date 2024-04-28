@@ -3,7 +3,9 @@ import { computed, ref } from 'vue';
 import { formatDate, headshot, flagSrc, tiebreak } from '../utils';
 import { RouterLink, useRouter } from 'vue-router';
 
-const props = defineProps(['match'])
+const props = defineProps(['match', 'edition'])
+console.log(props.match)
+console.log(props.edition)
 const router = useRouter()
 const winner = ref(null)
 const winPlayer = ref(null)
@@ -41,6 +43,14 @@ const navigate = (id, name) => {
     router.push({name: 'Player', params: {id: id, name: name}})
 }
 
+const navigateStats = () => {
+    router.push({name: 'MatchStats', params: {name: props.edition.Tournament.name, id: props.edition.Tournament.id, year: props.edition.year, editionId: props.edition.edition_no, matchId: props.match.id}})
+}
+
+const navigateH2H = () => {
+    router.push({name: 'H2H', params: {p1Name: props.match.player1.full_name, p1Id: props.match.p1, p2Name: props.match.player2.full_name, p2Id: props.match.p2}})
+}
+
 const winnerStatus = computed(() => {
     if (winEntry.value.seed && winEntry.value.status) {
         return `(${winEntry.value.seed} ${winEntry.value.status})`
@@ -76,14 +86,14 @@ const loserStatus = computed(() => {
             <v-row>
                 <v-col class="d-flex align-center">
                     <v-avatar v-if="winner.headshot" variant="outlined">
-                        <v-img :src="headshot(winner.id)" @click="navigate(winner.id, winner.full_name)"></v-img>
+                        <v-img :src="headshot(winner.id)" @click="navigate(winner.id, winner.full_name)"/>
                     </v-avatar>
-                    <v-img :src="flagSrc(winner.country)" max-width="50" rounded="lg" class="mx-2"></v-img>
+                    <v-img :src="flagSrc(winner.country)" max-width="50" rounded="lg" class="mx-2"/>
                     <RouterLink class="hover-link" :to="{name: 'Player', params: {id: winner.id, name: winner.full_name}}">{{ winner.full_name }}</RouterLink>
                     <span v-if="winEntry.seed || winEntry.status" class="small">&nbsp;{{ winnerStatus }}</span>
                 </v-col>
                 <v-col cols='1'>
-                    <v-icon icon="fad fa-check" size="small"></v-icon>
+                    <v-icon icon="fad fa-check" size="small"/>
                 </v-col>
                 <v-col cols="3" class="d-flex align-center justify-space-evenly">
                     <div v-if="match.s1p1">{{ match['s1' + winPlayer] }}<sup v-if="match['t1' + winPlayer]">{{ tiebreak(match['s1' + winPlayer], match['t1' + winPlayer]) }}</sup></div>
@@ -96,9 +106,9 @@ const loserStatus = computed(() => {
             <v-row>
                 <v-col v-if="match.incomplete !== 'B'" class="d-flex align-center">
                     <v-avatar v-if="loser && loser.headshot" variant="outlined">
-                        <v-img :src="headshot(loser.id)" @click="navigate(loser.id, loser.full_name)"></v-img>
+                        <v-img :src="headshot(loser.id)" @click="navigate(loser.id, loser.full_name)"/>
                     </v-avatar>
-                    <v-img :src="flagSrc(loser.country)" max-width="50" rounded="lg" class="mx-2"></v-img>
+                    <v-img :src="flagSrc(loser.country)" max-width="50" rounded="lg" class="mx-2"/>
                     <RouterLink class="hover-link" :to="{name: 'Player', params: {id: loser.id, name: loser.full_name}}">{{ loser.full_name }}</RouterLink>
                     <span v-if="loseEntry.seed || loseEntry.status" class="small">&nbsp;{{ loserStatus }}</span>
                 </v-col>
@@ -117,6 +127,12 @@ const loserStatus = computed(() => {
                 <v-col v-else-if="match.incomplete === 'WO'">Walkover</v-col>
                 <v-col v-else-if="match.incomplete === 'D'">Default</v-col>
                 <v-col v-if="match.umpire" class="text-right">Umpire: {{ match.umpire }}</v-col>
+            </v-row>
+            <v-row>
+                <v-col class="text-right">
+                    <v-chip v-if="match.incomplete !== 'B'" @click="navigateH2H" class="mx-2">H2H</v-chip>
+                    <v-chip v-if="match.incomplete !== 'B'" @click="navigateStats">Match Stats</v-chip>
+                </v-col>
             </v-row>
         </v-container>
     </v-card>

@@ -26,12 +26,12 @@ const meter = computed(() => {
                     max="100"
                     color="indigo-accent-4"
                     class="bg-green-darken-3"
-                ></v-progress-linear>
+                />
             </div>
         </v-col>
         <v-col cols="1" class="d-flex align-center justify-center">
             <div :class="{'font-weight-bold': p2 > p1}">{{ p2 }}</div>
         </v-col>
-        <v-divider thickness="2"></v-divider>
+        <v-divider thickness="2"/>
     </v-row>
 </template>

@@ -31,8 +31,7 @@ watch(searchYear, () => {
                         v-model="searchYear"
                         :items="years"
                         style="width: 15%;"
-                    >
-                    </v-combobox>
+                    />
                 </v-col>
             </v-row>
             <v-row>

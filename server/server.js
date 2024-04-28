@@ -26,34 +26,23 @@ const entryController = require('./controllers/entryController')
 const matchScoreController = require('./controllers/matchScoreController')
 
 app.get('/', (req, res) => res.send('This is the root!'))
+
 app.get('/search/:search', tournamentController.search)
 
-// Player endpoints
 app.get('/players/id/:id', playerController.findById)
 app.get('/players/name/:player', playerController.findByName)
-app.post('/players', playerController.create)
+app.get('/players/wl-index/:player', matchScoreController.wlIndex)
 
-// Tournament endpoints
 app.get('/tournaments/id/:id', tournamentController.findById)
-app.post('/tournaments', tournamentController.create)
 
-// Edition endpoints
 app.get('/editions/id/:edition', editionController.findByEditionNo)
 app.get('/editions/upcoming', editionController.findUpcoming)
 app.get('/editions/year/:year', editionController.findByYear)
 app.get('/editions/player/:player', editionController.findByPlayer)
-app.post('/editions', editionController.create)
-
-// Entry endpoints
 app.get('/editions/entries', entryController.getEntriesByPlayer)
-
-// MatchScore endpoints
-app.get('/h2h', matchScoreController.findH2H)
-app.get('/players/wl-index/:player', matchScoreController.wlIndex)
-
-// MatchStat endpoints
 app.get('/editions/match/:id', matchStatController.findMatch)
 app.get('/editions/stats', matchStatController.findPlayerStats)
-app.post('/match-stats', matchStatController.create)
+
+app.get('/h2h', matchScoreController.findH2H)
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
