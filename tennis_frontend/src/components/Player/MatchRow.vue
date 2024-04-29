@@ -55,25 +55,25 @@ if (props.match.p1 === props.id && props.match.p2) {
     <td>
         <div v-if="match.incomplete === 'WO'">WALKOVER</div>
         <div v-else>
-            <span>
-                {{ match.p1 === id && (match.s1p1 || match.s1p2) ? `${match.s1p1}${match.s1p2}` : `${match.s1p2}${match.s1p1}` }}
-                <sup v-if="match.t1p1 || match.t1p2">{{ match.t1p1 > match.t1p2 ? match.t1p2 : match.t1p1 }}</sup>
+            <span v-if="match.s1p1 !== null">
+                {{ match.p1 === id ? `${match.s1p1}${match.s1p2}` : `${match.s1p2}${match.s1p1}` }}
+                <sup v-if="match.t1p1 || match.t1p2">{{ match.t1p1 > match.t1p2 ? match.t1p2 : match.t1p1 }}</sup>&nbsp;
             </span>
-            <span>
-                {{ match.p1 === id && (match.s2p1 || match.s2p2) ? `${match.s2p1}${match.s2p2}` : `${match.s2p2}${match.s2p1}` }}
-                <sup v-if="match.t2p1 || match.t2p2">{{ match.t2p1 > match.t2p2 ? match.t2p2 : match.t2p1 }}</sup>
+            <span v-if="match.s2p1 !== null">
+                {{ match.p1 === id ? `${match.s2p1}${match.s2p2}` : `${match.s2p2}${match.s2p1}` }}
+                <sup v-if="match.t2p1 || match.t2p2">{{ match.t2p1 > match.t2p2 ? match.t2p2 : match.t2p1 }}</sup>&nbsp;
             </span>
-            <span>
-                {{ match.p1 === id && (match.s3p1 || match.s3p2) ? `${match.s3p1}${match.s3p2}` : `${match.s3p2}${match.s3p1}` }}
-                <sup v-if="match.t3p1 || match.t3p2">{{ match.t3p1 > match.t3p2 ? match.t3p2 : match.t3p1 }}</sup>
+            <span v-if="match.s3p1 !== null">
+                {{ match.p1 === id ? `${match.s3p1}${match.s3p2}` : `${match.s3p2}${match.s3p1}` }}
+                <sup v-if="match.t3p1 || match.t3p2">{{ match.t3p1 > match.t3p2 ? match.t3p2 : match.t3p1 }}</sup>&nbsp;
             </span>
-            <span>
-                {{ match.p1 === id && (match.s4p1 || match.s4p2) ? `${match.s4p1}${match.s4p2}` : `${match.s4p2}${match.s4p1}` }}
-                <sup v-if="match.t4p1 || match.t4p2">{{ match.t4p1 > match.t4p2 ? match.t4p2 : match.t4p1 }}</sup>
+            <span v-if="match.s4p1 !== null">
+                {{ match.p1 === id ? `${match.s4p1}${match.s4p2}` : `${match.s4p2}${match.s4p1}` }}
+                <sup v-if="match.t4p1 || match.t4p2">{{ match.t4p1 > match.t4p2 ? match.t4p2 : match.t4p1 }}</sup>&nbsp;
             </span>
-            <span>
-                {{ match.p1 === id && (match.s5p1 || match.s5p2) ? `${match.s5p1}${match.s5p2}` : `${match.s5p2}${match.s5p1}` }}
-                <sup v-if="match.t5p1 || match.t5p2">{{ match.t5p1 > match.t5p2 ? match.t5p2 : match.t5p1 }}</sup>
+            <span v-if="match.s5p1 !== null">
+                {{ match.p1 === id ? `${match.s5p1}${match.s5p2}` : `${match.s5p2}${match.s5p1}` }}
+                <sup v-if="match.t5p1 || match.t5p2">{{ match.t5p1 > match.t5p2 ? match.t5p2 : match.t5p1 }}</sup>&nbsp;
             </span>
         </div>
         <div v-if="match.incomplete === 'R'">Ret'd</div>

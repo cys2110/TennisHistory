@@ -62,7 +62,7 @@ onMounted(() => {
         <div class="d-flex flex-column align-center">
             <div class="text-h5">
                 <span v-if="match.MatchScore.Edition.sponsor_name">{{ match.MatchScore.Edition.sponsor_name }} | </span>
-                <span><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: match.MatchScore.Edition.Tournament.id, name: match.MatchScore.Edition.Tournament.name}}">{{ match.MatchScore.Edition.Tournament.name }}</RouterLink></span>
+                <span><RouterLink class="hover-link" :to="{name: 'Tournament'}">{{ match.MatchScore.Edition.Tournament.name }}</RouterLink></span>
             </div>
             <div class="text-subtitle-1">
                 <span>{{ match.MatchScore.Edition.environment }} {{ match.MatchScore.Edition.surface }} 
@@ -100,7 +100,7 @@ onMounted(() => {
                         <v-icon v-if="match.MatchScore.winner_id === match.MatchScore.p1" icon="fad fa-check"/>
                     </v-col>
                     <v-col cols="3" class="d-flex justify-space-evenly">
-                        <div v-if="match.MatchScore.s1p1 || match.MatchScore.s1p1 === 0">
+                        <div v-if="match.MatchScore.s1p1 !== null">
                             {{ match.MatchScore.s1p1 }}
                             <sup v-if="match.MatchScore.t1p1 || match.MatchScore.t1p1 === 0">{{ match.MatchScore.t1p1 }}</sup>
                         </div>

@@ -3,11 +3,13 @@ const { DataTypes, Model } = require('sequelize');
 module.exports = (sequelize, models) => {
     class Entry extends Model {
         static associate () {
-            const { Player, Edition, MatchScore } = models
+            const { Player, Edition, MatchScore, NonCount } = models
             Entry.belongsTo(Edition)
             Entry.belongsTo(Player)
             Entry.hasMany(MatchScore, {foreignKey: 'p1_no', as: 'entry1'})
             Entry.hasMany(MatchScore, {foreignKey: 'p2_no', as: 'entry2'})
+            Entry.hasMany(NonCount, {foreignKey: 'p1_no', as: 'atpe1'})
+            Entry.hasMany(NonCount, {foreignKey: 'p2_no', as: 'atpe2'})
         }
     }
     Entry.init({

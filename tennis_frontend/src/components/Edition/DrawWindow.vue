@@ -51,7 +51,7 @@ const selectedRound = ref(parseInt(props.edition.type_of_draw))
       <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >= 4">
         <DrawCard v-for="match in sfArray" :key="match.id" :match :edition />
       </v-col>
-      <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound >=2">
+      <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound <=8">
         <DrawCard v-for="match in finalArray" :key="match.id" :match :edition />
       </v-col>
     </v-row>

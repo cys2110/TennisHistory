@@ -18,6 +18,8 @@ db.Entry = require('./entry')(sequelize, db)
 db.MatchScore = require('./matchScore')(sequelize, db)
 db.MatchStat = require('./matchStat')(sequelize, db)
 db.Tie = require('./tie')(sequelize, db)
+db.NonCount = require('./nonCount')(sequelize, db)
+db.WTA = require('./wta')(sequelize, db)
 
 Object.keys(db).forEach(modelName => {
     if (db[modelName].associate) {

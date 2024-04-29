@@ -103,7 +103,8 @@ exports.findPlayerStats = async (req, res) => {
                 attributes: ['id']
             }
         },
-        group: ['MatchScore.id', 'MatchScore.Edition.id']
+        group: ['MatchScore.id', 'MatchScore.Edition.id'],
+        raw: true
        })
 
        const p2Stats = await MatchStat.findOne({
@@ -141,16 +142,16 @@ exports.findPlayerStats = async (req, res) => {
                     attributes: ['id']
                 }
             },
-            group: ['MatchScore.id', 'MatchScore.Edition.id']
+        group: ['MatchScore.id', 'MatchScore.Edition.id'],
+        raw: true
        })
 
        function addStats(p1, p2) {
         const result = {}
         for (const key in p1) {
-            if (p1.hasOwnProperty(key) && p2.hasOwnProperty(key)) {
-                result[key] = parseInt(p1[key]) + parseInt(p2[key])
-            }
+            result[key] = parseInt(p1[key]) + parseInt(p2[key])
         }
+        return result
        }
 
        let stats

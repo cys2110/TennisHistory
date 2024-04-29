@@ -1,19 +1,20 @@
-const { DataTypes, Model } = require('sequelize');
+const { DataTypes, Model } = require('sequelize')
 
 module.exports = (sequelize, models) => {
-    class MatchScore extends Model {
-        static associate () {
-            const { Player, Edition, Entry, Tie } = models
-            MatchScore.belongsTo(Edition)
-            MatchScore.belongsTo(Tie)
-            MatchScore.belongsTo(Entry, {foreignKey: {name: 'p1_no'}, as: 'entry1'})
-            MatchScore.belongsTo(Player, {foreignKey: {name: 'p1', type: DataTypes.STRING}, as: 'player1'})
-            MatchScore.belongsTo(Entry, {foreignKey: {name: 'p2_no'}, as: 'entry2'})
-            MatchScore.belongsTo(Player, {foreignKey: {name: 'p2', type: DataTypes.STRING}, as: 'player2'})
-            MatchScore.belongsTo(Player, {foreignKey: {name: 'winner_id', type: DataTypes.STRING}})
+    class NonCount extends Model {
+        static associate() {
+            const { Player, Tie, WTA, Entry } = models
+            NonCount.belongsTo(Tie)
+            NonCount.belongsTo(Player, {foreignKey: {name: 'p1', type: DataTypes.STRING}, as: 'atp1'})
+            NonCount.belongsTo(Player, {foreignKey: {name: 'p2', type: DataTypes.STRING}, as: 'atp2'})
+            NonCount.belongsTo(Entry, {foreignKey: {name: 'p1_no', type: DataTypes.STRING}, as: 'atpe1'})
+            NonCount.belongsTo(Entry, {foreignKey: {name: 'p2_no'}, as: 'atpe2'})
+            NonCount.belongsTo(WTA, {foreignKey: 'wta_p1', as: 'wta1'})
+            NonCount.belongsTo(WTA, {foreignKey: 'wta_p2', as: 'wta2'})
         }
     }
-    MatchScore.init({
+
+    NonCount.init({
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -44,12 +45,13 @@ module.exports = (sequelize, models) => {
         s5p1: DataTypes.INTEGER,
         s5p2: DataTypes.INTEGER,
         t5p1: DataTypes.INTEGER,
-        t5p2: DataTypes.INTEGER
+        t5p2: DataTypes.INTEGER,
+        winner: DataTypes.ENUM('p1', 'p2', 'wta1', 'wta2')
     },
     {
         sequelize,
-        modelName: 'MatchScore'
+        modelName: 'NonCount'
     })
 
-    return MatchScore
+    return NonCount
 }

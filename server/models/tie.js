@@ -3,8 +3,10 @@ const { DataTypes, Model } = require('sequelize');
 module.exports = (sequelize, models) => {
     class Tie extends Model {
         static associate () {
-            const { Edition } = models
+            const { Edition, MatchScore, NonCount } = models
             Tie.belongsTo(Edition)
+            Tie.hasMany(MatchScore)
+            Tie.hasMany(NonCount)
         }
     }
     Tie.init({
@@ -15,17 +17,14 @@ module.exports = (sequelize, models) => {
         },
         round: DataTypes.STRING,
         country1: DataTypes.STRING(3),
-        coutrny2: DataTypes.STRING(3),
-        winner: DataTypes.STRING(3),
-        start_date: DataTypes.DATEONLY,
-        end_date: DataTypes.DATEONLY,
+        country2: DataTypes.STRING(3),
+        date: DataTypes.DATEONLY,
         venue: DataTypes.STRING,
         city: DataTypes.STRING,
         country: DataTypes.STRING(3),
         environment: DataTypes.ENUM('Indoor', 'Outdoor'),
         surface: DataTypes.ENUM('Clay', 'Carpet', 'Grass', 'Hard'),
-        hard_type: DataTypes.STRING,
-        score: DataTypes.STRING
+        hard_type: DataTypes.STRING
     },
     {
         sequelize,

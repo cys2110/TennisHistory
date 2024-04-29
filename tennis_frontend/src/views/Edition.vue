@@ -30,7 +30,7 @@ onMounted(() => {
                     <v-img :src="categorySrc(edition.category)" class="filter"/>
                 </v-col>
                 <v-col class="d-flex flex-column">
-                    <div class="text-h5"><RouterLink class="hover-link" :to="{name: 'Tournament', params: {name: edition.Tournament.name, id: edition.TournamentId}}">{{ edition.Tournament.name }}</RouterLink></div>
+                    <div class="text-h5"><RouterLink class="hover-link" :to="{name: 'Tournament'}">{{ edition.Tournament.name }}</RouterLink></div>
                     <div class="text-h5" v-if="edition.sponsor_name">{{ edition.sponsor_name }}</div>
                     <div class="text-subtitle-1">{{ formattedDates(edition.start_date, edition.end_date) }}</div>
                 </v-col>

@@ -64,9 +64,9 @@ const sortedMatches = matches.toSorted((a, b) => {
         </v-row>
         <v-row>
             <v-col class="d-flex justify-space-between">
-                <span v-if="entry.rank" class="text-button">Rank: {{ entry.rank }}</span>
-                <span v-if="entry.points" class="text-button">Points: {{ entry.points }}</span>
-                <span v-if="entry.pm" class="text-button">Prize money: {{ formatCurrency(entry.Edition.currency, entry.pm) }}</span>
+                <span v-if="entry.rank !== null" class="text-button">Rank: {{ entry.rank }}</span>
+                <span v-if="entry.points !== null" class="text-button">Points: {{ entry.points }}</span>
+                <span v-if="entry.pm !== null" class="text-button">Prize money: {{ formatCurrency(entry.Edition.currency, entry.pm) }}</span>
             </v-col>
         </v-row>
     </v-card>

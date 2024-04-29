@@ -10,7 +10,7 @@ app.use(bodyParser.json())
 app.use(logger('dev'))
 
 const db = require('./models')
-// db.MatchStat.sync({force: true})
+// db.WTA.sync({alter: true})
 //     .then(() => {
 //         console.log('Synced db')
 //     })
@@ -18,14 +18,25 @@ const db = require('./models')
 //         console.log("Failed to sync db:" + err.message)
 //     })
 
+// db.NonCount.sync({alter: true})
+// .then(() => {
+//     console.log('Synced db')
+// })
+// .catch((err) => {
+//     console.log("Failed to sync db:" + err.message)
+// })
+
 const tournamentController = require('./controllers/tournamentController')
 const editionController = require('./controllers/editionController')
 const playerController = require('./controllers/playerController')
 const matchStatController = require('./controllers/matchStatController')
 const entryController = require('./controllers/entryController')
 const matchScoreController = require('./controllers/matchScoreController')
+const tieController = require('./controllers/tieController')
 
 app.get('/', (req, res) => res.send('This is the root!'))
+
+app.get('/test', tieController.findTie)
 
 app.get('/search/:search', tournamentController.search)
 
