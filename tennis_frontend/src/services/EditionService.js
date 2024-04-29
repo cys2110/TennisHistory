@@ -30,5 +30,8 @@ export default {
     },
     getPlayerStats(player, year, surface) {
         return apiClient.get(`stats?player=${player}&year=${year}&surface=${surface}`)
+    },
+    getTiesByEdition(id) {
+        return apiClient.get(`ties/${id}`)
     }
 }

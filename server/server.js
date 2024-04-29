@@ -18,7 +18,7 @@ const db = require('./models')
 //         console.log("Failed to sync db:" + err.message)
 //     })
 
-// db.NonCount.sync({alter: true})
+// db.Edition.sync({alter: true})
 // .then(() => {
 //     console.log('Synced db')
 // })
@@ -36,13 +36,12 @@ const tieController = require('./controllers/tieController')
 
 app.get('/', (req, res) => res.send('This is the root!'))
 
-app.get('/test', tieController.findTie)
-
 app.get('/search/:search', tournamentController.search)
 
 app.get('/players/id/:id', playerController.findById)
 app.get('/players/name/:player', playerController.findByName)
 app.get('/players/wl-index/:player', matchScoreController.wlIndex)
+app.get('/players/ties/:edition', tieController.findPlayersByEdition)
 
 app.get('/tournaments/id/:id', tournamentController.findById)
 
@@ -53,6 +52,7 @@ app.get('/editions/player/:player', editionController.findByPlayer)
 app.get('/editions/entries', entryController.getEntriesByPlayer)
 app.get('/editions/match/:id', matchStatController.findMatch)
 app.get('/editions/stats', matchStatController.findPlayerStats)
+app.get('/editions/ties/:edition', tieController.findTieByEdition)
 
 app.get('/h2h', matchScoreController.findH2H)
 

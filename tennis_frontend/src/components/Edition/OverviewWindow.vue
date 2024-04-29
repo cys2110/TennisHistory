@@ -1,6 +1,5 @@
 <script setup>
 import { formatCurrency, joinArray, headshot, flagSrc } from '@/components/utils';
-import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const props = defineProps(['edition'])

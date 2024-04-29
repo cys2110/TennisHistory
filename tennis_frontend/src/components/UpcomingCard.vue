@@ -26,8 +26,9 @@ const navigate = () => {
                 <v-col cols="2">
                     <v-img
                         :src="categorySrc(edition.category)"
-                        class="filter"
+                        :class="{'filter': edition.category === 'ATP 250' || edition.category === 'Next Gen Finals' || edition.category === 'ATP Finals'}"
                         :alt="edition.category"
+                        width="150"
                     />
                 </v-col>
                 <v-col class="d-flex flex-column">

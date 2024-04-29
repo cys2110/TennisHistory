@@ -18,5 +18,8 @@ export default {
     },
     getPlayerByName(name) {
         return apiClient.get('name/' + name)
+    },
+    getTeamPlayersByEdition(id) {
+        return apiClient.get(`ties/` + id)
     }
 }
