@@ -1,30 +1,8 @@
 <script setup>
-import { computed } from 'vue';
-import { formatDate, joinArray } from '@/components/utils';
+import { formatDate, joinArray, plays, bh } from '@/components/utils';
 
 const props = defineProps(['player'])
 
-const yearsActive = computed(() => {
-    if (props.player.turned_pro && props.player.retired) {
-        return `${props.player.turned_pro} - ${props.player.retired}`
-    } else {
-        return `${props.player.turned_pro} - present`
-    }
-})
-
-const height = computed(() => {
-    return `${props.player.height_cm}cm (${props.player.height_ft})`
-})
-
-const rh = computed(() => {
-    if (props.player.rh) { return 'Right-handed' }
-    else { return 'Left-handed' }
-})
-
-const bh = computed(() => {
-    if (props.player.bh1) { return 'One-handed' }
-    else { return 'Two-handed' }
-})
 </script>
 
 <template>
@@ -33,7 +11,7 @@ const bh = computed(() => {
             <v-col cols="6">
                 <div class="detail">
                     <span>Years active</span>
-                    <span>{{ yearsActive }}</span>
+                    <span>{{ player.turned_pro }} - {{ player.retired ? player.retired : 'present' }}</span>
                 </div>
                 <div class="detail" v-if="player.dob">
                     <span>Date of birth</span>
@@ -41,17 +19,17 @@ const bh = computed(() => {
                 </div>
                 <div class="detail" v-if="player.height_cm">
                     <span>Height</span>
-                    <span>{{ height }}</span>
+                    <span>{{ player.height_cm }} cm ({{ player.height_ft }})</span>
                 </div>
             </v-col>
             <v-col cols="6">
-                <div class="detail" v-if="player.rh || player.rh === false">
+                <div class="detail" v-if="player.rh !== null">
                     <span>Plays</span>
-                    <span>{{ rh }}</span>
+                    <span>{{ plays(player.rh) }}</span>
                 </div>
-                <div class="detail" v-if="player.bh1 || player.bh1 === false">
+                <div class="detail" v-if="player.bh1 !== null">
                     <span>Backhand</span>
-                    <span>{{ bh }}</span>
+                    <span>{{ bh(player.bh1) }}</span>
                 </div>
                 <div class="detail" v-if="player.coaches.length > 0">
                     <span>{{ player.coaches.length === 1 ? 'Coach' : 'Coaches' }}</span>

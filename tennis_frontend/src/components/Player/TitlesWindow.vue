@@ -5,8 +5,6 @@ import { groupObjectsByKey } from '@/components/utils';
 import { RouterLink } from 'vue-router';
 
 const props = defineProps(['player'])
-const finalsArray = ref([])
-const titlesArray = ref([])
 const finals = ref({})
 const titles = ref({})
 const selection = ref('Titles')
@@ -15,11 +13,11 @@ const items = ['Titles', 'Finals']
 onMounted(() => {
     EditionService.getEditionsByPlayer(props.player.id)
     .then(response => {
-        finalsArray.value = response.data.filter(edition => edition.finalist_id === props.player.id)
+        const finalsArray = response.data.filter(edition => edition.finalist_id === props.player.id)
         const groupedFinals = groupObjectsByKey(finalsArray.value, 'year')
         finals.value = groupedFinals
 
-        titlesArray.value = response.data.filter(edition => edition.winner_id === props.player.id)
+        const titlesArray = response.data.filter(edition => edition.winner_id === props.player.id)
         const groupedTitles = groupObjectsByKey(titlesArray.value, 'year')
         titles.value = groupedTitles
     })

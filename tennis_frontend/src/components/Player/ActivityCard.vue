@@ -13,11 +13,7 @@ const sortedMatches = matches.toSorted((a, b) => {
 </script>
 
 <template>
-    <v-card
-        class="ma-10 pt-9 pb-5 px-10 w-75 mx-auto"
-        variant="elevated"
-        color="indigo-darken-4"
-    >
+    <short-card class="ma-10 pt-9 pb-5 px-10 w-75 mx-auto">
         <v-row>
             <v-col>
                 <v-img :src="categorySrc(entry.Edition.category)" class="filter" />
@@ -36,7 +32,7 @@ const sortedMatches = matches.toSorted((a, b) => {
                 </v-card-subtitle>
             </v-col>
             <v-col class="d-flex align-center">
-                <v-img rounded="lg" class="border-thin" :src="flagSrc(entry.Edition.country)" :alt="entry.Edition.country"/>
+                <flag-img :src="flagSrc(entry.Edition.country)" :alt="entry.Edition.country"/>
             </v-col>
         </v-row>
         <v-row></v-row>
@@ -69,5 +65,5 @@ const sortedMatches = matches.toSorted((a, b) => {
                 <span v-if="entry.pm !== null" class="text-button">Prize money: {{ formatCurrency(entry.Edition.currency, entry.pm) }}</span>
             </v-col>
         </v-row>
-    </v-card>
+    </short-card>
 </template>

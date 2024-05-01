@@ -2,7 +2,7 @@
 import H2HService from '@/services/H2HService';
 import PlayerService from '@/services/PlayerService';
 import { onMounted, ref } from 'vue';
-import { flagSrc, headshot, formatCurrency, formatDate, round } from '@/components/utils';
+import { flagSrc, headshot, formatCurrency, formatDate, round, plays, bh, incomplete } from '@/components/utils';
 import { RouterLink } from 'vue-router';
 import PlayerStatItem from '@/components/H2H/PlayerStatItem.vue';
 import H2HItem from '@/components/H2H/H2HItem.vue';
@@ -14,22 +14,6 @@ const p1Wins = ref(null)
 const p2Wins = ref(null)
 const p1 = ref(null)
 const p2 = ref(null)
-
-const plays = (value) => {
-    if (value) {
-        return 'Right-handed'
-    } else {
-        return 'Left-handed'
-    }
-}
-
-const bh = (value) => {
-    if (value) {
-        return 'One-handed'
-    } else {
-        return 'Two-handed'
-    }
-}
 
 const searchH2H = () => {
     PlayerService.getPlayerById(props.p1Id)
@@ -52,7 +36,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <v-sheet v-if="p1 && p2" class="bg-transparent my-10 pa-3 w-75 mx-auto">
+    <view-sheet v-if="p1 && p2">
         <v-container>
             <v-row>
                 <v-col class="d-flex flex-column align-center">
@@ -61,7 +45,7 @@ onMounted(() => {
                     </div>
                     <div class="d-flex justify-center align-center my-5">
                         <div>
-                            <v-img :src="flagSrc(p1.country)" width="50" rounded="lg" class="mx-2"/>
+                            <flag-img :src="flagSrc(p1.country)" width="50" class="mx-2"/>
                         </div>
                         <div>
                             <RouterLink class="hover-link text-h5" :to="{name: 'Player', params: {id: p1.id, name: p1.full_name}}">{{ p1.full_name }}</RouterLink>
@@ -88,14 +72,14 @@ onMounted(() => {
                             <RouterLink class="hover-link text-h5" :to="{name: 'Player', params: {id: p2.id, name: p2.full_name}}">{{ p2.full_name }}</RouterLink>
                         </div>
                         <div>
-                            <v-img :src="flagSrc(p2.country)" width="50" rounded="lg" class="mx-2"/>
+                            <flag-img :src="flagSrc(p2.country)" width="50" class="mx-2"/>
                         </div>
                     </div>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col>
-                    <v-card variant="elevated" color="indigo-accent-4" class="pa-3" rounded="xl">
+                    <short-card class="pa-3">
                         <PlayerStatItem>
                             <template #field>DOB</template>
                             <template #value>{{ p1.dob ? formatDate(p1.dob) : 'Unknown' }}</template>
@@ -106,17 +90,17 @@ onMounted(() => {
                         </PlayerStatItem>
                         <PlayerStatItem>
                             <template #field>Plays</template>
-                            <template #value>{{ p1.rh || p1.rh === false ? plays(p1.rh) : 'Unknown' }}</template>
+                            <template #value>{{ p1.rh !== null ? plays(p1.rh) : 'Unknown' }}</template>
                         </PlayerStatItem>
                         <PlayerStatItem>
                             <template #field>Backhand</template>
-                            <template #value>{{ p1.bh1 || ph.bh1 === false ? bh(p1.bh1) : 'Unknown' }}</template>
+                            <template #value>{{ p1.bh1 !== null ? bh(p1.bh1) : 'Unknown' }}</template>
                         </PlayerStatItem>
                         <PlayerStatItem>
                             <template #field>Turned pro</template>
                             <template #value>{{ p1.turned_pro }}</template>
                         </PlayerStatItem>
-                    </v-card>
+                    </short-card>
                 </v-col>
                 <v-col>
                     <v-card variant="text" class="pa-3" rounded="xl">
@@ -137,7 +121,7 @@ onMounted(() => {
                     </v-card>
                 </v-col>
                 <v-col>
-                    <v-card variant="elevated" color="indigo-accent-4" class="pa-3" rounded="xl">
+                    <short-card class="pa-3">
                         <PlayerStatItem>
                             <template #field>DOB</template>
                             <template #value>{{ p2.dob ? formatDate(p2.dob) : 'Unknown' }}</template>
@@ -148,17 +132,17 @@ onMounted(() => {
                         </PlayerStatItem>
                         <PlayerStatItem>
                             <template #field>Plays</template>
-                            <template #value>{{ p2.rh || p2.rh === false ? plays(p2.rh) : 'Unknown' }}</template>
+                            <template #value>{{ p2.rh !== null ? plays(p2.rh) : 'Unknown' }}</template>
                         </PlayerStatItem>
                         <PlayerStatItem>
                             <template #field>Backhand</template>
-                            <template #value>{{ p2.bh1 || p2.bh1 === false ? bh(p2.bh1) : 'Unknown' }}</template>
+                            <template #value>{{ p2.bh1 !== null ? bh(p2.bh1) : 'Unknown' }}</template>
                         </PlayerStatItem>
                         <PlayerStatItem>
                             <template #field>Turned pro</template>
                             <template #value>{{ p2.turned_pro }}</template>
                         </PlayerStatItem>
-                    </v-card>
+                    </short-card>
                 </v-col>
             </v-row>
             <v-row>
@@ -194,8 +178,8 @@ onMounted(() => {
                                         </v-avatar>
                                     </div>
                                     <div>
-                                        <v-img v-if="match.winner_id === p1.id" :src="flagSrc(p1.country)" width="40" rounded="lg" class="mx-2"/>
-                                        <v-img v-else :src="flagSrc(p2.country)" width="40" rounded="lg" class="mx-2"/>
+                                        <flag-img v-if="match.winner_id === p1.id" :src="flagSrc(p1.country)" width="40" class="mx-2"/>
+                                        <flag-img v-else :src="flagSrc(p2.country)" width="40" class="mx-2"/>
                                     </div>
                                     <div>
                                         <RouterLink v-if="match.winner_id === p1.id" class="hover-link" :to="{name: 'Player', params: {id: p1.id, name: p1.full_name}}">{{ p1.full_name }}</RouterLink>
@@ -209,28 +193,15 @@ onMounted(() => {
                                 <td class="text-center">{{ match.Edition.environment }} {{ match.Edition.surface }}</td>
                                 <td v-if="match.incomplete === 'WO'" class="text-center">Walkover</td>
                                 <td v-else class="text-center">
-                                    <span>
-                                        {{ match.winner_id === match.p1 && (match.s1p1 || match.s1p2) ? `${match.s1p1}${match.s1p2}` : `${match.s1p2}${match.s1p1}` }}
-                                        <sup v-if="match.t1p1 || match.t1p2">{{ match.t1p1 > match.t1p2 ? match.t1p2 : match.t1p1 }}</sup>&nbsp;
+                                    <span v-if="match.winner_id === match.p1" v-for="num in Array.from({ length: 5 }, (_, index) => index + 1)">
+                                        {{ match[`s${num}p1`] }}{{ match[`s${num}p2`] }}
+                                        <sup>{{ match[`t${num}p1`] > match[`t${num}p2`] ? match[`t${num}p2`] : match[`t${num}p1`] }}</sup>&nbsp;
                                     </span>
-                                    <span>
-                                        {{ match.winner_id === match.p1 && (match.s2p1 || match.s2p2) ? `${match.s2p1}${match.s2p2}`: `${match.s2p2}${match.s2p1}` }}
-                                        <sup v-if="match.t2p1">{{ match.t2p1 > match.t2p2 ? match.t2p2 : match.t2p1 }}</sup>&nbsp;
+                                    <span v-else v-for="num in Array.from({ length: 5 }, (_, index) => index + 1)">
+                                        {{ match[`s${num}p2`] }}{{ match[`s${num}p1`] }}
+                                        <sup>{{ match[`t${num}p1`] > match[`t${num}p2`] ? match[`t${num}p2`] : match[`t${num}p1`] }}</sup>&nbsp;
                                     </span>
-                                    <span>
-                                        {{ match.winner_id === match.p1 && (match.s3p1 || match.s3p2) ? `${match.s3p1}${match.s3p2}` : `${match.s3p2}${match.s3p1}` }}
-                                        <sup v-if="match.t3p1">{{ match.t3p1 > match.t3p2 ? match.t3p2 : match.t3p1 }}</sup>&nbsp;
-                                    </span>
-                                    <span>
-                                        {{ match.winner_id === match.p1 && (match.s4p1 || match.s4p2) ? `${match.s4p1}${match.s4p2}` : `${match.s4p2}${match.s4p1}` }}
-                                        <sup v-if="match.t4p1">{{ match.t4p1 > match.t4p2 ? match.t4p2 : match.t4p1 }}</sup>&nbsp;
-                                    </span>
-                                    <span>
-                                        {{ match.winner_id === match.p1 && (match.s5p1 || match.s5p2) ? `${match.s5p1}${match.s5p2}` : `${match.s5p2}${match.s5p1}` }}
-                                        <sup v-if="match.t4p1">{{ match.t5p1 > match.t5p2 ? match.t5p2 : match.t5p1 }}</sup>&nbsp;
-                                    </span>
-                                    <span v-if="match.incomplete === 'R'">Ret.</span>
-                                    <span v-if="match.incomplete === 'D'">Def.</span>
+                                    <span v-if="match.incomplete">{{ incomplete(match.incomplete) }}</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -238,5 +209,5 @@ onMounted(() => {
                 </v-col>
             </v-row>
         </v-container>
-    </v-sheet>
+    </view-sheet>
 </template>

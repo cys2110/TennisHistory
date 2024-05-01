@@ -7,21 +7,10 @@ const props = defineProps(['match', 'id'])
 const opponent = ref(null)
 
 function round (roundNumber) {
-    switch (roundNumber) {
-        case '128':
-            return 'R128'
-        case '64':
-            return 'R64'
-        case '32':
-            return 'R32'
-        case '16':
-            return 'R16'
-        case 'QF':
-            return 'QF'
-        case 'SF':
-            return 'SF'
-        case 'F':
-            return 'F'
+    if (isNaN(parseInt(roundNumber))) {
+        return roundNumber
+    } else {
+        return `R${roundNumber}`
     }
 }
 
@@ -39,11 +28,10 @@ if (props.match.p1 === props.id && props.match.p2) {
         <div class="d-flex align-center" v-else-if="opponent">
             <v-avatar
             v-if="opponent.headshot"
-            variant="outlined"
             >
                 <v-img :src="headshot(opponent.id)" :alt="opponent.full_name" />
             </v-avatar>
-            <v-img :src="flagSrc(opponent.country)" max-width="25" rounded="lg" class="mx-2" :alt="opponent.country"/>
+            <flag-img :src="flagSrc(opponent.country)" max-width="25" class="mx-2" :alt="opponent.country"/>
             <RouterLink class="hover-link" :to="{name: 'Player', params: {id: opponent.id, name: opponent.full_name}}">{{ opponent.full_name }}</RouterLink>
         </div>
     </td>

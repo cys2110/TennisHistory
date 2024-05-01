@@ -35,18 +35,17 @@ const score = (match, wtaMatches) => {
     <v-container>
         <v-row>
             <v-col cols="4" v-for="group in groupedTies" :key="group[0].round">
-                <v-card class="mx-3 py-3" variant="elevated" color="indigo-darken-4" rounded="xl">
+                <short-card class="mx-3 py-3">
                     <v-card-title class="text-h5 text-center">{{ group[0].round }}</v-card-title>
                     <v-card-subtitle class="text-center">{{ group[0].venue }}, {{ group[0].city }}</v-card-subtitle>
                         <div v-for="tie in group" :key="tie.id">
                             <v-card-text>
                             <div class="d-flex justify-space-evenly">
                                 <div>
-                                    <v-img
+                                    <flag-img
                                         :src="flagSrc(tie.country1)"
                                         :alt="tie.country1"
                                         width="100"
-                                        rounded="lg"
                                     />
                                 </div>
                                 <div class="d-flex flex-nowrap align-center">
@@ -55,11 +54,10 @@ const score = (match, wtaMatches) => {
                                     <span class="text-h6" :class="{'font-weight-bold': score(tie.MatchScores, tie.NonCounts) <= 1}">{{ 3 - score(tie.MatchScores, tie.NonCounts) }}</span>
                                 </div>
                                 <div>
-                                    <v-img
+                                    <flag-img
                                         :src="flagSrc(tie.country2)"
                                         :alt="tie.country2"
                                         width="100"
-                                        rounded="lg"
                                     />
                                 </div>
                             </div>
@@ -72,7 +70,7 @@ const score = (match, wtaMatches) => {
                             </v-chip>
                         </v-card-actions>
                     </div>
-                </v-card>
+                </short-card>
             </v-col>
         </v-row>
     </v-container>

@@ -10,21 +10,13 @@ app.use(bodyParser.json())
 app.use(logger('dev'))
 
 const db = require('./models')
-// db.WTA.sync({alter: true})
+// db.User.sync({alter: true})
 //     .then(() => {
 //         console.log('Synced db')
 //     })
 //     .catch((err) => {
 //         console.log("Failed to sync db:" + err.message)
 //     })
-
-// db.Edition.sync({alter: true})
-// .then(() => {
-//     console.log('Synced db')
-// })
-// .catch((err) => {
-//     console.log("Failed to sync db:" + err.message)
-// })
 
 const tournamentController = require('./controllers/tournamentController')
 const editionController = require('./controllers/editionController')
@@ -33,6 +25,7 @@ const matchStatController = require('./controllers/matchStatController')
 const entryController = require('./controllers/entryController')
 const matchScoreController = require('./controllers/matchScoreController')
 const tieController = require('./controllers/tieController')
+const config = require('./config/config')
 
 app.get('/', (req, res) => res.send('This is the root!'))
 

@@ -18,19 +18,17 @@ const duration = (length) => {
             <thead>
                 <tr>
                     <th class="text-center py-2">
-                        <v-img
+                        <flag-img
                             :src="flagSrc(country1)"
                             width="100"
-                            rounded="lg"
                             class="mx-auto py-1"
                         />
                     </th>
                     <th class="text-center">Score</th>
                     <th class="text-center py-2">
-                        <v-img
+                        <flag-img
                             :src="flagSrc(country2)"
                             width="100"
-                            rounded="lg"
                             class="mx-auto py-1"
                         />
                     </th>
@@ -44,7 +42,6 @@ const duration = (length) => {
                         <div>
                             <v-avatar
                                 v-if="match.player1.headshot"
-                                variant="outlined"
                                 class="mr-2"
                             >
                                 <v-img
@@ -58,15 +55,14 @@ const duration = (length) => {
                         </div>
                     </td>
                     <td class="text-center">
-                        <span>{{ match.s1p1 }}{{ match.s1p2 }}</span>&nbsp;
-                        <span>{{ match.s2p1 }}{{ match.s2p2 }}</span>&nbsp;
-                        <span v-if="match.s3p1 !== null">{{ match.s3p1 }}{{ match.s3p2 }}</span>
+                        <span>{{ match.s1p1 }}{{ match.s1p2 }}<sup v-if="match.t1p1 !== null">{{ match.t1p1 > match.t1p2 ? match.t1p2 : match.t1p1 }}</sup></span>&nbsp;
+                        <span>{{ match.s2p1 }}{{ match.s2p2 }}<sup v-if="match.t2p1 !== null">{{ match.t2p1 > match.t2p2 ? match.t2p2 : match.t2p1 }}</sup></span>&nbsp;
+                        <span v-if="match.s3p1 !== null">{{ match.s3p1 }}{{ match.s3p2 }}<sup v-if="match.t3p1 !== null">{{ match.t3p1 > match.t3p2 ? match.t3p2 : match.t3p1 }}</sup></span>
                     </td>
                     <td class="d-flex align-center py-8">
                         <div>
                             <v-avatar
                                 v-if="match.player2.headshot"
-                                variant="outlined"
                                 class="mr-2"
                             >
                                 <v-img
@@ -100,7 +96,6 @@ const duration = (length) => {
                             <div>
                                 <v-avatar
                                     v-if="wta[1].atp1.headshot"
-                                    variant="outlined"
                                     class="mr-2"
                                 >
                                     <v-img
@@ -125,7 +120,6 @@ const duration = (length) => {
                             <div>
                                 <v-avatar
                                     v-if="wta[1].atp2.headshot"
-                                    variant="outlined"
                                     class="mr-2"
                                 >
                                     <v-img

@@ -18,7 +18,7 @@ watch(searchYear, () => {
 </script>
 
 <template>
-    <v-sheet class="bg-transparent my-10 pa-3 w-75 mx-auto">
+    <view-sheet>
         <v-container>
             <v-row>
                 <v-col>
@@ -37,11 +37,11 @@ watch(searchYear, () => {
             <v-row>
                 <v-col>
                     <div v-if="results.length > 0">
-                        <ArchiveCard v-for="result in results" :key="result.id" :edition="result" />
+                        <ArchiveCard v-for="edition in results" :key="edition.id" :edition />
                     </div>
                     <div class="text-subtitle-1 my-5" v-else>No data available yet</div>
                 </v-col>
             </v-row>
         </v-container>
-    </v-sheet>
+    </view-sheet>
 </template>

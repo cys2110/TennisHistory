@@ -32,7 +32,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <v-sheet class="bg-transparent my-10 pa-3 w-75 mx-auto">
+    <view-sheet>
         <v-container v-if="edition && matches.length > 0">
             <v-row>
                 <v-col cols="2">
@@ -47,7 +47,7 @@ onMounted(() => {
                     <div class="text-subtitle-1">{{ formattedDates(edition.start_date, edition.end_date) }}</div>
                 </v-col>
                 <v-col cols="2">
-                    <v-img rounded="xl" :src="flagSrc(edition.country)"/>
+                    <flag-img :src="flagSrc(edition.country)"/>
                 </v-col>
             </v-row>
             <v-row>
@@ -87,5 +87,5 @@ onMounted(() => {
             </v-row>
         </v-container>
         <div v-else class="text-h3">Loading...</div>
-    </v-sheet>
+    </view-sheet>
 </template>

@@ -47,7 +47,7 @@ const submitH2H = () => {
 </script>
 
 <template>
-    <v-card width="60%" class="mx-auto" rounded="xl">
+    <short-card width="60%" class="mx-auto">
         <v-container class="mx-3 mt-2">
             <v-row>
                     <v-col cols="5">
@@ -90,5 +90,5 @@ const submitH2H = () => {
                 </v-col>
             </v-row>
         </v-container>
-    </v-card>
+    </short-card>
 </template>

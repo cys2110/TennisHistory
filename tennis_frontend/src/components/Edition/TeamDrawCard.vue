@@ -20,14 +20,13 @@ const score = (match, wtaMatches) => {
 </script>
 
 <template>
-    <v-card variant="elevated" color="indigo-darken-4" rounded="xl" class="my-3">
+    <short-card class="my-3">
         <v-container>
             <v-row>
                 <v-col cols="10">
-                    <v-img
+                    <flag-img
                         :src="flagSrc(tie.country1)"
                         :alt="tie.country1"
-                        rounded="lg"
                         width="150"
                     />
                 </v-col>
@@ -35,10 +34,9 @@ const score = (match, wtaMatches) => {
             </v-row>
             <v-row>
                 <v-col cols="10">
-                    <v-img
+                    <flag-img
                         :src="flagSrc(tie.country2)"
                         :alt="tie.country2"
-                        rounded="lg"
                         width="150"
                     />
                 </v-col>
@@ -53,5 +51,5 @@ const score = (match, wtaMatches) => {
                 </v-dialog>
             </v-chip>
         </v-card-actions>
-    </v-card>
+    </short-card>
 </template>

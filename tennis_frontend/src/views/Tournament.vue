@@ -24,11 +24,11 @@ onMounted(() => {
 </script>
 
 <template>
-    <v-sheet class="bg-transparent my-10 pa-3 w-75 mx-auto">
+    <view-sheet>
         <v-container v-if="tournament">
             <v-row>
                 <v-col class="d-flex">
-                    <div class="text-h3">{{ tournament.name }}</div> <a v-if="tournament.website" :href="tournament.website" target="_blank"><v-icon icon="fad fa-arrow-up-right-from-square"/></a>
+                    <div class="text-h4 text-sm-h3">{{ tournament.name }}</div> <a v-if="tournament.website" :href="tournament.website" target="_blank"><v-icon icon="fad fa-arrow-up-right-from-square"/></a>
                 </v-col>
             </v-row>
             <v-row>
@@ -37,11 +37,11 @@ onMounted(() => {
                 </v-col>
             </v-row>
             <v-row>
-                <v-col cols="3">
+                <v-col cols="12" sm="6" md="4">
                     <TournamentCard v-for="edition in tournament.Editions" :edition :key="edition.id" />
                 </v-col>
             </v-row>
         </v-container>
         <div v-else class="text-h3">No data available yet</div>
-    </v-sheet>
+    </view-sheet>
 </template>

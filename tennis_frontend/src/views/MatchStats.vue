@@ -4,61 +4,22 @@ import StatItem from '@/components/Edition/StatItem.vue';
 import DualStatItem from '@/components/Edition/DualStatItem.vue';
 import StatItemPercent from '@/components/Edition/StatItemPercent.vue';
 import StatServiceItem from '@/components/Edition/StatServiceItem.vue';
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
-import { flagSrc, headshot, formattedDates, formatDate, round } from '@/components/utils';
+import { flagSrc, headshot, formattedDates, formatDate, round, status, formatTime, incomplete } from '@/components/utils';
 
 const props = defineProps(['matchId'])
 const match = ref(null)
-const duration = ref(null)
-
-const incomplete = computed(() => {
-    switch (match.value.MatchScore.incomplete) {
-        case 'R':
-            return 'Retirement'
-        case 'D':
-            return 'Default'
-        case 'WO':
-            return 'Walkover'
-    }
-})
-
-const p1Status = computed(() => {
-    if (match.value.MatchScore.entry1.seed && match.value.MatchScore.entry1.status) {
-        return `(${match.value.MatchScore.entry1.seed} ${match.value.MatchScore.entry1.status})`
-    } else if (match.value.MatchScore.entry1.seed) {
-        return `(${match.value.MatchScore.entry1.seed})`
-    } else {
-        return `(${match.value.MatchScore.entry1.status})`
-    }
-})
-
-const p2Status = computed(() => {
-    if (match.value.MatchScore.entry2.seed && match.value.MatchScore.entry2.status) {
-        return `(${match.value.MatchScore.entry2.seed} ${match.value.MatchScore.entry2.status})`
-    } else if (match.value.MatchScore.entry2.seed) {
-        return `(${match.value.MatchScore.entry2.seed})`
-    } else {
-        return `(${match.value.MatchScore.entry2.status})`
-    }
-})
 
 onMounted(() => {
     EditionService.getMatchStats(props.matchId)
-    .then (response => {
-        match.value = response.data
-        const hour = Math.floor(match.value.MatchScore.duration_mins / 60)
-        const minutes = match.value.MatchScore.duration_mins % 60
-        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes
-        duration.value = `${hour}:${formattedMinutes}`
-        console.log(match.value)
-    })
+    .then (response => match.value = response.data)
     .catch(error => console.log(error))
 })
 </script>
 
 <template>
-    <v-sheet v-if="match && match.MatchScore.incomplete !== 'B'" class="bg-transparent my-10 pa-3 w-75 mx-auto">
+    <view-sheet v-if="match">
         <div class="d-flex flex-column align-center">
             <div class="text-h5">
                 <span v-if="match.MatchScore.Edition.sponsor_name">{{ match.MatchScore.Edition.sponsor_name }} | </span>
@@ -71,11 +32,11 @@ onMounted(() => {
             </div>
             <div class="text-subtitle-1"><span>{{ round(match.MatchScore.round) }}</span></div>
         </div>
-        <v-card class="w-50 mx-auto my-5 pa-2" rounded="xl" variant="elevated" color="indigo-darken-4">
+        <short-card class="w-50 mx-auto my-5 pa-2">
             <v-container>
                 <v-row>
                     <v-col class="d-flex justify-end">
-                        <div v-if="match.MatchScore.duration_mins" class="text-body-2">Duration: {{ duration }}</div>
+                        <div v-if="match.MatchScore.duration_mins" class="text-body-2">Duration: {{ formatTime(match.MatchScore.duration_mins) }}</div>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -83,17 +44,16 @@ onMounted(() => {
                         <div>
                             <v-avatar
                                 v-if="match.MatchScore.player1.headshot"
-                                variant="outlined"
                             >
                                 <v-img :src="headshot(match.MatchScore.p1)" :alt="match.MatchScore.player1.full_name"/>
                             </v-avatar>
                         </div>
                         <div class="mx-2">
-                            <v-img :src="flagSrc(match.MatchScore.player1.country)" :alt="match.MatchScore.player1.country" rounded="lg" width="50"/>
+                            <flag-img :src="flagSrc(match.MatchScore.player1.country)" :alt="match.MatchScore.player1.country" width="50"/>
                         </div>
                         <div>
                             <RouterLink class="hover-link" :to="{name: 'Player', params: {id: match.MatchScore.p1, name: match.MatchScore.player1.full_name}}">{{ match.MatchScore.player1.full_name }}</RouterLink>
-                            <span v-if="match.MatchScore.entry1.seed || match.MatchScore.entry1.status">&nbsp;<small>{{ p1Status }}</small></span>
+                            <span v-if="match.MatchScore.entry1.seed || match.MatchScore.entry1.status">&nbsp;<small>{{ status(match.MatchScore.entry1.seed, match.MatchScore.entry1.status) }}</small></span>
                         </div>
                     </v-col>
                     <v-col cols="1">
@@ -102,81 +62,78 @@ onMounted(() => {
                     <v-col cols="3" class="d-flex justify-space-evenly">
                         <div v-if="match.MatchScore.s1p1 !== null">
                             {{ match.MatchScore.s1p1 }}
-                            <sup v-if="match.MatchScore.t1p1 || match.MatchScore.t1p1 === 0">{{ match.MatchScore.t1p1 }}</sup>
+                            <sup v-if="match.MatchScore.t1p1 !== null">{{ match.MatchScore.t1p1 }}</sup>
                         </div>
-                        <div v-if="match.MatchScore.s2p1 || match.MatchScore.s2p1 === 0">
+                        <div v-if="match.MatchScore.s2p1 !== null">
                             {{ match.MatchScore.s2p1 }}
-                            <sup v-if="match.MatchScore.t2p1 || match.MatchScore.t2p1 === 0">{{ match.MatchScore.t2p1 }}</sup>
+                            <sup v-if="match.MatchScore.t2p1 !== null">{{ match.MatchScore.t2p1 }}</sup>
                         </div>
-                        <div v-if="match.MatchScore.s3p1 || match.MatchScore.s3p1 === 0">
+                        <div v-if="match.MatchScore.s3p1 !== null">
                             {{ match.MatchScore.s3p1 }}
-                            <sup v-if="match.MatchScore.t3p1 || match.MatchScore.t3p1 === 0">{{ match.MatchScore.t3p1 }}</sup>
+                            <sup v-if="match.MatchScore.t3p1 !== null">{{ match.MatchScore.t3p1 }}</sup>
                         </div>
-                        <div v-if="match.MatchScore.s4p1 || match.MatchScore.s4p1 === 0">
+                        <div v-if="match.MatchScore.s4p1 !== null">
                             {{ match.MatchScore.s4p1 }}
-                            <sup v-if="match.MatchScore.t4p1 || match.MatchScore.t4p1 === 0">{{ match.MatchScore.t4p1 }}</sup>
+                            <sup v-if="match.MatchScore.t4p1 !== null">{{ match.MatchScore.t4p1 }}</sup>
                         </div>
-                        <div v-if="match.MatchScore.s5p1 || match.MatchScore.s5p1 === 0">
+                        <div v-if="match.MatchScore.s5p1 !== null">
                             {{ match.MatchScore.s5p1 }}
-                            <sup v-if="match.MatchScore.t5p1 || match.MatchScore.t5p1 === 0">{{ match.MatchScore.t5p1 }}</sup>
+                            <sup v-if="match.MatchScore.t5p1 !== null">{{ match.MatchScore.t5p1 }}</sup>
                         </div>
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col class="d-flex align-center">
                         <div>
-                            <v-avatar
-                                variant="outlined"
-                            >
+                            <v-avatar>
                                 <v-img :src="headshot(match.MatchScore.p2)" :alt="match.MatchScore.player2.full_name"/>
                             </v-avatar>
                         </div>
                         <div class="mx-2">
-                            <v-img :src="flagSrc(match.MatchScore.player2.country)" width="50" :alt="match.MatchScore.player2.country" rounded="lg"/>
+                            <flag-img :src="flagSrc(match.MatchScore.player2.country)" width="50" :alt="match.MatchScore.player2.country"/>
                         </div>
                         <div>
                             <RouterLink class="hover-link" :to="{name: 'Player', params: {id: match.MatchScore.p2, name: match.MatchScore.player2.full_name}}">{{ match.MatchScore.player2.full_name }}</RouterLink>
-                            <span v-if="match.MatchScore.entry2.seed || match.MatchScore.entry2.status">&nbsp;<small>{{ p2Status }}</small></span>
+                            <span v-if="match.MatchScore.entry2.seed || match.MatchScore.entry2.status">&nbsp;<small>{{ status(match.MatchScore.entry2.seed, match.MatchScore.entry2.status) }}</small></span>
                         </div>
                     </v-col>
                     <v-col cols="1">
                         <v-icon v-if="match.MatchScore.winner_id === match.MatchScore.p2" icon="fad fa-check"/>
                     </v-col>
                     <v-col cols="3" class="d-flex justify-space-evenly">
-                        <div v-if="match.MatchScore.s1p2 || match.MatchScore.s1p2 === 0">
+                        <div v-if="match.MatchScore.s1p2 !== null">
                             {{ match.MatchScore.s1p2 }}
-                            <sup v-if="match.MatchScore.t1p1 || match.MatchScore.t1p1 === 0">{{ match.MatchScore.t1p2 }}</sup>
+                            <sup v-if="match.MatchScore.t1p1 !== null">{{ match.MatchScore.t1p2 }}</sup>
                         </div>
-                        <div v-if="match.MatchScore.s2p2 || match.MatchScore.s2p2 === 0">
+                        <div v-if="match.MatchScore.s2p2 !== null">
                             {{ match.MatchScore.s2p2 }}
-                            <sup v-if="match.MatchScore.t2p1 || match.MatchScore.t2p1 === 0">{{ match.MatchScore.t2p2 }}</sup>
+                            <sup v-if="match.MatchScore.t2p1 !== null">{{ match.MatchScore.t2p2 }}</sup>
                         </div>
-                        <div v-if="match.MatchScore.s3p2 || match.MatchScore.s3p2 === 0">
+                        <div v-if="match.MatchScore.s3p2 !== null">
                             {{ match.MatchScore.s3p2 }}
-                            <sup v-if="match.MatchScore.t3p1 || match.MatchScore.t3p1 === 0">{{ match.MatchScore.t3p2 }}</sup>
+                            <sup v-if="match.MatchScore.t3p1 !== null">{{ match.MatchScore.t3p2 }}</sup>
                         </div>
-                        <div v-if="match.MatchScore.s4p2 || match.MatchScore.s4p2 === 0">
+                        <div v-if="match.MatchScore.s4p2 !== null">
                             {{ match.MatchScore.s4p2 }}
-                            <sup v-if="match.MatchScore.t4p1 || match.MatchScore.t4p1 === 0">{{ match.MatchScore.t4p2 }}</sup>
+                            <sup v-if="match.MatchScore.t4p1 !== null">{{ match.MatchScore.t4p2 }}</sup>
                         </div>
-                        <div v-if="match.MatchScore.s5p2 || match.MatchScore.s5p2 === 0">
+                        <div v-if="match.MatchScore.s5p2 !== null">
                             {{ match.MatchScore.s5p2 }}
-                            <sup v-if="match.MatchScore.t5p1 || match.MatchScore.t5p1 === 0">{{ match.MatchScore.t5p2 }}</sup>
+                            <sup v-if="match.MatchScore.t5p1 !== null">{{ match.MatchScore.t5p2 }}</sup>
                         </div>
                     </v-col>
                 </v-row>
                 <v-row>
-                    <v-col v-if="match.MatchScore.incomplete">{{ incomplete }}</v-col>
+                    <v-col v-if="match.MatchScore.incomplete">{{ incomplete(match.MatchScore.incomplete) }}</v-col>
                     <v-col v-if="match.MatchScore.umpire" class="text-right text-body-2">Umpire: {{ match.MatchScore.umpire }}</v-col>
                 </v-row>
             </v-container>
-        </v-card>
+        </short-card>
         <v-container class="w-75">
             <v-row v-if="match.p1_serve1 || match.p1_sv_pts">
                 <v-col>
                     <v-avatar
                         v-if="match.MatchScore.player1.headshot"
-                        variant="outlined"
                         size="x-large"
                     >
                         <v-img :src="headshot(match.MatchScore.p1)"/>
@@ -187,7 +144,6 @@ onMounted(() => {
                 <v-col class="text-right">
                     <v-avatar
                         v-if="match.MatchScore.player2.headshot"
-                        variant="outlined"
                         size="x-large"
                     >
                         <v-img :src="headshot(match.MatchScore.p2)"/>
@@ -277,6 +233,8 @@ onMounted(() => {
                 </StatServiceItem>
             </div>
         </v-container>
-    </v-sheet>
-    <div v-else class="text-subtitle-1">No data available</div>
+    </view-sheet>
+    <view-sheet>
+        <div class="text-subtitle-1">No data available</div>
+    </view-sheet>
 </template>

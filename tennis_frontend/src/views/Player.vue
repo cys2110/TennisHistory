@@ -20,14 +20,14 @@ onMounted(() => {
 </script>
 
 <template>
-    <v-sheet class="bg-transparent my-10 pa-3 w-75 mx-auto">
+    <view-sheet>
         <v-container v-if="player">
             <v-row>
                 <v-col cols="10" class="d-flex flex-column justify-space-evenly">
                     <div class="d-flex">
                         <div class="text-h4">{{ player.first_name }} {{ player.last_name.toUpperCase() }}</div>
                         <div>
-                            <v-img
+                            <flag-img
                                 :src="flagSrc(player.country)"
                                 :alt="player.country"
                                 class="flag"
@@ -113,12 +113,11 @@ onMounted(() => {
                 </v-col>
             </v-row>
         </v-container>
-    </v-sheet>
+    </view-sheet>
 </template>
 
 <style scoped>
 .flag {
-    border-radius: 20%;
     margin-left: 2rem;
     width: 3rem;
 }

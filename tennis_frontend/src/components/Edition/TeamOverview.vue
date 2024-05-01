@@ -48,12 +48,11 @@ onMounted(() => {
         </v-row>
         <v-row v-if="teams">
             <v-col cols="3" v-for="(country, countryCode) in teams.groupedWTA" :key="countryCode">
-                <v-card class="py-3 px-6" variant="elevated" color="indigo-darken-4" rounded="xl">
+                <short-card class="py-3 px-6">
                     <v-card-title>
-                        <v-img
+                        <flag-img
                             :src="flagSrc(countryCode)"
                             width="100"
-                            rounded="lg"
                             class="mx-auto"
                         />
                     </v-card-title>
@@ -61,7 +60,6 @@ onMounted(() => {
                             <div>
                                 <v-avatar
                                     v-if="player['Player.headshot']"
-                                    variant="outlined"
                                     class="mr-2"
                                 >
                                     <v-img
@@ -77,7 +75,7 @@ onMounted(() => {
                         <div v-for="player in country" class="d-flex flex-column my-2">
                             <div>{{ player.name }}</div>
                         </div>
-                </v-card>
+                </short-card>
             </v-col>
         </v-row>
     </v-container>

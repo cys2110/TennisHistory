@@ -50,10 +50,8 @@ const navigate = () => {
                     >
                         Results
                     </v-chip>
-                    <v-img
-                        rounded="lg"
+                    <flag-img
                         max-width="75"
-                        class="border-thin"
                         :src="flagSrc(edition.country)"
                         :alt="edition.country"
                     />

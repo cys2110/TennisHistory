@@ -1,27 +1,15 @@
 <script setup>
 import { RouterLink } from 'vue-router';
 import { headshot, flagSrc } from './utils';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 const props = defineProps(['edition'])
 const display = ref(true)
 
 const formatScore = (score) => {
-  const parts = score.split(' ');
-  const formattedParts = parts.map(part => {
-    const match = part.match(/\((.*?)\)/);
-    if (match) {
-      const subscript = match[1];
-      const base = part.replace(/\(.*?\)/, '');
-      return `${base}<sup>${subscript}</sup>`;
-    } else {
-      return part;
-    }
-  });
-  return formattedParts.join(' ');
+  return score.replaceAll('(', '<sup>').replaceAll(')', '</sup>')
 }
 
-const score = computed(() => formatScore(props.edition.final_score))
 const endDate = new Date(props.edition.end_date)
 const currentDate = new Date()
 
@@ -30,11 +18,7 @@ endDate < currentDate ? display.value = true : display.value = false
 </script>
 
 <template>
-  <v-card
-    variant="outlined"
-    rounded="xl"
-    color="indigo-accent-1"
-  >
+  <short-card>
     <v-container>
       <v-row>
         <v-col>
@@ -52,7 +36,6 @@ endDate < currentDate ? display.value = true : display.value = false
         <v-col class="d-flex justify-space-evenly align-center">
           <v-avatar
             size="x-large"
-            variant="outlined"
           >
             <v-img
               v-if="edition.winner?.headshot"
@@ -60,10 +43,10 @@ endDate < currentDate ? display.value = true : display.value = false
               :alt="edition.winner.full_name" 
             />
           </v-avatar>
-          <v-img
+          <flag-img
             v-if="edition.winner"
             :src="flagSrc(edition.winner.country)"
-            rounded="lg" max-width="50"
+            max-width="50"
             :alt="edition.winner.country"
           />
           <div class="text-subtitle-1">
@@ -84,7 +67,6 @@ endDate < currentDate ? display.value = true : display.value = false
         <v-col class="d-flex justify-space-evenly align-center">
           <v-avatar
             size="x-large"
-            variant="outlined"
           >
             <v-img
               v-if="edition.finalist?.headshot"
@@ -92,11 +74,10 @@ endDate < currentDate ? display.value = true : display.value = false
               :alt="edition.finalist.full_name"
             />
           </v-avatar>
-          <v-img
+          <flag-img
             v-if="edition.finalist"
             :src="flagSrc(edition.finalist.country)"
             max-width="50"
-            rounded="lg"
             :alt="edition.finalist.country"
           />
           <div class="text-subtitle-1">
@@ -112,9 +93,9 @@ endDate < currentDate ? display.value = true : display.value = false
       </v-row>
       <v-row>
         <v-col class="text-center">
-          <div v-if="edition.winner" class="text-h6">{{ score }}</div>
+          <div v-if="edition.winner" class="text-h6" v-html="formatScore(edition.final_score)" />
         </v-col>
       </v-row>
     </v-container>
-  </v-card>
+  </short-card>
 </template>

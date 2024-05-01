@@ -17,23 +17,24 @@ const navigate = () => {
 <template>
     <v-card
         variant="outlined"
-        class="my-5 mx-auto py-3 px-4 w-75"
-        rounded="pill"
+        class="my-2 my-sm-5 mx-auto py-sm-3 px-sm-4 w-sm-75"
+        rounded="xl"
         color="indigo-accent-1"
     >
         <v-container>
             <v-row class="align-center">
-                <v-col cols="2">
+                <v-col cols="12" sm="2">
                     <v-img
                         :src="categorySrc(edition.category)"
                         :class="{'filter': edition.category === 'ATP 250' || edition.category === 'Next Gen Finals' || edition.category === 'ATP Finals'}"
                         :alt="edition.category"
                         width="150"
+                        class="mx-auto"
                     />
                 </v-col>
                 <v-col class="d-flex flex-column">
-                    <div class="text-h5" v-if="edition.sponsor_name">{{ edition.sponsor_name }}</div>
-                    <div class="text-h5">
+                    <div class="text-h6 text-sm-h5" v-if="edition.sponsor_name">{{ edition.sponsor_name }}</div>
+                    <div class="text-h6 text-sm-h5">
                         <RouterLink
                             :to="{name: 'Tournament', params: {name: edition.Tournament.name, id: edition.TournamentId }}"
                             class="hover-link"
@@ -43,7 +44,7 @@ const navigate = () => {
                     </div>
                     <div class="text-subtitle-2">{{ edition.city }} | {{ formattedDates(edition.start_date, edition.end_date) }} | {{ edition.environment }} {{ edition.surface }}<span v-if="edition.hard_type">{{ edition.hard_type }}</span></div>
                 </v-col>
-                <v-col cols="3" class="d-flex justify-space-evenly align-center">
+                <v-col cols="12" sm="3" class="d-flex justify-space-evenly align-center">
                     <v-chip
                         v-if="currentDate > startDate"
                         variant="outlined"
@@ -51,10 +52,8 @@ const navigate = () => {
                     >
                         Results
                     </v-chip>
-                    <v-img
-                        rounded="lg"
+                    <flag-img
                         max-width="75"
-                        class="border-thin"
                         :src="flagSrc(edition.country)"
                         :alt="edition.country"
                     />

@@ -1,3 +1,5 @@
+import { useDate } from 'vuetify';
+
 export function headshot(player) {
     return new URL(`https://www.atptour.com/-/media/alias/player-headshot/${player}`).href
 }
@@ -15,37 +17,29 @@ export function categorySrc(category) {
 }
 
 export function formattedDates(start, end) {
-    const options = { year: 'numeric', month: 'long', day:'numeric'}
-    const datedStart = new Date(start)
-    const startDay = datedStart.getDate()
-    const startMonth = datedStart.getMonth()
-    const startYear = datedStart.getFullYear()
-    const datedEnd = new Date(end)
-    const endDay = datedEnd.getDate()
-    const endMonth = datedEnd.getMonth()
-    const endYear = datedEnd.getFullYear()
+    const startDate = new Date(start)
+    const endDate = new Date(end)
+    const date = useDate()
 
-    const startDate = datedStart.toLocaleDateString('en-gb', options)
-    const endDate = datedEnd.toLocaleDateString('en-gb', options)
-
-    if (startMonth === endMonth && startYear === endYear) {
-        return `${startDay}-${endDay} ${getMonthName(startMonth)} ${startYear}`
-    } else if (startYear === endYear) {
-        return `${startDay} ${getMonthName(startMonth)}-${endDay} ${getMonthName(endMonth)} ${startYear}`
+    if (date.getYear(startDate) === date.getYear(endDate) && date.isSameMonth(startDate, endDate)) {
+        return `${date.getDate(startDate)} - ${date.getDate(endDate)} ${date.format(startDate, 'monthAndYear')}`
+    } else if (date.getYear(startDate) === date.getYear(endDate)) {
+        return `${date.format(startDate, 'monthAndDate')} - ${date.format(endDate, 'monthAndDate')} ${date.getYear(startDate)}`
     } else {
-        return `${startDate} - ${endDate}`
+        return `${date.format(startDate, 'monthAndDate')} - ${date.format(endDate, 'monthAndDate')} ${date.getYear(endDate)}`
     }
 }
 
-function getMonthName(monthIndex) {
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    return months[monthIndex]
+export function formatDate(value) {
+    const date = useDate()
+    return date.format(value, 'fullDateWithWeekday')
 }
 
-export function formatDate(date) {
-    const options = { year: 'numeric', month: 'long', day:'numeric'}
-    const newDate = new Date(date)
-    return newDate.toLocaleDateString('en-gb', options)
+export function formatTime(time) {
+    const hour = Math.floor(time / 60)
+    const minutes = time % 60
+    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes
+    return `${hour}:${formattedMinutes}`
 }
 
 export function formatCurrency (currency, number) {
@@ -96,4 +90,33 @@ export function round (roundNumber) {
         case 'F':
             return 'Final'
     }
+}
+
+export function status (seed, status) {
+    if (seed && status) {
+        return `(${seed} ${status})`
+    } else if (seed) {
+        return `(${seed})`
+    } else {
+        return `(${status})`
+    }
+}
+
+export function incomplete (status) {
+    switch (status) {
+        case 'R':
+            return 'Retirement'
+        case 'D':
+            return 'Default'
+        case 'WO':
+            return 'Walkover'
+    }
+}
+
+export function plays (value) {
+    return value ? `Right-handed` : `Left-handed`
+}
+
+export function bh (value) {
+    return value ? `One-handed` : `Two-handed`
 }

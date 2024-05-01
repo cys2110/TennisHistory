@@ -8,6 +8,7 @@ import router from './router'
 
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
+
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { aliases, fa } from 'vuetify/iconsets/fa-svg'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -16,6 +17,7 @@ import { fas } from '@fortawesome/pro-solid-svg-icons'
 import { far } from '@fortawesome/pro-regular-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import { mdi } from 'vuetify/iconsets/mdi'
+import { VCard, VImg, VSheet } from 'vuetify/lib/components/index.mjs'
 
 const vuetify = createVuetify({
     theme: {
@@ -29,6 +31,33 @@ const vuetify = createVuetify({
         mdi
       }
     },
+    date: {
+      locale: {
+        en: 'en-GB'
+      }
+    },
+    aliases: {
+      ViewSheet: VSheet,
+      ShortCard: VCard,
+      FlagImg: VImg
+    },
+    defaults: {
+      ViewSheet: {
+        class: 'bg-transparent my-10 pa-3 w-75 mx-auto'
+      },
+      ShortCard: {
+        variant: 'elevated',
+        color: 'indigo-darken-4',
+        rounded: 'xl'
+      },
+      VAvatar: {
+        variant: 'outlined'
+      },
+      FlagImg: {
+        rounded: 'lg',
+        class: 'border-thin'
+      }
+    }
 })
 
 const app = createApp(App)
