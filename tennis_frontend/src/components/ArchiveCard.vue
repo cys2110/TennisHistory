@@ -1,9 +1,11 @@
 <script setup>
 import { categorySrc, flagSrc, formattedDates } from './utils';
 import { RouterLink, useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
 
 const props = defineProps(['edition'])
 const router = useRouter()
+const { smAndDown } = useDisplay()
 const currentDate = new Date()
 const startDate = new Date(props.edition.start_date)
 
@@ -16,18 +18,19 @@ const navigate = () => {
 <template>
     <v-card
         variant="outlined"
-        class="my-5 py-3 px-4"
-        rounded="pill"
+        class="my-2 my-sm-5 mx-auto py-sm-3 px-sm-4 w-sm-75"
+        :rounded="smAndDown ? 'xl' : 'pill'"
         color="indigo-accent-1"
     >
         <v-container>
             <v-row class="align-center">
-                <v-col cols="2">
+                <v-col cols="12" sm="2">
                     <v-img
                         :src="categorySrc(edition.category)"
                         :class="{'filter': edition.category === 'ATP 250' || edition.category === 'Next Gen Finals' || edition.category === 'ATP Finals'}"
                         :alt="edition.category"
                         width="150"
+                        class="mx-auto"
                     />
                 </v-col>
                 <v-col class="d-flex flex-column">
@@ -42,7 +45,7 @@ const navigate = () => {
                     </div>
                     <div class="text-subtitle-2">{{ edition.city }} | {{ formattedDates(edition.start_date, edition.end_date) }} | {{ edition.environment }} {{ edition.surface }}<span v-if="edition.hard_type"> ({{ edition.hard_type }})</span></div>
                 </v-col>
-                <v-col cols="3" class="d-flex justify-space-evenly align-center">
+                <v-col cols="12" sm="3" class="d-flex justify-space-evenly align-center">
                     <v-chip
                         variant="outlined"
                         v-if="currentDate > startDate"

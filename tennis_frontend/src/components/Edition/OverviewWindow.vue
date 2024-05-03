@@ -1,10 +1,15 @@
 <script setup>
 import { formatCurrency, joinArray, headshot, flagSrc } from '@/components/utils';
-import { useRouter } from 'vue-router';
+import { useRouter, RouterLink } from 'vue-router';
 import { ref } from 'vue'
+import { useDisplay } from 'vuetify/lib/framework.mjs';
+import EntryInfoRow from './EntryInfoRow.vue';
+import EntryInfoHeading from './EntryInfoHeading.vue';
+import EditionPmRow from './EditionPmRow.vue';
 
 const props = defineProps(['edition'])
 const router = useRouter()
+const { mdAndDown } = useDisplay()
 
 const seedsArray = props.edition.Entries.filter(entry => entry.seed)
 const seeds = ref(seedsArray.toSorted((a, b) => {
@@ -26,7 +31,7 @@ const navigate = (id, name) => {
 <template>
     <v-container>
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12" sm="6">
                 <div class="detail" v-if="edition.venue">
                     <span class="font-weight-bold">Venue</span>
                     <span>{{ edition.venue }}</span>
@@ -40,7 +45,7 @@ const navigate = (id, name) => {
                     <span>{{ edition.environment }} {{ edition.surface }}<span v-if="edition.hard_type"> ({{ edition.hard_type }})</span></span>
                 </div>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" sm="6">
                 <div class="detail" v-if="edition.pm">
                     <span class="font-weight-bold">Prize money</span>
                     <span>{{ formatCurrency(edition.currency, edition.pm) }}</span>
@@ -56,7 +61,7 @@ const navigate = (id, name) => {
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="6">
+            <v-col cols="12" sm="6">
                 <v-table
                     v-if="seeds.length > 0"
                     height="30rem"
@@ -76,17 +81,19 @@ const navigate = (id, name) => {
                         <tr v-for="seed in seeds" :key="seed.id">
                             <td class="text-center">{{ seed.seed }}</td>
                             <td class="d-flex align-center">
-                                <v-avatar>
+                                <v-avatar
+                                    :size="xs ? 'x-small' : 'default'"
+                                >
                                     <v-img v-if="seed.Player.headshot" :src="headshot(seed.PlayerId)" @click="navigate(seed.PlayerId, seed.Player.full_name)"/>
                                 </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><flag-img :src="flagSrc(seed.Player.country)"/></div>
+                                <div :style="mdAndDown ? 'min-width: 30%' : 'width: 10%'" class="mx-3"><flag-img :src="flagSrc(seed.Player.country)"/></div>
                                 <RouterLink class="hover-link" :class="{'strikethrough': seed.wd}" :to="{name: 'Player', params: {id: seed.PlayerId, name: seed.Player.full_name}}">{{ seed.Player.full_name }}</RouterLink></td>
                             <td :class="{'strikethrough': seed.wd}" class="text-center">{{ seed.rank }}</td>
                         </tr>
                     </tbody>
                 </v-table>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" sm="6">
                 <v-table
                     v-if="edition.winner_pm"
                     hover
@@ -105,56 +112,46 @@ const navigate = (id, name) => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="text-center">
-                            <td class="font-weight-bold">WINNER</td>
-                            <td>{{ formatCurrency(edition.currency, edition.winner_pm) }}</td>
-                            <td>{{ edition.winner_pts }}</td>
-                        </tr>
-                        <tr class="text-center">
-                            <td class="font-weight-bold">FINALIST</td>
-                            <td>{{ formatCurrency(edition.currency, edition.finalist_pm) }}</td>
-                            <td>{{ edition.finalist_pts }}</td>
-                        </tr>
-                        <tr class="text-center">
-                            <td class="font-weight-bold">SEMIFINALIST</td>
-                            <td>{{ formatCurrency(edition.currency, edition.semifinalist_pm) }}</td>
-                            <td>{{ edition.semifinalist_pts }}</td>
-                        </tr>
-                        <tr class="text-center">
-                            <td class="font-weight-bold">QUARTERFINALIST</td>
-                            <td>{{ formatCurrency(edition.currency, edition.quarterfinalist_pm) }}</td>
-                            <td>{{ edition.quarterfinalist_pts }}</td>
-                        </tr>
-                        <tr v-if="edition.r128_pm" class="text-center">
-                            <td class="font-weight-bold">4TH ROUND</td>
-                            <td>{{ formatCurrency(edition.currency, edition.r16_pm) }}</td>
-                            <td>{{ edition.r16_pts }}</td>
-                        </tr>
-                        <tr v-if="edition.r64_pm" class="text-center">
-                            <td class="font-weight-bold">3RD ROUND</td>
-                            <td v-if="edition.r128_pm">{{ formatCurrency(edition.currency, edition.r32_pm) }}</td>
-                            <td v-else>{{ formatCurrency(edition.currency, edition.r16_pm) }}</td>
-                            <td v-if="edition.r128_pm">{{ edition.r32_pts }}</td>
-                            <td v-else>{{ edition.r16_pts }}</td>
-                        </tr>
-                        <tr class="text-center">
-                            <td class="font-weight-bold">2ND ROUND</td>
-                            <td v-if="edition.r128_pm">{{ formatCurrency(edition.currency, edition.r64_pm) }}</td>
-                            <td v-else-if="edition.r64_pm">{{ formatCurrency(edition.currency, edition.r32_pm) }}</td>
-                            <td v-else>{{ formatCurrency(edition.currency, edition.r16_pm) }}</td>
-                            <td v-if="edition.r128_pm">{{ edition.r64_pts }}</td>
-                            <td v-else-if="edition.r64_pm">{{ edition.r32_pts }}</td>
-                            <td v-else>{{ edition.r16_pts }}</td>
-                        </tr>
-                        <tr class="text-center">
-                            <td class="font-weight-bold">1ST ROUND</td>
-                            <td v-if="edition.r128_pm">{{ formatCurrency(edition.currency, edition.r128_pm) }}</td>
-                            <td v-else-if="edition.r64_pm">{{ formatCurrency(edition.currency, edition.r64_pm) }}</td>
-                            <td v-else>{{ formatCurrency(edition.currency, edition.r32_pm) }}</td>
-                            <td v-if="edition.r128_pm">{{ edition.r128_pts }}</td>
-                            <td v-else-if="edition.r64_pm">{{ edition.r64_pts }}</td>
-                            <td v-else>{{ edition.r32_pts }}</td>
-                        </tr>
+                        <EditionPmRow>
+                            <template #round>WINNER</template>
+                            <template #pm>{{ formatCurrency(edition.currency, edition.winner_pm) }}</template>
+                            <template #pts>{{ edition.winner_pts }}</template>
+                        </EditionPmRow>
+                        <EditionPmRow>
+                            <template #round>FINALIST</template>
+                            <template #pm>{{ formatCurrency(edition.currency, edition.finalist_pm) }}</template>
+                            <template #pts>{{ edition.finalist_pts }}</template>
+                        </EditionPmRow>
+                        <EditionPmRow>
+                            <template #round>SEMIFINALIST</template>
+                            <template #pm>{{ formatCurrency(edition.currency, edition.semifinalist_pm) }}</template>
+                            <template #pts>{{ edition.semifinalist_pts }}</template>
+                        </EditionPmRow>
+                        <EditionPmRow>
+                            <template #round>QUARTERFINALIST</template>
+                            <template #pm>{{ formatCurrency(edition.currency, edition.quarterfinalist_pm) }}</template>
+                            <template #pts>{{ edition.quarterfinalist_pts }}</template>
+                        </EditionPmRow>
+                        <EditionPmRow v-if="edition.r128_pm">
+                            <template #round>4TH ROUND</template>
+                            <template #pm>{{ formatCurrency(edition.currency, edition.r16_pm) }}</template>
+                            <template #pts>{{ edition.r16_pts }}</template>
+                        </EditionPmRow>
+                        <EditionPmRow v-if="edition.r64_pm">
+                            <template #round>3RD ROUND</template>
+                            <template #pm>{{ edition.r128_pm ? formatCurrency(edition.currency, edition.r32_pm) : formatCurrency(edition.currency, edition.r16_pm) }}</template>
+                            <template #pts>{{ edition.r128_pm ? edition.r32_pts : edition.r16_pts }}</template>
+                        </EditionPmRow>
+                        <EditionPmRow>
+                            <template #round>2ND ROUND</template>
+                            <template #pm>{{ edition.r128_pm ? formatCurrency(edition.currency, edition.r64_pm) : edition.r64_pm ? formatCurrency(edition.currency, edition.r32_pm) : formatCurrency(edition.currency, edition.r16_pm) }}</template>
+                            <template #pts>{{ edition.r128_pm ? edition.r64_pts : edition.r64_pm ? edition.r32_pts : edition.r16_pts }}</template>
+                        </EditionPmRow>
+                        <EditionPmRow>
+                            <template #round>1ST ROUND</template>
+                            <template #pm>{{ edition.r128_pm ? formatCurrency(edition.currency, edition.r128_pm) : edition.r64_pm ? formatCurrency(edition.currency, edition.r64_pm) : formatCurrency(edition.currency, edition.r32_pm) }}</template>
+                            <template #pts>{{ edition.r128_pm ? edition.r128_pts : edition.r64_pm ? edition.r64_pts : edition.r32_pts }}</template>
+                        </EditionPmRow>
                     </tbody>
                 </v-table>
                 <v-table
@@ -166,147 +163,70 @@ const navigate = (id, name) => {
                     density="compact"
                 >
                     <thead v-if="ldaArray.length > 0">
-                        <tr class="bg-indigo-accent-1">
-                            <th colspan="2" class="font-weight-bold text-center">Last direct acceptance</th>
-                        </tr>
+                        <EntryInfoHeading>
+                            <template #heading>Last direct acceptance</template>
+                        </EntryInfoHeading>
                     </thead>
                     <tbody v-if="ldaArray.length > 0">
-                        <tr>
-                            <td class="d-flex align-center pl-7">
-                                <v-avatar
-                                    class="my-1"
-                                    size="small"
-                                >
-                                    <v-img v-if="ldaArray[0].Player.headshot" :src="headshot(ldaArray[0].PlayerId)" @click="navigate(ldaArray[0].PlayerId, ldaArray[0].Player.full_name)"/>
-                                </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><flag-img :src="flagSrc(ldaArray[0].Player.country)"/></div>
-                                <RouterLink class="hover-link" :to="{name: 'Player', params: {id: ldaArray[0].PlayerId, name: ldaArray[0].Player.full_name}}">{{ ldaArray[0].Player.full_name }}</RouterLink>
-                            </td>
-                            <td><span v-if="ldaArray[0].status === 'PR'">P</span>{{ ldaArray[0].lda }}</td>
-                        </tr>
+                        <EntryInfoRow v-for="player in ldaArray" :key="player.id" :player>
+                            <template #reason>{{ player.status === 'PR' ? 'P' : null }}{{ player.lda }}</template>
+                        </EntryInfoRow>
                     </tbody>
                     <thead v-if="llsArray.length > 0">
-                        <tr class="bg-indigo-accent-1">
-                            <th colspan="2" class="text-center font-weight-bold">Lucky losers</th>
-                        </tr>
+                        <EntryInfoHeading>
+                            <template #heading>Lucky Losers</template>
+                        </EntryInfoHeading>
                     </thead>
                     <tbody>
-                        <tr v-for="player in llsArray">
-                            <td class="d-flex align-center pl-7">
-                                <v-avatar
-                                    class="my-1"
-                                    size="small"
-                                >
-                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"/>
-                                </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><flag-img :src="flagSrc(player.Player.country)"/></div>
-                                <RouterLink class="hover-link" :to="{name: 'Player', params: {id: player.PlayerId, name: player.Player.full_name}}">{{ player.Player.full_name }}</RouterLink>
-                            </td>
-                            <td></td>
-                        </tr>
+                        <EntryInfoRow v-for="player in llsArray" :key="player.id" :player></EntryInfoRow>
                     </tbody>
                     <thead v-if="altsArray.length > 0">
-                        <tr class="bg-indigo-accent-1">
-                            <th colspan="2" class="text-center font-weight-bold">Alternates</th>
-                        </tr>
+                        <EntryInfoHeading>
+                            <template #heading>Alternates</template>
+                        </EntryInfoHeading>
                     </thead>
                     <tbody>
-                        <tr v-for="player in altsArray">
-                            <td class="d-flex align-center pl-7">
-                                <v-avatar
-                                    class="my-1"
-                                    size="small"
-                                >
-                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"/>
-                                </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><flag-img :src="flagSrc(player.Player.country)"/></div>
-                                <RouterLink class="hover-link" :to="{name: 'Player', params: {id: player.PlayerId, name: player.Player.full_name}}">{{ player.Player.full_name }}</RouterLink>
-                            </td>
-                            <td></td>
-                        </tr>
+                        <EntryInfoRow v-for="player in altsArray" :key="player.id" :player></EntryInfoRow>
                     </tbody>
                     <thead v-if="wdsArray.length > 0">
-                        <tr class="bg-indigo-accent-1">
-                            <th colspan="2" class="text-center font-weight-bold">Withdrawals</th>
-                        </tr>
+                        <EntryInfoHeading>
+                            <template #heading>Withdrawals</template>
+                        </EntryInfoHeading>
                     </thead>
                     <tbody>
-                        <tr v-for="player in wdsArray">
-                            <td class="d-flex align-center pl-7">
-                                <v-avatar
-                                    class="my-1"
-                                    size="small"
-                                >
-                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"/>
-                                </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><flag-img :src="flagSrc(player.Player.country)"/></div>
-                                <RouterLink class="hover-link" :to="{name: 'Player', params: {id: player.PlayerId, name: player.Player.full_name}}">{{ player.Player.full_name }}</RouterLink>
-                            </td>
-                            <td v-if="player.wd === 'true'"></td>
-                            <td v-else>{{ player.wd }}</td>
-                        </tr>
+                        <EntryInfoRow v-for="player in wdsArray" :key="player.id" :player>
+                            <template #reason>{{ player.wd !== 'true' ? player.wd : null }}</template>
+                        </EntryInfoRow>
                     </tbody>
                     <thead v-if="retsArray.length > 0">
-                        <tr class="bg-indigo-accent-1">
-                            <th colspan="2" class="text-center font-weight-bold">Retirements</th>
-                        </tr>
+                        <EntryInfoHeading>
+                            <template #heading>Retirements</template>
+                        </EntryInfoHeading>
                     </thead>
                     <tbody>
-                        <tr v-for="player in retsArray">
-                            <td class="d-flex align-center pl-7">
-                                <v-avatar
-                                    class="my-1"
-                                    size="small"
-                                >
-                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"/>
-                                </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><flag-img :src="flagSrc(player.Player.country)"/></div>
-                                <RouterLink class="hover-link" :to="{name: 'Player', params: {id: player.PlayerId, name: player.Player.full_name}}">{{ player.Player.full_name }}</RouterLink>
-                            </td>
-                            <td v-if="player.ret === 'true'"></td>
-                            <td v-else>{{ player.ret }}</td>
-                        </tr>
+                        <EntryInfoRow v-for="player in retsArray" :key="player.id" :player>
+                            <template #reason>{{ player.ret !== 'true' ? player.ret : null }}</template>
+                        </EntryInfoRow>
                     </tbody>
                     <thead v-if="wosArray.length > 0">
-                        <tr class="bg-indigo-accent-1">
-                            <th colspan="2" class="text-center font-weight-bold">Walkovers</th>
-                        </tr>
+                        <EntryInfoHeading>
+                            <template #heading>Walkovers</template>
+                        </EntryInfoHeading>
                     </thead>
                     <tbody>
-                        <tr v-for="player in wosArray">
-                            <td class="d-flex align-center pl-7">
-                                <v-avatar
-                                    class="my-1"
-                                    size="small"
-                                >
-                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"/>
-                                </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><flag-img :src="flagSrc(player.Player.country)"/></div>
-                                <RouterLink class="hover-link" :to="{name: 'Player', params: {id: player.PlayerId, name: player.Player.full_name}}">{{ player.Player.full_name }}</RouterLink>
-                            </td>
-                            <td v-if="player.wo === 'true'"></td>
-                            <td v-else>{{ player.wo }}</td>
-                        </tr>
+                        <EntryInfoRow v-for="player in wosArray" :key="player.id" :player>
+                            <template #reason>{{ player.wo !== 'true' ? player.wo : null }}</template>
+                        </EntryInfoRow>
                     </tbody>
                     <thead v-if="defsArray.length > 0">
-                        <tr class="bg-indigo-accent-1">
-                            <th colspan="2" class="text-center font-weight-bold">Defaults</th>
-                        </tr>
+                        <EntryInfoHeading>
+                            <template #heading>Defaults</template>
+                        </EntryInfoHeading>
                     </thead>
                     <tbody>
-                        <tr v-for="player in defsArray">
-                            <td class="d-flex align-center pl-7">
-                                <v-avatar
-                                    class="my-1"
-                                    size="small"
-                                >
-                                    <v-img v-if="player.Player.headshot" :src="headshot(player.PlayerId)" @click="navigate(player.PlayerId, player.Player.full_name)"/>
-                                </v-avatar>
-                                <div style="width: 10%;" class="mx-3"><flag-img :src="flagSrc(player.Player.country)"/></div>
-                                <RouterLink class="hover-link" :to="{name: 'Player', params: {id: player.PlayerId, name: player.Player.full_name}}">{{ player.Player.full_name }}</RouterLink>
-                            </td>
-                            <td>{{ player.defaulted === 'true' ? '' : player.defaulted }}</td>
-                        </tr>
+                        <EntryInfoRow v-for="player in defsArray" :key="player.id" :player>
+                            <template #reason>{{ player.default !== 'true' ? player.defaulted : null }}</template>
+                        </EntryInfoRow>
                     </tbody>
                 </v-table>
             </v-col>

@@ -1,9 +1,11 @@
 <script setup>
 import { categorySrc, formattedDates, flagSrc } from './utils';
 import { RouterLink, useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
 
 const props = defineProps(['edition'])
 const router = useRouter()
+const { smAndDown } = useDisplay()
 
 const currentDate = new Date()
 const startDate = new Date(props.edition.start_date)
@@ -18,7 +20,7 @@ const navigate = () => {
     <v-card
         variant="outlined"
         class="my-2 my-sm-5 mx-auto py-sm-3 px-sm-4 w-sm-75"
-        rounded="xl"
+        :rounded="smAndDown ? 'xl' : 'pill'"
         color="indigo-accent-1"
     >
         <v-container>

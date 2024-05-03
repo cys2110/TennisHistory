@@ -24,13 +24,12 @@ watch(searchYear, () => {
                 <v-col>
                     <div class="text-h3">Results Archive</div>
                 </v-col>
-                <v-col>
+                <v-col cols="12">
                     <v-combobox
                         variant="underlined"
-                        class="ml-auto"
+                        class="ml-auto w-100"
                         v-model="searchYear"
                         :items="years"
-                        style="width: 15%;"
                     />
                 </v-col>
             </v-row>

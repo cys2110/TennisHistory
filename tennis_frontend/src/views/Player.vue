@@ -23,9 +23,9 @@ onMounted(() => {
     <view-sheet>
         <v-container v-if="player">
             <v-row>
-                <v-col cols="10" class="d-flex flex-column justify-space-evenly">
-                    <div class="d-flex">
-                        <div class="text-h4">{{ player.first_name }} {{ player.last_name.toUpperCase() }}</div>
+                <v-col cols="7" sm="10" class="d-flex flex-column justify-space-evenly">
+                    <div class="d-sm-flex">
+                        <div class="text-h6 text-sm-h4">{{ player.first_name }} {{ player.last_name.toUpperCase() }}</div>
                         <div>
                             <flag-img
                                 :src="flagSrc(player.country)"
@@ -43,23 +43,23 @@ onMounted(() => {
                             Active
                         </v-chip>
                     </div>
-                    <div class="d-flex align-self-center my-2 align-space-between justify-space-around bg-indigo-accent-4 rounded-pill py-5 w-100">
+                    <div class="d-sm-flex align-self-center my-2 align-space-between justify-space-around bg-indigo-accent-4 rounded-pill py-5 w-100">
                         <div class="d-flex flex-column mx-2 align-center justify-center">
-                            <div class="text-h4">{{ player.career_high }}</div>
-                            <div class="subtitle-1">{{ formatDate(player.ch_date) }}</div>
-                            <div class="subtitle-1">CAREER HIGH</div>
+                            <div class="text-h6 text-lg-h4">{{ player.career_high }}</div>
+                            <div class="text-body-1 text-lg-subtitle-1">{{ formatDate(player.ch_date) }}</div>
+                            <div class="text-body-1 text-lg-subtitle-1">CAREER HIGH</div>
                         </div>
                         <div class="d-flex flex-column mx-2 align-center justify-center">
-                            <div class="text-h4">{{ player.win }}-{{ player.loss }}</div>
-                            <div class="subtitle-1">WIN-LOSS</div>
+                            <div class="text-h6 text-lg-h4">{{ player.win }}-{{ player.loss }}</div>
+                            <div class="text-body-1 text-md-subtitle-1">WIN-LOSS</div>
                         </div>
                         <div class="d-flex flex-column mx-2 align-center justify-center">
-                            <div class="text-h4">{{ player.titles }}</div>
-                            <div class="subtitle-1">TITLES</div>
+                            <div class="text-h6 text-lg-h4">{{ player.titles }}</div>
+                            <div class="text-body-1 text-lg-subtitle-1">TITLES</div>
                         </div>
                         <div class="d-flex flex-column mx-2 align-center justify-center">
-                            <div class="text-h4">{{ formatCurrency('USD', player.pm_USD) }}</div>
-                            <div class="subtitle-1">PRIZE MONEY</div>
+                            <div class="text-h6 text-lg-h4">{{ formatCurrency('USD', player.pm_USD) }}</div>
+                            <div class="text-body-1 text-lg-subtitle-1">PRIZE MONEY</div>
                         </div>
                     </div>
                 </v-col>
@@ -81,7 +81,7 @@ onMounted(() => {
             <v-row>
                 <v-col>
                     <v-toolbar color="indigo-accent-4" class="rounded-t-xl">
-                        <v-tabs v-model="tab">
+                        <v-tabs v-model="tab" show-arrows="">
                             <v-tab value="overview">Overview</v-tab>
                             <v-tab value="activity">Activity</v-tab>
                             <v-tab value="titles">Titles and Finals</v-tab>

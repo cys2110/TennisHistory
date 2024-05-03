@@ -5,8 +5,8 @@ import { groupObjectsByKey } from '@/components/utils';
 import { RouterLink } from 'vue-router';
 
 const props = defineProps(['player'])
-const finals = ref({})
-const titles = ref({})
+const finals = ref(null)
+const titles = ref(null)
 const selection = ref('Titles')
 const items = ['Titles', 'Finals']
 
@@ -14,11 +14,11 @@ onMounted(() => {
     EditionService.getEditionsByPlayer(props.player.id)
     .then(response => {
         const finalsArray = response.data.filter(edition => edition.finalist_id === props.player.id)
-        const groupedFinals = groupObjectsByKey(finalsArray.value, 'year')
+        const groupedFinals = groupObjectsByKey(finalsArray, 'year')
         finals.value = groupedFinals
 
         const titlesArray = response.data.filter(edition => edition.winner_id === props.player.id)
-        const groupedTitles = groupObjectsByKey(titlesArray.value, 'year')
+        const groupedTitles = groupObjectsByKey(titlesArray, 'year')
         titles.value = groupedTitles
     })
     .catch(error => console.log(error))
@@ -33,7 +33,7 @@ onMounted(() => {
             </v-col>
         </v-row>
         <v-row v-if="selection === 'Titles'">
-            <v-table v-if="titlesArray.length > 0" class="w-75 mx-auto rounded-xl">
+            <v-table v-if="titles" class="w-75 mx-auto rounded-xl">
                 <thead>
                     <tr class="bg-indigo-accent-1">
                         <th class="font-weight-bold text-center">Year</th>
@@ -46,7 +46,7 @@ onMounted(() => {
                     <tr v-for="year in titles">
                         <td class="text-center">{{ year[0].year }}</td>
                         <td class="text-center">{{ year.length }}</td>
-                        <td class="text-center">
+                        <td>
                             <div v-for="tournament in year">
                                 <span v-if="tournament.sponsor_name">{{ tournament.sponsor_name }} | </span>
                                 <span><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: tournament.TournamentId, name: tournament.Tournament.name}}">{{ tournament.Tournament.name }}</RouterLink></span>
@@ -64,7 +64,7 @@ onMounted(() => {
             <div v-else class="text-subtitle-1">No titles won</div>
         </v-row>
         <v-row v-if="selection === 'Finals'">
-            <v-table v-if="finalsArray.length > 0" class="w-75 mx-auto rounded-xl">
+            <v-table v-if="finals" class="w-75 mx-auto rounded-xl">
                 <thead>
                     <tr class="bg-indigo-accent-1">
                         <th class="font-weight-bold text-center">Year</th>
@@ -77,7 +77,7 @@ onMounted(() => {
                     <tr v-for="year in finals">
                         <td class="text-center">{{ year[0].year }}</td>
                         <td class="text-center">{{ year.length }}</td>
-                        <td class="text-center">
+                        <td>
                             <div v-for="tournament in year">
                                 <span v-if="tournament.sponsor_name">{{ tournament.sponsor_name }} | </span>
                                 <span><RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: tournament.TournamentId, name: tournament.Tournament.name}}">{{ tournament.Tournament.name }}</RouterLink></span>

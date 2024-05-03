@@ -38,7 +38,7 @@ const sortedRounds = rounds.sort((a, b) => b.value - a.value)
     </v-row>
     <v-row class="overflow-x-auto">
       <template v-for="round in sortedRounds" :key="round.name">
-        <v-col cols="4" class="d-flex flex-column justify-space-around" v-if="selectedRound === round.value || selectedRound === round.value*2 || selectedRound === round.value*4" >
+        <v-col cols="12" md="6" xl="4" class="d-flex flex-column justify-space-around" v-if="selectedRound === round.value || selectedRound === round.value*2 || selectedRound === round.value*4" >
           <DrawCard v-for="match in groupedMatches[round.string]" :key="match.id" :match :edition />
         </v-col>
       </template>

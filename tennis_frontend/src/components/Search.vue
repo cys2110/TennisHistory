@@ -2,7 +2,9 @@
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import SearchService from '@/services/SearchService';
+import { useDisplay } from 'vuetify';
 
+const { smAndDown } = useDisplay()
 const searchTerm = ref(null)
 const tournamentResults = ref([])
 const playerResults = ref([])
@@ -18,10 +20,10 @@ const submitSearch = () => {
 </script>
 
 <template>
-    <short-card width="60%" class="mx-auto">
+    <short-card :width="smAndDown ? '100%' : '60%'" class="mx-auto">
         <v-card-actions class="mx-2 mt-2">
             <v-text-field
-                label="Search tournament or player by last name"
+                label="Search tournament or player"
                 variant="outlined"
                 clearable
                 v-model="searchTerm"

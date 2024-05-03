@@ -2,9 +2,11 @@
 import { ref } from 'vue';
 import { formatDate, headshot, flagSrc, status, formatTime, incomplete } from '../utils';
 import { RouterLink, useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify/lib/framework.mjs';
 
 const props = defineProps(['match', 'edition'])
 const router = useRouter()
+const { xs } = useDisplay()
 const winner = ref(null)
 const winPlayer = ref(null)
 const loser = ref(null)
@@ -46,7 +48,7 @@ const navigateH2H = () => {
 </script>
 
 <template>
-    <short-card class="ma-3 mx-auto" style="width: 40%;">
+    <short-card class="ma-3 mx-auto" :style="xs ? 'width: 100%' : 'width: 40%'">
         <v-container>
             <v-row class="flex-nowrap">
                 <v-col v-if="match.date">

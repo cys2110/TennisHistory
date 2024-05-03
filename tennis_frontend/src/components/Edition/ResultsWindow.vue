@@ -19,7 +19,7 @@ const tab = ref(null)
 </script>
 
 <template>
-        <v-tabs v-model="tab">
+        <v-tabs v-model="tab" show-arrows="">
             <v-tab v-for="round in sortedRounds" :key="round.name" :value="round.value">{{ round.string }}</v-tab>
         </v-tabs>
         <v-window v-model="tab" class="mt-5" direction="vertical">

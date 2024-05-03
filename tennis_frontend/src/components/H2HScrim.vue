@@ -2,8 +2,10 @@
 import PlayerService from '@/services/PlayerService';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
 
 const router = useRouter()
+const { smAndDown } = useDisplay()
 const emits = defineEmits(['close'])
 const searchP1 = ref(null)
 const searchP2 = ref(null)
@@ -47,10 +49,10 @@ const submitH2H = () => {
 </script>
 
 <template>
-    <short-card width="60%" class="mx-auto">
+    <short-card :width="smAndDown ? '100%' : '60%'" class="mx-auto">
         <v-container class="mx-3 mt-2">
             <v-row>
-                    <v-col cols="5">
+                    <v-col cols="11" sm="5">
                         <v-text-field
                             label="Search player 1"
                             variant="underlined"
@@ -61,7 +63,7 @@ const submitH2H = () => {
                         >
                         </v-text-field>
                     </v-col>
-                    <v-col cols="5">
+                    <v-col cols="11" sm="5">
                         <v-text-field
                             label="Search player 2"
                             variant="underlined"
@@ -73,18 +75,18 @@ const submitH2H = () => {
                         </v-text-field>
                     </v-col>
                     <v-spacer></v-spacer>
-                    <v-col cols="1" class="d-flex align-center">
+                    <v-col cols="12" sm="1" class="d-flex align-center justify-center">
                         <v-icon icon="fad fa-right-from-line" @click="submitH2H"/>
                     </v-col>
             </v-row>
             <v-row>
                 <v-col cols="5">
-                    <v-list v-if="p1Results.length > 0">
+                    <v-list v-if="p1Results.length > 0" bg-color="transparent">
                         <v-list-item v-for="player in p1Results" :key="player.id" @click="setP1(player)">{{ player.full_name }}</v-list-item>
                     </v-list>
                 </v-col>
                 <v-col cols="5">
-                    <v-list v-if="p2Results.length > 0">
+                    <v-list v-if="p2Results.length > 0" bg-color="transparent">
                         <v-list-item v-for="player in p2Results" :key="player.id" @click="setP2(player)">{{ player.full_name }}</v-list-item>
                     </v-list>
                 </v-col>
