@@ -25,7 +25,6 @@ const matchStatController = require('./controllers/matchStatController')
 const entryController = require('./controllers/entryController')
 const matchScoreController = require('./controllers/matchScoreController')
 const tieController = require('./controllers/tieController')
-const config = require('./config/config')
 
 app.get('/', (req, res) => res.send('This is the root!'))
 
