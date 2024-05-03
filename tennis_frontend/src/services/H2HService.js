@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'https://tennis-history-backend-a82162895ecd.herokuapp.com//h2h',
+    baseURL: 'https://tennis-history-backend-a82162895ecd.herokuapp.com/h2h',
     withCredentials: false,
     headers: {
         Accept: 'application/json',
