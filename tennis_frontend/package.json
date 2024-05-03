@@ -22,6 +22,7 @@
     "@fortawesome/sharp-thin-svg-icons": "^6.5.2",
     "@fortawesome/vue-fontawesome": "^3.0.6",
     "axios": "^1.6.8",
+    "dotenv": "^16.4.5",
     "pinia": "^2.1.7",
     "vite-plugin-vuetify": "^2.0.3",
     "vue": "^3.4.21",

@@ -30,4 +30,5 @@ coverage
 *.tsbuildinfo
 
 config.js
+.env
 
