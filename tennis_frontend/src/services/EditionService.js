@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/editions/',
+    baseURL: 'https://tennis-history-backend-a82162895ecd.herokuapp.com//editions/',
     withCredentials: false,
     headers: {
         Accept: 'application/json',
