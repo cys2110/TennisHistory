@@ -7,7 +7,7 @@ import Search from './Search.vue'
     <v-app-bar scroll-behavior="elevate" color="indigo-darken-4">
         <v-app-bar-title class="custom-font text-h6 text-sm-h4">Tennis History</v-app-bar-title>
         <v-btn icon="fas fa-house" href="/"></v-btn>
-        <v-btn icon="far fa-calendar" href="/results-archive"></v-btn>
+        <v-btn icon="far fa-calendar" :to="{name: 'Results Archive'}"></v-btn>
         <v-btn icon="fad fa-people-arrows" rounded="xl">
             <v-icon icon="fad fa-people-arrows"/>
             <v-dialog activator="parent" transition="v-fade-transition">
