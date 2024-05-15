@@ -24,8 +24,8 @@ onMounted(() => {
         <v-container v-if="player">
             <v-row>
                 <v-col cols="7" sm="10" class="d-flex flex-column justify-space-evenly">
-                    <div class="d-sm-flex">
-                        <div class="text-h6 text-sm-h4">{{ player.first_name }} {{ player.last_name.toUpperCase() }}</div>
+                    <div class="d-sm-flex align-center">
+                        <div class="text-h6 text-sm-h4 text-md-h2">{{ player.first_name }} {{ player.last_name.toUpperCase() }}</div>
                         <div>
                             <flag-img
                                 :src="flagSrc(player.country)"

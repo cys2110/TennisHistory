@@ -22,7 +22,9 @@ const years = computed(() => {
 const getActivity = () => {
     EditionService.getEntriesByPlayer(props.player.id, selectedYear.value)
     .then(response => {
-        results.value = response.data.entries
+        results.value = response.data.entries.toSorted((a, b) => {
+            return a.Edition.end_date.localeCompare(b.Edition.end_date)
+        })
         winCount.value = response.data.wins
         lossCount.value = response.data.losses
         titles.value = response.data.titles

@@ -37,7 +37,6 @@ if (props.match.p1 === props.id && props.match.p2) {
     </td>
     <td>
         <v-icon v-if="match.winner_id === id" icon="fad fa-check" class="text-light-green-accent-3"/>
-
         <v-icon v-else icon="fas fa-x" class="text-red-darken-1"/>
     </td>
     <td>
@@ -67,5 +66,11 @@ if (props.match.p1 === props.id && props.match.p2) {
         <div v-if="match.incomplete === 'R'">Ret'd</div>
         <div v-else-if="match.incomplete === 'D'">Def.</div>
     </td>
-    <td></td>
+    <td>
+        <v-btn v-if="match.incomplete !== 'B'"
+            color="indigo-accent-1"
+            rounded="pill"
+            :to="{name: 'H2H', params: {p1Name: match.player1.full_name, p1Id: match.p1, p2Name: match.player2.full_name, p2Id: match.p2}}"
+        >H2H</v-btn>
+    </td>
 </template>

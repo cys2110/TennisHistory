@@ -33,7 +33,7 @@ onMounted(() => {
             </v-col>
         </v-row>
         <v-row v-if="selection === 'Titles'">
-            <v-table v-if="titles" class="w-75 mx-auto rounded-xl">
+            <v-table v-if="Object.keys(titles).length !== 0" class="w-75 mx-auto rounded-xl">
                 <thead>
                     <tr class="bg-indigo-accent-1">
                         <th class="font-weight-bold text-center">Year</th>
@@ -64,7 +64,7 @@ onMounted(() => {
             <div v-else class="text-subtitle-1">No titles won</div>
         </v-row>
         <v-row v-if="selection === 'Finals'">
-            <v-table v-if="finals" class="w-75 mx-auto rounded-xl">
+            <v-table v-if="Object.keys(finals).length !== 0" class="w-75 mx-auto rounded-xl">
                 <thead>
                     <tr class="bg-indigo-accent-1">
                         <th class="font-weight-bold text-center">Year</th>
