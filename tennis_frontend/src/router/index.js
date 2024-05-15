@@ -22,7 +22,7 @@ const router = createRouter({
       component: About
     },
     {
-      path: '/results-archive',
+      path: '/archive',
       name: 'Results Archive',
       component: ResultsArchive,
       beforeEnter: (to, from, next) => {
