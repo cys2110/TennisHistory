@@ -20,13 +20,15 @@ const sortedMatches = matches.toSorted((a, b) => {
             </v-col>
             <v-col cols="9">
                 <v-card-title class="text-h5">
-                    <span v-if="entry.Edition.sponsor_name">{{ entry.Edition.sponsor_name }} | </span>
-                    <RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: entry.Edition.Tournament.id, name: entry.Edition.Tournament.name}}">{{ entry.Edition.Tournament.name }}</RouterLink>
+                    <div v-if="entry.Edition.sponsor_name">{{ entry.Edition.sponsor_name }}</div>
+                    <div>
+                        <RouterLink class="hover-link" :to="{name: 'Tournament', params: {id: entry.Edition.Tournament.id, name: entry.Edition.Tournament.name}}">{{ entry.Edition.Tournament.name }}</RouterLink>
+                    </div>
                 </v-card-title>
                 <v-card-subtitle>
                     <div class="d-flex text-subtitle-1">
                         {{ entry.Edition.city }} 
-                    | {{ entry.Edition.environment }} {{ entry.Edition.surface }}<span v-if="entry.Edition.hard_type">&nbsp;({{ entry.Edition.hard_type }})&nbsp;</span> | 
+                    | {{ entry.Edition.environment }} {{ entry.Edition.surface }}<span v-if="entry.Edition.hard_type">&nbsp;({{ entry.Edition.hard_type }})&nbsp;</span> | &nbsp;
                     <span>{{ formattedDates(entry.Edition.start_date, entry.Edition.end_date) }}</span>
                     </div>
                 </v-card-subtitle>
