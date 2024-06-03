@@ -4,21 +4,57 @@ import Search from './Search.vue'
 </script>
 
 <template>
-    <v-app-bar scroll-behavior="elevate" color="indigo-darken-4">
-        <v-app-bar-title class="custom-font text-h6 text-sm-h4">Tennis History</v-app-bar-title>
-        <v-btn icon="fas fa-house" href="/"></v-btn>
-        <v-btn icon="far fa-calendar" :to="{name: 'Results Archive'}"></v-btn>
-        <v-btn icon="fad fa-people-arrows" rounded="xl">
-            <v-icon icon="fad fa-people-arrows"/>
-            <v-dialog activator="parent" transition="v-fade-transition">
+    <v-app-bar
+        scroll-behavior="elevate"
+        color="indigo-darken-4"
+    >
+        <v-app-bar-title
+            text="Tennis History"
+            class="custom-font text-h6 text-sm-h4"
+        />
+        <!--Home-->
+        <v-btn
+            icon="fas fa-house"
+            :to="{name: 'home'}"
+        />
+        <!--Archive-->
+        <v-btn
+            icon="far fa-calendar"
+            :to="{name: 'Results Archive'}"
+        />
+        <!--Head to head-->
+        <v-btn
+            icon=""
+        >
+            <v-icon
+                icon="fad fa-people-arrows"
+            />
+            <v-dialog
+                activator="parent"
+                transition="dialog-bottom-transition"
+                height="70%"
+                opacity="50%"
+                scroll-strategy="reposition"
+            >
                 <template v-slot:default="{ isActive }">
                     <H2HScrim @close="isActive.value = false" />
                 </template>
             </v-dialog>
         </v-btn>
-        <v-btn rounded="xl">
-            <v-icon icon="fas fa-magnifying-glass"/>
-            <v-dialog activator="parent" transition="dialog-bottom-transition">
+        <!--Search-->
+        <v-btn
+            icon=""
+        >
+            <v-icon
+                icon="fas fa-magnifying-glass"
+            />
+            <v-dialog
+                activator="parent"
+                transition="dialog-bottom-transition"
+                height="70%"
+                opacity="50%"
+                scroll-strategy="reposition"
+            >
                 <template v-slot:default="{ isActive }">
                     <Search @close="isActive.value = false" />
                 </template>

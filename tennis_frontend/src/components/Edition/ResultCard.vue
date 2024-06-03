@@ -65,7 +65,7 @@ const navigateH2H = () => {
                     </v-avatar>
                     <flag-img :src="flagSrc(winner.country)" max-width="50" class="mx-2"/>
                     <RouterLink class="hover-link" :to="{name: 'Player', params: {id: winner.id, name: winner.full_name}}">{{ winner.full_name }}</RouterLink>
-                    <span v-if="winEntry.seed || winEntry.status" class="small">&nbsp;{{ status(winEntry.seed, winEntry.status) }}</span>
+                    <small v-if="winEntry.seed || winEntry.status" class="text-grey-lighten-1">&nbsp;{{ status(winEntry.seed, winEntry.status) }}</small>
                 </v-col>
                 <v-col cols='1'>
                     <v-icon icon="fad fa-check" size="small"/>
@@ -83,7 +83,7 @@ const navigateH2H = () => {
                     </v-avatar>
                     <flag-img :src="flagSrc(loser.country)" max-width="50" class="mx-2"/>
                     <RouterLink class="hover-link" :to="{name: 'Player', params: {id: loser.id, name: loser.full_name}}">{{ loser.full_name }}</RouterLink>
-                    <span v-if="loseEntry.seed || loseEntry.status" class="small">&nbsp;{{ status(loseEntry.seed, loseEntry.status) }}</span>
+                    <small v-if="loseEntry.seed || loseEntry.status" class="text-grey-lighten-1">&nbsp;{{ status(loseEntry.seed, loseEntry.status) }}</small>
                 </v-col>
                 <v-col v-else class="text-center">Bye</v-col>
                 <v-col cols="1"></v-col>

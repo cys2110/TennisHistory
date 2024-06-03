@@ -33,12 +33,12 @@ onMounted(() => {
             </v-row>
             <v-row>
                 <v-col>
-                    <div class="text-subtitle-1">{{ years }}</div>
+                    <div class="text-h6">{{ years }}</div>
                 </v-col>
             </v-row>
             <v-row>
-                <v-col cols="12" sm="6" md="4">
-                    <TournamentCard v-for="edition in tournament.Editions" :edition :key="edition.id" />
+                <v-col cols="12" sm="6" md="4" v-for="edition in tournament.Editions">
+                    <TournamentCard :edition :key="edition.id" />
                 </v-col>
             </v-row>
         </v-container>
