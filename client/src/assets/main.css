@@ -1,38 +1,60 @@
 @import './base.css';
+@import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+.v-application {
+  font-family: Inter, sans-serif !important;
 }
 
-a,
-.green {
+.hover-link {
+  color: var(--blue-link);
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+  background-image: linear-gradient(var(--blue-link), var(--blue-link));
+  background-size: 0% 0.1em;
+  background-position-y: 105%;
+  background-position-x: 50%;
+  background-repeat: no-repeat;
+  transition: background-size 0.4s ease-in-out;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+.hover-link:hover,
+.hover-link:focus,
+.hover-link:active {
+background-size: 100% 0.1em;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+.filter {
+  filter: invert(91%) sepia(0%) saturate(217%) hue-rotate(185deg) brightness(95%) contrast(95%);
+  width: 125px;
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+.mini-flag {
+  width: 30px;
+  border-radius: 5px;
+  vertical-align: middle;
+  border: 1px solid var(--color-border)
+}
+
+.flag {
+  width: 150px;
+  border-radius: 15px;
+}
+
+.detail {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin: 10px;
+  background-color: var(--color-background-mute);
+  border-radius: 15px;
+}
+
+.strikethrough {
+  text-decoration: line-through;
 }
