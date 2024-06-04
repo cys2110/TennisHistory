@@ -70,7 +70,10 @@ exports.findUpcoming = (req, res) => {
         },
         order: [['end_date', 'ASC']],
         attributes: ['id', 'sponsor_name', 'category', 'environment', 'surface', 'hard_type', 'city', 'country', 'start_date', 'end_date'],
-        include: db.Tournament
+        include: {
+            model: db.Tournament,
+            attributes: ['id', 'name']
+        }
     })
     .then(response => res.send(response))
     .catch(error => res.status(500).send(error.message))
