@@ -1,6 +1,6 @@
 const dotenv = require('dotenv')
 dotenv.config()
-const config = require('../config/config')
+// const config = require('../config/config')
 const Sequelize = require('sequelize')
 const sequelize = new Sequelize(process.env.DB, process.env.DB_USER, process.env.PASSWORD, {
     host: process.env.HOST,
