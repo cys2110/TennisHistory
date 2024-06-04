@@ -5,18 +5,20 @@ const Op = db.Sequelize.Op
 exports.findById = (req, res) => {
     const { id } = req.params
     Tournament.findByPk(id, {
+        attributes: ['id', 'name', 'start_year', 'end_year', 'website'],
         include: {
             model: db.Edition,
+            attributes: ['id', 'edition_no', 'year', 'final_score'],
             include: [
                 {
                     model: db.Player,
                     as: 'winner',
-                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'headshot', 'country']
+                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
                 },
                 {
                     model: db.Player,
                     as: 'finalist',
-                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'headshot', 'country']
+                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
                 }
             ]
         }
