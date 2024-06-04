@@ -24,7 +24,7 @@ const navigateH2H = () => {
         <v-container>
             <v-row class="flex-nowrap">
                 <v-col class="d-flex align-center">
-                    <v-avatar v-if="match.player1?.headshot">
+                    <v-avatar v-if="match.player1">
                         <v-img :src="headshot(match.p1)" @click="navigate()"/>
                     </v-avatar>
                     <flag-img v-if="match.player1" :src="flagSrc(match.player1.country)" class="mx-2" max-width="50"/>
@@ -43,7 +43,7 @@ const navigateH2H = () => {
             </v-row>
             <v-row class="flexnowrap">
                 <v-col class="d-flex align-center">
-                    <v-avatar v-if="match.player2?.headshot">
+                    <v-avatar v-if="match.player2">
                         <v-img :src="headshot(match.p2)" @click="navigate()"/>
                     </v-avatar>
                     <flag-img v-if="match.player2" :src="flagSrc(match.player2.country)" max-width="50" class="mx-2"/>
