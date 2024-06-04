@@ -85,8 +85,12 @@ exports.findByYear = (req, res) => {
         where: {
             year: year
         },
+        attributes: ['id', 'edition_no', 'sponsor_name', 'year', 'start_date', 'end_date', 'category', 'city', 'country', 'environment', 'surface', 'hard_type'],
         order: [['start_date', 'ASC']],
-        include: db.Tournament
+        include: {
+            model: db.Tournament,
+            attributes: ['id', 'name']
+        }
     })
     .then(response => res.send(response))
     .catch(error => res.status(500).send(error.message))
