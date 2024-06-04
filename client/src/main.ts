@@ -1,10 +1,9 @@
-import './assets/main.css'
-
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
 import 'vuetify/styles'
+import './assets/main.css'
 import { createVuetify } from 'vuetify'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -43,12 +42,13 @@ const vuetify = createVuetify({
           class: 'bg-transparent my-10 pa-3 w-75 mx-auto'
         },
         ShortCard: {
-          variant: 'elevated',
-          color: 'indigo-darken-4',
+          variant: 'text',
+          class: '!bg-indigo-800',
           rounded: 'xl'
         },
         VAvatar: {
-          variant: 'outlined'
+          variant: 'outlined',
+          class: 'border-zinc-400'
         },
         FlagImg: {
           rounded: 'lg',

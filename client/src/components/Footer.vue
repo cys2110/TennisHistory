@@ -29,7 +29,7 @@
             </v-btn>
         </div>
         <div class="px-4 py-2 text-center">
-            Created by <a class="!text-green-600" href="https://www.claire-sheridan.com" target="_blank">Claire Sheridan</a> using Vuetify and TailwindCSS
+            Created by <a class="hover-link" href="https://www.claire-sheridan.com" target="_blank">Claire Sheridan</a> using Vuetify and TailwindCSS
         </div>
     </v-footer>
 </template>

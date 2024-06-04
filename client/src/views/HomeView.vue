@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import EditionService from '@/services/EditionService';
-import { onMounted, ref } from 'vue';
+import UpcomingCard from '@/components/Home/UpcomingCard.vue';
+import { onMounted, ref, type Ref } from 'vue';
+import { type UpcomingEdition } from '@/components/utils';
 
-const upcoming = ref([])
+const upcoming: Ref<UpcomingEdition[]> = ref([])
 
 onMounted(() => {
     EditionService.getUpcomingEditions()
@@ -13,6 +15,10 @@ onMounted(() => {
 
 <template>
     <view-sheet>
-        <div class="text-h3">Upcoming Tournaments</div>
+        <div class="!text-4xl !text-zinc-300">Upcoming Tournaments</div>
+        <div v-if="upcoming.length > 0">
+            <UpcomingCard v-for="edition in upcoming" :key="edition.id" :edition />
+        </div>
+        <div v-else class="!text-zinc-400 my-5">No upcoming tournaments</div>
     </view-sheet>
 </template>
