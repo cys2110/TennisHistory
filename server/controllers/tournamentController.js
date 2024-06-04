@@ -8,7 +8,7 @@ exports.findById = (req, res) => {
         attributes: ['id', 'name', 'start_year', 'end_year', 'website'],
         include: {
             model: db.Edition,
-            attributes: ['id', 'edition_no', 'year', 'final_score'],
+            attributes: ['id', 'edition_no', 'year', 'final_score', 'end_date'],
             include: [
                 {
                     model: db.Player,
