@@ -69,6 +69,7 @@ exports.findUpcoming = (req, res) => {
             }
         },
         order: [['end_date', 'ASC']],
+        attributes: ['id', 'sponsor_name', 'category', 'environment', 'surface', 'hard_type', 'city', 'country', 'start_date', 'end_date'],
         include: db.Tournament
     })
     .then(response => res.send(response))
