@@ -9,9 +9,9 @@
 }
 
 .hover-link {
-  color: var(--blue-link);
+  color: #94a3b8;
   text-decoration: none;
-  background-image: linear-gradient(var(--blue-link), var(--blue-link));
+  background-image: linear-gradient(#94a3b8, #94a3b8);
   background-size: 0% 0.1em;
   background-position-y: 105%;
   background-position-x: 50%;
@@ -25,12 +25,7 @@
 background-size: 100% 0.1em;
 }
 
-.filter {
-  filter: invert(91%) sepia(0%) saturate(217%) hue-rotate(185deg) brightness(95%) contrast(95%);
-  width: 125px;
-}
-
-.mini-flag {
+/* .mini-flag {
   width: 30px;
   border-radius: 5px;
   vertical-align: middle;
@@ -53,7 +48,7 @@ background-size: 100% 0.1em;
   margin: 10px;
   background-color: var(--color-background-mute);
   border-radius: 15px;
-}
+} */
 
 .strikethrough {
   text-decoration: line-through;

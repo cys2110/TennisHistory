@@ -20,7 +20,7 @@
                 text="Home"
                 activator="parent"
                 location="bottom"
-                content-class="!bg-indigo-600 !text-indigo-50 !text-sm"
+                content-class="!bg-indigo-600 !text-zinc-300 !text-sm"
                 height="30"
             />
         </v-btn>
