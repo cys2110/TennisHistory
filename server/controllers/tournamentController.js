@@ -35,10 +35,12 @@ exports.search = async (req, res) => {
                 name: {
                     [Op.iRegexp]: search
                 }
-            }
+            },
+            attributes: ['id', 'name']
         })
         const players = await db.Player.findAll({
-            where: db.sequelize.literal(`first_name || ' ' || last_name ILIKE '%${search}%'`)
+            where: db.sequelize.literal(`first_name || ' ' || last_name ILIKE '%${search}%'`),
+            attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
         })
         const response = {
             tournaments,
