@@ -54,7 +54,7 @@ watch(() => [props.p1Name, props.p2Name], () => {
 </script>
 
 <template>
-    <v-sheet class="w-5/6 mx-auto my-10 bg-transparent">
+    <v-sheet class="w-5/6 md:w-8/12 lg:w-1/2 mx-auto my-10 bg-transparent">
         <v-container v-if="p1 && p2">
             <v-row>
                 <v-col class="flex-col items-center" cols="4">
