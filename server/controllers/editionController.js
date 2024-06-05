@@ -8,36 +8,29 @@ exports.findByEditionNo = (req, res) => {
         where: {
             edition_no: edition
         },
+        attributes: ['id', 'edition_no', 'sponsor_name', 'category', 'city', 'country', 'start_date', 'end_date', 'environment', 'surface', 'hard_type', 'year', 'type_of_draw', 'currency', 'pm', 'tfc', 'supervisors', 'venue', 'winner_pm', 'winner_pts', 'finalist_pm', 'finalist_pts', 'semifinalist_pm', 'semifinalist_pts', 'quarterfinalist_pm', 'quarterfinalist_pts', 'r16_pm', 'r16_pts', 'r32_pm', 'r32_pts', 'r64_pm', 'r64_pts', 'r128_pm', 'r128_pts'],
         include: [
             {
-                model: db.Player,
-                as: 'winner',
-                attributes: ['id', 'first_name', 'last_name', 'full_name', 'headshot', 'country']
-            },
-            {
-                model: db.Player,
-                as: 'finalist',
-                attributes: ['id', 'first_name', 'last_name', 'full_name', 'headshot', 'country']
-            },
-            {
                 model: db.Entry,
+                attributes: ['rank', 'seed', 'status', 'wd', 'ret', 'wo', 'lda', 'defaulted'],
                 include: {
                     model: db.Player,
-                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'headshot', 'country']
+                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
                 },
             },
             {
                 model: db.MatchScore,
+                attributes: ['id', 'match_no', 'round', 'incomplete', 'umpire', 'date', 'duration_mins', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p2', 'winner_id'],
                 include: [
                     {
                         model: db.Player,
                         as: 'player1',
-                        attributes: ['id', 'first_name', 'last_name', 'headshot', 'country', 'full_name']
+                        attributes: ['id', 'first_name', 'last_name', 'country', 'full_name']
                     },
                     {
                         model: db.Player,
                         as: 'player2',
-                        attributes: ['id', 'first_name', 'last_name', 'full_name', 'headshot', 'country']
+                        attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
                     },
                     {
                         model: db.Entry,
@@ -50,9 +43,6 @@ exports.findByEditionNo = (req, res) => {
                         attributes: ['seed', 'status']
                     }
                 ]
-            },
-            {
-                model: db.Tournament
             }
         ]
     })

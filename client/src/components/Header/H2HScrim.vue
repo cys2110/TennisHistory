@@ -58,7 +58,6 @@ const setP2 = (player: PlayerSearch) => {
                         variant="underlined"
                         clearable
                         rounded
-                        autofocus
                         v-model="searchP2"
                         @update:model-value="submitSearch2"
                     />

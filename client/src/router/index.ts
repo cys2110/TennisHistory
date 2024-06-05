@@ -43,7 +43,7 @@ const router = createRouter({
       component: EditionView
     },
     {
-      path: '/tournaments/:name/:id/:editionNo/:matchId',
+      path: '/tournaments/:name/:id/:editionNo/:matchId/:p1/:p2',
       name: 'MatchStats',
       props: true,
       component: MatchStats

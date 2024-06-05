@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon'
+import { DateTime, Duration } from 'luxon'
 
 // variables
 
@@ -44,8 +44,17 @@ export const formatCurrency = (currency: string, amount: number) => {
     return amount.toLocaleString('en-gb', {style: 'currency', currency: currency})
 }
 
+export const formatTime = (time: number) => {
+    const minutes = Duration.fromObject({minutes: time})
+    return minutes.toFormat('hh:mm')
+}
+
 export const encodeName = (name: string) => {
     return name.replace(/ /g, '_')
+}
+
+export const status = (seed: number | null, status: string | null) => {
+    return seed && status ? `(${seed} ${status})` : seed ? `(${seed})` : `(${status})`
 }
 
 export const round = (roundNumber: string) => {
@@ -225,5 +234,124 @@ export interface MatchH2H {
         surface: string,
         edition_no: number,
         Tournament: SearchTournament
+    }
+}
+
+export interface MatchStat {
+    id: number,
+    p1_aces: number,
+    p1_dfs: number,
+    p1_serve1: number,
+    p1_total_serve1: number,
+    p1_serve1_pts_w: number,
+    p1_serve1_pts: number,
+    p1_serve2_pts_w: number,
+    p1_serve2_pts: number,
+    p1_bps_saved: number,
+    p1_bps_faced: number,
+    p1_sv_gms: number | null,
+    p1_ret1_w: number,
+    p1_ret1: number,
+    p1_ret2_w: number,
+    p1_ret2: number,
+    p1_bp_opps: number,
+    p1_bps_converted: number,
+    p1_ret_gms: number | null,
+    p1_net_w: number | null,
+    p1_net: number | null,
+    p1_winners: number | null,
+    p1_ues: number | null,
+    p1_sv_pts: number,
+    p1_sv_pts_total: number,
+    p1_ret_pts: number,
+    p1_ret_pts_total: number,
+    p1_pts: number,
+    total_pts: number,
+    p1_max_speed_kph: number | null,
+    p1_max_speed_mph: number | null,
+    p1_avg_sv1_kph: number | null,
+    p1_avg_sv1_mph: number | null,
+    p1_avg_sv2_kph: number | null,
+    p1_avg_sv2_mph: number | null,
+    p2_aces: number,
+    p2_dfs: number,
+    p2_serve1: number,
+    p2_total_serve1: number,
+    p2_serve1_pts_w: number,
+    p2_serve1_pts: number,
+    p2_serve2_pts_w: number,
+    p2_serve2_pts: number,
+    p2_bps_saved: number,
+    p2_bps_faced: number,
+    p2_sv_gms: number | null,
+    p2_ret1_w: number,
+    p2_ret1: number,
+    p2_ret2_w: number,
+    p2_ret2: number,
+    p2_bp_opps: number,
+    p2_bps_converted: number,
+    p2_ret_gms: number | null,
+    p2_net_w: number | null,
+    p2_net: number | null,
+    p2_winners: number | null,
+    p2_ues: number | null,
+    p2_sv_pts: number,
+    p2_sv_pts_total: number,
+    p2_ret_pts: number,
+    p2_ret_pts_total: number,
+    p2_pts: number,
+    p2_max_speed_kph: number | null,
+    p2_max_speed_mph: number | null,
+    p2_avg_sv1_kph: number | null,
+    p2_avg_sv1_mph: number | null,
+    p2_avg_sv2_kph: number | null,
+    p2_avg_sv2_mph: number | null,
+    MatchScore: {
+        id: number,
+        round: string,
+        incomplete: string | null,
+        umpire: string | null,
+        duration_mins: number | null,
+        date: Date | null,
+        s1p1: number | null,
+        s1p2: number | null,
+        t1p1: number | null,
+        t1p2: number | null,
+        s2p1: number | null,
+        s2p2: number | null,
+        t2p1: number | null,
+        t2p2: number | null,
+        s3p1: number | null,
+        s3p2: number | null,
+        t3p1: number | null,
+        t3p2: number | null,
+        s4p1: number | null,
+        s4p2: number | null,
+        t4p1: number | null,
+        t4p2: number | null,
+        s5p1: number | null,
+        s5p2: number | null,
+        t5p1: number | null,
+        t5p2: number | null,
+        winner_id: string,
+        Edition: {
+            year: number,
+            environment: string,
+            surface: string,
+            hard_type: string,
+            sponsor_name: string,
+            start_date: Date,
+            end_date: Date
+        },
+        player1: PlayerSearch,
+        player2: PlayerSearch,
+        entry1: {
+            seed: number | null,
+            status: string | null
+        },
+        entry2: {
+            seed: number | null,
+            status: string | null
+        }
     }
 }
