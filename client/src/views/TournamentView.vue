@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TournamentService from '@/services/TournamentService';
-import { computed, onMounted, ref, type Ref } from 'vue';
+import { computed, onMounted, ref, type Ref, watch } from 'vue';
 import { type Tournament } from '@/components/utils';
 import TournamentCard from '@/components/Tournament/TournamentCard.vue';
 
@@ -10,6 +10,11 @@ const props = defineProps<{
 }>()
 const tournament: Ref<Tournament | null> = ref(null)
 
+const updateDocumentTitle = () => {
+    const tournamentName = props.name
+    document.title = `${tournamentName.replace(/_/g, ' ')} | TennisHistory`
+}
+
 const years = computed(() => {
     return !tournament.value?.end_year ? `${tournament.value?.start_year} - present` :
         tournament.value.start_year === tournament.value.end_year ? tournament.value.start_year :
@@ -18,12 +23,13 @@ const years = computed(() => {
 
 onMounted(() => {
     TournamentService.getTournamentById(parseInt(props.id))
-    .then(response => {
-        tournament.value = response.data
-        console.log(tournament.value)
-    })
+    .then(response => tournament.value = response.data)
     .catch(e => console.log(e))
 })
+
+watch(() => props.name, () => {
+    updateDocumentTitle()
+}, {immediate: true})
 </script>
 
 <template>
@@ -52,7 +58,7 @@ onMounted(() => {
                 <v-col
                     cols="12"
                     sm="6"
-                    md="3"
+                    lg="3"
                     v-for="edition in tournament.Editions"
                     :key="edition.id"
                 >

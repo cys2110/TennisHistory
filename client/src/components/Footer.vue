@@ -3,11 +3,11 @@
         class="flex-col !bg-indigo-800 max-h-24"
     >
         <div class="px-4">
-            <!--need to add about link-->
             <v-btn
                 class="!text-indigo-50"
                 rounded="xl"
                 variant="text"
+                :to="{name: 'About'}"
             >
                 About
             </v-btn>

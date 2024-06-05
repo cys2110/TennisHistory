@@ -43,7 +43,7 @@ const vuetify = createVuetify({
         },
         ShortCard: {
           variant: 'text',
-          class: '!bg-indigo-800',
+          class: 'bg-indigo-800',
           rounded: 'xl'
         },
         VAvatar: {

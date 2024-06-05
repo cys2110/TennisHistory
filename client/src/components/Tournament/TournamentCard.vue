@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, type Ref } from 'vue';
-import { type EditionsOfTournament, headshot, flagSrc } from '../utils';
+import { type EditionsOfTournament, headshot, flagSrc, encodeName } from '../utils';
 import { DateTime } from 'luxon'
 
 const props = defineProps<{
@@ -44,8 +44,12 @@ const formattedScore = computed(() => {
                     </v-avatar>
                 </v-col>
                 <v-col class="flex items-center mx-2">
-                    <!--routerlink-->
-                    {{ edition.winner.full_name }}
+                    <router-link
+                        :to="{name: 'Player', params: {id: edition.winner.id, name: encodeName(edition.winner.full_name)}}"
+                        class="hover-link"
+                    >
+                        {{ edition.winner.full_name }}
+                    </router-link>
                 </v-col>
             </v-row>
 
@@ -69,8 +73,12 @@ const formattedScore = computed(() => {
                     </v-avatar>
                 </v-col>
                 <v-col class="flex items-center mx-2">
-                    <!--routerlink-->
-                    {{ edition.finalist.full_name }}
+                    <router-link
+                        :to="{name: 'Player', params: {id: edition.finalist.id, name: encodeName(edition.finalist.full_name)}}"
+                        class="hover-link"
+                    >
+                        {{ edition.finalist.full_name }}
+                    </router-link>
                 </v-col>
             </v-row>
 

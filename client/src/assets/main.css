@@ -22,7 +22,7 @@
 .hover-link:hover,
 .hover-link:focus,
 .hover-link:active {
-background-size: 100% 0.1em;
+  background-size: 100% 0.1em;
 }
 
 /* .mini-flag {
