@@ -9,26 +9,24 @@ exports.findMatch = (req, res) => {
         where: {
             MatchScoreId: id
         },
+        attributes: ['id', 'p1_aces', 'p1_dfs', 'p1_serve1', 'p1_total_serve1', 'p1_serve1_pts_w', 'p1_serve1_pts', 'p1_serve2_pts_w', 'p1_serve2_pts', 'p1_bps_saved', 'p1_bps_faced', 'p1_sv_gms', 'p1_ret1_w', 'p1_ret1', 'p1_ret2_w', 'p1_ret2', 'p1_bp_opps', 'p1_bps_converted', 'p1_ret_gms', 'p1_net_w', 'p1_net', 'p1_winners', 'p1_ues', 'p1_sv_pts', 'p1_sv_pts_total', 'p1_ret_pts', 'p1_ret_pts_total', 'p1_pts', 'total_pts', 'p1_max_speed_kph', 'p1_max_speed_mph', 'p1_avg_sv1_kph', 'p1_avg_sv1_mph', 'p1_avg_sv2_kph', 'p1_avg_sv2_mph', 'p2_aces', 'p2_dfs', 'p2_serve1', 'p2_total_serve1', 'p2_serve1_pts_w', 'p2_serve1_pts', 'p2_serve2_pts_w', 'p2_serve2_pts', 'p2_bps_saved', 'p2_bps_faced', 'p2_sv_gms', 'p2_ret1_w', 'p2_ret1', 'p2_ret2_w', 'p2_ret2', 'p2_bp_opps', 'p2_bps_converted', 'p2_ret_gms', 'p2_net_w', 'p2_net', 'p2_winners', 'p2_ues', 'p2_sv_pts', 'p2_sv_pts_total', 'p2_ret_pts', 'p2_ret_pts_total', 'p2_pts', 'p2_max_speed_kph', 'p2_max_speed_mph', 'p2_avg_sv1_kph', 'p2_avg_sv1_mph', 'p2_avg_sv2_kph', 'p2_avg_sv2_mph'],
         include: {
             model: db.MatchScore,
+            attributes: ['id', 'round', 'incomplete', 'umpire', 'date', 'duration_mins', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p2', 'winner_id'],
             include: [
                 {
                 model: db.Edition,
-                include: {
-                    model: db.Tournament,
-                    attributes: ['name', 'id']
-                },
                 attributes: ['id', 'category', 'environment', 'surface', 'hard_type', 'start_date', 'end_date', 'year', 'sponsor_name']
                 },
                 {
                     model: db.Player,
                     as: 'player1',
-                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'country', 'headshot']
+                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
                 },
                 {
                     model: db.Player,
                     as: 'player2',
-                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'country', 'headshot']
+                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
                 },
                 {
                     model: db.Entry,
