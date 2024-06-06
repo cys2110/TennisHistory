@@ -30,10 +30,10 @@ const index = computed(() => {
         <v-row class="mb-2" dense>
             <v-col>
                 <v-progress-linear
+                    class="bg-red-800"
                     rounded
                     height="20"
                     color="#166534"
-                    class="bg-red-800"
                     :max="total"
                     :model-value="win"
                 >

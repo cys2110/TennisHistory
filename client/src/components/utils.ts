@@ -1,4 +1,5 @@
 import { DateTime, Duration } from 'luxon'
+import type { EditionByPlayer } from './interfaces'
 
 // variables
 
@@ -84,6 +85,8 @@ export const incomplete = (status: string) => {
             return 'Def.'
         case 'WO':
             return 'Walkover'
+        case 'B':
+            return 'Bye'
     }
 }
 
@@ -99,13 +102,11 @@ export const percentage = (value1: number, total: number) => {
     return value1 / total * 100
 }
 
-type GenericObject = { [key: string]: any };
-
-export function groupObjectsByKey(array: GenericObject[], key: string): { [key: string]: GenericObject[] } {
-  const groupedArrays: { [key: string]: GenericObject[] } = {};
+export function groupObjectsByKey(array: EditionByPlayer[], key: string): { [key: string]: EditionByPlayer[] } {
+  const groupedArrays: { [key: string]: EditionByPlayer[] } = {};
 
   array.forEach(obj => {
-    const value = obj[key];
+    const value = (obj as any)[key];
     if (!groupedArrays[value]) {
       groupedArrays[value] = [obj];
     } else {

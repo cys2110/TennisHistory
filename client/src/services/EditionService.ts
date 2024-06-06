@@ -29,7 +29,7 @@ export default {
     getMatchStats(id: number) {
         return apiClient.get(`match/${id}`)
     },
-    getPlayerStats(player: string, year: number, surface: string) {
+    getPlayerStats(player: string, year: number | string, surface: string) {
         return apiClient.get(`stats?player=${player}&year=${year}&surface=${surface}`)
     },
     getTiesByEdition(id: number) {
