@@ -120,7 +120,7 @@ exports.getEntriesByPlayer = async (req, res) => {
                 '$Edition.year$': year,
                 wd: null
             },
-            attributes: ['rank', 'points', 'pm']
+            attributes: ['rank', 'points', 'pm', 'id']
         })
 
         const prizeMoney = entries.reduce((total, entry) => total + entry.pm, 0)
