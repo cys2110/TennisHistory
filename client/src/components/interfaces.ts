@@ -19,6 +19,17 @@ export interface Edition {
     edition_no: number,
 }
 
+export interface EditionByPlayer extends Edition {
+    environment: string,
+    surface: string,
+    hard_type: string | null,
+    sponsor_name: string,
+    year: number,
+    winner_id: string,
+    finalist_id: string,
+    Tournament: Tournament
+}
+
 export interface EditionsOfTournament extends Edition {
     year: number,
     final_score: string | null,
@@ -91,6 +102,60 @@ interface Entries {
     lda: number | null,
     defaulted: string | null,
     Player: Player
+}
+
+export interface EntriesByPlayer {
+    id: number,
+    rank: number | null,
+    points: number | null,
+    pm: number | null,
+    Edition: EntriesEdition,
+    entry1: EntriesMatch[],
+    entry2: EntriesMatch[]
+}
+
+interface EntriesEdition {
+    sponsor_name: string | null,
+    category: string | null,
+    city: string,
+    country: string,
+    start_date: Date,
+    end_date: Date,
+    environment: string,
+    surface: string,
+    hard_type: string | null,
+    Tournament: Tournament,
+    currency: string | null,
+    year: number
+}
+
+export interface EntriesMatch {
+    id: number,
+    round: string,
+    incomplete: string | null,
+    s1p1: number | null,
+    s1p2: number | null,
+    t1p1: number | null,
+    t1p2: number | null,
+    s2p1: number | null,
+    s2p2: number | null,
+    t2p1: number | null,
+    t2p2: number | null,
+    s3p1: number | null,
+    s3p2: number | null,
+    t3p1: number | null,
+    t3p2: number | null,
+    s4p1: number | null,
+    s4p2: number | null,
+    t4p1: number | null,
+    t4p2: number | null,
+    s5p1: number | null,
+    s5p2: number | null,
+    t5p1: number | null,
+    t5p2: number | null,
+    winner_id: string,
+    player1: Player,
+    player2: Player
 }
 
 // Match Scores
@@ -386,4 +451,50 @@ export interface WLIndex {
     lhTotal1: number,
     lhWins2: number,
     lhTotal2: number
+}
+
+export interface Index {
+    category: string,
+    stats: {
+        metric: string,
+        win: number,
+        total: number,
+        titles?: number
+    }[]
+}
+
+export interface PlayerStat {
+    category: string,
+    stats: {
+        metric: string,
+        win?: number,
+        total: number,
+    }[]
+}
+
+export interface RawPlayerStat {
+    aces: number,
+    dfs: number,
+    serve1_in: number,
+    total_serve1: number,
+    serve1_pts_w: number,
+    serve1_pts: number,
+    serve2_pts_w: number,
+    serve2_pts: number,
+    bps_saved: number,
+    bps_faced: number,
+    ret1_w: number,
+    ret1: number,
+    ret2_w: number,
+    ret2: number,
+    bp_opps: number,
+    bps_converted: number,
+    sv_pts: number,
+    sv_pts_total: number,
+    ret_pts: number,
+    ret_pts_total: number,
+    pts_w: number,
+    total_pts: number,
+    "MatchScore.id": number,
+    "MatchScore.Edition.id": number
 }

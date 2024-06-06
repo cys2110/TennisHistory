@@ -8,6 +8,7 @@ import PlayerStatItem from '@/components/H2H/PlayerStatItem.vue';
 import H2HItem from '@/components/H2H/H2HItem.vue';
 import { useDisplay } from 'vuetify';
 import { DateTime } from 'luxon'
+import ScoreItem from '@/components/H2H/ScoreItem.vue';
 
 const props = defineProps<{
     p1Id: string,
@@ -297,13 +298,10 @@ watch(() => [props.p1Name, props.p2Name], () => {
                                 <td class="text-center">{{ round(match.round) }}</td>
                                 <td class="text-center">{{ match.Edition.environment }} {{ match.Edition.surface }}</td>
                                 <td class="text-center whitespace-nowrap">
-                                    <span v-if="match.winner_id === match.p1" v-for="num in Array.from({ length: 5 }, (_, index) => index + 1)">
-                                        {{ match[`s${num}p1`] }}{{ match[`s${num}p2`] }}<sup>{{ match[`t${num}p1`] > match[`t${num}p2`] ? match[`t${num}p2`] : match[`t${num}p1`] }}</sup>&nbsp;
-                                    </span>
-                                    <span v-else v-for="num in Array.from({ length: 5 }, (_, index) => index + 1)">
-                                        {{ match[`s${num}p2`] }}{{ match[`s${num}p1`] }}<sup>{{ match[`t${num}p1`] > match[`t${num}p2`] ? match[`t${num}p2`] : match[`t${num}p1`] }}</sup>&nbsp;
-                                    </span>
-                                    <span v-if="match.incomplete">{{ incomplete(match.incomplete) }}</span>
+                                    <div class="flex justify-center">
+                                        <ScoreItem :match />
+                                        <span v-if="match.incomplete">{{ incomplete(match.incomplete) }}</span>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
