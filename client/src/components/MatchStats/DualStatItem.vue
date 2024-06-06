@@ -15,11 +15,11 @@ const props = defineProps<{
                 <div class="text-sm text-left mb-0.5">{{ p1Value }}/{{ p1Total }}</div>
                 <div>
                     <v-progress-linear
+                        class="bg-green-800"
                         rounded
                         height="20"
                         :max="p1Total"
                         color="#3730a3"
-                        class="bg-green-800"
                         :model-value="p1Value"
                     >
                         <span class="text-sm">{{ percentage(p1Value, p1Total).toFixed(0) }}%</span>
@@ -35,11 +35,11 @@ const props = defineProps<{
                 <div class="text-sm text-right mb-0.5">{{ p2Value }}/{{ p2Total }}</div>
                 <div>
                     <v-progress-linear
+                        class="bg-indigo-800"
                         rounded
                         height="20"
                         :max="p2Total"
                         color="#166534"
-                        class="bg-indigo-800"
                         :model-value="p2Value"
                     >
                         <span class="text-sm">{{ percentage(p2Value, p2Total).toFixed(0) }}%</span>

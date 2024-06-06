@@ -1,19 +1,14 @@
 <script setup lang="ts">
-import TournamentService from '@/services/TournamentService';
 import { computed, onMounted, ref, type Ref, watch } from 'vue';
-import { type Tournament } from '@/components/utils';
 import TournamentCard from '@/components/Tournament/TournamentCard.vue';
+import TournamentService from '@/services/TournamentService';
+import type { TournamentDetails } from '@/components/interfaces';
 
 const props = defineProps<{
     id: string,
     name: string
 }>()
-const tournament: Ref<Tournament | null> = ref(null)
-
-const updateDocumentTitle = () => {
-    const tournamentName = props.name
-    document.title = `${tournamentName.replace(/_/g, ' ')} | TennisHistory`
-}
+const tournament: Ref<TournamentDetails | null> = ref(null)
 
 const years = computed(() => {
     return !tournament.value?.end_year ? `${tournament.value?.start_year} - present` :
@@ -27,6 +22,11 @@ onMounted(() => {
     .catch(e => console.log(e))
 })
 
+const updateDocumentTitle = () => {
+    const tournamentName = props.name
+    document.title = `${tournamentName.replace(/_/g, ' ')} | TennisHistory`
+}
+
 watch(() => props.name, () => {
     updateDocumentTitle()
 }, {immediate: true})
@@ -38,16 +38,20 @@ watch(() => props.name, () => {
             <v-row>
                 <div class="text-zinc-300 text-3xl">{{ tournament.name }}</div>
                 <div class="text-xs ml-3">
-                    <a v-if="tournament.website" :href="tournament.website" target="_blank">
+                    <a
+                        v-if="tournament.website"
+                        :href="tournament.website"
+                        target="_blank"
+                    >
                         <v-icon
                             icon="fad fa-arrow-up-right-from-square"
                             :href="tournament.website"
                         />
                         <v-tooltip
+                            content-class="!bg-indigo-800 !text-zinc-300 !text-sm"
                             text="Go to website"
                             activator="parent"
                             location="end"
-                            content-class="!bg-indigo-800 !text-zinc-300 !text-sm"
                             height="30"
                         />
                     </a>
@@ -56,11 +60,11 @@ watch(() => props.name, () => {
             <v-row class="text-xl my-5 text-zinc-300">{{ years }}</v-row>
             <v-row>
                 <v-col
+                    v-for="edition in tournament.Editions"
+                    :key="edition.id"
                     cols="12"
                     sm="6"
                     lg="3"
-                    v-for="edition in tournament.Editions"
-                    :key="edition.id"
                 >
                     <TournamentCard :edition />
                 </v-col>

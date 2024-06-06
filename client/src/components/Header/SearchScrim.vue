@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import SearchService from '@/services/SearchService';
 import { ref, type Ref } from 'vue';
-import { type PlayerSearch, type SearchTournament, encodeName, flagSrc, headshot } from '../utils';
 import { useDisplay } from 'vuetify';
+import SearchService from '@/services/SearchService';
+import { encodeName, flagSrc, headshot } from '../utils';
+import type { Player, Tournament } from '../interfaces';
 
 const { smAndUp } = useDisplay()
 const searchTerm: Ref<string> = ref('')
-const tournamentResults: Ref<SearchTournament[]> = ref([])
-const playerResults: Ref<PlayerSearch[]> = ref([])
+const tournamentResults: Ref<Tournament[]> = ref([])
+const playerResults: Ref<Player[]> = ref([])
 
 const submitSearch = () => {
     SearchService.search(searchTerm.value)
@@ -21,8 +22,8 @@ const submitSearch = () => {
 
 <template>
     <short-card
-        :width="smAndUp ? '60%' : '100%'"
         class="mx-auto"
+        :width="smAndUp ? '60%' : '100%'"
     >
         <!--Searchbar-->
         <v-card-actions>

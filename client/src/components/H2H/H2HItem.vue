@@ -19,11 +19,11 @@ const props = defineProps<{
         </div>
         <div v-if="meter">
             <v-progress-linear
+                class="!bg-green-800"
                 height="10"
                 rounded
                 max="100"
                 color="#3730a3"
-                class="!bg-green-800"
                 :model-value="meter"
             />
         </div>

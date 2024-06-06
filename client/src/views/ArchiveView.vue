@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { DateTime } from 'luxon'
 import { ref, watch, type Ref } from 'vue';
-import { type ArchiveEdition } from '@/components/utils';
 import ArchiveCard from '@/components/Archive/ArchiveCard.vue';
 import EditionService from '@/services/EditionService';
+import type { ArchiveEdition } from '@/components/interfaces';
 
 const years = Array.from({length: (DateTime.now().year + 1) - 1968}, (_, index) => 2024 - index)
 const searchYear: Ref<number> = ref(2024)
@@ -25,10 +25,10 @@ watch(searchYear, () => {
                 <v-col class="text-3xl text-zinc-300">Results Archive</v-col>
                 <v-col cols="12" sm="3">
                     <v-combobox
+                        class="text-zinc-300"
                         variant="underlined"
                         v-model="searchYear"
                         :items="years"
-                        class="text-zinc-300"
                     />
                 </v-col>
             </v-row>
