@@ -99,259 +99,27 @@ export const percentage = (value1: number, total: number) => {
     return value1 / total * 100
 }
 
-// types
+type GenericObject = { [key: string]: any };
 
-export interface UpcomingEdition {
-    id: number,
-    edition_no: number,
-    sponsor_name: string | null,
-    category: string | null,
-    city: string,
-    country: string,
-    start_date: Date,
-    end_date: Date,
-    environment: string,
-    surface: string,
-    hard_type: string | null,
-    Tournament: SearchTournament
-}
+export function groupObjectsByKey(array: GenericObject[], key: string): { [key: string]: GenericObject[] } {
+  const groupedArrays: { [key: string]: GenericObject[] } = {};
 
-export interface ArchiveEdition extends UpcomingEdition {
-    year: number,
-}
-
-export interface EditionsOfTournament {
-    id: number,
-    edition_no: number,
-    year: number,
-    final_score: string | null,
-    end_date: Date,
-    winner: PlayerSearch,
-    finalist: PlayerSearch
-}
-
-export interface Tournament extends SearchTournament {
-    start_year: number,
-    end_year: number | null,
-    website: string | null,
-    Editions: EditionsOfTournament[]
-}
-
-export interface SearchTournament {
-    id: number,
-    name: string
-}
-
-export interface PlayerSearch {
-    id: string,
-    first_name: string,
-    last_name: string,
-    full_name: string,
-    country: string,
-}
-
-export interface Player extends PlayerSearch {
-    country_yr: number | null,
-    prev_country: string | null,
-    prev_country_yr: number | null,
-    first_country: string | null,
-    status: boolean,
-    turned_pro: number,
-    retired: number | null,
-    dob: Date | null,
-    rh: boolean | null,
-    bh1: boolean | null,
-    height_cm: number | null,
-    height_ft: string | null,
-    coaches: string[] | null,
-    career_high: number | null,
-    ch_date: Date | null,
-    pm_USD: number,
-    titles: number,
-    win: number,
-    loss: number,
-    gladiator: boolean,
-    ao_round: string | null,
-    ao_years: number[] | null,
-    rg_round: string | null,
-    rg_years: number[] | null,
-    wimbledon_round: string | null,
-    wimbledon_years: number[] | null,
-    uso_round: string | null,
-    uso_years: number[] | null,
-    finals_round: string | null,
-    finals_years: number[] | null,
-    davis_round: string | null,
-    davis_years: number[] | null,
-    olympics_round: string | null,
-    olympics_years: number[] | null,
-    hopman_round: string | null,
-    hopman_years: number[] | null,
-    gs_cup_round: string | null,
-    gs_cup_years: number[] | null,
-    wct_round: string | null,
-    wct_years: number[] | null,
-    createdAt: Date,
-    updatedAt: Date
-}
-
-export interface MatchH2H {
-    id: number,
-    round: string,
-    incomplete: string | null,
-    s1p1: number | null,
-    s1p2: number | null,
-    t1p1: number | null,
-    t1p2: number | null,
-    s2p1: number | null,
-    s2p2: number | null,
-    t2p1: number | null,
-    t2p2: number | null,
-    s3p1: number | null,
-    s3p2: number | null,
-    t3p1: number | null,
-    t3p2: number | null,
-    s4p1: number | null,
-    s4p2: number | null,
-    t4p1: number | null,
-    t4p2: number | null,
-    s5p1: number | null,
-    s5p2: number | null,
-    t5p1: number | null,
-    t5p2: number | null,
-    createdAt: Date,
-    updatedAt: Date,
-    p1: string,
-    p2: string,
-    EditionId: number,
-    p1_no: number,
-    p2_no: number,
-    TieId: number | null,
-    winner_id: string,
-    Edition: {
-        year: number,
-        environment: string,
-        surface: string,
-        edition_no: number,
-        Tournament: SearchTournament
+  array.forEach(obj => {
+    const value = obj[key];
+    if (!groupedArrays[value]) {
+      groupedArrays[value] = [obj];
+    } else {
+      groupedArrays[value].push(obj);
     }
+  });
+
+  return groupedArrays;
 }
 
-export interface MatchStat {
-    id: number,
-    p1_aces: number,
-    p1_dfs: number,
-    p1_serve1: number,
-    p1_total_serve1: number,
-    p1_serve1_pts_w: number,
-    p1_serve1_pts: number,
-    p1_serve2_pts_w: number,
-    p1_serve2_pts: number,
-    p1_bps_saved: number,
-    p1_bps_faced: number,
-    p1_sv_gms: number | null,
-    p1_ret1_w: number,
-    p1_ret1: number,
-    p1_ret2_w: number,
-    p1_ret2: number,
-    p1_bp_opps: number,
-    p1_bps_converted: number,
-    p1_ret_gms: number | null,
-    p1_net_w: number | null,
-    p1_net: number | null,
-    p1_winners: number | null,
-    p1_ues: number | null,
-    p1_sv_pts: number,
-    p1_sv_pts_total: number,
-    p1_ret_pts: number,
-    p1_ret_pts_total: number,
-    p1_pts: number,
-    total_pts: number,
-    p1_max_speed_kph: number | null,
-    p1_max_speed_mph: number | null,
-    p1_avg_sv1_kph: number | null,
-    p1_avg_sv1_mph: number | null,
-    p1_avg_sv2_kph: number | null,
-    p1_avg_sv2_mph: number | null,
-    p2_aces: number,
-    p2_dfs: number,
-    p2_serve1: number,
-    p2_total_serve1: number,
-    p2_serve1_pts_w: number,
-    p2_serve1_pts: number,
-    p2_serve2_pts_w: number,
-    p2_serve2_pts: number,
-    p2_bps_saved: number,
-    p2_bps_faced: number,
-    p2_sv_gms: number | null,
-    p2_ret1_w: number,
-    p2_ret1: number,
-    p2_ret2_w: number,
-    p2_ret2: number,
-    p2_bp_opps: number,
-    p2_bps_converted: number,
-    p2_ret_gms: number | null,
-    p2_net_w: number | null,
-    p2_net: number | null,
-    p2_winners: number | null,
-    p2_ues: number | null,
-    p2_sv_pts: number,
-    p2_sv_pts_total: number,
-    p2_ret_pts: number,
-    p2_ret_pts_total: number,
-    p2_pts: number,
-    p2_max_speed_kph: number | null,
-    p2_max_speed_mph: number | null,
-    p2_avg_sv1_kph: number | null,
-    p2_avg_sv1_mph: number | null,
-    p2_avg_sv2_kph: number | null,
-    p2_avg_sv2_mph: number | null,
-    MatchScore: {
-        id: number,
-        round: string,
-        incomplete: string | null,
-        umpire: string | null,
-        duration_mins: number | null,
-        date: Date | null,
-        s1p1: number | null,
-        s1p2: number | null,
-        t1p1: number | null,
-        t1p2: number | null,
-        s2p1: number | null,
-        s2p2: number | null,
-        t2p1: number | null,
-        t2p2: number | null,
-        s3p1: number | null,
-        s3p2: number | null,
-        t3p1: number | null,
-        t3p2: number | null,
-        s4p1: number | null,
-        s4p2: number | null,
-        t4p1: number | null,
-        t4p2: number | null,
-        s5p1: number | null,
-        s5p2: number | null,
-        t5p1: number | null,
-        t5p2: number | null,
-        winner_id: string,
-        Edition: {
-            year: number,
-            environment: string,
-            surface: string,
-            hard_type: string,
-            sponsor_name: string,
-            start_date: Date,
-            end_date: Date
-        },
-        player1: PlayerSearch,
-        player2: PlayerSearch,
-        entry1: {
-            seed: number | null,
-            status: string | null
-        },
-        entry2: {
-            seed: number | null,
-            status: string | null
-        }
+export function tiebreak (matchScore: number, tiebreakScore: number) {
+    if (matchScore === 6) {
+        return tiebreakScore
+    } else {
+        return
     }
 }

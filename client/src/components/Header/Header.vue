@@ -1,102 +1,75 @@
 <script setup lang="ts">
+import { useDisplay } from 'vuetify';
 import H2HScrim from './H2HScrim.vue';
 import SearchScrim from './SearchScrim.vue';
-import { useDisplay } from 'vuetify';
 
 const { smAndDown } = useDisplay()
+
+const items = [
+    {
+        route: 'Home',
+        icon: 'fas fa-house',
+        tooltip: 'Home'
+    },
+    {
+        route: 'Archive',
+        icon: 'far fa-calendar',
+        tooltip: 'Results Archive'
+    },
+    {
+        icon: 'fad fa-people-arrows',
+        tooltip: 'Head to Head',
+        dialogComponent: H2HScrim
+    },
+    {
+        icon: 'fas fa-magnifying-glass',
+        tooltip: 'Search',
+        dialogComponent: SearchScrim
+    }
+]
 </script>
 
 <template>
     <v-app-bar
-        scroll-behavior="elevate"
         class="!bg-indigo-800 px-3"
+        scroll-behavior="elevate"
     >
         <v-app-bar-title
-            text="Tennis History"
             class="custom-font !text-xl sm:!text-2xl md:!text-3xl"
+            text="Tennis History"
         />
-        <!--Home-->
-        <v-btn
-            :to="{name: 'Home'}"
-            :density="smAndDown ? 'comfortable' : 'default'"
-            icon=""
-            class="mx-1"
+        <div
+            v-for="item in items"
+            :key="item.tooltip"
         >
-            <v-icon icon="fas fa-house" />
-            <v-tooltip
-                text="Home"
-                activator="parent"
-                location="bottom"
-                content-class="!bg-indigo-600 !text-zinc-300 !text-sm"
-                height="30"
-            />
-        </v-btn>
-        <!--Archive-->
-        <v-btn
-            :to="{name: 'Archive'}"
-            :density="smAndDown ? 'comfortable' : 'default'"
-            icon=""
-            class="mx-1"
-        >
-            <v-icon icon="far fa-calendar" />
-            <v-tooltip
-                text="Results Archive"
-                activator="parent"
-                location="bottom"
-                content-class="!bg-indigo-600 !text-zinc-300 !text-sm"
-                height="30"
-            />
-        </v-btn>
-        <!--Head to head-->
-        <v-btn
-            icon=""
-            :density="smAndDown ? 'comfortable' : 'default'"
-        >
-            <v-icon icon="fad fa-people-arrows" />
-            <v-tooltip
-                text="Head to Head"
-                activator="parent"
-                location="bottom"
-                content-class="!bg-indigo-600 !text-zinc-300 !text-sm"
-                height="30"
-            />
-            <v-dialog
-                activator="parent"
-                transition="dialog-bottom-transition"
-                height="70%"
-                opacity="50%"
-                scroll-strategy="reposition"
+            <v-btn
+                class="mx-1"
+                :to="item.route ? {name: item.route} : ''"
+                :density="smAndDown ? 'comfortable' : 'default'"
+                icon=""
             >
-                <template v-slot:default="{ isActive }">
-                    <H2HScrim @close="isActive.value = false" />
-                </template>
-            </v-dialog>
-        </v-btn>
-        <!--Search-->
-        <v-btn
-            icon=""
-            :density="smAndDown ? 'comfortable' : 'default'"
-        >
-            <v-icon icon="fas fa-magnifying-glass" />
-            <v-tooltip
-                text="Search"
-                activator="parent"
-                location="bottom"
-                content-class="!bg-indigo-600 !text-zinc-300 !text-sm"
-                height="30"
-            />
-            <v-dialog
-                activator="parent"
-                transition="dialog-bottom-transition"
-                height="70%"
-                opacity="50%"
-                scroll-strategy="reposition"
-            >
-                <template v-slot:default="{isActive}">
-                    <SearchScrim @close="isActive.value = false" />
-                </template>
-            </v-dialog>
-        </v-btn>
+                <v-icon :icon="item.icon" />
+                <v-tooltip
+                    content-class="!bg-indigo-600 !text-zinc-300 !text-sm"
+                    :text="item.tooltip"
+                    activator="parent"
+                    location="bottom"
+                    height="30"
+                />
+                <v-dialog
+                    v-if="item.dialogComponent"
+                    activator="parent"
+                    transition="dialog-bottom-transition"
+                    height="70%"
+                    opacity="50%"
+                    scroll-strategy="reposition"
+                >
+                    <template v-slot:default="{ isActive }">
+                        <component :is="item.dialogComponent" @close="isActive.value = false" />
+                    </template>
+                </v-dialog>
+            </v-btn>
+        </div>
     </v-app-bar>
 </template>
 

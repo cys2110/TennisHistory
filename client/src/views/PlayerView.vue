@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { type Player, gladiator, headshot, formatDate, formatCurrency, flagSrc } from '@/components/utils';
+import OverviewWindow from '@/components/Player/OverviewWindow.vue';
+import TitlesWindow from '@/components/Player/TitlesWindow.vue';
+import WLIndexWindow from '@/components/Player/WLIndexWindow.vue';
+import { gladiator, headshot, formatDate, formatCurrency, flagSrc } from '@/components/utils';
+import type { PlayerDetails } from '@/components/interfaces';
 import PlayerService from '@/services/PlayerService';
 import { onMounted, ref, watch, type Ref } from 'vue';
 import { useDisplay } from 'vuetify';
@@ -10,7 +14,7 @@ const props = defineProps<{
 }>()
 const { mdAndUp } = useDisplay()
 
-const player: Ref<Player | null> = ref(null)
+const player: Ref<PlayerDetails | null> = ref(null)
 const tab: Ref<string> = ref('overview')
 
 const updateDocumentTitle = () => {
@@ -30,7 +34,7 @@ watch(() => props.name, () => {
 </script>
 
 <template>
-    <view-sheet>
+    <v-sheet class="w-5/6 md:w-8/12 lg:w-1/2 mx-auto my-3 bg-transparent">
         <v-container v-if="player">
             <v-row>
                 <v-col :order="mdAndUp ? 1 : 2" cols="12" md="9" class="text-zinc-300">
@@ -151,10 +155,16 @@ watch(() => props.name, () => {
             <v-row>
                 <v-col>
                     <v-window v-model="tab">
-                        <v-window-item value="overview"></v-window-item>
+                        <v-window-item value="overview">
+                            <OverviewWindow :player />
+                        </v-window-item>
                         <v-window-item value="activity"></v-window-item>
-                        <v-window-item value="titles"></v-window-item>
-                        <v-window-item value="wlIndex"></v-window-item>
+                        <v-window-item value="titles">
+                            <TitlesWindow :id="player.id" />
+                        </v-window-item>
+                        <v-window-item value="wlIndex">
+                            <WLIndexWindow :id="player.id" />
+                        </v-window-item>
                         <v-window-item value="stats"></v-window-item>
                     </v-window>
                 </v-col>
@@ -164,5 +174,5 @@ watch(() => props.name, () => {
             <div class="text-3xl text-zinc-300">{{ props.name.replace(/_/g, ' ') }}</div>
             <div class="text-zinc-400 my-3">No data available yet</div>
         </div>
-    </view-sheet>
+    </v-sheet>
 </template>

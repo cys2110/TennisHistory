@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import H2HService from '@/services/H2HService';
 import PlayerService from '@/services/PlayerService';
-import { type Player, type MatchH2H, flagSrc, headshot, formatCurrency, formatDate, round, encodeName, incomplete, plays, bh, percentage } from '@/components/utils';
+import { flagSrc, headshot, formatCurrency, formatDate, round, encodeName, incomplete, plays, bh, percentage } from '@/components/utils';
+import type { PlayerDetails, MatchH2H } from '@/components/interfaces';
 import { onMounted, ref, watch, type Ref } from 'vue';
 import PlayerStatItem from '@/components/H2H/PlayerStatItem.vue';
 import H2HItem from '@/components/H2H/H2HItem.vue';
@@ -16,8 +17,8 @@ const props = defineProps<{
 }>()
 const { mdAndUp, smAndUp } = useDisplay()
 
-const p1: Ref<Player | null> = ref(null)
-const p2: Ref<Player | null> = ref(null)
+const p1: Ref<PlayerDetails | null> = ref(null)
+const p2: Ref<PlayerDetails | null> = ref(null)
 const matches: Ref<MatchH2H[]> = ref([])
 const p1Wins: Ref<number> = ref(0)
 const p2Wins: Ref<number> = ref(0)

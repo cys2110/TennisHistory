@@ -2,16 +2,17 @@
 import DualStatItem from '@/components/MatchStats/DualStatItem.vue';
 import ServiceStatItem from '@/components/MatchStats/ServiceStatItem.vue';
 import StatItem from '@/components/MatchStats/StatItem.vue';
-import { type MatchStat, formatDate, formattedDates, round, formatTime, flagSrc, headshot, status, incomplete } from '@/components/utils';
+import { formatDate, formattedDates, round, formatTime, flagSrc, headshot, status, incomplete } from '@/components/utils';
+import type { MatchStat } from '@/components/interfaces';
 import EditionService from '@/services/EditionService';
 import { ref, type Ref, watch, onMounted } from 'vue';
 import { useDisplay } from 'vuetify';
 
 const props = defineProps<{
-    matchId: number,
+    matchId: string,
     name: string,
-    id: number,
-    editionNo: number,
+    id: string,
+    editionNo: string,
     p1: string,
     p2: string
 }>()
@@ -26,7 +27,7 @@ const updateDocumentTitle = () => {
 }
 
 onMounted(() => {
-    EditionService.getMatchStats(props.matchId)
+    EditionService.getMatchStats(parseInt(props.matchId))
     .then(response => match.value = response.data)
     .catch(e => console.log(e))
 })

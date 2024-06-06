@@ -2,7 +2,7 @@
 import EditionService from '@/services/EditionService';
 import UpcomingCard from '@/components/Home/UpcomingCard.vue';
 import { onMounted, ref, type Ref } from 'vue';
-import { type UpcomingEdition } from '@/components/utils';
+import type { UpcomingEdition } from '@/components/interfaces';
 
 const upcoming: Ref<UpcomingEdition[]> = ref([])
 
