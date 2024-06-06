@@ -66,7 +66,7 @@ exports.findPlayerStats = async (req, res) => {
         whereCondition2['$MatchScore.Edition.year$'] = year
        }
 
-       const p1Stats = await MatchStat.findOne({
+       const p1Stats = await MatchStat.findAll({
         attributes: [
             [sequelize.fn('sum', sequelize.col('p1_aces')), 'aces'],
             [sequelize.fn('sum', sequelize.col('p1_dfs')), 'dfs'],
@@ -105,7 +105,7 @@ exports.findPlayerStats = async (req, res) => {
         raw: true
        })
 
-       const p2Stats = await MatchStat.findOne({
+       const p2Stats = await MatchStat.findAll({
         attributes: [
             [sequelize.fn('sum', sequelize.col('p2_aces')), 'aces'],
             [sequelize.fn('sum', sequelize.col('p2_dfs')), 'dfs'],
@@ -144,25 +144,46 @@ exports.findPlayerStats = async (req, res) => {
         raw: true
        })
 
+       const summedP1 = p1Stats.reduce((acc, cur) => {
+            Object.keys(cur).forEach(key => {
+            if (!acc[key]) {
+                acc[key] = 0;
+            }
+            acc[key] += +cur[key];
+            });
+            return acc;
+        }, {})
+
+        const summedP2 = p2Stats.reduce((acc, cur) => {
+            Object.keys(cur).forEach(key => {
+            if (!acc[key]) {
+                acc[key] = 0;
+            }
+            acc[key] += +cur[key];
+            });
+            return acc;
+        }, {})
+
        function addStats(p1, p2) {
-        const result = {}
-        for (const key in p1) {
-            result[key] = parseInt(p1[key]) + parseInt(p2[key])
-        }
-        return result
+            const result = {}
+            for (const key in p1) {
+                result[key] = parseInt(p1[key]) + parseInt(p2[key])
+            }
+            return result
        }
 
        let stats
 
        if (p1Stats && p2Stats) {
-        stats = addStats(p1Stats, p2Stats)
+        stats = addStats(summedP1, summedP2)
        } else if (p1Stats) {
-        stats = p1Stats
+        stats = summedP1
        } else if (p2Stats) {
-        stats = p2Stats
+        stats = summedP2
        }
 
         const response = {
+            summedP2,
             stats
         }
 
