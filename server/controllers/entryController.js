@@ -63,6 +63,7 @@ exports.getEntriesByPlayer = async (req, res) => {
                 {
                     model: db.MatchScore,
                     as: 'entry1',
+                    attributes: ['round', 'incomplete', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p2', 'winner_id', 'id'],
                     include: [
                         {
                             model: db.Player,
@@ -73,12 +74,23 @@ exports.getEntriesByPlayer = async (req, res) => {
                             model: db.Player,
                             as: 'player2',
                             attributes: ['id', 'first_name', 'last_name', 'full_name', 'country', 'headshot']
+                        },
+                        {
+                            model: db.Entry,
+                            as: 'entry1',
+                            attributes: ['rank']
+                        },
+                        {
+                            model: db.Entry,
+                            as: 'entry2',
+                            attributes: ['rank']
                         }
                     ]
                 },
                 {
                     model: db.MatchScore,
                     as: 'entry2',
+                    attributes: ['round', 'incomplete', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p2', 'winner_id', 'id'],
                     include: [
                         {
                             model: db.Player,
@@ -89,6 +101,16 @@ exports.getEntriesByPlayer = async (req, res) => {
                             model: db.Player,
                             as: 'player2',
                             attributes: ['id', 'first_name', 'last_name', 'full_name', 'country', 'headshot']
+                        },
+                        {
+                            model: db.Entry,
+                            as: 'entry1',
+                            attributes: ['rank']
+                        },
+                        {
+                            model: db.Entry,
+                            as: 'entry2',
+                            attributes: ['rank']
                         }
                     ]
                 }
@@ -97,7 +119,8 @@ exports.getEntriesByPlayer = async (req, res) => {
                 PlayerId: player,
                 '$Edition.year$': year,
                 wd: null
-            }
+            },
+            attributes: ['rank', 'points', 'pm']
         })
 
         const prizeMoney = entries.reduce((total, entry) => total + entry.pm, 0)
