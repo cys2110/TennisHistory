@@ -92,8 +92,12 @@ exports.findByPlayer = (req, res) => {
         where: {
             [Op.or]: [{winner_id: player}, {finalist_id: player}]
         },
-        order: [['start_date', 'ASC']],
-        include: db.Tournament
+        attributes: ['id', 'edition_no', 'sponsor_name', 'year', 'environment', 'surface', 'hard_type', 'winner_id', 'finalist_id'],
+        order: [['edition_no', 'ASC']],
+        include: {
+            model: db.Tournament,
+            attributes: ['id', 'name']
+        }
     })
     .then(response => res.send(response))
     .catch(error => res.status(500).send(error.message))
