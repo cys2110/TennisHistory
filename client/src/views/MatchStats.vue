@@ -33,18 +33,18 @@ onMounted(() => {
     .then(response => {
         match.value = response.data
         p1Scores.value = [
-            { set: match.value?.MatchScore.s5p1 || '', tie: match.value?.MatchScore.t5p1 || '' },
-            { set: match.value?.MatchScore.s4p1 || '', tie: match.value?.MatchScore.t4p1 || '' },
-            { set: match.value?.MatchScore.s3p1 || '', tie: match.value?.MatchScore.t3p1 || '' },
-            { set: match.value?.MatchScore.s2p1 || '', tie: match.value?.MatchScore.t2p1 || '' },
-            { set: match.value?.MatchScore.s1p1 || '', tie: match.value?.MatchScore.t1p1 || '' },
+            { set: match.value?.MatchScore.s5p1 ?? '', tie: match.value?.MatchScore.t5p1 ?? '' },
+            { set: match.value?.MatchScore.s4p1 ?? '', tie: match.value?.MatchScore.t4p1 ?? '' },
+            { set: match.value?.MatchScore.s3p1 ?? '', tie: match.value?.MatchScore.t3p1 ?? '' },
+            { set: match.value?.MatchScore.s2p1 ?? '', tie: match.value?.MatchScore.t2p1 ?? '' },
+            { set: match.value?.MatchScore.s1p1 ?? '', tie: match.value?.MatchScore.t1p1 ?? '' },
         ]
         p2Scores.value = [
-            { set: match.value?.MatchScore.s5p2 || '', tie: match.value?.MatchScore.t5p2 || '' },
-            { set: match.value?.MatchScore.s4p2 || '', tie: match.value?.MatchScore.t4p2 || '' },
-            { set: match.value?.MatchScore.s3p2 || '', tie: match.value?.MatchScore.t3p2 || '' },
-            { set: match.value?.MatchScore.s2p2 || '', tie: match.value?.MatchScore.t2p2 || '' },
-            { set: match.value?.MatchScore.s1p2 || '', tie: match.value?.MatchScore.t1p2 || '' },
+            { set: match.value?.MatchScore.s5p2 ?? '', tie: match.value?.MatchScore.t5p2 ?? '' },
+            { set: match.value?.MatchScore.s4p2 ?? '', tie: match.value?.MatchScore.t4p2 ?? '' },
+            { set: match.value?.MatchScore.s3p2 ?? '', tie: match.value?.MatchScore.t3p2 ?? '' },
+            { set: match.value?.MatchScore.s2p2 ?? '', tie: match.value?.MatchScore.t2p2 ?? '' },
+            { set: match.value?.MatchScore.s1p2 ?? '', tie: match.value?.MatchScore.t1p2 ?? '' },
         ]
     })
     .catch(e => console.log(e))

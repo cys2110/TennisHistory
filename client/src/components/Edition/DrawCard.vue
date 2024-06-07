@@ -10,19 +10,19 @@ const props = defineProps<{
 }>()
 
 const p1Scores = [
-    { set: props.match.s5p1 || '', tie: props.match.t5p1 || '' },
-    { set: props.match.s4p1 || '', tie: props.match.t4p1 || '' },
-    { set: props.match.s3p1 || '', tie: props.match.t3p1 || '' },
-    { set: props.match.s2p1 || '', tie: props.match.t2p1 || '' },
-    { set: props.match.s1p1 || '', tie: props.match.t1p1 || '' }
+    { set: props.match.s5p1 ?? '', tie: props.match.t5p1 ?? '' },
+    { set: props.match.s4p1 ?? '', tie: props.match.t4p1 ?? '' },
+    { set: props.match.s3p1 ?? '', tie: props.match.t3p1 ?? '' },
+    { set: props.match.s2p1 ?? '', tie: props.match.t2p1 ?? '' },
+    { set: props.match.s1p1 ?? '', tie: props.match.t1p1 ?? '' }
 ]
 
 const p2Scores = [
-    { set: props.match.s5p2 || '', tie: props.match.t5p2 || '' },
-    { set: props.match.s4p2 || '', tie: props.match.t4p2 || '' },
-    { set: props.match.s3p2 || '', tie: props.match.t3p2 || '' },
-    { set: props.match.s2p2 || '', tie: props.match.t2p2 || '' },
-    { set: props.match.s1p2 || '', tie: props.match.t1p2 || '' }
+    { set: props.match.s5p2 ?? '', tie: props.match.t5p2 ?? '' },
+    { set: props.match.s4p2 ?? '', tie: props.match.t4p2 ?? '' },
+    { set: props.match.s3p2 ?? '', tie: props.match.t3p2 ?? '' },
+    { set: props.match.s2p2 ?? '', tie: props.match.t2p2 ?? '' },
+    { set: props.match.s1p2 ?? '', tie: props.match.t1p2 ?? '' }
 ]
 </script>
 
@@ -82,7 +82,7 @@ const p2Scores = [
                     cols="1"
                 >
                     <v-icon
-                        v-if="match.winner_id === match.player1.id"
+                        v-if="match.player1 && match.winner_id === match.player1.id"
                         class="text-green-500 text-[12px]"
                         icon="fad fa-check"
                     />
@@ -156,7 +156,7 @@ const p2Scores = [
                     cols="1"
                 >
                     <v-icon
-                        v-if="match.winner_id === match.player2.id"
+                        v-if="match.player2 && match.winner_id === match.player2.id"
                         class="text-green-500 text-[12px]"
                         icon="fad fa-check"
                     />
