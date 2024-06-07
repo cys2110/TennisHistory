@@ -17,6 +17,8 @@ const props = defineProps<{
     p2: string
 }>()
 const match: Ref<MatchStat | null> = ref(null)
+const p1Scores: Ref<{set: number | string, tie: number | string}[]> = ref([])
+const p2Scores: Ref<{set: number | string, tie: number | string}[]> = ref([])
 const { mdAndUp } = useDisplay()
 
 const updateDocumentTitle = () => {
@@ -28,7 +30,23 @@ const updateDocumentTitle = () => {
 
 onMounted(() => {
     EditionService.getMatchStats(parseInt(props.matchId))
-    .then(response => match.value = response.data)
+    .then(response => {
+        match.value = response.data
+        p1Scores.value = [
+            { set: match.value?.MatchScore.s5p1 || '', tie: match.value?.MatchScore.t5p1 || '' },
+            { set: match.value?.MatchScore.s4p1 || '', tie: match.value?.MatchScore.t4p1 || '' },
+            { set: match.value?.MatchScore.s3p1 || '', tie: match.value?.MatchScore.t3p1 || '' },
+            { set: match.value?.MatchScore.s2p1 || '', tie: match.value?.MatchScore.t2p1 || '' },
+            { set: match.value?.MatchScore.s1p1 || '', tie: match.value?.MatchScore.t1p1 || '' },
+        ]
+        p2Scores.value = [
+            { set: match.value?.MatchScore.s5p2 || '', tie: match.value?.MatchScore.t5p2 || '' },
+            { set: match.value?.MatchScore.s4p2 || '', tie: match.value?.MatchScore.t4p2 || '' },
+            { set: match.value?.MatchScore.s3p2 || '', tie: match.value?.MatchScore.t3p2 || '' },
+            { set: match.value?.MatchScore.s2p2 || '', tie: match.value?.MatchScore.t2p2 || '' },
+            { set: match.value?.MatchScore.s1p2 || '', tie: match.value?.MatchScore.t1p2 || '' },
+        ]
+    })
     .catch(e => console.log(e))
 })
 
@@ -94,8 +112,13 @@ watch(() => props.name, () => {
                     <v-col cols="1" class="flex items-center">
                         <v-icon v-if="match.MatchScore.winner_id === match.MatchScore.player1.id" icon="fad fa-check" class="text-green-600 text-sm" />
                     </v-col>
-                    <v-col cols="3" class="flex text-sm items-center text-zinc-300">
-                        <div v-for="num in Array.from({length: 5}, (_, index) => index + 1)" class="mx-0.5">{{ match.MatchScore[`s${num}p1`] }}<sup>{{ match.MatchScore[`t${num}p1`] }}</sup></div>
+                    <v-col cols="3" class="flex flex-row-reverse text-sm items-center text-zinc-300">
+                        <div
+                            v-for="score in p1Scores"
+                            :key="score.set"
+                        >
+                            {{ score.set }}<sup>{{ score.tie }}</sup>&nbsp;
+                        </div>
                     </v-col>
                     <v-col cols="1" v-if="match.MatchScore.incomplete" class="flex text-sm items-center text-zinc-300">
                         <div v-if="match.MatchScore.winner_id === match.MatchScore.player2.id" class="mx-0.5">{{ incomplete(match.MatchScore.incomplete) }}</div>
@@ -131,8 +154,13 @@ watch(() => props.name, () => {
                     <v-col cols="1" class="flex items-center">
                         <v-icon v-if="match.MatchScore.winner_id === match.MatchScore.player2.id" icon="fad fa-check" class="text-green-600 text-sm" />
                     </v-col>
-                    <v-col cols="3" class="flex text-sm items-center text-zinc-300">
-                        <div v-for="num in Array.from({length: 5}, (_, index) => index + 1)" class="mx-0.5">{{ match.MatchScore[`s${num}p2`] }}<sup>{{ match.MatchScore[`t${num}p2`] }}</sup></div>
+                    <v-col cols="3" class="flex flex-row-reverse text-sm items-center text-zinc-300">
+                        <div
+                            v-for="score in p2Scores"
+                            :key="score.set"
+                        >
+                            {{ score.set }}<sup>{{ score.tie }}</sup>&nbsp;
+                        </div>
                     </v-col>
                     <v-col cols="1" v-if="match.MatchScore.incomplete" class="flex text-sm items-center text-zinc-300">
                         <div v-if="match.MatchScore.winner_id === match.MatchScore.player1.id" class="mx-0.5">{{ incomplete(match.MatchScore.incomplete) }}</div>

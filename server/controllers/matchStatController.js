@@ -183,7 +183,6 @@ exports.findPlayerStats = async (req, res) => {
        }
 
         const response = {
-            summedP2,
             stats
         }
 

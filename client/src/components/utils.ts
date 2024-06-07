@@ -1,5 +1,5 @@
 import { DateTime, Duration } from 'luxon'
-import type { EditionByPlayer } from './interfaces'
+import type { EditionByPlayer, MatchScore } from './interfaces'
 
 // variables
 
@@ -84,9 +84,7 @@ export const incomplete = (status: string) => {
         case 'D':
             return 'Def.'
         case 'WO':
-            return 'Walkover'
-        case 'B':
-            return 'Bye'
+            return 'WO'
     }
 }
 
@@ -102,8 +100,11 @@ export const percentage = (value1: number, total: number) => {
     return value1 / total * 100
 }
 
-export function groupObjectsByKey(array: EditionByPlayer[], key: string): { [key: string]: EditionByPlayer[] } {
-  const groupedArrays: { [key: string]: EditionByPlayer[] } = {};
+export function groupObjectsByKey(array: EditionByPlayer[], key: string): { [key: string]: EditionByPlayer[] };
+export function groupObjectsByKey(array: MatchScore[], key: string): { [key: string]: MatchScore[] };
+
+export function groupObjectsByKey (array: EditionByPlayer[] | MatchScore[], key: string): { [key: string]: any } {
+  const groupedArrays: { [key: string]: any[] } = {};
 
   array.forEach(obj => {
     const value = (obj as any)[key];
@@ -117,10 +118,10 @@ export function groupObjectsByKey(array: EditionByPlayer[], key: string): { [key
   return groupedArrays;
 }
 
-export function tiebreak (matchScore: number, tiebreakScore: number) {
-    if (matchScore === 6) {
-        return tiebreakScore
-    } else {
-        return
-    }
+export const getMatchScore = (comp1: string, comp2: string, score1: number, score2: number) => {
+    return comp1 === comp2 ? `${score1}${score2}` : `${score2}${score1}`
+}
+
+export const getTieBreak = (score1: number, score2: number) => {
+    return score1 > score2 ? score2 : score1
 }

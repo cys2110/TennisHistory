@@ -67,7 +67,7 @@ export interface EditionDetails extends Edition {
     hard_type: string | null,
     year: number,
     type_of_draw: string,
-    currency: string | null,
+    currency: string,
     pm: number | null,
     tfc: number | null,
     supervisors: string[] | null,
@@ -92,7 +92,7 @@ export interface EditionDetails extends Edition {
     MatchScores: MatchScore[]
 }
 
-interface Entries {
+export interface Entries {
     rank: number | null,
     seed: number | null,
     status: string | null,
@@ -125,7 +125,7 @@ interface EntriesEdition {
     surface: string,
     hard_type: string | null,
     Tournament: Tournament,
-    currency: string | null,
+    currency: string,
     year: number
 }
 

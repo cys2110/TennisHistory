@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useDisplay } from 'vuetify';
-import { headshot, flagSrc, encodeName } from '../utils';
+import { headshot, flagSrc, encodeName, getMatchScore, getTieBreak } from '../utils';
 import type { EntriesMatch } from '../interfaces';
 
 const props = defineProps<{
@@ -33,15 +33,7 @@ const sets = computed(() => [
   { index: 3, s1: props.match.s3p1, s2: props.match.s3p2, t1: props.match.t3p1, t2: props.match.t3p2 },
   { index: 4, s1: props.match.s4p1, s2: props.match.s4p2, t1: props.match.t4p1, t2: props.match.t4p2 },
   { index: 5, s1: props.match.s5p1, s2: props.match.s5p2, t1: props.match.t5p1, t2: props.match.t5p2 }
-]);
-
-const getMatchScore = (score1: number, score2: number) => {
-    return props.match.player1.id === props.playerId ? `${score1}${score2}` : `${score2}${score1}`
-}
-
-const getTieBreak = (score1: number, score2: number) => {
-    return score1 > score2 ? score2 : score1
-}
+])
 </script>
 
 <template>
@@ -91,7 +83,7 @@ const getTieBreak = (score1: number, score2: number) => {
                 v-for="set in sets"
                 :key="set.index"
             >
-                {{ set.s1 !== null && set.s2 !== null ? getMatchScore(set.s1, set.s2) : ''}}<sup v-if="set.t1 !== null && set.t2 !== null">{{ getTieBreak(set.t1, set.t2) }}</sup>&nbsp;
+                {{ set.s1 !== null && set.s2 !== null ? getMatchScore(props.match.player1.id, props.playerId, set.s1, set.s2) : ''}}<sup v-if="set.t1 !== null && set.t2 !== null">{{ getTieBreak(set.t1, set.t2) }}</sup>&nbsp;
             </div>
             <div v-if="match.incomplete === 'R'">Ret.</div>
             <div v-else-if="match.incomplete === 'D'">Def.</div>

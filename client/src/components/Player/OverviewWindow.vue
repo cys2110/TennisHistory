@@ -80,7 +80,10 @@ const results = [
                         <span>Active</span>
                         <span>{{ player.turned_pro }} - {{ player.retired ?? 'present' }}</span>
                     </div>
-                    <div v-if="player.dob" class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between text-sm">
+                    <div
+                        v-if="player.dob"
+                        class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between text-sm"
+                    >
                         <div class="flex items-center">Age</div>
                         <div class="!flex-col text-right">
                             <div>{{ Math.floor(Math.abs(DateTime.fromISO(player.dob).diffNow('years').toObject().years)) }}</div>
