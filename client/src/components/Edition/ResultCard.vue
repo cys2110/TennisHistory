@@ -62,7 +62,7 @@ const p2Scores = [
                     {{ functions.formatTime(match.duration_mins) }}
                 </v-col>
             </v-row>
-            <v-row dense>
+            <v-row dense class="py-2">
                 <v-col
                     v-if="winner"
                     class="flex items-center"
@@ -196,7 +196,7 @@ const p2Scores = [
                     {{ match.incomplete }}.
                 </v-col>
             </v-row>
-            <v-row>
+            <v-row v-if="match.incomplete !== 'B'">
                 <v-col>{{ match.umpire ?? '' }}</v-col>
                 <v-col class="flex justify-end">
                     <v-chip
