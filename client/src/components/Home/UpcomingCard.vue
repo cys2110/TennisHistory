@@ -67,6 +67,7 @@ const { smAndDown } = useDisplay()
                 >
                     <v-chip
                         v-if="DateTime.now() > DateTime.fromISO(edition.start_date)"
+                        class="text-zinc-300"
                         variant="outlined"
                         :to="{name: 'Edition', params: {name: encodeName(edition.Tournament.name), id: edition.Tournament.id, editionNo: edition.edition_no}}"
                     >

@@ -2,12 +2,16 @@
 import { onMounted, ref, type Ref, watch } from 'vue';
 import { useDisplay } from 'vuetify';
 import EditionService from '@/services/EditionService';
+import OverviewWindow from '@/components/Edition/OverviewWindow.vue';
 import { categorySrc, formattedDates } from '@/components/utils';
 import type { EditionDetails, MatchScore } from '@/components/interfaces';
+import ResultsWindow from '@/components/Edition/ResultsWindow.vue';
+import DrawWindow from '@/components/Edition/DrawWindow.vue';
 
 const props = defineProps<{
     editionNo: string,
-    name: string
+    name: string,
+    id: string
 }>()
 const { xs } = useDisplay()
 
@@ -35,9 +39,9 @@ watch(() => props.name, () => {
 </script>
 
 <template>
-    <view-sheet class="lg:!w-3/5 xl:!w-1/2">
+    <v-sheet class="md:!w-4/5 xl:!w-2/3 mx-auto my-10 bg-transparent">
         <v-container v-if="edition">
-            <v-row class="bg-indigo-800 rounded-xl">
+            <v-row class="bg-indigo-800 rounded-xl p-3">
                 <v-col
                     v-if="xs"
                     cols="2"
@@ -47,6 +51,7 @@ watch(() => props.name, () => {
                     class="flex items-center justify-center"
                     cols="7"
                     sm="4"
+                    lg="2"
                 >
                     <v-img
                         :src="categorySrc(edition.category)"
@@ -54,9 +59,10 @@ watch(() => props.name, () => {
                     />
                 </v-col>
                 <v-col
-                    class="text-zinc-300 text-center"
+                    class="text-zinc-300 text-center sm:!text-left"
                     cols="12"
                     sm="8"
+                    lg="10"
                 >
                     <div>
                         <router-link
@@ -70,7 +76,7 @@ watch(() => props.name, () => {
                     <div>{{ formattedDates(edition.start_date, edition.end_date) }}</div>
                 </v-col>
             </v-row>
-            <v-row>
+            <v-row class="mt-10">
                 <v-col>
                     <v-toolbar class="rounded-t-xl bg-zinc-700">
                         <v-tabs
@@ -110,15 +116,21 @@ watch(() => props.name, () => {
             <v-row>
                 <v-col>
                     <v-window v-model="tab">
-                        <v-window-item value="overview"></v-window-item>
-                        <v-window-item value="results"></v-window-item>
+                        <v-window-item value="overview">
+                            <OverviewWindow :edition />
+                        </v-window-item>
+                        <v-window-item value="results">
+                            <ResultsWindow :matches :edition :name :id/>
+                        </v-window-item>
                         <v-window-item value="group"></v-window-item>
-                        <v-window-item value="draw"></v-window-item>
+                        <v-window-item value="draw">
+                            <DrawWindow :matches :edition :name :id />
+                        </v-window-item>
                         <v-window-item value="teamKO"></v-window-item>
                     </v-window>
                 </v-col>
             </v-row>
         </v-container>
         <div v-else class="text-zinc-400">No data available</div>
-    </view-sheet>
+    </v-sheet>
 </template>
