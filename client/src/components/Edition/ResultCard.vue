@@ -17,19 +17,19 @@ const loser: Ref<Player | null> = ref(null)
 const winEntry: Ref< {seed: number | null, status: string | null} | null> = ref(null)
 const loseEntry: Ref< {seed: number | null, status: string | null} | null> = ref(null)
 
-if (props.match.player1 && props.match.winner_id === props.match.player1.id) {
-    winner.value = props.match.player1
-    winEntry.value = props.match.entry1
+if (props.match.entry1 && props.match.winner_id === props.match.entry1.Player.id) {
+    winner.value = props.match.entry1.Player
+    winEntry.value = {seed: props.match.entry1.seed, status: props.match.entry1.status}
     if (props.match.incomplete !== 'B') {
-        loser.value = props.match.player2
-        loseEntry.value = props.match.entry2
+        loser.value = props.match.entry2.Player
+        loseEntry.value = {seed: props.match.entry2.seed, status: props.match.entry2.status}
     }
 } else {
-    winner.value = props.match.player2
-    winEntry.value = props.match.entry2
+    winner.value = props.match.entry2.Player
+    winEntry.value = {seed: props.match.entry2.seed, status: props.match.entry2.status}
     if (props.match.incomplete !== 'B') {
-        loser.value = props.match.player1
-        loseEntry.value = props.match.entry1
+        loser.value = props.match.entry1.Player
+        loseEntry.value = {seed: props.match.entry1.seed, status: props.match.entry1.status}
     }
 }
 
@@ -112,7 +112,7 @@ const p2Scores = [
                     cols="3"
                 >
                     <div
-                        v-if="match.player1 && match.winner_id === match.player1.id"
+                        v-if="match.entry1 && match.winner_id === match.entry1.Player.id"
                         v-for="score in p1Scores"
                         :key="score.set"
                     >
@@ -174,7 +174,7 @@ const p2Scores = [
                     cols="3"
                 >
                     <div
-                        v-if="match.player2 && match.winner_id === match.player2.id"
+                        v-if="match.entry2 && match.winner_id === match.entry2.Player.id"
                         v-for="score in p1Scores"
                         :key="score.set"
                     >
@@ -202,7 +202,7 @@ const p2Scores = [
                     <v-chip
                         v-if="match.incomplete !== 'B'"
                         class="mx-1"
-                        :to="{name: 'H2H', params: {p1Name: functions.encodeName(match.player1.full_name), p1Id: match.player1.id, p2Name: functions.encodeName(match.player2.full_name), p2Id: match.player2.id}}"
+                        :to="{name: 'H2H', params: {p1Name: functions.encodeName(match.entry1.Player.full_name), p1Id: match.entry1.Player.id, p2Name: functions.encodeName(match.entry2.Player.full_name), p2Id: match.entry2.Player.id}}"
                         :size="xl ? 'small' : 'x-small'"
                     >
                         H2H
@@ -210,7 +210,7 @@ const p2Scores = [
                     <v-chip
                         v-if="match.incomplete !=='B' && match.incomplete !== 'WO'"
                         class="mx-1"
-                        :to="{name: 'MatchStats', params: {name: name, id: id, editionNo: edition.edition_no, matchId: match.id, p1: functions.encodeName(match.player1.full_name), p2: functions.encodeName(match.player2.full_name)}}"
+                        :to="{name: 'MatchStats', params: {name: name, id: id, editionNo: edition.edition_no, matchId: match.id, p1: functions.encodeName(match.entry1.Player.full_name), p2: functions.encodeName(match.entry2.Player.full_name)}}"
                         :size="xl ? 'small' : 'x-small'"
                     >
                         Stats

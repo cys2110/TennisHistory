@@ -23,6 +23,7 @@ const p2: Ref<PlayerDetails | null> = ref(null)
 const matches: Ref<MatchH2H[]> = ref([])
 const p1Wins: Ref<number> = ref(0)
 const p2Wins: Ref<number> = ref(0)
+const totalMatches: Ref<number> = ref(0)
 
 const searchH2H = () => {
     PlayerService.getPlayerById(props.p1Id)
@@ -36,8 +37,9 @@ const searchH2H = () => {
     H2HService.h2h(props.p1Id, props.p2Id)
     .then(response => {
         matches.value = response.data.matches
-        p1Wins.value = response.data.count[0].p1Wins
-        p2Wins.value = response.data.count[0].p2Wins
+        p1Wins.value = response.data.count.p1Wins
+        p2Wins.value = response.data.count.p2Wins
+        totalMatches.value = response.data.count.total
     })
     .catch(e => console.log(e))
 }
@@ -87,16 +89,16 @@ watch(() => [props.p1Name, props.p2Name], () => {
                     </div>
                 </v-col>
                 <v-col cols="4" class="flex items-center justify-center">
-                    <div class="text-xl">{{ p1Wins }}</div>
+                    <div class="text-xl">{{ (+p1Wins) + (+p2Wins) }}</div>
                     <div class="mx-3">
                         <v-progress-circular
                             :size="mdAndUp ? 200 : smAndUp ? 100 : 50"
                             color="#3730a3"
                             bg-color="#166534"
-                            :model-value="functions.percentage(p1Wins, (+p1Wins) + (+p2Wins))"
+                            :model-value="functions.percentage((+p1Wins) + (+p2Wins), +totalMatches)"
                         />
                     </div>
-                    <div class="text-lg">{{ p2Wins }}</div>
+                    <div class="text-lg">{{ (+totalMatches) - ((+p1Wins) + (+p2Wins)) }}</div>
                 </v-col>
                 <v-col class="flex-col items-center" cols="4">
                     <div>

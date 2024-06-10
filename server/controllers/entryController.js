@@ -1,6 +1,7 @@
 const db = require('../models')
 const Entry = db.Entry
 const Op = db.Sequelize.Op
+const { TournamentAttributes, MatchScoreAttributes, PlayerAttributes } = require('./attributes.cjs')
 
 exports.getEntriesByPlayer = async (req, res) => {
     try {
@@ -50,12 +51,12 @@ exports.getEntriesByPlayer = async (req, res) => {
                 {
                     model: db.Edition,
                     as: 'Edition',
-                    attributes: ['id', 'year', 'sponsor_name', 'environment', 'surface', 'hard_type', 'city', 'country', 'start_date', 'end_date', 'category', 'currency'],
+                    attributes: ['id', 'edition_no', 'year', 'sponsor_name', 'environment', 'surface', 'hard_type', 'city', 'country', 'start_date', 'end_date', 'category', 'currency'],
                     include: [
                         {
                             model: db.Tournament,
                             as: 'Tournament',
-                            attributes: ['name', 'id']
+                            attributes: TournamentAttributes
                         }
                     ],
                     order: [['end_date', 'ASC']]
@@ -63,54 +64,50 @@ exports.getEntriesByPlayer = async (req, res) => {
                 {
                     model: db.MatchScore,
                     as: 'entry1',
-                    attributes: ['round', 'incomplete', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p2', 'winner_id', 'id'],
+                    attributes: MatchScoreAttributes,
                     include: [
-                        {
-                            model: db.Player,
-                            as: 'player1',
-                            attributes: ['id', 'first_name', 'last_name', 'full_name', 'country', 'headshot']
-                        },
-                        {
-                            model: db.Player,
-                            as: 'player2',
-                            attributes: ['id', 'first_name', 'last_name', 'full_name', 'country', 'headshot']
-                        },
                         {
                             model: db.Entry,
                             as: 'entry1',
-                            attributes: ['rank']
+                            attributes: ['rank'],
+                            include: {
+                                model: db.Player,
+                                attributes: PlayerAttributes
+                            }
                         },
                         {
                             model: db.Entry,
                             as: 'entry2',
-                            attributes: ['rank']
+                            attributes: ['rank'],
+                            include: {
+                                model: db.Player,
+                                attributes: PlayerAttributes
+                            }
                         }
                     ]
                 },
                 {
                     model: db.MatchScore,
                     as: 'entry2',
-                    attributes: ['round', 'incomplete', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p2', 'winner_id', 'id'],
+                    attributes: MatchScoreAttributes,
                     include: [
-                        {
-                            model: db.Player,
-                            as: 'player1',
-                            attributes: ['id', 'first_name', 'last_name', 'full_name', 'country', 'headshot']
-                        },
-                        {
-                            model: db.Player,
-                            as: 'player2',
-                            attributes: ['id', 'first_name', 'last_name', 'full_name', 'country', 'headshot']
-                        },
                         {
                             model: db.Entry,
                             as: 'entry1',
-                            attributes: ['rank']
+                            attributes: ['rank'],
+                            include: {
+                                model: db.Player,
+                                attributes: PlayerAttributes
+                            }
                         },
                         {
                             model: db.Entry,
                             as: 'entry2',
-                            attributes: ['rank']
+                            attributes: ['rank'],
+                            include: {
+                                model: db.Player,
+                                attributes: PlayerAttributes
+                            }
                         }
                     ]
                 }

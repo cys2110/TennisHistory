@@ -159,13 +159,18 @@ export interface EntriesMatch {
     t5p1: number | null,
     t5p2: number | null,
     winner_id: string,
-    player1: Player,
-    player2: Player
+    entry1: {
+        rank: number | null,
+        Player: Player
+    },
+    entry2: {
+        rank: number | null,
+        Player: Player
+    }
 }
 
 // Match Scores
-
-export interface MatchH2H {
+export interface BaseMatchScore {
     id: number,
     round: string,
     incomplete: string | null,
@@ -189,14 +194,10 @@ export interface MatchH2H {
     s5p2: number | null,
     t5p1: number | null,
     t5p2: number | null,
-    createdAt: Date,
-    updatedAt: Date,
-    p1: string,
-    p2: string,
-    EditionId: number,
-    p1_no: number,
-    p2_no: number,
-    TieId: number | null,
+    winner_id: string | null
+}
+
+export interface MatchH2H extends BaseMatchScore {
     winner_id: string,
     Edition: {
         year: number,
@@ -207,42 +208,13 @@ export interface MatchH2H {
     }
 }
 
-interface BaseMatchScore {
-    id: number,
-    round: string,
-    incomplete: string | null,
+export interface MatchScore extends BaseMatchScore {
+    match_no: number | null,
     umpire: string | null,
     duration_mins: number | null,
     date: Date | null,
-    s1p1: number | null,
-    s1p2: number | null,
-    t1p1: number | null,
-    t1p2: number | null,
-    s2p1: number | null,
-    s2p2: number | null,
-    t2p1: number | null,
-    t2p2: number | null,
-    s3p1: number | null,
-    s3p2: number | null,
-    t3p1: number | null,
-    t3p2: number | null,
-    s4p1: number | null,
-    s4p2: number | null,
-    t4p1: number | null,
-    t4p2: number | null,
-    s5p1: number | null,
-    s5p2: number | null,
-    t5p1: number | null,
-    t5p2: number | null,
-    winner_id: string,
     entry1: Entry,
     entry2: Entry
-}
-
-export interface MatchScore extends BaseMatchScore {
-    match_no: number | null,
-    player1: Player,
-    player2: Player
 }
 
 // Match Stats

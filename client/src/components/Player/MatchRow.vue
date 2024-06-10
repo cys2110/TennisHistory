@@ -16,15 +16,15 @@ const round = (roundNumber: string) => {
 }
 
 const opponentId = computed(() => {
-    return props.match.player1.id === props.playerId && props.match.player2 ? props.match.player2.id : props.match.player1.id
+    return props.match.entry1.Player.id === props.playerId && props.match.entry2 ? props.match.entry2.Player.id : props.match.entry1.Player.id
 })
 
 const opponentCountry = computed(() => {
-    return props.match.player1.id === props.playerId && props.match.player2 ? props.match.player2.country : props.match.player1.country
+    return props.match.entry1.Player.id === props.playerId && props.match.entry2.Player ? props.match.entry2.Player.country : props.match.entry1.Player.country
 })
 
 const opponentName = computed(() => {
-    return props.match.player1.id === props.playerId && props.match.player2 ? props.match.player2.full_name : props.match.player1.full_name
+    return props.match.entry1.Player.id === props.playerId && props.match.entry2.Player ? props.match.entry2.Player.full_name : props.match.entry1.Player.full_name
 })
 
 const sets = computed(() => [
@@ -42,7 +42,7 @@ const sets = computed(() => [
         <td class="text-nowrap">
             <div v-if="match.incomplete === 'B'">BYE</div>
             <div
-                v-else-if="match.player1 && match.player2"
+                v-else-if="match.entry1 && match.entry2"
                 class="flex items-center"
             >
                 <div class="mx-0.5">
@@ -83,7 +83,7 @@ const sets = computed(() => [
                 v-for="set in sets"
                 :key="set.index"
             >
-                {{ set.s1 !== null && set.s2 !== null ? getMatchScore(props.match.player1.id, props.playerId, set.s1, set.s2) : ''}}<sup v-if="set.t1 !== null && set.t2 !== null">{{ getTieBreak(set.t1, set.t2) }}</sup>&nbsp;
+                {{ set.s1 !== null && set.s2 !== null ? getMatchScore(props.match.entry1.Player.id, playerId, set.s1, set.s2) : ''}}<sup v-if="set.t1 !== null && set.t2 !== null">{{ getTieBreak(set.t1, set.t2) }}</sup>&nbsp;
             </div>
             <div v-if="match.incomplete === 'R'">Ret.</div>
             <div v-else-if="match.incomplete === 'D'">Def.</div>
@@ -92,7 +92,7 @@ const sets = computed(() => [
             <v-chip
                 v-if="match.incomplete !== 'B'"
                 class="bg-zinc-300 text-indigo-800"
-                :to="{name: 'H2H', params: {p1Name: encodeName(match.player1.full_name), p1Id: match.player1.id, p2Name: encodeName(match.player2.full_name), p2Id: match.player2.full_name}}"
+                :to="{name: 'H2H', params: {p1Name: encodeName(match.entry1.Player.full_name), p1Id: match.entry1.Player.id, p2Name: encodeName(match.entry2.Player.full_name), p2Id: match.entry2.Player.full_name}}"
                 density="compact"
             >
                 H2H

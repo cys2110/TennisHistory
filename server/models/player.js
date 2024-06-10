@@ -8,8 +8,6 @@ module.exports = (sequelize, models) => {
             Player.hasMany(Edition, {foreignKey: 'finalist_id', as: 'finalist'})
             Player.belongsToMany(Edition, {as: 'edition_entries', through: Entry})
             Player.hasMany(Entry)
-            Player.hasMany(MatchScore, {foreignKey: 'p1', as: 'player1'})
-            Player.hasMany(MatchScore, {foreignKey: 'p2', as: 'player2'})
             Player.hasMany(MatchScore, {foreignKey: 'winner_id'})
             Player.hasMany(NonCount, {foreignKey: 'p1', as: 'atp1'})
             Player.hasMany(NonCount, {foreignKey: 'p2', as: 'atp2'})
