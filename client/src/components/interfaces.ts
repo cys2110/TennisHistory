@@ -292,6 +292,19 @@ export interface MatchStat {
 }
 
 interface MatchStatScore extends BaseMatchScore {
+    date: Date | null,
+    duration_mins: number | null,
+    umpire: string | null,
+    entry1: {
+        seed: number | null,
+        status: string | null,
+        Player: Player
+    },
+    entry2: {
+        seed: number | null,
+        status: string | null,
+        Player: Player
+    },
     Edition: {
         year: number,
         environment: string,
