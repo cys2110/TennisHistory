@@ -307,7 +307,7 @@ watch(() => [props.p1Name, props.p2Name], () => {
                                 <td class="text-center">{{ match.Edition.environment }} {{ match.Edition.surface }}</td>
                                 <td class="text-center whitespace-nowrap">
                                     <div class="flex justify-center">
-                                        <ScoreItem :match />
+                                        <ScoreItem :match :p1="p1Id"/>
                                         <span v-if="match.incomplete">{{ functions.incomplete(match.incomplete) }}</span>
                                     </div>
                                 </td>
