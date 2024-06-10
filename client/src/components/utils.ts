@@ -3,9 +3,9 @@ import type { EditionByPlayer, MatchScore } from './interfaces'
 
 // variables
 
-// export const API_URL = 'https://tennis-history-backend-a82162895ecd.herokuapp.com/'
+export const API_URL = 'https://tennis-history-backend-a82162895ecd.herokuapp.com/'
 
-export const API_URL = 'http://localhost:8080/'
+// export const API_URL = 'http://localhost:8080/'
 
 // functions
 
