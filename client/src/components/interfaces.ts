@@ -34,8 +34,8 @@ export interface EditionsOfTournament extends Edition {
     year: number,
     final_score: string | null,
     end_date: Date,
-    winner_id: Player,
-    finalist_id: Player
+    winner: Player,
+    finalist: Player
 }
 
 export interface UpcomingEdition extends Edition {
