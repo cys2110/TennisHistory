@@ -240,7 +240,9 @@ interface BaseMatchScore {
 }
 
 export interface MatchScore extends BaseMatchScore {
-    match_no: number | null
+    match_no: number | null,
+    player1: Player,
+    player2: Player
 }
 
 // Match Stats
