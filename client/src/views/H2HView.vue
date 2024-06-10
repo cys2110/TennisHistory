@@ -93,7 +93,7 @@ watch(() => [props.p1Name, props.p2Name], () => {
                             :size="mdAndUp ? 200 : smAndUp ? 100 : 50"
                             color="#3730a3"
                             bg-color="#166534"
-                            :model-value="functions.percentage(p1Wins, p1Wins + p2Wins)"
+                            :model-value="functions.percentage(p1Wins, (+p1Wins) + (+p2Wins))"
                         />
                     </div>
                     <div class="text-lg">{{ p2Wins }}</div>
@@ -131,7 +131,7 @@ watch(() => [props.p1Name, props.p2Name], () => {
                     <short-card v-if="mdAndUp" class="p-3 text-zinc-300">
                         <PlayerStatItem>
                             <template #field>DOB</template>
-                            <template #value>{{ p1.dob ? p1.dob : 'Unknown' }}</template>
+                            <template #value>{{ p1.dob ? DateTime.fromISO(p1.dob).setLocale('gb').toFormat('dd LLLL yyyy') : 'Unknown' }}</template>
                         </PlayerStatItem>
                         <PlayerStatItem>
                             <template #field>Height</template>
@@ -206,7 +206,7 @@ watch(() => [props.p1Name, props.p2Name], () => {
                     <short-card v-if="mdAndUp" cols="4" class="p-3 !text-zinc-300 !bg-green-800">
                         <PlayerStatItem>
                             <template #field>DOB</template>
-                            <template #value>{{ p2.dob ? functions.formatDate(p2.dob) : 'Unknown' }}</template>
+                            <template #value>{{ p2.dob ? DateTime.fromISO(p2.dob).setLocale('gb').toFormat('dd LLLL yyyy') : 'Unknown' }}</template>
                         </PlayerStatItem>
                         <PlayerStatItem>
                             <template #field>Height</template>

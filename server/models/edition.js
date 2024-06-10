@@ -7,6 +7,7 @@ module.exports = (sequelize, models) => {
             Edition.belongsTo(Tournament)
             Edition.belongsTo(Player, {foreignKey: {name: 'winner_id', type: DataTypes.STRING}, as: 'winner'})
             Edition.belongsTo(Player, {foreignKey: {name: 'finalist_id', type: DataTypes.STRING}, as: 'finalist'})
+            Edition.belongsToMany(Player, { as: 'entries', through: Entry})
             Edition.hasMany(Entry)
             Edition.hasMany(MatchScore)
             Edition.hasMany(Tie)

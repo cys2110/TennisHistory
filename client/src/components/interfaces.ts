@@ -34,8 +34,8 @@ export interface EditionsOfTournament extends Edition {
     year: number,
     final_score: string | null,
     end_date: Date,
-    winner: Player,
-    finalist: Player
+    winner_id: Player,
+    finalist_id: Player
 }
 
 export interface UpcomingEdition extends Edition {
@@ -92,16 +92,21 @@ export interface EditionDetails extends Edition {
     MatchScores: MatchScore[]
 }
 
-export interface Entries {
-    rank: number | null,
+// Entries
+
+export interface Entry {
     seed: number | null,
     status: string | null,
+    Player: Player
+}
+
+export interface Entries extends Entry {
+    rank: number | null,
     wd: string | null,
     ret: string | null,
     wo: string | null,
     lda: number | null,
     defaulted: string | null,
-    Player: Player
 }
 
 export interface EntriesByPlayer {
@@ -230,16 +235,8 @@ interface BaseMatchScore {
     t5p1: number | null,
     t5p2: number | null,
     winner_id: string,
-    player1: Player,
-    player2: Player,
-    entry1: {
-        seed: number | null,
-        status: string | null
-    },
-    entry2: {
-        seed: number | null,
-        status: string | null
-    }
+    entry1: Entry,
+    entry2: Entry
 }
 
 export interface MatchScore extends BaseMatchScore {
@@ -329,7 +326,7 @@ interface MatchStatScore extends BaseMatchScore {
         sponsor_name: string,
         start_date: Date,
         end_date: Date
-    },
+    }
 }
 
 // Player
@@ -496,5 +493,6 @@ export interface RawPlayerStat {
     pts_w: number,
     total_pts: number,
     "MatchScore.id": number,
-    "MatchScore.Edition.id": number
+    "MatchScore.Edition.id": number,
+    "MatchScore.entry1.Player.id": null
 }

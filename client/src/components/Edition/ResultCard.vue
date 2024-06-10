@@ -213,7 +213,7 @@ const p2Scores = [
                         :to="{name: 'MatchStats', params: {name: name, id: id, editionNo: edition.edition_no, matchId: match.id, p1: functions.encodeName(match.player1.full_name), p2: functions.encodeName(match.player2.full_name)}}"
                         :size="xl ? 'small' : 'x-small'"
                     >
-                        Match Stats
+                        Stats
                     </v-chip>
                 </v-col>
             </v-row>

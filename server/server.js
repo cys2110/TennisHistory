@@ -10,7 +10,7 @@ app.use(bodyParser.json())
 app.use(logger('dev'))
 
 const db = require('./models')
-// db.User.sync({alter: true})
+// db.sequelize.sync({alter: true})
 //     .then(() => {
 //         console.log('Synced db')
 //     })
@@ -27,6 +27,7 @@ const matchScoreController = require('./controllers/matchScoreController')
 const tieController = require('./controllers/tieController')
 
 app.get('/', (req, res) => res.send('This is the root!'))
+app.get('/test', editionController.test)
 
 app.get('/search/:search', tournamentController.search)
 

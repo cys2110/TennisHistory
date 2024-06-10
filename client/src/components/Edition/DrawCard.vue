@@ -192,7 +192,7 @@ const p2Scores = [
                         :to="{name: 'MatchStats', params: {name: encodeName(name), id: id, editionNo: edition.edition_no, matchId: match.id, p1: encodeName(match.player1.full_name), p2: encodeName(match.player2.full_name)}}"
                         density="compact"
                     >
-                        Match Stats
+                        Stats
                     </v-chip>
                 </v-col>
             </v-row>
