@@ -3,12 +3,8 @@ const { DataTypes, Model } = require('sequelize');
 module.exports = (sequelize, models) => {
     class MatchStat extends Model {
         static associate () {
-            const { Player, Entry, MatchScore } = models
+            const { MatchScore } = models
             MatchStat.belongsTo(MatchScore)
-            MatchStat.belongsTo(Player, {foreignKey: {name: 'p1', type: DataTypes.STRING}})
-            MatchStat.belongsTo(Player, {foreignKey: {name: 'p2', type: DataTypes.STRING}})
-            MatchStat.belongsTo(Entry, {foreignKey: 'p1_no'})
-            MatchStat.belongsTo(Entry, {foreignKey: 'p2_no'})
         }
     }
     MatchStat.init({

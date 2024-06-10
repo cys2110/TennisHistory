@@ -32,6 +32,7 @@ onMounted(() => {
     EditionService.getMatchStats(parseInt(props.matchId))
     .then(response => {
         match.value = response.data
+        console.log(match.value)
         p1Scores.value = [
             { set: match.value?.MatchScore.s5p1 ?? '', tie: match.value?.MatchScore.t5p1 ?? '' },
             { set: match.value?.MatchScore.s4p1 ?? '', tie: match.value?.MatchScore.t4p1 ?? '' },
@@ -86,31 +87,31 @@ watch(() => props.name, () => {
                     <v-col class="flex items-center">
                         <div>
                             <flag-img
-                                :src="flagSrc(match.MatchScore.player1.country)"
-                                :alt="match.MatchScore.player1.country"
+                                :src="flagSrc(match.MatchScore.entry1.Player.country)"
+                                :alt="match.MatchScore.entry1.Player.country"
                                 class="w-[2rem] mx-0.5"
                             />
                         </div>
                         <div>
                             <v-avatar class="mx-0.5">
                                 <v-img
-                                    :src="headshot(match.MatchScore.player1.id)"
-                                    :alt="match.MatchScore.player1.full_name"
+                                    :src="headshot(match.MatchScore.entry1.Player.id)"
+                                    :alt="match.MatchScore.entry1.Player.full_name"
                                 />
                             </v-avatar>
                         </div>
                         <div class="mx-0.5">
                             <router-link
                                 class="hover-link text-sm"
-                                :to="{name: 'Player', params: {id: match.MatchScore.player1.id, name: p1}}"
+                                :to="{name: 'Player', params: {id: match.MatchScore.entry1.Player.id, name: p1}}"
                             >
-                                {{ match.MatchScore.player1.full_name }}
+                                {{ match.MatchScore.entry1.Player.full_name }}
                             </router-link>
                             <small v-if="match.MatchScore.entry1.seed || match.MatchScore.entry1.status" class="mx-1 text-zinc-300">{{ status(match.MatchScore.entry1.seed, match.MatchScore.entry1.status) }}</small>
                         </div>
                     </v-col>
                     <v-col cols="1" class="flex items-center">
-                        <v-icon v-if="match.MatchScore.winner_id === match.MatchScore.player1.id" icon="fad fa-check" class="text-green-600 text-sm" />
+                        <v-icon v-if="match.MatchScore.winner_id === match.MatchScore.entry1.Player.id" icon="fad fa-check" class="text-green-600 text-sm" />
                     </v-col>
                     <v-col cols="3" class="flex flex-row-reverse text-sm items-center text-zinc-300">
                         <div
@@ -121,38 +122,38 @@ watch(() => props.name, () => {
                         </div>
                     </v-col>
                     <v-col cols="1" v-if="match.MatchScore.incomplete" class="flex text-sm items-center text-zinc-300">
-                        <div v-if="match.MatchScore.winner_id === match.MatchScore.player2.id" class="mx-0.5">{{ incomplete(match.MatchScore.incomplete) }}</div>
+                        <div v-if="match.MatchScore.winner_id === match.MatchScore.entry2.Player.id" class="mx-0.5">{{ incomplete(match.MatchScore.incomplete) }}</div>
                     </v-col>
                 </v-row>
                 <v-row >
                     <v-col class="flex items-center">
                         <div>
                             <flag-img
-                                :src="flagSrc(match.MatchScore.player2.country)"
-                                :alt="match.MatchScore.player2.country"
+                                :src="flagSrc(match.MatchScore.entry2.Player.country)"
+                                :alt="match.MatchScore.entry2.Player.country"
                                 class="w-[2rem] mx-0.5"
                             />
                         </div>
                         <div>
                             <v-avatar class="mx-0.5">
                                 <v-img
-                                    :src="headshot(match.MatchScore.player2.id)"
-                                    :alt="match.MatchScore.player2.full_name"
+                                    :src="headshot(match.MatchScore.entry2.Player.id)"
+                                    :alt="match.MatchScore.entry2.Player.full_name"
                                 />
                             </v-avatar>
                         </div>
                         <div class="mx-0.5">
                             <router-link
                                 class="hover-link text-sm"
-                                :to="{name: 'Player', params: {id: match.MatchScore.player2.id, name: p2}}"
+                                :to="{name: 'Player', params: {id: match.MatchScore.entry2.Player.id, name: p2}}"
                             >
-                                {{ match.MatchScore.player2.full_name }}
+                                {{ match.MatchScore.entry2.Player.full_name }}
                             </router-link>
                             <small v-if="match.MatchScore.entry2.seed || match.MatchScore.entry2.status" class="mx-1 text-zinc-300">{{ status(match.MatchScore.entry2.seed, match.MatchScore.entry2.status) }}</small>
                         </div>
                     </v-col>
                     <v-col cols="1" class="flex items-center">
-                        <v-icon v-if="match.MatchScore.winner_id === match.MatchScore.player2.id" icon="fad fa-check" class="text-green-600 text-sm" />
+                        <v-icon v-if="match.MatchScore.winner_id === match.MatchScore.entry2.Player.id" icon="fad fa-check" class="text-green-600 text-sm" />
                     </v-col>
                     <v-col cols="3" class="flex flex-row-reverse text-sm items-center text-zinc-300">
                         <div
@@ -163,7 +164,7 @@ watch(() => props.name, () => {
                         </div>
                     </v-col>
                     <v-col cols="1" v-if="match.MatchScore.incomplete" class="flex text-sm items-center text-zinc-300">
-                        <div v-if="match.MatchScore.winner_id === match.MatchScore.player1.id" class="mx-0.5">{{ incomplete(match.MatchScore.incomplete) }}</div>
+                        <div v-if="match.MatchScore.winner_id === match.MatchScore.entry1.Player.id" class="mx-0.5">{{ incomplete(match.MatchScore.incomplete) }}</div>
                     </v-col>
                 </v-row>
             </v-container>
@@ -173,11 +174,11 @@ watch(() => props.name, () => {
                 <v-col>
                     <v-avatar :size="mdAndUp ? 'x-large' : 'default'">
                         <v-img
-                            :src="headshot(match.MatchScore.player1.id)"
-                            :alt="match.MatchScore.player1.full_name"
+                            :src="headshot(match.MatchScore.entry1.Player.id)"
+                            :alt="match.MatchScore.entry1.Player.full_name"
                         />
                     </v-avatar>
-                    <div class="font-bold text-uppercase mt-1">{{ match.MatchScore.player1.full_name }}</div>
+                    <div class="font-bold text-uppercase mt-1">{{ match.MatchScore.entry1.Player.full_name }}</div>
                 </v-col>
                 <v-col class="flex items-end justify-center">
                     <div v-if="match.p1_serve1_pts" class="font-bold text-center">SERVICE STATS</div>
@@ -185,11 +186,11 @@ watch(() => props.name, () => {
                 <v-col class="text-right">
                     <v-avatar :size="mdAndUp ? 'x-large' : 'default'">
                         <v-img
-                            :src="headshot(match.MatchScore.player2.id)"
-                            :alt="match.MatchScore.player2.full_name"
+                            :src="headshot(match.MatchScore.entry2.Player.id)"
+                            :alt="match.MatchScore.entry2.Player.full_name"
                         />
                     </v-avatar>
-                    <div class="mt-1 font-bold text-uppercase">{{ match.MatchScore.player2.full_name }}</div>
+                    <div class="mt-1 font-bold text-uppercase">{{ match.MatchScore.entry2.Player.full_name }}</div>
                 </v-col>
                 <v-divider thickness="3" />
             </v-row>

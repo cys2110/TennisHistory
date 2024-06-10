@@ -1,4 +1,5 @@
 const db = require('../models')
+const { PlayerAttributes } = require('./attributes.cjs')
 const MatchStat = db.MatchStat
 const Op = db.Sequelize.Op
 const sequelize = db.sequelize
@@ -19,24 +20,22 @@ exports.findMatch = (req, res) => {
                 attributes: ['id', 'category', 'environment', 'surface', 'hard_type', 'start_date', 'end_date', 'year', 'sponsor_name']
                 },
                 {
-                    model: db.Player,
-                    as: 'player1',
-                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
-                },
-                {
-                    model: db.Player,
-                    as: 'player2',
-                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
-                },
-                {
                     model: db.Entry,
                     as: 'entry1',
-                    attributes: ['seed', 'status']
+                    attributes: ['seed', 'status'],
+                    include: {
+                        model: db.Player,
+                        attributes: PlayerAttributes
+                    }
                 },
                 {
                     model: db.Entry,
                     as: 'entry2',
-                    attributes: ['seed', 'status']
+                    attributes: ['seed', 'status'],
+                    include: {
+                        model: db.Player,
+                        attributes: PlayerAttributes
+                    }
                 }
             ]
         }
@@ -50,11 +49,11 @@ exports.findPlayerStats = async (req, res) => {
         const { year, player, surface } = req.query
 
         const whereCondition1 = {
-            p1: player
+            '$MatchScore.entry1.Player.id$': player
         }
 
         const whereCondition2 = {
-            p2: player
+            '$MatchScore.entry2.Player.id$': player
         }
 
        if (surface !== 'All') {
@@ -95,13 +94,23 @@ exports.findPlayerStats = async (req, res) => {
         include: {
             model: db.MatchScore,
             attributes: ['id'],
-            include: {
-                model: db.Edition,
-                as: 'Edition',
-                attributes: ['id']
-            }
+            include: [
+                {
+                    model: db.Edition,
+                    attributes: ['id']
+                },
+                {
+                    model: db.Entry,
+                    as: 'entry1',
+                    attributes: [],
+                    include: {
+                        model: db.Player,
+                        attributes: ['id']
+                    }
+                }
+            ]
         },
-        group: ['MatchScore.id', 'MatchScore.Edition.id'],
+        group: ['MatchScore.id', 'MatchScore.Edition.id', 'MatchScore.entry1.Player.id'],
         raw: true
        })
 
@@ -134,13 +143,24 @@ exports.findPlayerStats = async (req, res) => {
             include: {
                 model: db.MatchScore,
                 attributes: ['id'],
-                include: {
-                    model: db.Edition,
-                    as: 'Edition',
-                    attributes: ['id']
-                }
+                include: [
+                    {
+                        model: db.Edition,
+                        as: 'Edition',
+                        attributes: ['id']
+                    },
+                    {
+                        model: db.Entry,
+                        as: 'entry2',
+                        attributes: [],
+                        include: {
+                            model: db.Player,
+                            attributes: ['id']
+                        }
+                    }
+                ]
             },
-        group: ['MatchScore.id', 'MatchScore.Edition.id'],
+            group: ['MatchScore.id', 'MatchScore.Edition.id', 'MatchScore.entry2.Player.id'],
         raw: true
        })
 

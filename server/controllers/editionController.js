@@ -1,6 +1,15 @@
 const db = require('../models')
 const Edition = db.Edition
 const Op = db.Sequelize.Op
+const { TournamentAttributes, EditionAttributes } = require('./attributes.cjs')
+
+exports.test = (req, res) => {
+    Edition.findByPk(1, {
+        include: 'entries'
+    })
+    .then(response => res.send(response))
+    .catch(error => res.status(500).send(error.message))
+}
 
 exports.findByEditionNo = (req, res) => {
     const { edition } = req.params
@@ -75,11 +84,11 @@ exports.findByYear = (req, res) => {
         where: {
             year: year
         },
-        attributes: ['id', 'edition_no', 'sponsor_name', 'year', 'start_date', 'end_date', 'category', 'city', 'country', 'environment', 'surface', 'hard_type'],
+        attributes: EditionAttributes,
         order: [['start_date', 'ASC']],
         include: {
             model: db.Tournament,
-            attributes: ['id', 'name']
+            attributes: TournamentAttributes
         }
     })
     .then(response => res.send(response))
@@ -96,7 +105,7 @@ exports.findByPlayer = (req, res) => {
         order: [['edition_no', 'ASC']],
         include: {
             model: db.Tournament,
-            attributes: ['id', 'name']
+            attributes: TournamentAttributes
         }
     })
     .then(response => res.send(response))
