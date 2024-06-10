@@ -4,7 +4,8 @@ import { getMatchScore, getTieBreak } from '../utils';
 import type { MatchH2H } from '../interfaces';
 
 const props = defineProps<{
-    match: MatchH2H
+    match: MatchH2H,
+    p1: string
 }>()
 
 const sets = computed(() => [
@@ -22,6 +23,6 @@ const sets = computed(() => [
         :key="set.index"
         class="flex"
     >
-        {{ set.s1 !== null && set.s2 !== null ? getMatchScore(props.match.p1, props.match.winner_id, set.s1, set.s2) : ''}}<sup v-if="set.t1 !== null && set.t2 !== null">{{ getTieBreak(set.t1, set.t2) }}</sup>&nbsp;
+        {{ set.s1 !== null && set.s2 !== null ? getMatchScore(p1, match.winner_id, set.s1, set.s2) : ''}}<sup v-if="set.t1 !== null && set.t2 !== null">{{ getTieBreak(set.t1, set.t2) }}</sup>&nbsp;
     </div>
 </template>
