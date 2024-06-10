@@ -1,15 +1,7 @@
 const db = require('../models')
 const Edition = db.Edition
 const Op = db.Sequelize.Op
-const { TournamentAttributes, EditionAttributes } = require('./attributes.cjs')
-
-exports.test = (req, res) => {
-    Edition.findByPk(1, {
-        include: 'entries'
-    })
-    .then(response => res.send(response))
-    .catch(error => res.status(500).send(error.message))
-}
+const { TournamentAttributes, EditionAttributes, PlayerAttributes, MatchScoreAttributes } = require('./attributes.cjs')
 
 exports.findByEditionNo = (req, res) => {
     const { edition } = req.params
@@ -24,32 +16,30 @@ exports.findByEditionNo = (req, res) => {
                 attributes: ['rank', 'seed', 'status', 'wd', 'ret', 'wo', 'lda', 'defaulted'],
                 include: {
                     model: db.Player,
-                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
+                    attributes: PlayerAttributes
                 },
             },
             {
                 model: db.MatchScore,
-                attributes: ['id', 'match_no', 'round', 'incomplete', 'umpire', 'date', 'duration_mins', 's1p1', 's1p2', 't1p1', 't1p2', 's2p1', 's2p2', 't2p1', 't2p2', 's3p1', 's3p2', 't3p1', 't3p2', 's4p1', 's4p2', 't4p1', 't4p2', 's5p1', 's5p2', 't5p1', 't5p2', 'winner_id'],
+                attributes: ['match_no', 'umpire', 'date', 'duration_mins', ...MatchScoreAttributes],
                 include: [
-                    {
-                        model: db.Player,
-                        as: 'player1',
-                        attributes: ['id', 'first_name', 'last_name', 'country', 'full_name']
-                    },
-                    {
-                        model: db.Player,
-                        as: 'player2',
-                        attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
-                    },
                     {
                         model: db.Entry,
                         as: 'entry1',
-                        attributes: ['seed', 'status']
+                        attributes: ['seed', 'status'],
+                        include: {
+                            model: db.Player,
+                            attributes: PlayerAttributes
+                        }
                     },
                     {
                         model: db.Entry,
                         as: 'entry2',
-                        attributes: ['seed', 'status']
+                        attributes: ['seed', 'status'],
+                        include: {
+                            model: db.Player,
+                            attributes: PlayerAttributes
+                        }
                     }
                 ]
             }
@@ -71,7 +61,7 @@ exports.findUpcoming = (req, res) => {
         attributes: ['id', 'sponsor_name', 'category', 'environment', 'surface', 'hard_type', 'city', 'country', 'start_date', 'end_date', 'edition_no'],
         include: {
             model: db.Tournament,
-            attributes: ['id', 'name']
+            attributes: TournamentAttributes
         }
     })
     .then(response => res.send(response))

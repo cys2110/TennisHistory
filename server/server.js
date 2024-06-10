@@ -27,7 +27,6 @@ const matchScoreController = require('./controllers/matchScoreController')
 const tieController = require('./controllers/tieController')
 
 app.get('/', (req, res) => res.send('This is the root!'))
-app.get('/test', editionController.test)
 
 app.get('/search/:search', tournamentController.search)
 

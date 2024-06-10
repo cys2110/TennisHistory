@@ -1,6 +1,7 @@
 const db = require('../models')
 const Tournament = db.Tournament
 const Op = db.Sequelize.Op
+const { PlayerAttributes } = require('./attributes.cjs')
 
 exports.findById = (req, res) => {
     const { id } = req.params
@@ -13,12 +14,12 @@ exports.findById = (req, res) => {
                 {
                     model: db.Player,
                     as: 'winner',
-                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
+                    attributes: PlayerAttributes
                 },
                 {
                     model: db.Player,
                     as: 'finalist',
-                    attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
+                    attributes: PlayerAttributes
                 }
             ]
         }
@@ -40,7 +41,7 @@ exports.search = async (req, res) => {
         })
         const players = await db.Player.findAll({
             where: db.sequelize.literal(`first_name || ' ' || last_name ILIKE '%${search}%'`),
-            attributes: ['id', 'first_name', 'last_name', 'full_name', 'country']
+            attributes: PlayerAttributes
         })
         const response = {
             tournaments,
