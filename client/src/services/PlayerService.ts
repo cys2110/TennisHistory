@@ -11,9 +11,6 @@ const apiClient = axios.create({
 })
 
 export default {
-    getPlayerById(id: string) {
-        return apiClient.get('id/' + id)
-    },
     getPlayerIndex(id: string) {
         return apiClient.get('wl-index/' + id)
     },

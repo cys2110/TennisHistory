@@ -2,10 +2,10 @@
 import { DateTime } from 'luxon';
 import { useDisplay } from 'vuetify';
 import { categorySrc, encodeName, formattedDates, flagSrc } from '../utils';
-import type { ArchiveEdition } from '../interfaces';
+import type { Edition } from '../interfaces';
 
 const props = defineProps<{
-    edition: ArchiveEdition
+    edition: Edition
 }>()
 const { smAndDown } = useDisplay()
 </script>
@@ -26,8 +26,8 @@ const { smAndDown } = useDisplay()
                     <v-img
                         v-if="edition.category"
                         class="!size-20 mx-auto"
-                        :src="categorySrc(edition.category)"
-                        :alt="edition.category"
+                        :src="categorySrc(edition.category.id)"
+                        :alt="edition.category.id"
                     />
                 </v-col>
                 <v-col
@@ -44,23 +44,23 @@ const { smAndDown } = useDisplay()
                     <div class="text-xl py-0.5">
                         <router-link
                             class="hover-link"
-                            :to="{name: 'Tournament', params: {id: edition.Tournament.id, name: encodeName(edition.Tournament.name)}}"
+                            :to="{name: 'Tournament', params: {id: edition.tournament.id, name: encodeName(edition.tournament.name)}}"
                         >
-                            {{ edition.Tournament.name }}
+                            {{ edition.tournament.name }}
                         </router-link>
                     </div>
                     <div class="flex justify-center sm:!justify-start py-0.5">
-                        <div>{{ edition.city }}</div>
+                        <div>{{ edition.venue.city }}</div>
                         <div class="!w-9">
                             <flag-img
                                 class="mx-1"
-                                :src="flagSrc(edition.country)"
-                                :alt="edition.country"
+                                :src="flagSrc(edition.venue.country.id)"
+                                :alt="edition.venue.country.name"
                             />
                         </div>
                     </div>
                     <div class="py-0.5">{{ formattedDates(edition.start_date, edition.end_date) }}</div>
-                    <div class="py-0.5">{{ edition.environment }} {{ edition.surface }}<span v-if="edition.hard_type"> ({{ edition.hard_type }})</span></div>
+                    <div class="py-0.5">{{ edition.surface.environment }} {{ edition.surface.surface }}<span v-if="edition.surface.hard_type"> ({{ edition.surface.hard_type }})</span></div>
                 </v-col>
                 <v-col
                     class="text-center flex justify-center items-center"
@@ -70,7 +70,7 @@ const { smAndDown } = useDisplay()
                     <v-chip
                         v-if="DateTime.now() > DateTime.fromISO(edition.start_date)"
                         variant="outlined"
-                        :to="{name: 'Edition', params: {name: encodeName(edition.Tournament.name), id: edition.Tournament.id, editionNo: edition.edition_no}}"
+                        :to="{name: 'Edition', params: {name: encodeName(edition.tournament.name), id: edition.tournament.id, editionNo: edition.id}}"
                     >
                         Results
                     </v-chip>

@@ -1,71 +1,50 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { useDisplay } from 'vuetify';
-import { headshot, flagSrc, encodeName, getMatchScore, getTieBreak } from '../utils';
-import type { EntriesMatch } from '../interfaces';
+import { headshot, flagSrc, encodeName, getTieBreak, round } from '../utils';
+import type { ActivityMatch } from '../interfaces';
 
 const props = defineProps<{
-    match: EntriesMatch,
-    playerId: string
+    match: ActivityMatch,
+    playerId: string,
+    playerName: string
 }>()
 
 const { lgAndUp } = useDisplay()
-
-const round = (roundNumber: string) => {
-    return isNaN(parseInt(roundNumber)) ? roundNumber : `R${roundNumber}`
-}
-
-const opponentId = computed(() => {
-    return props.match.entry1.Player.id === props.playerId && props.match.entry2 ? props.match.entry2.Player.id : props.match.entry1.Player.id
-})
-
-const opponentCountry = computed(() => {
-    return props.match.entry1.Player.id === props.playerId && props.match.entry2.Player ? props.match.entry2.Player.country : props.match.entry1.Player.country
-})
-
-const opponentName = computed(() => {
-    return props.match.entry1.Player.id === props.playerId && props.match.entry2.Player ? props.match.entry2.Player.full_name : props.match.entry1.Player.full_name
-})
-
-const sets = computed(() => [
-  { index: 1, s1: props.match.s1p1, s2: props.match.s1p2, t1: props.match.t1p1, t2: props.match.t1p2 },
-  { index: 2, s1: props.match.s2p1, s2: props.match.s2p2, t1: props.match.t2p1, t2: props.match.t2p2 },
-  { index: 3, s1: props.match.s3p1, s2: props.match.s3p2, t1: props.match.t3p1, t2: props.match.t3p2 },
-  { index: 4, s1: props.match.s4p1, s2: props.match.s4p2, t1: props.match.t4p1, t2: props.match.t4p2 },
-  { index: 5, s1: props.match.s5p1, s2: props.match.s5p2, t1: props.match.t5p1, t2: props.match.t5p2 }
-])
 </script>
 
 <template>
     <tr class="text-xs md:text-sm">
         <td class="text-center">{{ round(match.round) }}</td>
         <td class="text-nowrap">
-            <div v-if="match.incomplete === 'B'">BYE</div>
+            <div v-if="match.incomplete">BYE</div>
             <div
-                v-else-if="match.entry1 && match.entry2"
+                v-else
                 class="flex items-center"
             >
                 <div class="mx-0.5">
                     <flag-img
+                        v-if="match.opp_countryCode"
                         class="w-[2rem]"
-                        :src="flagSrc(opponentCountry)"
-                        :alt="opponentCountry"
+                        :src="flagSrc(match.opp_countryCode)"
+                        :alt="match.opp_countryName"
                     />
                 </div>
                 <div class="mx-0.5">
                     <v-avatar :size="lgAndUp ? 'default' : 'small'">
                         <v-img
-                            :src="headshot(opponentId)"
-                            :alt="opponentName"
+                            v-if="match.opp_id"
+                            :src="headshot(match.opp_id)"
+                            :alt="`${match.opp_first_name} ${match.opp_last_name}`"
                         />
                     </v-avatar>
                 </div>
                 <div class="mx-0.5">
                     <router-link
+                        v-if="match.opp_first_name"
                         class="hover-link"
-                        :to="{name: 'Player', params: {id: opponentId, name: opponentName}}"
+                        :to="{name: 'Player', params: {id: match.opp_id, name: `${match.opp_first_name}_${match.opp_last_name}`}}"
                     >
-                        {{ opponentName }}
+                        {{ match.opp_first_name }} {{ match.opp_last_name }}
                     </router-link>
                 </div>
             </div>
@@ -77,22 +56,39 @@ const sets = computed(() => [
             />
         </td>
         <td class="flex items-center">
-            <div v-if="match.incomplete === 'WO'">WO</div>
+            <div v-if="match.p_scores.incomplete === 'WO' || match.opp_scores.incomplete === 'WO'">WO</div>
             <div
                 v-else
-                v-for="set in sets"
-                :key="set.index"
+                class="flex"
             >
-                {{ set.s1 !== null && set.s2 !== null ? getMatchScore(props.match.entry1.Player.id, playerId, set.s1, set.s2) : ''}}<sup v-if="set.t1 !== null && set.t2 !== null">{{ getTieBreak(set.t1, set.t2) }}</sup>&nbsp;
+                <div>
+                    {{ match.p_scores.s1 }}{{ match.opp_scores.s1 }}
+                    <sup v-if="match.p_scores.t1 && match.opp_scores.t1">{{ getTieBreak(match.p_scores.t1, match.opp_scores.t1) }}</sup>
+                </div>&nbsp;
+                <div>
+                    {{ match.p_scores.s2 }}{{ match.opp_scores.s2 }}
+                    <sup v-if="match.p_scores.t2 && match.opp_scores.t2">{{ getTieBreak(match.p_scores.t2, match.opp_scores.t2) }}</sup>
+                </div>&nbsp;
+                <div>
+                    {{ match.p_scores.s3 }}{{ match.opp_scores.s3 }}
+                    <sup v-if="match.p_scores.t3 && match.opp_scores.t3">{{ getTieBreak(match.p_scores.t3, match.opp_scores.t3) }}</sup>
+                </div>&nbsp;
+                <div>
+                    {{ match.p_scores.s4 }}{{ match.opp_scores.s4 }}
+                    <sup v-if="match.p_scores.t4 && match.opp_scores.t4">{{ getTieBreak(match.p_scores.t4, match.opp_scores.t4) }}</sup>
+                </div>&nbsp;
+                <div>
+                    {{ match.p_scores.s5 }}{{ match.opp_scores.s5 }}
+                    <sup v-if="match.p_scores.t5 && match.opp_scores.t5">{{ getTieBreak(match.p_scores.t5, match.opp_scores.t5) }}</sup>
+                </div>&nbsp;
             </div>
-            <div v-if="match.incomplete === 'R'">Ret.</div>
-            <div v-else-if="match.incomplete === 'D'">Def.</div>
+            <div v-if="match.p_scores.incomplete || match.opp_scores.incomplete">{{ match.p_scores.incomplete ?? match.opp_scores.incomplete }}</div>
         </td>
         <td>
             <v-chip
-                v-if="match.incomplete !== 'B'"
+                v-if="!match.incomplete"
                 class="bg-zinc-300 text-indigo-800"
-                :to="{name: 'H2H', params: {p1Name: encodeName(match.entry1.Player.full_name), p1Id: match.entry1.Player.id, p2Name: encodeName(match.entry2.Player.full_name), p2Id: match.entry2.Player.full_name}}"
+                :to="{name: 'H2H', params: {p1Name: encodeName(playerName), p1Id: playerId, p2Name: `${match.opp_first_name}_${match.opp_last_name}`, p2Id: match.opp_id}}"
                 density="compact"
             >
                 H2H

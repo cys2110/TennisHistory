@@ -14,15 +14,6 @@ export default {
     getEditionById(id: number) {
         return apiClient.get('id/' + id)
     },
-    getUpcomingEditions() {
-        return apiClient.get('upcoming')
-    },
-    getEditionsByYear(year: number) {
-        return apiClient.get('year/' + year)
-    },
-    getEditionsByPlayer(player: string) {
-        return apiClient.get('player/' + player)
-    },
     getEntriesByPlayer(player: string, year: number) {
         return apiClient.get(`entries?player=${player}&year=${year}`)
     },

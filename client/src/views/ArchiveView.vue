@@ -1,19 +1,30 @@
 <script setup lang="ts">
+import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon'
 import { ref, watch, type Ref } from 'vue';
+import apolloClient from '@/apollo';
+import { getEditionByYear } from '@/services/APICalls';
 import ArchiveCard from '@/components/Archive/ArchiveCard.vue';
-import EditionService from '@/services/EditionService';
-import type { ArchiveEdition } from '@/components/interfaces';
+import type { Edition } from '@/components/interfaces';
+
+provideApolloClient(apolloClient)
 
 const years = Array.from({length: (DateTime.now().year + 1) - 1968}, (_, index) => 2024 - index)
-const searchYear: Ref<number> = ref(2024)
-const results: Ref<ArchiveEdition[]> = ref([])
+const searchYear: Ref<number> = ref(DateTime.now().year)
+const results: Ref<Edition[]> = ref([])
 
-watch(searchYear, () => {
-    if (searchYear.value !== null && !isNaN(searchYear.value)) {
-        EditionService.getEditionsByYear(searchYear.value)
-        .then(response => results.value = response.data)
-        .catch(e => console.log(e))
+const { query, variables } = getEditionByYear(searchYear.value)
+const { result, loading, error} = useQuery(query, variables)
+
+watch(searchYear, (newYear) => {
+    if (newYear !== null && !isNaN(newYear)) {
+        const { query, variables } = getEditionByYear(newYear)
+        const { result, loading, error} = useQuery(query, variables)
+        watch(result, (newResult) => {
+            if (result.value) {
+                results.value = result.value.events
+            }
+        })
     }
 }, {immediate: true})
 </script>

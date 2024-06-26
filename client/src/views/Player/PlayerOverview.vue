@@ -1,74 +1,75 @@
 <script setup lang="ts">
 import { DateTime } from 'luxon';
-import { plays, bh, encodeName } from '../utils';
-import type { PlayerDetails } from '../interfaces';
+import convert from 'convert'
+import { plays, bh, encodeName, convertToFt } from '@/components/utils';
+import type { PlayerDetails } from '@/components/interfaces';
 
 const props = defineProps<{
     player: PlayerDetails
 }>()
 
-const results = [
-    {
-        tournament: 'Australian Open',
-        id: 580,
-        round: props.player.ao_round ?? '—',
-        years: props.player.ao_years?.join(', ') ?? '—'
-    },
-    {
-        tournament: 'Roland Garros',
-        id: 520,
-        round: props.player.rg_round ?? '—',
-        years: props.player.rg_years?.join(', ') ?? '—'
-    },
-    {
-        tournament: 'Wimbledon',
-        id: 540,
-        round: props.player.wimbledon_round ?? '—',
-        years: props.player.wimbledon_years?.join(', ') ?? '—'
-    },
-    {
-        tournament: 'US Open',
-        id: 560,
-        round: props.player.uso_round ?? '—',
-        years: props.player.uso_years?.join(', ') ?? '—'
-    },
-    {
-        tournament: 'Year-End Finals',
-        id: 605,
-        round: props.player.finals_round ?? '—',
-        years: props.player.finals_years?.join(', ') ?? '—'
-    },
-    {
-        tournament: 'Olympics',
-        id: 96,
-        round: props.player.olympics_round ?? '—',
-        years: props.player.olympics_years?.join(', ') ?? '—'
-    },
-    {
-        tournament: 'Davis Cup',
-        id: 10005,
-        round: props.player.davis_round ?? '—',
-        years: props.player.davis_years?.join(', ') ?? '—'
-    },
-    {
-        tournament: 'Hopman Cup',
-        id: 10004,
-        round: props.player.hopman_round ?? '—',
-        years: props.player.hopman_years?.join(', ') ?? '—'
-    },
-    {
-        tournament: 'Grand Slam Cup',
-        id: 604,
-        round: props.player.gs_cup_round ?? '—',
-        years: props.player.gs_cup_years?.join(', ') ?? '—'
-    },
-    {
-        tournament: 'WCT Finals',
-        id: 10003,
-        round: props.player.wct_round ?? '—',
-        years: props.player.wct_years?.join(', ') ?? '—'
-    }
-]
+// const results = [
+//     {
+//         tournament: 'Australian Open',
+//         id: 580,
+//         round: props.player.ao_round ?? '—',
+//         years: props.player.ao_years?.join(', ') ?? '—'
+//     },
+//     {
+//         tournament: 'Roland Garros',
+//         id: 520,
+//         round: props.player.rg_round ?? '—',
+//         years: props.player.rg_years?.join(', ') ?? '—'
+//     },
+//     {
+//         tournament: 'Wimbledon',
+//         id: 540,
+//         round: props.player.wimbledon_round ?? '—',
+//         years: props.player.wimbledon_years?.join(', ') ?? '—'
+//     },
+//     {
+//         tournament: 'US Open',
+//         id: 560,
+//         round: props.player.uso_round ?? '—',
+//         years: props.player.uso_years?.join(', ') ?? '—'
+//     },
+//     {
+//         tournament: 'Year-End Finals',
+//         id: 605,
+//         round: props.player.finals_round ?? '—',
+//         years: props.player.finals_years?.join(', ') ?? '—'
+//     },
+//     {
+//         tournament: 'Olympics',
+//         id: 96,
+//         round: props.player.olympics_round ?? '—',
+//         years: props.player.olympics_years?.join(', ') ?? '—'
+//     },
+//     {
+//         tournament: 'Davis Cup',
+//         id: 10005,
+//         round: props.player.davis_round ?? '—',
+//         years: props.player.davis_years?.join(', ') ?? '—'
+//     },
+//     {
+//         tournament: 'Hopman Cup',
+//         id: 10004,
+//         round: props.player.hopman_round ?? '—',
+//         years: props.player.hopman_years?.join(', ') ?? '—'
+//     },
+//     {
+//         tournament: 'Grand Slam Cup',
+//         id: 604,
+//         round: props.player.gs_cup_round ?? '—',
+//         years: props.player.gs_cup_years?.join(', ') ?? '—'
+//     },
+//     {
+//         tournament: 'WCT Finals',
+//         id: 10003,
+//         round: props.player.wct_round ?? '—',
+//         years: props.player.wct_years?.join(', ') ?? '—'
+//     }
+// ]
 </script>
 
 <template>
@@ -78,7 +79,7 @@ const results = [
                 <div class="w-100 mx-1">
                     <div class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between text-sm">
                         <span>Active</span>
-                        <span>{{ player.turned_pro }} - {{ player.retired ?? 'present' }}</span>
+                        <span>{{ player.turned_pro.id }} - {{ player.retired ? player.retired.id : 'present' }}</span>
                     </div>
                     <div
                         v-if="player.dob"
@@ -91,11 +92,11 @@ const results = [
                         </div>
                     </div>
                     <div
-                        v-if="player.height_cm && player.height_ft"
+                        v-if="player.height_cm"
                         class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between text-sm"
                     >
                         <span>Height</span>
-                        <span>{{ player.height_cm }}cm ({{ player.height_ft }})</span>
+                        <span>{{ player.height_cm }}cm ({{ convertToFt(player.height_cm) }})</span>
                     </div>
                 </div>
                 <div class="w-100 mx-1">
@@ -113,7 +114,7 @@ const results = [
                         <span>Backhand</span>
                         <span>{{ bh(player.bh1) }}</span>
                     </div>
-                    <div
+                    <!-- <div
                         v-if="player.coaches"
                         class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between text-sm"
                     >
@@ -121,17 +122,17 @@ const results = [
                         <div>
                             <div
                                 v-for="coach in player.coaches"
-                                :key="coach"
+                                :key="coach.first_name"
                                 class="text-right"
                             >
-                                {{ coach }}
+                                {{ coach.first_name }} {{ coach.last_name }}
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </v-col>
         </v-row>
-        <v-row>
+        <!-- <v-row>
             <v-col>
                 <v-table class="bg-transparent rounded-lg">
                     <thead>
@@ -157,6 +158,6 @@ const results = [
                     </tbody>
                 </v-table>
             </v-col>
-        </v-row>
+        </v-row> -->
     </v-container>
 </template>

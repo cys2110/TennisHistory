@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import { formattedDates, flagSrc, formatCurrency, categorySrc, encodeName } from '../utils';
-import type { EntriesByPlayer, EntriesMatch } from '../interfaces';
+import type { PlayerActivity } from '../interfaces';
 import MatchRow from './MatchRow.vue';
 
 const props = defineProps<{
-    entry: EntriesByPlayer,
-    playerId: string
+    event: PlayerActivity,
+    playerId: string,
+    playerName: string
 }>()
-
-const matches: EntriesMatch[] = [...props.entry.entry1, ...props.entry.entry2]
-const sortedMatches = matches.sort((a: EntriesMatch, b: EntriesMatch) => {
-    return a.id - b.id
-})
 </script>
 
 <template>
@@ -20,37 +16,37 @@ const sortedMatches = matches.sort((a: EntriesMatch, b: EntriesMatch) => {
             <v-row>
                 <v-col cols="3" class="flex items-center">
                     <v-img
-                        v-if="entry.Edition.category"
-                        :src="categorySrc(entry.Edition.category)"
-                        :alt="entry.Edition.category"
+                        v-if="event.category"
+                        :src="categorySrc(event.category)"
+                        :alt="event.category"
                     />
                 </v-col>
                 <v-col cols="9">
                     <v-card-title>
-                        <div class="text-sm lg:text-3xl">{{ entry.Edition.sponsor_name ?? '' }}</div>
+                        <div class="text-sm lg:text-3xl">{{ event.sponsor_name ?? '' }}</div>
                         <div class="text-sm lg:text-3xl">
                             <router-link
                                 class="hover-link"
-                                :to="{name: 'Tournament', params: {id: entry.Edition.Tournament.id, name: encodeName(entry.Edition.Tournament.name)}}"
+                                :to="{name: 'Tournament', params: {id: event.tournamentId, name: encodeName(event.tournamentName)}}"
                             >
-                                {{ entry.Edition.Tournament.name }}
+                                {{ event.tournamentName }}
                             </router-link>
                         </div>
                     </v-card-title>
                     <v-card-subtitle>
                         <div class="flex items-center text-xs lg:text-base">
-                            <div>{{ entry.Edition.city }}</div>
+                            <div>{{ event.city }}</div>
                             <div class="mx-1">
                                 <flag-img
                                     class="w-[2rem]"
-                                    :src="flagSrc(entry.Edition.country)"
-                                    :alt="entry.Edition.country"
+                                    :src="flagSrc(event.countryId)"
+                                    :alt="event.countryName"
                                 />
                             </div>
                         </div>
                         <div class="text-xs lg:text-base">
-                            <div class="my-1">{{ entry.Edition.environment }} {{ entry.Edition.surface }} <span v-if="entry.Edition.hard_type">({{ entry.Edition.hard_type }})</span></div>
-                            <div class="my-1">{{ formattedDates(entry.Edition.start_date, entry.Edition.end_date) }}</div>
+                            <div class="my-1">{{ event.environment }} {{ event.surface }} <span v-if="event.hard_type">({{ event.hard_type }})</span></div>
+                            <div class="my-1">{{ formattedDates(event.start_date, event.end_date) }}</div>
                         </div>
                     </v-card-subtitle>
                 </v-col>
@@ -69,10 +65,11 @@ const sortedMatches = matches.sort((a: EntriesMatch, b: EntriesMatch) => {
                         </thead>
                         <tbody>
                             <MatchRow
-                                v-for="match in sortedMatches"
-                                :key="match.id"
+                                v-for="(match, index) in event.matches"
+                                :key="index"
                                 :match
                                 :playerId
+                                :playerName
                             />
                         </tbody>
                     </v-table>
@@ -81,22 +78,22 @@ const sortedMatches = matches.sort((a: EntriesMatch, b: EntriesMatch) => {
             <v-row>
                 <v-col class="text-zinc-300 text-xs lg:text-sm text-center sm:flex">
                     <div
-                        v-if="entry.rank !== null"
+                        v-if="event.rank !== null"
                         class="mx-1"
                     >
-                        Rank: {{ entry.rank }}
+                        Rank: {{ event.rank }}
                     </div>
                     <div
-                        v-if="entry.points !== null"
+                        v-if="event.points !== null"
                         class="mx-1"
                     >
-                        Points: {{ entry.points }}
+                        Points: {{ event.points }}
                     </div>
                     <div
-                        v-if="entry.Edition.currency && entry.pm !== null"
+                        v-if="event.currency && event.pm"
                         class="mx-1"
                     >
-                        Prize money: {{ formatCurrency(entry.Edition.currency, entry.pm) }}
+                        Prize money: {{ formatCurrency(event.currency, event.pm) }}
                     </div>
                 </v-col>
             </v-row>

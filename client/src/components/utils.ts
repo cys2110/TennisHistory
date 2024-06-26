@@ -1,4 +1,5 @@
 import { DateTime, Duration } from 'luxon'
+import convert from 'convert'
 import type { EditionByPlayer, MatchScore } from './interfaces'
 
 // variables
@@ -60,20 +61,20 @@ export const status = (seed: number | null, status: string | null) => {
 
 export const round = (roundNumber: string) => {
     switch (roundNumber) {
-        case '128':
-            return 'Round of 128'
-        case '64':
-            return 'Round of 64'
-        case '32':
-            return 'Round of 32'
-        case '16':
-            return 'Round of 16'
-        case 'QF':
-            return 'Quarterfinals'
-        case 'SF':
-            return 'Semifinals'
-        case 'F':
-            return 'Final'
+        case 'Round of 128':
+            return 'R128'
+        case 'Round of 64':
+            return 'R64'
+        case 'Round of 32':
+            return 'R32'
+        case 'Round of 16':
+            return 'R16'
+        case 'Quarterfinals':
+            return 'QF'
+        case 'Semifinals':
+            return 'SF'
+        case 'Final':
+            return 'F'
     }
 }
 
@@ -124,4 +125,11 @@ export const getMatchScore = (comp1: string, comp2: string, score1: number, scor
 
 export const getTieBreak = (score1: number, score2: number) => {
     return score1 > score2 ? score2 : score1
+}
+
+export const convertToFt = (cm:number) => {
+    const ftDecimal = convert(cm, 'cm').to('ft')
+    const ft = Math.floor(ftDecimal)
+    const inches = Math.round((ftDecimal - ft) * 12)
+    return `${ft}'${inches}"`
 }

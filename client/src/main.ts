@@ -4,6 +4,7 @@ import router from './router'
 
 import 'vuetify/styles'
 import './assets/main.css'
+import apolloClient from './apollo'
 import { createVuetify } from 'vuetify'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -65,5 +66,6 @@ library.add(fad)
 
 app.use(router)
 app.use(vuetify)
+app.provide('apollo', apolloClient)
 
 app.mount('#app')

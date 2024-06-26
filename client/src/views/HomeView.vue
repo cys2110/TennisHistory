@@ -1,15 +1,29 @@
 <script setup lang="ts">
-import EditionService from '@/services/EditionService';
+import { ref, watch, type Ref } from 'vue';
+import { DateTime } from 'luxon';
+import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import apolloClient from '@/apollo';
+import { getUpcomingEditions } from '@/services/APICalls';
 import UpcomingCard from '@/components/Home/UpcomingCard.vue';
-import { onMounted, ref, type Ref } from 'vue';
-import type { UpcomingEdition } from '@/components/interfaces';
+import type { Edition } from '@/components/interfaces';
 
-const upcoming: Ref<UpcomingEdition[]> = ref([])
+provideApolloClient(apolloClient)
 
-onMounted(() => {
-    EditionService.getUpcomingEditions()
-    .then(response => upcoming.value = response.data)
-    .catch(error => console.log(error))
+const { query, variables } = getUpcomingEditions(DateTime.now().toISODate())
+const { result, loading, error} = useQuery(query, variables)
+
+const upcoming: Ref<Edition[]> = ref([])
+
+watch(result, (newResult) => {
+    if (newResult) {
+        upcoming.value = newResult.events
+    }
+}, {immediate: true})
+
+watch(error, (newError) => {
+    if (newError) {
+        console.error(newError)
+    }
 })
 </script>
 
