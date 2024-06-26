@@ -33,7 +33,6 @@ const updateActivity = () => {
 
     watch(result, (newResult) => {
         if (newResult) {
-            console.log(newResult)
             stats.value = newResult.players[0].yearStats
             results.value = newResult.players[0].tournaments
         }

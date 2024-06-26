@@ -393,6 +393,10 @@ export const typeDefs = `#graphql
     type Tournament {
         id: Int! @unique
         name: String!
+        website: String
+        start_year: Year! @relationship(type: "ESTABLISHED", direction: OUT)
+        end_year: Year @relationship(type:"ABOLISHED", direction: OUT)
+        events: [Event!]! @relationship(type: "EDITION_OF", direction: IN)
     }
 
     type Event {
@@ -400,6 +404,9 @@ export const typeDefs = `#graphql
         start_date: Date
         end_date: Date
         sponsor_name: String
+        winner: Player @relationship(type: "WON", direction: IN)
+        finalist: Player @relationship(type: "FINALIST", direction: IN)
+        final_score: String
         surface: Surface @relationship(type: "ON_SURFACE", direction: OUT)
         venue: Venue @relationship(type: "TOOK_PLACE_IN", direction: OUT)
         category: Category @relationship(type: "CATEGORY_OF", direction: OUT)

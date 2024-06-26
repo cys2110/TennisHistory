@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, type Ref, watch } from 'vue';
+import { computed, ref, type Ref, watch } from 'vue';
+import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import apolloClient from '@/apollo';
+import { getTournament } from '@/services/APICalls';
 import TournamentCard from '@/components/Tournament/TournamentCard.vue';
-import TournamentService from '@/services/TournamentService';
 import type { TournamentDetails } from '@/components/interfaces';
+
+provideApolloClient(apolloClient)
 
 const props = defineProps<{
     id: string,
@@ -10,16 +14,25 @@ const props = defineProps<{
 }>()
 const tournament: Ref<TournamentDetails | null> = ref(null)
 
-const years = computed(() => {
-    return !tournament.value?.end_year ? `${tournament.value?.start_year} - present` :
-        tournament.value.start_year === tournament.value.end_year ? tournament.value.start_year :
-        `${tournament.value.start_year} - ${tournament.value.end_year}`
+    const { query, variables } = getTournament(parseInt(props.id))
+const { result, loading, error} = useQuery(query, variables)
+
+watch(result, (newResult) => {
+    if (newResult) {
+        tournament.value = newResult.tournaments[0]
+    }
+}, {immediate: true})
+
+watch(error, (newError) => {
+    if (newError) {
+        console.error(newError)
+    }
 })
 
-onMounted(() => {
-    TournamentService.getTournamentById(parseInt(props.id))
-    .then(response => tournament.value = response.data)
-    .catch(e => console.log(e))
+const years = computed(() => {
+    return !tournament.value?.end_year ? `${tournament.value?.start_year.id} - present` :
+        tournament.value.start_year === tournament.value.end_year ? tournament.value.start_year.id :
+        `${tournament.value.start_year.id} - ${tournament.value.end_year.id}`
 })
 
 const updateDocumentTitle = () => {
@@ -60,13 +73,13 @@ watch(() => props.name, () => {
             <v-row class="text-xl my-5 text-zinc-300">{{ years }}</v-row>
             <v-row>
                 <v-col
-                    v-for="edition in tournament.Editions"
-                    :key="edition.id"
+                    v-for="event in tournament.events"
+                    :key="event.id"
                     cols="12"
                     sm="6"
                     lg="3"
                 >
-                    <TournamentCard :edition />
+                    <TournamentCard :event />
                 </v-col>
             </v-row>
         </v-container>

@@ -2,20 +2,20 @@
 import { computed, ref, type Ref } from 'vue';
 import { DateTime } from 'luxon';
 import { headshot, flagSrc, encodeName } from '../utils';
-import type { EditionsOfTournament } from '../interfaces';
+import type { TournamentEvent } from '../interfaces';
 
 const props = defineProps<{
-    edition: EditionsOfTournament
+    event: TournamentEvent
 }>()
 const display: Ref<boolean> = ref(true)
 const noFinal: Ref<boolean> = ref(false)
 
-DateTime.fromISO(props.edition.end_date) < DateTime.now() ? display.value = true : display.value = false
-props.edition.final_score ? noFinal.value = false : noFinal.value = true
+DateTime.fromISO(props.event.end_date) < DateTime.now() ? display.value = true : display.value = false
+props.event.final_score ? noFinal.value = false : noFinal.value = true
 
 const formattedScore = computed(() => {
-    if (props.edition.final_score) {
-        return props.edition.final_score.replace(/\(/g, '<sup>').replace(/\)/g, '</sup>')
+    if (props.event.final_score) {
+        return props.event.final_score.replace(/\(/g, '<sup>').replace(/\)/g, '</sup>')
     }
 });
 </script>
@@ -27,9 +27,9 @@ const formattedScore = computed(() => {
                 <v-col class="text-center text-2xl">
                     <router-link
                         class="hover-link"
-                        :to="{name: 'Edition', params: {editionNo: edition.edition_no}}"
+                        :to="{name: 'Edition', params: {editionNo: event.id}}"
                     >
-                        {{ edition.year }}
+                        {{ event.year.id }}
                     </router-link>
                 </v-col>
             </v-row>
@@ -42,8 +42,8 @@ const formattedScore = computed(() => {
                     cols="2"
                 >
                     <flag-img
-                        :src="flagSrc(edition.winner.country)"
-                        :alt="edition.winner.country"
+                        :src="flagSrc(event.winner.country.id)"
+                        :alt="event.winner.country.name"
                     />
                 </v-col>
                 <v-col
@@ -52,17 +52,17 @@ const formattedScore = computed(() => {
                 >
                     <v-avatar>
                         <v-img
-                            :src="headshot(edition.winner.id)"
-                            :alt="edition.winner.full_name"
+                            :src="headshot(event.winner.id)"
+                            :alt="event.winner.full_name"
                         />
                     </v-avatar>
                 </v-col>
                 <v-col class="flex items-center mx-2">
                     <router-link
                         class="hover-link"
-                        :to="{name: 'Player', params: {id: edition.winner.id, name: encodeName(edition.winner.full_name)}}"
+                        :to="{name: 'Player', params: {id: event.winner.id, name: encodeName(event.winner.full_name)}}"
                     >
-                        {{ edition.winner.full_name }}
+                        {{ event.winner.full_name }}
                     </router-link>
                 </v-col>
             </v-row>
@@ -78,8 +78,8 @@ const formattedScore = computed(() => {
                     cols="2"
                 >
                     <flag-img
-                        :src="flagSrc(edition.finalist.country)"
-                        :alt="edition.finalist.country"
+                        :src="flagSrc(event.finalist.country.id)"
+                        :alt="event.finalist.country.name"
                     />
                 </v-col>
                 <v-col
@@ -88,17 +88,17 @@ const formattedScore = computed(() => {
                 >
                     <v-avatar>
                         <v-img
-                            :src="headshot(edition.finalist.id)"
-                            :alt="edition.finalist.full_name"
+                            :src="headshot(event.finalist.id)"
+                            :alt="event.finalist.full_name"
                         />
                     </v-avatar>
                 </v-col>
                 <v-col class="flex items-center mx-2">
                     <router-link
                         class="hover-link"
-                        :to="{name: 'Player', params: {id: edition.finalist.id, name: encodeName(edition.finalist.full_name)}}"
+                        :to="{name: 'Player', params: {id: event.finalist.id, name: encodeName(event.finalist.full_name)}}"
                     >
-                        {{ edition.finalist.full_name }}
+                        {{ event.finalist.full_name }}
                     </router-link>
                 </v-col>
             </v-row>

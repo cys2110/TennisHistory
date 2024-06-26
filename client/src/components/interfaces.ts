@@ -42,6 +42,32 @@ export interface Tournament {
     name: string
 }
 
+export interface TournamentDetails extends Tournament {
+    website: string | null,
+    start_year: idNumber,
+    end_year: idNumber,
+    events: TournamentEvent[]
+}
+
+export interface TournamentEvent {
+    id: number,
+    year: idNumber,
+    winner: Player & {
+        country: {
+            id: string,
+            name: string
+        }
+    },
+    finalist: Player & {
+        country: {
+            id: string,
+            name: string
+        }
+    },
+    final_score: string
+    end_date: Date
+}
+
 export interface Edition {
     id: number,
     category: idString | null,
@@ -54,15 +80,6 @@ export interface Edition {
     year: idNumber
 }
 
-// // Tournament
-
-// export interface TournamentDetails extends Tournament {
-//     start_year: number,
-//     end_year: number | null,
-//     website: string | null,
-//     Editions: EditionsOfTournament[]
-// }
-
 // Edition
 
 // export interface EditionByPlayer extends Edition {
@@ -74,14 +91,6 @@ export interface Edition {
 //     winner_id: string,
 //     finalist_id: string,
 //     Tournament: Tournament
-// }
-
-// export interface EditionsOfTournament extends Edition {
-//     year: number,
-//     final_score: string | null,
-//     end_date: Date,
-//     winner: Player,
-//     finalist: Player
 // }
 
 // export interface EditionDetails extends Edition {
@@ -342,6 +351,9 @@ export interface Player {
     first_name: string,
     last_name: string,
     full_name: string,
+}
+
+export interface PlayerDetails extends Player {
     countryConnection: {
         edges: {
             node: Country,
@@ -351,9 +363,6 @@ export interface Player {
             }
         }[]
     }
-}
-
-export interface PlayerDetails extends Player {
     prev_countriesConnection: {
         edges: {
             node: Country,

@@ -83,6 +83,59 @@ export const getEditionByYear = (year: number) => {
     return {query: call, variables: { year }}
 }
 
+export const getTournament = (id: number) => {
+    const call = gql `
+        query Tournament($id: Int!) {
+            tournaments (
+                where: { id: $id }
+            ) {
+                id
+                name
+                website
+                start_year {
+                    id
+                }
+                end_year {
+                    id
+                }
+                events {
+                    id
+                    year(options: {
+                        sort: [
+                            {id: DESC}
+                        ]
+                    }) {
+                        id
+                    }
+                    winner {
+                        id
+                        first_name
+                        last_name
+                        full_name
+                        country {
+                            id
+                            name
+                        }
+                    }
+                    finalist {
+                        id
+                        first_name
+                        last_name
+                        full_name
+                        country {
+                            id
+                            name
+                        }
+                    }
+                    final_score
+                    end_date
+                }
+            }
+        }
+    `
+    return {query: call, variables: { id }}
+}
+
 export const getPlayer = (id: string) => {
     const call = gql `
         query Player($id: String!) {
