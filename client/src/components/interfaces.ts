@@ -52,115 +52,110 @@ export interface TournamentDetails extends Tournament {
 export interface TournamentEvent {
     id: number,
     year: idNumber,
-    winner: Player & {
-        country: {
-            id: string,
-            name: string
-        }
-    },
-    finalist: Player & {
-        country: {
-            id: string,
-            name: string
-        }
-    },
+    winner: PlayerCountry,
+    finalist: PlayerCountry,
     final_score: string
     end_date: Date
 }
 
 export interface Edition {
     id: number,
-    category: idString | null,
+    category: string | null,
     sponsor_name: string | null,
     tournament: Tournament,
     venue: Venue,
     start_date: Date,
     end_date: Date,
     surface: Surface,
-    year: idNumber
+    year: idNumber,
+    draw_type?: string
 }
 
-// Edition
+export interface PlayerCountry extends Player {
+    country: {
+        id: string,
+        name: string
+    }
+}
 
-// export interface EditionByPlayer extends Edition {
-//     environment: string,
-//     surface: string,
-//     hard_type: string | null,
-//     sponsor_name: string,
-//     year: number,
-//     winner_id: string,
-//     finalist_id: string,
-//     Tournament: Tournament
-// }
+export interface Entry {
+    reason: string,
+    player: PlayerCountry
+}
 
-// export interface EditionDetails extends Edition {
-//     sponsor_name: string | null,
-//     category: string | null,
-//     city: string,
-//     country: string,
-//     start_date: Date,
-//     end_date: Date,
-//     environment: string,
-//     surface: string,
-//     hard_type: string | null,
-//     year: number,
-//     type_of_draw: string,
-//     currency: string,
-//     pm: number | null,
-//     tfc: number | null,
-//     supervisors: string[] | null,
-//     venue: string | null,
-//     winner_pm: number | null,
-//     winner_pts: number | null,
-//     finalist_pm: number | null,
-//     finalist_pts: number | null,
-//     semifinalist_pm: number | null,
-//     semifinalist_pts: number | null,
-//     quarterfinalist_pm: number | null,
-//     quarterfinalist_pts: number | null,
-//     r16_pm: number | null,
-//     r16_pts: number | null,
-//     r32_pm: number | null,
-//     r32_pts: number | null,
-//     r64_pm: number | null,
-//     r64_pts: number | null,
-//     r128_pm: number | null,
-//     r128_pts: number | null,
-//     Entries: Entries[],
-//     MatchScores: MatchScore[]
-// }
+export interface EditionDetails extends Edition {
+    currency: string,
+    pm: number | null,
+    tfc: number | null,
+    supervisors: idString[],
+    winner_pm: number | null,
+    winner_pts: number | null,
+    finalist_pm: number | null,
+    finalist_pts: number | null,
+    semifinalist_pm: number | null,
+    semifinalist_pts: number | null,
+    quarterfinalist_pm: number | null,
+    quarterfinalist_pts: number | null,
+    r16_pm: number | null,
+    r16_pts: number | null,
+    r32_pm: number | null,
+    r32_pts: number | null,
+    r64_pm: number | null,
+    r64_pts: number | null,
+    r128_pm: number | null,
+    r128_pts: number | null,
+    seeds: {
+        seed: number,
+        rank: number,
+        wd: string | null,
+        player: PlayerCountry
+    }[],
+    lda: {
+        rank: number,
+        status: string | null,
+        player: PlayerCountry
+    },
+    lls: PlayerCountry[],
+    alts: PlayerCountry[],
+    wds: Entry[],
+    rets: Entry[],
+    wos: Entry[],
+    defs: Entry[]
+}
+
+export interface Result {
+    round: string,
+    matches: MatchResult[]
+}
+
+export interface Status {
+    WC: String[],
+    Alt: String[],
+    LL: String[],
+    Q: String[],
+    PR: String[],
+    SE: String[]
+}
+
+export interface MatchResult {
+    id: string,
+    match_no: number,
+    date: Date | null,
+    duration: number | null,
+    umpire: string | null,
+    court: string | null,
+    incomplete: string | null,
+    winner: PlayerCountry,
+    loser: PlayerCountry | null,
+    winner_score: Score | null,
+    loser_score: Score | null,
+    winner_seed: number | null,
+    winner_status: string | null,
+    loser_seed: number | null,
+    loser_status: string | null
+}
 
 // // Entries
-
-// export interface Entry {
-//     seed: number | null,
-//     status: string | null,
-//     Player: Player
-// }
-
-// export interface Entries extends Entry {
-//     rank: number | null,
-//     wd: string | null,
-//     ret: string | null,
-//     wo: string | null,
-//     lda: number | null,
-//     defaulted: string | null,
-// }
-
-// interface EntriesEdition {
-//     sponsor_name: string | null,
-//     category: string | null,
-//     city: string,
-//     country: string,
-//     start_date: Date,
-//     end_date: Date,
-//     environment: string,
-//     surface: string,
-//     hard_type: string | null,
-//     Tournament: Tournament,
-//     currency: string,
-//     year: number
-// }
 
 // export interface EntriesMatch {
 //     id: number,

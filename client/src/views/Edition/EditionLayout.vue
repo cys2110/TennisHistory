@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref, type Ref, watch } from 'vue';
+import { ref, type Ref, watch } from 'vue';
+import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import apolloClient from '@/apollo';
 import { useDisplay } from 'vuetify';
-import EditionService from '@/services/EditionService';
-import OverviewWindow from '@/components/Edition/OverviewWindow.vue';
+import { getEdition } from '@/services/APICalls';
 import { categorySrc, formattedDates } from '@/components/utils';
-import type { EditionDetails, MatchScore } from '@/components/interfaces';
-import ResultsWindow from '@/components/Edition/ResultsWindow.vue';
-import DrawWindow from '@/components/Edition/DrawWindow.vue';
+import type { Edition } from '@/components/interfaces';
+
+provideApolloClient(apolloClient)
 
 const props = defineProps<{
     editionNo: string,
@@ -15,17 +16,23 @@ const props = defineProps<{
 }>()
 const { xs } = useDisplay()
 
-const edition: Ref<EditionDetails | null> = ref(null)
-const matches: Ref<MatchScore[]> = ref([])
+const edition: Ref<Edition | null> = ref(null)
 const tab = ref('overview')
 
-onMounted(() => {
-    EditionService.getEditionById(parseInt(props.editionNo))
-    .then(response => {
-        edition.value = response.data
-        matches.value = response.data.MatchScores
-    })
-    .catch(e => console.log(e))
+const { query, variables } = getEdition(parseInt(props.editionNo))
+const { result, loading, error} = useQuery(query, variables)
+
+watch(result, (newResult) => {
+    if (newResult) {
+        console.log(newResult)
+        edition.value = newResult.events[0]
+    }
+}, {immediate: true})
+
+watch(error, (newError) => {
+    if (newError) {
+        console.error(newError)
+    }
 })
 
 const updateDocumentTitle = () => {
@@ -84,27 +91,33 @@ watch(() => props.name, () => {
                             show-arrows
                             color="#d4d4d8"
                         >
-                            <v-tab value="overview">Overview</v-tab>
                             <v-tab
-                                v-if="edition.type_of_draw !== 'T'"
+                                value="overview"
+                                :to="{name: 'Edition'}"
+                            >
+                                Overview
+                            </v-tab>
+                            <v-tab
+                                v-if="edition.draw_type !== 'Team'"
                                 value="results"
+                                :to="{name: 'Results'}"
                             >
                                 Results
                             </v-tab>
                             <v-tab
-                                v-if="edition.type_of_draw === 'T'"
+                                v-if="edition.draw_type === 'Team'"
                                 value="group"
                             >
                                 Group Stages
                             </v-tab>
                             <v-tab
-                                v-if="edition.type_of_draw !=='T'"
+                                v-if="edition.draw_type !=='Team'"
                                 value="draw"
                             >
                                 Draw
                             </v-tab>
                             <v-tab
-                                v-if="edition.type_of_draw === 'T'"
+                                v-if="edition.draw_type === 'Team'"
                                 value="teamKO"
                             >
                                 Knockout Stages
@@ -115,19 +128,7 @@ watch(() => props.name, () => {
             </v-row>
             <v-row>
                 <v-col>
-                    <v-window v-model="tab">
-                        <v-window-item value="overview">
-                            <OverviewWindow :edition />
-                        </v-window-item>
-                        <v-window-item value="results">
-                            <ResultsWindow :matches :edition :name :id/>
-                        </v-window-item>
-                        <v-window-item value="group"></v-window-item>
-                        <v-window-item value="draw">
-                            <DrawWindow :matches :edition :name :id />
-                        </v-window-item>
-                        <v-window-item value="teamKO"></v-window-item>
-                    </v-window>
+                    <router-view />
                 </v-col>
             </v-row>
         </v-container>

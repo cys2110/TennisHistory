@@ -1,89 +1,101 @@
 <script setup lang="ts">
+import { ref, watch, type Ref } from 'vue';
 import { useDisplay } from 'vuetify';
-import EntryRow from './EntryRow.vue';
-import EntryHeading from './EntryHeading.vue';
-import { formatCurrency, headshot, flagSrc, encodeName } from '../utils';
-import type { EditionDetails, Entries } from '../interfaces';
+import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import apolloClient from '@/apollo';
+import { getEditionDetails } from '@/services/APICalls';
+import EntryRow from '@/components/Edition/EntryRow.vue';
+import EntryHeading from '@/components/Edition/EntryHeading.vue';
+import { formatCurrency, headshot, flagSrc, encodeName } from '@/components/utils';
+import type { EditionDetails } from '@/components/interfaces';
+
+provideApolloClient(apolloClient)
 
 const props = defineProps<{
-    edition: EditionDetails
+    editionNo: string
 }>()
 const { xl } = useDisplay()
 
-const seedsArray = props.edition.Entries.filter(
-    (entry): entry is Entries & { seed: number } => entry.seed !== null && entry.seed !== undefined
-).sort((a, b) => a.seed - b.seed)
-const ldaArray = props.edition.Entries.filter(entry => entry.lda)
-const llsArray = props.edition.Entries.filter(entry => entry.status === 'LL')
-const altsArray = props.edition.Entries.filter(entry => entry.status === 'Alt')
-const wdsArray = props.edition.Entries.filter(entry => entry.wd)
-const retsArray = props.edition.Entries.filter(entry => entry.ret)
-const wosArray = props.edition.Entries.filter(entry => entry.wo)
-const defsArray = props.edition.Entries.filter(entry => entry.defaulted)
+const { query, variables } = getEditionDetails(parseInt(props.editionNo))
+const { result, loading, error} = useQuery(query, variables)
 
-const prizeMoney = [
-    {
-        round: 'WINNER',
-        pm: props.edition.pm,
-        pts: props.edition.winner_pts
-    },
-    {
-        round: 'FINALIST',
-        pm: props.edition.finalist_pm,
-        pts: props.edition.finalist_pts
-    },
-    {
-        round: 'SEMIFINALIST',
-        pm: props.edition.semifinalist_pm,
-        pts: props.edition.semifinalist_pts
-    },
-    {
-        round: 'QUARTERFINALIST',
-        pm: props.edition.quarterfinalist_pm,
-        pts: props.edition.quarterfinalist_pts
-    },
-    {
-        round: 'ROUND OF 16',
-        pm: props.edition.r16_pm,
-        pts: props.edition.r16_pts
-    },
-    {
-        round: 'ROUND OF 32',
-        pm: props.edition.r32_pm,
-        pts: props.edition.r32_pts
-    },
-    {
-        round: 'ROUND OF 64',
-        pm: props.edition.r64_pm,
-        pts: props.edition.r64_pts
-    },
-    {
-        round: 'ROUND OF 128',
-        pm: props.edition.r128_pm,
-        pts: props.edition.r128_pts
+const edition: Ref<EditionDetails | null> = ref(null)
+const prizeMoney: Ref<{round: string, pm: number, pts: number}[]> = ref([])
+
+watch(result, (newResult) => {
+    if (newResult) {
+        edition.value = newResult.events[0]
+        prizeMoney.value = [
+            {
+                round: 'WINNER',
+                pm: newResult.events[0].winner_pm,
+                pts: newResult.events[0].winner_pts
+            },
+            {
+                round: 'FINALIST',
+                pm: newResult.events[0].finalist_pm,
+                pts: newResult.events[0].finalist_pts
+            },
+            {
+                round: 'SEMIFINALIST',
+                pm: newResult.events[0].semifinalist_pm,
+                pts: newResult.events[0].semifinalist_pts
+            },
+            {
+                round: 'QUARTERFINALIST',
+                pm: newResult.events[0].quarterfinalist_pm,
+                pts: newResult.events[0].quarterfinalist_pts
+            },
+            {
+                round: 'ROUND OF 16',
+                pm: newResult.events[0].r16_pm,
+                pts: newResult.events[0].r16_pts
+            },
+            {
+                round: 'ROUND OF 32',
+                pm: newResult.events[0].r32_pm,
+                pts: newResult.events[0].r32_pts
+            },
+            {
+                round: 'ROUND OF 64',
+                pm: newResult.events[0].r64_pm,
+                pts: newResult.events[0].r64_pts
+            },
+            {
+                round: 'ROUND OF 128',
+                pm: newResult.events[0].r128_pm,
+                pts: newResult.events[0].r128_pts
+            }
+        ]
     }
-]
+}, {immediate: true})
+
+watch(error, (newError) => {
+    if (newError) {
+        console.error(newError)
+    }
+})
 </script>
 
 <template>
-    <v-container>
+    <v-container v-if="edition">
         <v-row>
             <v-col class="sm:flex justify-between">
                 <div class="w-100 mx-1 text-xs lg:text-sm">
                     <div
-                        v-if="edition.venue"
+                        v-if="edition.venue.name"
                         class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between"
                     >
                         <span>Venue</span>
-                        <span class="text-right">{{ edition.venue }}</span>
+                        <span class="text-right">{{ edition.venue.name }}</span>
                     </div>
                     <div class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between">
                         <div>City</div>
-                        <div>{{ edition.city }}</div>
+                        <div>{{ edition.venue.city }}</div>
                     </div>
                     <div class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between">
                         <div>Surface</div>
-                        <div>{{ edition.environment }} {{ edition.surface }}<div v-if="edition.hard_type">({{ edition.hard_type }})</div></div>
+                        <div>{{ edition.surface.environment }} {{ edition.surface.surface }}<div v-if="edition.surface.hard_type">({{ edition.surface.hard_type }})</div></div>
                     </div>
                 </div>
                 <div class="w-100 mx-1 text-xs lg:text-sm">
@@ -102,17 +114,17 @@ const prizeMoney = [
                         <div>{{ formatCurrency(edition.currency, edition.tfc) }}</div>
                     </div>
                     <div
-                        v-if="edition.supervisors"
+                        v-if="edition.supervisors.length > 0"
                         class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between"
                     >
                         <div class="flex items-center">{{ edition.supervisors?.length === 1 ? 'Supervisor' : 'Supervisors' }}</div>
                         <div>
                             <div
                                 v-for="supervisor in edition.supervisors"
-                                :key="supervisor"
+                                :key="supervisor.id"
                                 class="text-right"
                             >
-                                {{ supervisor }}
+                                {{ supervisor.id }}
                             </div>
                         </div>
                     </div>
@@ -122,7 +134,7 @@ const prizeMoney = [
         <v-row>
             <v-col>
                 <v-table
-                    v-if="seedsArray.length > 0"
+                    v-if="edition.seeds.length > 0"
                     class="bg-transparent rounded-xl"
                     fixed-header
                     hover
@@ -137,34 +149,36 @@ const prizeMoney = [
                     </thead>
                     <tbody class="text-xs text-zinc-300">
                         <tr
-                            v-for="seed in seedsArray"
-                            :key="seed.Player.id"
+                            v-for="seed in edition.seeds"
+                            :key="seed.seed"
                         >
                             <td class="text-center">{{ seed.seed }}</td>
                             <td class="flex items-center">
                                 <div class="mx-1">
                                     <flag-img
                                         class="w-[2rem]"
-                                        :src="flagSrc(seed.Player.country)"
-                                        :alt="seed.Player.country"
+                                        :src="flagSrc(seed.player.country.id)"
+                                        :alt="seed.player.country.name"
                                     />
                                 </div>
                                 <div class="mx-1">
                                     <v-avatar size="small">
                                         <v-img
-                                            :src="headshot(seed.Player.id)"
-                                            :alt="seed.Player.full_name"
+                                            :src="headshot(seed.player.id)"
+                                            :alt="seed.player.full_name"
                                         />
                                     </v-avatar>
                                 </div>
                                 <div class="mx-1">
                                     <router-link
                                         class="hover-link"
-                                        :to="{name: 'Player', params: {id: seed.Player.id, name: encodeName(seed.Player.full_name)}}"
+                                        :class="{'strikethrough': seed.wd}"
+                                        :to="{name: 'Player', params: {id: seed.player.id, name: encodeName(seed.player.full_name)}}"
                                     >
-                                        {{ seed.Player.full_name }}
+                                        {{ seed.player.full_name }}
                                     </router-link>
                                 </div>
+                                <div>{{ seed.rank }}</div>
                             </td>
                             <td
                                 class="text-center"
@@ -213,7 +227,7 @@ const prizeMoney = [
                     </tbody>
                 </v-table>
                 <v-table
-                    v-if="ldaArray.length > 0"
+                    v-if="edition.lda"
                     class="bg-transparent rounded-xl my-5"
                     fixed-header
                     hover
@@ -221,17 +235,39 @@ const prizeMoney = [
                 >
                     <EntryHeading heading="Last direct acceptance" />
                     <tbody class="text-xs text-zinc-300">
-                        <EntryRow
-                            v-for="player in ldaArray"
-                            :key="player.Player.id"
-                            :player
-                        >
-                            <template #reason>{{ player.status === 'PR' ? 'P' : '' }}{{ player.lda ?? '' }}</template>
-                        </EntryRow>
+                        <tr>
+                            <td class="flex items-center text-nowrap">
+                                <div class="mx-1">
+                                    <flag-img
+                                        class="w-[2rem]"
+                                        :src="flagSrc(edition.lda.player.country.id)"
+                                        :alt="edition.lda.player.country.name"
+                                    />
+                                </div>
+                                <div class="mx-1">
+                                    <v-avatar size="small">
+                                        <v-img
+                                        :src="headshot(edition.lda.player.id)"
+                                        :alt="edition.lda.player.full_name"
+                                        />
+                                    </v-avatar>
+                                </div>
+                                <div class="mx-1">
+                                    <router-link
+                                        class="hover-link"
+                                        :to="{name: 'Player', params: {id: edition.lda.player.id, name: edition.lda.player.full_name}}"
+                                    >
+                                        {{ edition.lda.player.full_name }}
+                                    </router-link>
+                                </div>
+                            </td>
+                            <td>{{ edition.lda.status === 'PR' ? 'P' : '' }}{{ edition.lda.rank || '' }}
+                            </td>
+                        </tr>
                     </tbody>
                 </v-table>
                 <v-table
-                    v-if="llsArray.length > 0"
+                    v-if="edition.lls.length > 0"
                     class="bg-transparent rounded-xl my-5"
                     fixed-header
                     hover
@@ -240,15 +276,15 @@ const prizeMoney = [
                     <EntryHeading heading="Lucky losers" />
                     <tbody class="text-xs text-zinc-300">
                         <EntryRow
-                            v-for="player in llsArray"
-                            :key="player.Player.id"
-                            :player
+                            v-for="ll in edition.lls"
+                            :key="ll.id"
+                            :player="ll"
                         >
                         </EntryRow>
                     </tbody>
                 </v-table>
                 <v-table
-                    v-if="altsArray.length > 0"
+                    v-if="edition.alts.length > 0"
                     class="bg-transparent rounded-xl my-5"
                     fixed-header
                     hover
@@ -257,15 +293,15 @@ const prizeMoney = [
                     <EntryHeading heading="Alternates" />
                     <tbody class="text-xs text-zinc-300">
                         <EntryRow
-                            v-for="player in altsArray"
-                            :key="player.Player.id"
-                            :player
+                            v-for="alt in edition.alts"
+                            :key="alt.id"
+                            :player="alt"
                         >
                         </EntryRow>
                     </tbody>
                 </v-table>
                 <v-table
-                    v-if="wdsArray.length > 0"
+                    v-if="edition.wds.length > 0"
                     class="bg-transparent rounded-xl my-5"
                     fixed-header
                     hover
@@ -274,15 +310,15 @@ const prizeMoney = [
                     <EntryHeading heading="Withdrawals" />
                     <tbody class="text-xs text-zinc-300">
                         <EntryRow
-                            v-for="player in wdsArray"
-                            :key="player.Player.id"
-                            :player
+                            v-for="wd in edition.wds"
+                            :key="wd.player.id"
+                            :player="wd.player"
                         >
                         </EntryRow>
                     </tbody>
                 </v-table>
                 <v-table
-                    v-if="retsArray.length > 0"
+                    v-if="edition.rets.length > 0"
                     class="bg-transparent rounded-xl my-5"
                     fixed-header
                     hover
@@ -291,16 +327,16 @@ const prizeMoney = [
                     <EntryHeading heading="Retirements" />
                     <tbody class="text-xs text-zinc-300">
                         <EntryRow
-                            v-for="player in retsArray"
-                            :key="player.Player.id"
-                            :player
+                            v-for="ret in edition.rets"
+                            :key="ret.player.id"
+                            :player="ret.player"
                         >
-                            <template #reason>{{ player.ret !== 'true' ? player.ret : '' }}</template>
+                            <template #reason>{{ ret.reason !== 'true' ? ret.reason : '' }}</template>
                         </EntryRow>
                     </tbody>
                 </v-table>
                 <v-table
-                    v-if="wosArray.length > 0"
+                    v-if="edition.wos.length > 0"
                     class="bg-transparent rounded-xl my-5"
                     fixed-header
                     hover
@@ -309,16 +345,16 @@ const prizeMoney = [
                     <EntryHeading heading="Walkovers" />
                     <tbody class="text-xs text-zinc-300">
                         <EntryRow
-                            v-for="player in wosArray"
-                            :key="player.Player.id"
-                            :player
+                            v-for="wo in edition.wos"
+                            :key="wo.player.id"
+                            :player="wo.player"
                         >
-                            <template #reason>{{ player.wo !== 'true' ? player.wo : '' }}</template>
+                            <template #reason>{{ wo.reason !== 'true' ? wo.reason : '' }}</template>
                         </EntryRow>
                     </tbody>
                 </v-table>
                 <v-table
-                    v-if="defsArray.length > 0"
+                    v-if="edition.defs.length > 0"
                     class="bg-transparent rounded-xl my-5"
                     fixed-header
                     hover
@@ -327,11 +363,11 @@ const prizeMoney = [
                     <EntryHeading heading="Defaults" />
                     <tbody class="text-xs text-zinc-300">
                         <EntryRow
-                            v-for="player in defsArray"
-                            :key="player.Player.id"
-                            :player
+                            v-for="def in edition.defs"
+                            :key="def.player.id"
+                            :player="def.player"
                         >
-                            <template #reason>{{ player.defaulted !== 'true' ? player.defaulted : '' }}</template>
+                            <template #reason>{{ def.reason !== 'true' ? def.reason : '' }}</template>
                         </EntryRow>
                     </tbody>
                 </v-table>

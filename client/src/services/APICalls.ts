@@ -8,9 +8,7 @@ export const getUpcomingEditions = (date: Date) => {
                 options: {sort: [{start_date: ASC}]}
             ) {
                 id
-                category {
-                    id
-                }
+                category
                 sponsor_name
                 tournament {
                     id
@@ -55,9 +53,7 @@ export const getEditionByYear = (year: number) => {
                 year {
                     id
                 }
-                category {
-                    id
-                }
+                category
                 sponsor_name
                 tournament {
                     name
@@ -129,6 +125,283 @@ export const getTournament = (id: number) => {
                     }
                     final_score
                     end_date
+                }
+            }
+        }
+    `
+    return {query: call, variables: { id }}
+}
+
+export const getEdition = (id: number) => {
+    const call = gql `
+        query Event($id: Int!) {
+            events (
+                where: { id: $id }
+            ) {
+                id
+                category
+                sponsor_name
+                start_date
+                end_date
+                tournament {
+                    id
+                    name
+                }
+                venue {
+                    name
+                    city
+                    country {
+                        id
+                        name
+                    }
+                }
+                surface {
+                    environment
+                    surface
+                    hard_type
+                }
+                year {
+                    id
+                }
+                draw_type
+            }
+        }
+    `
+    return {query: call, variables: { id }}
+}
+
+export const getEditionDetails = (id: number) => {
+    const call = gql `
+        query Event($id: Int!) {
+            events (
+                where: { id: $id }
+            ) {
+                id
+                category
+                sponsor_name
+                start_date
+                end_date
+                tournament {
+                    id
+                    name
+                }
+                venue {
+                    name
+                    city
+                    country {
+                        id
+                        name
+                    }
+                }
+                surface {
+                    environment
+                    surface
+                    hard_type
+                }
+                year {
+                    id
+                }
+                draw_type
+                currency
+                pm
+                tfc
+                supervisors {
+                    id
+                }
+                winner_pm
+                winner_pts
+                finalist_pm
+                finalist_pts
+                semifinalist_pm
+                semifinalist_pts
+                quarterfinalist_pm
+                quarterfinalist_pts
+                r16_pm
+                r16_pts
+                r32_pm
+                r32_pts
+                r64_pm
+                r64_pts
+                r128_pm
+                r128_pts
+                seeds {
+                    seed
+                    rank
+                    player {
+                        id
+                        first_name
+                        last_name
+                        full_name
+                        country {
+                            id
+                            name
+                        }
+                    }
+                }
+                lda {
+                    rank
+                    player {
+                        id
+                        first_name
+                        last_name
+                        full_name
+                        country {
+                            id
+                            name
+                        }
+                    }
+                }
+                lls {
+                    id
+                    first_name
+                    last_name
+                    full_name
+                    country {
+                        id
+                        name
+                    }
+                }
+                alts {
+                    id
+                    first_name
+                    last_name
+                    full_name
+                    country {
+                        id
+                        name
+                    }
+                }
+                wds {
+                    reason
+                    player {
+                        id
+                        first_name
+                        last_name
+                        full_name
+                        country {
+                            id
+                            name
+                        }
+                    }
+                }
+                rets {
+                    reason
+                    player {
+                        id
+                        first_name
+                        last_name
+                        full_name
+                        country {
+                            id
+                            name
+                        }
+                    }
+                }
+                wos {
+                    reason
+                    player {
+                        id
+                        first_name
+                        last_name
+                        full_name
+                        country {
+                            id
+                            name
+                        }
+                    }
+                }
+                defs {
+                    reason
+                    player {
+                        id
+                        first_name
+                        last_name
+                        full_name
+                        country {
+                            id
+                            name
+                        }
+                    }
+                }
+            }
+        }
+    `
+    return {query: call, variables: { id }}
+}
+
+export const getResults = (id: number) => {
+    const call = gql `
+        query Event($id: Int!) {
+            events (
+                where: { id: $id }
+            ) {
+                resultSeeds {
+                    seeds
+                }
+                statuses {
+                    Alt
+                    WC
+                    PR
+                    Q
+                    LL
+                    SE
+                }
+                rounds {
+                    round
+                    matches {
+                        id
+                        match_no
+                        date
+                        duration
+                        umpire
+                        court
+                        winner {
+                            id
+                            first_name
+                            last_name
+                            full_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                        loser {
+                            id
+                            first_name
+                            last_name
+                            full_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                        winner_score {
+                            s1
+                            s2
+                            s3
+                            s4
+                            s5
+                            t1
+                            t2
+                            t3
+                            t4
+                            t5
+                            incomplete
+                        }
+                        loser_score {
+                            s1
+                            s2
+                            s3
+                            s4
+                            s5
+                            t1
+                            t2
+                            t3
+                            t4
+                            t5
+                            incomplete
+                        }
+                    }
                 }
             }
         }

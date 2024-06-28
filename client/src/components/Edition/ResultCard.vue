@@ -1,52 +1,24 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue';
 import { useDisplay } from 'vuetify';
 import * as functions from '../utils';
-import type { EditionDetails, MatchScore, Player } from '../interfaces';
+import type { MatchResult, Status } from '../interfaces';
 
 const props = defineProps<{
-    edition: EditionDetails,
-    match: MatchScore,
-    name: string,
-    id: string
+    match: MatchResult
+    seeds: string[]
+    statuses: Status
 }>()
+
 const { xl } = useDisplay()
 
-const winner: Ref<Player | null> = ref(null)
-const loser: Ref<Player | null> = ref(null)
-const winEntry: Ref< {seed: number | null, status: string | null} | null> = ref(null)
-const loseEntry: Ref< {seed: number | null, status: string | null} | null> = ref(null)
-
-if (props.match.entry1 && props.match.winner_id === props.match.entry1.Player.id) {
-    winner.value = props.match.entry1.Player
-    winEntry.value = {seed: props.match.entry1.seed, status: props.match.entry1.status}
-    if (props.match.incomplete !== 'B') {
-        loser.value = props.match.entry2.Player
-        loseEntry.value = {seed: props.match.entry2.seed, status: props.match.entry2.status}
+const findStatus = (value: string): keyof Status | string => {
+    for (const key in props.statuses) {
+        if (props.statuses[key as keyof Status].includes(value)) {
+            return key as keyof Status
+        }
     }
-} else {
-    winner.value = props.match.entry2.Player
-    winEntry.value = {seed: props.match.entry2.seed, status: props.match.entry2.status}
-    if (props.match.incomplete !== 'B') {
-        loser.value = props.match.entry1.Player
-        loseEntry.value = {seed: props.match.entry1.seed, status: props.match.entry1.status}
-    }
+    return ''
 }
-
-const p1Scores = [
-    { set: props.match.s5p1 ?? '', tb: props.match.t5p1 ?? ''},
-    { set: props.match.s4p1 ?? '', tb: props.match.t4p1 ?? ''},
-    { set: props.match.s3p1 ?? '', tb: props.match.t3p1 ?? ''},
-    { set: props.match.s2p1 ?? '', tb: props.match.t2p1 ?? ''},
-    { set: props.match.s1p1 ?? '', tb: props.match.t1p1 ?? ''}
-]
-const p2Scores = [
-    { set: props.match.s5p2 ?? '', tb: props.match.t5p2 ?? ''},
-    { set: props.match.s4p2 ?? '', tb: props.match.t4p2 ?? ''},
-    { set: props.match.s3p2 ?? '', tb: props.match.t3p2 ?? ''},
-    { set: props.match.s2p2 ?? '', tb: props.match.t2p2 ?? ''},
-    { set: props.match.s1p2 ?? '', tb: props.match.t1p2 ?? ''}
-]
 </script>
 
 <template>
@@ -55,46 +27,46 @@ const p2Scores = [
             <v-row>
                 <v-col v-if="match.date">{{ functions.formatDate(match.date) }}</v-col>
                 <v-col
-                    v-if="match.duration_mins"
+                    v-if="match.duration"
                     class="text-right"
                     cols="3"
                 >
-                    {{ functions.formatTime(match.duration_mins) }}
+                    {{ functions.formatTime(match.duration) }}
                 </v-col>
             </v-row>
             <v-row dense class="py-2">
                 <v-col
-                    v-if="winner"
                     class="flex items-center"
-                    :cols="match.incomplete === 'WO' || match.incomplete === 'R' || match.incomplete === 'D' ? 6 : 8"
+                    :cols="match.loser_score?.incomplete ? 5 : 8"
                 >
                     <div class="mx-0.5">
                         <flag-img
                             class="w-[1rem] lg:w-[2rem]"
-                            :src="functions.flagSrc(winner.country)"
-                            :alt="winner.country"
+                            :src="functions.flagSrc(match.winner.country.id)"
+                            :alt="match.winner.country.name"
                         />
                     </div>
                     <div class="mx-0.5">
                         <v-avatar :size="xl ? 'small' : 'x-small'">
                             <v-img
-                                :src="functions.headshot(winner.id)"
-                                :alt="winner.full_name"
+                                :src="functions.headshot(match.winner.id)"
+                                :alt="match.winner.full_name"
                             />
                         </v-avatar>
                     </div>
                     <div class="mx-0.5">
                         <router-link
                             class="hover-link"
-                            :to="{name: 'Player', params: {name: functions.encodeName(winner.full_name), id: winner.id}}"
+                            :to="{name: 'Player', params: {name: functions.encodeName(match.winner.full_name), id: match.winner.id}}"
                         >
-                            {{ winner.full_name }}
+                            {{ match.winner.full_name }}
                         </router-link>
+                        
                         <small
-                            v-if="winEntry?.seed || winEntry?.status"
+                           v-if="seeds.includes(match.winner.id) || Object.values(statuses).some(array => array.includes(match.winner.id))"
                             class="text-[8px] xl:text-[10px]"
                         >
-                            &nbsp;{{ functions.status(winEntry.seed, winEntry.status) }}
+                             ({{ seeds.indexOf(match.winner.id) + 1 || '' }}{{ findStatus(match.winner.id) }})
                         </small>
                     </div>
                 </v-col>
@@ -111,59 +83,52 @@ const p2Scores = [
                     class="flex flex-row-reverse items-center"
                     cols="3"
                 >
-                    <div
-                        v-if="match.entry1 && match.winner_id === match.entry1.Player.id"
-                        v-for="score in p1Scores"
-                        :key="score.set"
-                    >
-                        {{ score.set }}<sup>{{ score.tb }}</sup>&nbsp;
-                    </div>
-                    <div
-                        v-else
-                        v-for="score in p2Scores"
-                        :key="score.tb"
-                    >
-                        {{ score.set }}<sup>{{ score.tb }}</sup>&nbsp;
+                    <div class="flex">
+                        <div>{{ match.winner_score?.s1 }}<sup>{{ match.winner_score?.t1 }}</sup></div>
+                        &nbsp;<div>{{ match.winner_score?.s2 }}<sup>{{ match.winner_score?.t2 }}</sup></div>
+                        &nbsp;<div>{{ match.winner_score?.s3 }}<sup>{{ match.winner_score?.t3 }}</sup></div>
+                        &nbsp;<div>{{ match.winner_score?.s4 }}<sup>{{ match.winner_score?.t4 }}</sup></div>
+                        &nbsp;<div>{{ match.winner_score?.s5 }}<sup>{{ match.winner_score?.t5 }}</sup></div>
                     </div>
                 </v-col>
                 <v-col 
-                    v-if="match.incomplete === 'R' || match.incomplete === 'WO' || match.incomplete === 'D'"
+                    v-if="match.loser_score?.incomplete"
                     cols="2"
                 />
             </v-row>
             <v-row dense>
                 <v-col
-                    v-if="loser"
+                    v-if="match.loser"
                     class="flex items-center"
-                    :cols="match.incomplete === 'WO' || match.incomplete === 'R' || match.incomplete === 'D' ? 5 : 8"
+                    :cols="match.loser_score?.incomplete ? 5 : 8"
                 >
                     <div class="mx-0.5">
                         <flag-img
                             class="w-[1rem] lg:w-[2rem]"
-                            :src="functions.flagSrc(loser.country)"
-                            :alt="loser.country"
+                            :src="functions.flagSrc(match.loser.country.id)"
+                            :alt="match.loser.country.name"
                         />
                     </div>
                     <div class="mx-0.5">
                         <v-avatar :size="xl ? 'small' : 'x-small'">
                             <v-img
-                                :src="functions.headshot(loser.id)"
-                                :alt="loser.full_name"
+                                :src="functions.headshot(match.loser.id)"
+                                :alt="match.loser.full_name"
                             />
                         </v-avatar>
                     </div>
                     <div class="mx-0.5">
                         <router-link
                             class="hover-link"
-                            :to="{name: 'Player', params: {name: functions.encodeName(loser.full_name), id: loser.id}}"
+                            :to="{name: 'Player', params: {name: functions.encodeName(match.loser.full_name), id: match.loser.id}}"
                         >
-                            {{ loser.full_name }}
+                            {{ match.loser.full_name }}
                         </router-link>
                         <small
-                            v-if="winEntry?.seed || winEntry?.status"
+                           v-if="seeds.includes(match.loser.id) || Object.values(statuses).some(array => array.includes(match.loser?.id))"
                             class="text-[8px] xl:text-[10px]"
                         >
-                            &nbsp;{{ functions.status(winEntry.seed, winEntry.status) }}
+                             ({{ seeds.indexOf(match.loser.id) + 1 || '' }}{{ findStatus(match.loser.id) }})
                         </small>
                     </div>
                 </v-col>
@@ -173,44 +138,37 @@ const p2Scores = [
                     class="flex flex-row-reverse items-center"
                     cols="3"
                 >
-                    <div
-                        v-if="match.entry2 && match.winner_id === match.entry2.Player.id"
-                        v-for="score in p1Scores"
-                        :key="score.set"
-                    >
-                        {{ score.set }}<sup>{{ score.tb }}</sup>&nbsp;
-                    </div>
-                    <div
-                        v-else
-                        v-for="score in p2Scores"
-                        :key="score.tb"
-                    >
-                        {{ score.set }}<sup>{{ score.tb }}</sup>&nbsp;
+                    <div class="flex">
+                        <div>{{ match.loser_score?.s1 }}<sup>{{ match.loser_score?.t1 }}</sup></div>
+                        &nbsp;<div>{{ match.loser_score?.s2 }}<sup>{{ match.loser_score?.t2 }}</sup></div>
+                        &nbsp;<div>{{ match.loser_score?.s3 }}<sup>{{ match.loser_score?.t3 }}</sup></div>
+                        &nbsp;<div>{{ match.loser_score?.s4 }}<sup>{{ match.loser_score?.t4 }}</sup></div>
+                        &nbsp;<div>{{ match.loser_score?.s5 }}<sup>{{ match.loser_score?.t5 }}</sup></div>
                     </div>
                 </v-col>
                 <v-col
-                    v-if="match.incomplete === 'R' || match.incomplete === 'WO' || match.incomplete === 'D'"
+                    v-if="match.loser_score?.incomplete"
                     class="flex items-center justify-center"
                     cols="2"
                 >
-                    {{ match.incomplete }}.
+                    {{ match.loser_score.incomplete }}.
                 </v-col>
             </v-row>
-            <v-row v-if="match.incomplete !== 'B'">
+            <v-row v-if="match.loser">
                 <v-col>{{ match.umpire ?? '' }}</v-col>
                 <v-col class="flex justify-end">
                     <v-chip
-                        v-if="match.incomplete !== 'B'"
+                        v-if="!match.incomplete"
                         class="mx-1"
-                        :to="{name: 'H2H', params: {p1Name: functions.encodeName(match.entry1.Player.full_name), p1Id: match.entry1.Player.id, p2Name: functions.encodeName(match.entry2.Player.full_name), p2Id: match.entry2.Player.id}}"
+                        :to="{name: 'H2H', params: {p1Name: functions.encodeName(match.winner.full_name), p1Id: match.winner.id, p2Name: functions.encodeName(match.loser.full_name), p2Id: match.loser.id}}"
                         :size="xl ? 'small' : 'x-small'"
                     >
                         H2H
                     </v-chip>
                     <v-chip
-                        v-if="match.incomplete !=='B' && match.incomplete !== 'WO'"
+                        v-if="!match.incomplete && match.loser_score?.incomplete !== 'WO'"
                         class="mx-1"
-                        :to="{name: 'MatchStats', params: {name: name, id: id, editionNo: edition.edition_no, matchId: match.id, p1: functions.encodeName(match.entry1.Player.full_name), p2: functions.encodeName(match.entry2.Player.full_name)}}"
+                        :to="{name: 'MatchStats', params: {matchId: match.match_no}}"
                         :size="xl ? 'small' : 'x-small'"
                     >
                         Stats

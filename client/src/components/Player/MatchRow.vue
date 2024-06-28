@@ -46,6 +46,7 @@ const { lgAndUp } = useDisplay()
                     >
                         {{ match.opp_first_name }} {{ match.opp_last_name }}
                     </router-link>
+                    <small>({{ match.opp_rank }})</small>
                 </div>
             </div>
         </td>

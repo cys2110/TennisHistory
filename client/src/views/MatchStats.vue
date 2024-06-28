@@ -1,63 +1,63 @@
 <script setup lang="ts">
-import DualStatItem from '@/components/MatchStats/DualStatItem.vue';
-import ServiceStatItem from '@/components/MatchStats/ServiceStatItem.vue';
-import StatItem from '@/components/MatchStats/StatItem.vue';
-import { formatDate, formattedDates, round, formatTime, flagSrc, headshot, status, incomplete } from '@/components/utils';
-import type { MatchStat } from '@/components/interfaces';
-import EditionService from '@/services/EditionService';
-import { ref, type Ref, watch, onMounted } from 'vue';
-import { useDisplay } from 'vuetify';
+// import DualStatItem from '@/components/MatchStats/DualStatItem.vue';
+// import ServiceStatItem from '@/components/MatchStats/ServiceStatItem.vue';
+// import StatItem from '@/components/MatchStats/StatItem.vue';
+// import { formatDate, formattedDates, round, formatTime, flagSrc, headshot, status, incomplete } from '@/components/utils';
+// import type { MatchStat } from '@/components/interfaces';
+// import EditionService from '@/services/EditionService';
+// import { ref, type Ref, watch, onMounted } from 'vue';
+// import { useDisplay } from 'vuetify';
 
-const props = defineProps<{
-    matchId: string,
-    name: string,
-    id: string,
-    editionNo: string,
-    p1: string,
-    p2: string
-}>()
-const match: Ref<MatchStat | null> = ref(null)
-const p1Scores: Ref<{set: number | string, tie: number | string}[]> = ref([])
-const p2Scores: Ref<{set: number | string, tie: number | string}[]> = ref([])
-const { mdAndUp } = useDisplay()
+// const props = defineProps<{
+//     matchId: string,
+//     name: string,
+//     id: string,
+//     editionNo: string,
+//     p1: string,
+//     p2: string
+// }>()
+// const match: Ref<MatchStat | null> = ref(null)
+// const p1Scores: Ref<{set: number | string, tie: number | string}[]> = ref([])
+// const p2Scores: Ref<{set: number | string, tie: number | string}[]> = ref([])
+// const { mdAndUp } = useDisplay()
 
-const updateDocumentTitle = () => {
-    const p1Name = props.p1.replace(/_/g, ' ')
-    const p2Name = props.p2.replace(/_/g, ' ')
-    const tournamentName = props.name.replace(/_/g, ' ')
-    document.title = `${p1Name} v. ${p2Name} | ${tournamentName} | TennisHistory`
-}
+// const updateDocumentTitle = () => {
+//     const p1Name = props.p1.replace(/_/g, ' ')
+//     const p2Name = props.p2.replace(/_/g, ' ')
+//     const tournamentName = props.name.replace(/_/g, ' ')
+//     document.title = `${p1Name} v. ${p2Name} | ${tournamentName} | TennisHistory`
+// }
 
-onMounted(() => {
-    EditionService.getMatchStats(parseInt(props.matchId))
-    .then(response => {
-        match.value = response.data
-        console.log(match.value)
-        p1Scores.value = [
-            { set: match.value?.MatchScore.s5p1 ?? '', tie: match.value?.MatchScore.t5p1 ?? '' },
-            { set: match.value?.MatchScore.s4p1 ?? '', tie: match.value?.MatchScore.t4p1 ?? '' },
-            { set: match.value?.MatchScore.s3p1 ?? '', tie: match.value?.MatchScore.t3p1 ?? '' },
-            { set: match.value?.MatchScore.s2p1 ?? '', tie: match.value?.MatchScore.t2p1 ?? '' },
-            { set: match.value?.MatchScore.s1p1 ?? '', tie: match.value?.MatchScore.t1p1 ?? '' },
-        ]
-        p2Scores.value = [
-            { set: match.value?.MatchScore.s5p2 ?? '', tie: match.value?.MatchScore.t5p2 ?? '' },
-            { set: match.value?.MatchScore.s4p2 ?? '', tie: match.value?.MatchScore.t4p2 ?? '' },
-            { set: match.value?.MatchScore.s3p2 ?? '', tie: match.value?.MatchScore.t3p2 ?? '' },
-            { set: match.value?.MatchScore.s2p2 ?? '', tie: match.value?.MatchScore.t2p2 ?? '' },
-            { set: match.value?.MatchScore.s1p2 ?? '', tie: match.value?.MatchScore.t1p2 ?? '' },
-        ]
-    })
-    .catch(e => console.log(e))
-})
+// onMounted(() => {
+//     EditionService.getMatchStats(parseInt(props.matchId))
+//     .then(response => {
+//         match.value = response.data
+//         console.log(match.value)
+//         p1Scores.value = [
+//             { set: match.value?.MatchScore.s5p1 ?? '', tie: match.value?.MatchScore.t5p1 ?? '' },
+//             { set: match.value?.MatchScore.s4p1 ?? '', tie: match.value?.MatchScore.t4p1 ?? '' },
+//             { set: match.value?.MatchScore.s3p1 ?? '', tie: match.value?.MatchScore.t3p1 ?? '' },
+//             { set: match.value?.MatchScore.s2p1 ?? '', tie: match.value?.MatchScore.t2p1 ?? '' },
+//             { set: match.value?.MatchScore.s1p1 ?? '', tie: match.value?.MatchScore.t1p1 ?? '' },
+//         ]
+//         p2Scores.value = [
+//             { set: match.value?.MatchScore.s5p2 ?? '', tie: match.value?.MatchScore.t5p2 ?? '' },
+//             { set: match.value?.MatchScore.s4p2 ?? '', tie: match.value?.MatchScore.t4p2 ?? '' },
+//             { set: match.value?.MatchScore.s3p2 ?? '', tie: match.value?.MatchScore.t3p2 ?? '' },
+//             { set: match.value?.MatchScore.s2p2 ?? '', tie: match.value?.MatchScore.t2p2 ?? '' },
+//             { set: match.value?.MatchScore.s1p2 ?? '', tie: match.value?.MatchScore.t1p2 ?? '' },
+//         ]
+//     })
+//     .catch(e => console.log(e))
+// })
 
-watch(() => props.name, () => {
-    updateDocumentTitle()
-}, {immediate: true})
+// watch(() => props.name, () => {
+//     updateDocumentTitle()
+// }, {immediate: true})
 </script>
 
 <template>
-    <v-sheet v-if="match" class="w-5/6 md:w-8/12 lg:w-1/2 mx-auto my-10 bg-transparent">
+    <!-- <v-sheet v-if="match" class="w-5/6 md:w-8/12 lg:w-1/2 mx-auto my-10 bg-transparent">
         <div class="text-zinc-300 text-center">
             <div class="text-3xl">
                 <span v-if="match.MatchScore.Edition.sponsor_name">{{ match.MatchScore.Edition.sponsor_name }} | </span>
@@ -272,5 +272,5 @@ watch(() => props.name, () => {
         <div class="text-3xl text-zinc-300">{{ name.replace(/_/g, ' ') }}</div>
         <div class="text-xl text-zinc-300">{{ p1.replace(/_/g, ' ') }} v. {{ p2.replace(/_/g, ' ') }}</div>
         <div class="text-zinc-400 my-4">No data available</div>
-    </view-sheet>
+    </view-sheet> -->
 </template>

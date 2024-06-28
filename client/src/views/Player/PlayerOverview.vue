@@ -7,69 +7,6 @@ import type { PlayerDetails } from '@/components/interfaces';
 const props = defineProps<{
     player: PlayerDetails
 }>()
-
-// const results = [
-//     {
-//         tournament: 'Australian Open',
-//         id: 580,
-//         round: props.player.ao_round ?? '—',
-//         years: props.player.ao_years?.join(', ') ?? '—'
-//     },
-//     {
-//         tournament: 'Roland Garros',
-//         id: 520,
-//         round: props.player.rg_round ?? '—',
-//         years: props.player.rg_years?.join(', ') ?? '—'
-//     },
-//     {
-//         tournament: 'Wimbledon',
-//         id: 540,
-//         round: props.player.wimbledon_round ?? '—',
-//         years: props.player.wimbledon_years?.join(', ') ?? '—'
-//     },
-//     {
-//         tournament: 'US Open',
-//         id: 560,
-//         round: props.player.uso_round ?? '—',
-//         years: props.player.uso_years?.join(', ') ?? '—'
-//     },
-//     {
-//         tournament: 'Year-End Finals',
-//         id: 605,
-//         round: props.player.finals_round ?? '—',
-//         years: props.player.finals_years?.join(', ') ?? '—'
-//     },
-//     {
-//         tournament: 'Olympics',
-//         id: 96,
-//         round: props.player.olympics_round ?? '—',
-//         years: props.player.olympics_years?.join(', ') ?? '—'
-//     },
-//     {
-//         tournament: 'Davis Cup',
-//         id: 10005,
-//         round: props.player.davis_round ?? '—',
-//         years: props.player.davis_years?.join(', ') ?? '—'
-//     },
-//     {
-//         tournament: 'Hopman Cup',
-//         id: 10004,
-//         round: props.player.hopman_round ?? '—',
-//         years: props.player.hopman_years?.join(', ') ?? '—'
-//     },
-//     {
-//         tournament: 'Grand Slam Cup',
-//         id: 604,
-//         round: props.player.gs_cup_round ?? '—',
-//         years: props.player.gs_cup_years?.join(', ') ?? '—'
-//     },
-//     {
-//         tournament: 'WCT Finals',
-//         id: 10003,
-//         round: props.player.wct_round ?? '—',
-//         years: props.player.wct_years?.join(', ') ?? '—'
-//     }
-// ]
 </script>
 
 <template>

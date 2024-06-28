@@ -22,8 +22,8 @@ const { smAndDown } = useDisplay()
                     <v-img
                         v-if="edition.category"
                         class="!size-20 mx-auto"
-                        :src="categorySrc(edition.category.id)"
-                        :alt="edition.category.id"
+                        :src="categorySrc(edition.category)"
+                        :alt="edition.category"
                     />
                 </v-col>
                 <v-col
@@ -69,7 +69,7 @@ const { smAndDown } = useDisplay()
                         v-if="DateTime.now() > DateTime.fromISO(edition.start_date)"
                         class="text-zinc-300"
                         variant="outlined"
-                        :to="{name: 'Edition', params: {name: encodeName(edition.tournament.name), id: edition.tournament.id, editionNo: edition.id}}"
+                        :to="{name: 'Edition', params: {name: encodeName(edition.tournament.name), id: edition.tournament.id, year: edition.year.id, editionNo: edition.id}}"
                     >
                         Results
                     </v-chip>

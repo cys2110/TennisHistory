@@ -14,7 +14,7 @@ const props = defineProps<{
 }>()
 const tournament: Ref<TournamentDetails | null> = ref(null)
 
-    const { query, variables } = getTournament(parseInt(props.id))
+const { query, variables } = getTournament(parseInt(props.id))
 const { result, loading, error} = useQuery(query, variables)
 
 watch(result, (newResult) => {

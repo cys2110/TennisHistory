@@ -27,7 +27,7 @@ const formattedScore = computed(() => {
                 <v-col class="text-center text-2xl">
                     <router-link
                         class="hover-link"
-                        :to="{name: 'Edition', params: {editionNo: event.id}}"
+                        :to="{name: 'Edition', params: {year: event.year.id, editionNo: event.id}}"
                     >
                         {{ event.year.id }}
                     </router-link>

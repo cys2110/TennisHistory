@@ -1,64 +1,64 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, type Ref } from 'vue';
-import { useDisplay } from 'vuetify';
-import { DateTime } from 'luxon'
-import H2HService from '@/services/H2HService';
-import PlayerService from '@/services/PlayerService';
-import PlayerStatItem from '@/components/H2H/PlayerStatItem.vue';
-import H2HItem from '@/components/H2H/H2HItem.vue';
-import ScoreItem from '@/components/H2H/ScoreItem.vue';
-import * as functions from '@/components/utils';
-import type { PlayerDetails, MatchH2H } from '@/components/interfaces';
+// import { onMounted, ref, watch, type Ref } from 'vue';
+// import { useDisplay } from 'vuetify';
+// import { DateTime } from 'luxon'
+// import H2HService from '@/services/H2HService';
+// import PlayerService from '@/services/PlayerService';
+// import PlayerStatItem from '@/components/H2H/PlayerStatItem.vue';
+// import H2HItem from '@/components/H2H/H2HItem.vue';
+// import ScoreItem from '@/components/H2H/ScoreItem.vue';
+// import * as functions from '@/components/utils';
+// import type { PlayerDetails, MatchH2H } from '@/components/interfaces';
 
-const props = defineProps<{
-    p1Id: string,
-    p2Id: string,
-    p1Name: string,
-    p2Name: string
-}>()
-const { mdAndUp, smAndUp } = useDisplay()
+// const props = defineProps<{
+//     p1Id: string,
+//     p2Id: string,
+//     p1Name: string,
+//     p2Name: string
+// }>()
+// const { mdAndUp, smAndUp } = useDisplay()
 
-const p1: Ref<PlayerDetails | null> = ref(null)
-const p2: Ref<PlayerDetails | null> = ref(null)
-const matches: Ref<MatchH2H[]> = ref([])
-const p1Wins: Ref<number> = ref(0)
-const p2Wins: Ref<number> = ref(0)
-const totalMatches: Ref<number> = ref(0)
+// const p1: Ref<PlayerDetails | null> = ref(null)
+// const p2: Ref<PlayerDetails | null> = ref(null)
+// const matches: Ref<MatchH2H[]> = ref([])
+// const p1Wins: Ref<number> = ref(0)
+// const p2Wins: Ref<number> = ref(0)
+// const totalMatches: Ref<number> = ref(0)
 
-const searchH2H = () => {
-    PlayerService.getPlayerById(props.p1Id)
-    .then(response => p1.value = response.data)
-    .catch(e => console.log(e))
+// const searchH2H = () => {
+//     PlayerService.getPlayerById(props.p1Id)
+//     .then(response => p1.value = response.data)
+//     .catch(e => console.log(e))
 
-    PlayerService.getPlayerById(props.p2Id)
-    .then(response => p2.value = response.data)
-    .catch(e => console.log(e))
+//     PlayerService.getPlayerById(props.p2Id)
+//     .then(response => p2.value = response.data)
+//     .catch(e => console.log(e))
 
-    H2HService.h2h(props.p1Id, props.p2Id)
-    .then(response => {
-        matches.value = response.data.matches
-        p1Wins.value = response.data.count.p1Wins
-        p2Wins.value = response.data.count.p2Wins
-        totalMatches.value = response.data.count.total
-    })
-    .catch(e => console.log(e))
-}
+//     H2HService.h2h(props.p1Id, props.p2Id)
+//     .then(response => {
+//         matches.value = response.data.matches
+//         p1Wins.value = response.data.count.p1Wins
+//         p2Wins.value = response.data.count.p2Wins
+//         totalMatches.value = response.data.count.total
+//     })
+//     .catch(e => console.log(e))
+// }
 
-const updateDocumentTitle = () => {
-    const nameP1 = props.p1Name.replace(/_/g, ' ')
-    const nameP2 = props.p2Name.replace(/_/g, ' ')
-    document.title = `${nameP1} v. ${nameP2} | TennisHistory`
-}
+// const updateDocumentTitle = () => {
+//     const nameP1 = props.p1Name.replace(/_/g, ' ')
+//     const nameP2 = props.p2Name.replace(/_/g, ' ')
+//     document.title = `${nameP1} v. ${nameP2} | TennisHistory`
+// }
 
-onMounted(() => searchH2H())
+// onMounted(() => searchH2H())
 
-watch(() => [props.p1Name, props.p2Name], () => {
-    updateDocumentTitle()
-}, {immediate: true})
+// watch(() => [props.p1Name, props.p2Name], () => {
+//     updateDocumentTitle()
+// }, {immediate: true})
 </script>
 
 <template>
-    <v-sheet class="w-5/6 md:w-8/12 lg:w-1/2 mx-auto my-10 bg-transparent">
+    <!-- <v-sheet class="w-5/6 md:w-8/12 lg:w-1/2 mx-auto my-10 bg-transparent">
         <v-container v-if="p1 && p2">
             <v-row>
                 <v-col class="flex-col items-center" cols="4">
@@ -321,5 +321,5 @@ watch(() => [props.p1Name, props.p2Name], () => {
             <div class="text-3xl text-zinc-300">{{ p1Name.replace(/_/g, ' ') }} v. {{ p2Name.replace(/_/g, ' ') }}</div>
             <div class="text-zinc-400 my-4">No data available.</div>
         </div>
-    </v-sheet>
+    </v-sheet> -->
 </template>

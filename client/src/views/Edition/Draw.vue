@@ -1,39 +1,39 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import DrawCard from './DrawCard.vue';
-import { groupObjectsByKey, round } from '../utils';
-import type { EditionDetails, MatchScore } from '../interfaces';
+// import { ref } from 'vue';
+// import DrawCard from './DrawCard.vue';
+// import { groupObjectsByKey, round } from '../utils';
+// import type { EditionDetails, MatchScore } from '../interfaces';
 
-const props = defineProps<{
-    edition: EditionDetails,
-    matches: MatchScore[],
-    name: string,
-    id: string
-}>()
+// const props = defineProps<{
+//     edition: EditionDetails,
+//     matches: MatchScore[],
+//     name: string,
+//     id: string
+// }>()
 
-const sortedMatches = props.matches.sort((a, b) => {
-    return a.id - b.id
-})
-const groupedMatches = groupObjectsByKey(sortedMatches, 'round')
-const sortedRounds = Object.keys(groupedMatches)
-    .map(key => {
-        let name = key
-        if (isNaN(parseInt(key))) {
-            name = key
-        } else {
-            name = `R${key}`
-        }
-        const string = key
-        const value = 2 * groupedMatches[key].length
-        return {name, string, value}
-    })
-    .sort((a, b) => b.value - a.value)
+// const sortedMatches = props.matches.sort((a, b) => {
+//     return a.id - b.id
+// })
+// const groupedMatches = groupObjectsByKey(sortedMatches, 'round')
+// const sortedRounds = Object.keys(groupedMatches)
+//     .map(key => {
+//         let name = key
+//         if (isNaN(parseInt(key))) {
+//             name = key
+//         } else {
+//             name = `R${key}`
+//         }
+//         const string = key
+//         const value = 2 * groupedMatches[key].length
+//         return {name, string, value}
+//     })
+//     .sort((a, b) => b.value - a.value)
 
-const selectedRound = ref(parseInt(props.edition.type_of_draw))
+// const selectedRound = ref(parseInt(props.edition.type_of_draw))
 </script>
 
 <template>
-    <v-container>
+    <!-- <v-container>
         <v-row>
             <v-col class="text-center">
                 <v-btn-toggle
@@ -76,5 +76,5 @@ const selectedRound = ref(parseInt(props.edition.type_of_draw))
                 </v-col>
             </template>
         </v-row>
-    </v-container>
+    </v-container> -->
 </template>

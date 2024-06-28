@@ -1,44 +1,44 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue';
-import { useDisplay } from 'vuetify';
-import PlayerService from '@/services/PlayerService';
-import { encodeName, flagSrc, headshot } from '../utils';
-import type { Player } from '../interfaces';
+// import { ref, type Ref } from 'vue';
+// import { useDisplay } from 'vuetify';
+// import PlayerService from '@/services/PlayerService';
+// import { encodeName, flagSrc, headshot } from '../utils';
+// import type { Player } from '../interfaces';
 
-const { mdAndUp, smAndUp } = useDisplay()
+// const { mdAndUp, smAndUp } = useDisplay()
 
-const searchP1: Ref<string> = ref('')
-const searchP2: Ref<string> = ref('')
-const p1Results: Ref<Player[]> = ref([])
-const p2Results: Ref<Player[]> = ref([])
-const p1Id: Ref<string | null> = ref(null)
-const p2Id: Ref<string | null> = ref(null)
+// const searchP1: Ref<string> = ref('')
+// const searchP2: Ref<string> = ref('')
+// const p1Results: Ref<Player[]> = ref([])
+// const p2Results: Ref<Player[]> = ref([])
+// const p1Id: Ref<string | null> = ref(null)
+// const p2Id: Ref<string | null> = ref(null)
 
-const submitSearch1 = () => {
-    PlayerService.getPlayerByName(searchP1.value)
-    .then(response => p1Results.value = response.data)
-    .catch(e => console.log(e))
-}
-const submitSearch2 = () => {
-    PlayerService.getPlayerByName(searchP2.value)
-    .then(response => p2Results.value = response.data)
-    .catch(e => console.log(e))
-}
+// const submitSearch1 = () => {
+//     PlayerService.getPlayerByName(searchP1.value)
+//     .then(response => p1Results.value = response.data)
+//     .catch(e => console.log(e))
+// }
+// const submitSearch2 = () => {
+//     PlayerService.getPlayerByName(searchP2.value)
+//     .then(response => p2Results.value = response.data)
+//     .catch(e => console.log(e))
+// }
 
-const setP1 = (player: Player) => {
-    searchP1.value = player.full_name
-    p1Results.value = []
-    p1Id.value = player.id
-}
-const setP2 = (player: Player) => {
-    searchP2.value = player.full_name
-    p2Results.value = []
-    p2Id.value = player.id
-}
+// const setP1 = (player: Player) => {
+//     searchP1.value = player.full_name
+//     p1Results.value = []
+//     p1Id.value = player.id
+// }
+// const setP2 = (player: Player) => {
+//     searchP2.value = player.full_name
+//     p2Results.value = []
+//     p2Id.value = player.id
+// }
 </script>
 
 <template>
-    <short-card
+    <!-- <short-card
         class="mx-auto"
         :width="smAndUp ? '60%' : '100%'"
     >
@@ -149,5 +149,5 @@ const setP2 = (player: Player) => {
                 </v-col>
             </v-row>
         </v-container>
-    </short-card>
+    </short-card> -->
 </template>
