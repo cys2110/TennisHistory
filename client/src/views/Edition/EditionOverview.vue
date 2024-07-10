@@ -83,11 +83,10 @@ watch(error, (newError) => {
             <v-col class="sm:flex justify-between">
                 <div class="w-100 mx-1 text-xs lg:text-sm">
                     <div
-                        v-if="edition.venue.name"
                         class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between"
                     >
                         <span>Venue</span>
-                        <span class="text-right">{{ edition.venue.name }}</span>
+                        <span class="text-right">{{ edition.venue.name ?? '—' }}</span>
                     </div>
                     <div class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between">
                         <div>City</div>
@@ -100,32 +99,31 @@ watch(error, (newError) => {
                 </div>
                 <div class="w-100 mx-1 text-xs lg:text-sm">
                     <div
-                        v-if="edition.pm"
                         class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between"
                     >
                         <div>Prize money</div>
-                        <div>{{ formatCurrency(edition.currency, edition.pm) }}</div>
+                        <div>{{ edition.pm ? formatCurrency(edition.currency, edition.pm) : '—' }}</div>
                     </div>
                     <div
-                        v-if="edition.tfc"
                         class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between items-center"
                     >
                         <div>Total financial commitment</div>
-                        <div>{{ formatCurrency(edition.currency, edition.tfc) }}</div>
+                        <div>{{ edition.tfc ? formatCurrency(edition.currency, edition.tfc) : '—' }}</div>
                     </div>
                     <div
-                        v-if="edition.supervisors.length > 0"
                         class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between"
                     >
                         <div class="flex items-center">{{ edition.supervisors?.length === 1 ? 'Supervisor' : 'Supervisors' }}</div>
                         <div>
                             <div
+                                v-if="edition.supervisors.length > 0"
                                 v-for="supervisor in edition.supervisors"
                                 :key="supervisor.id"
                                 class="text-right"
                             >
                                 {{ supervisor.id }}
                             </div>
+                            <div v-else>—</div>
                         </div>
                     </div>
                 </div>
@@ -178,7 +176,6 @@ watch(error, (newError) => {
                                         {{ seed.player.full_name }}
                                     </router-link>
                                 </div>
-                                <div>{{ seed.rank }}</div>
                             </td>
                             <td
                                 class="text-center"

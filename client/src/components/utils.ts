@@ -1,6 +1,5 @@
 import { DateTime, Duration } from 'luxon'
 import convert from 'convert'
-import type { EditionByPlayer, MatchScore } from './interfaces'
 
 // variables
 
@@ -101,23 +100,21 @@ export const percentage = (value1: number, total: number) => {
     return value1 / total * 100
 }
 
-export function groupObjectsByKey(array: EditionByPlayer[], key: string): { [key: string]: EditionByPlayer[] };
-export function groupObjectsByKey(array: MatchScore[], key: string): { [key: string]: MatchScore[] };
 
-export function groupObjectsByKey (array: EditionByPlayer[] | MatchScore[], key: string): { [key: string]: any } {
-  const groupedArrays: { [key: string]: any[] } = {};
+// export function groupObjectsByKey (array: EditionByPlayer[] | MatchScore[], key: string): { [key: string]: any } {
+//   const groupedArrays: { [key: string]: any[] } = {};
 
-  array.forEach(obj => {
-    const value = (obj as any)[key];
-    if (!groupedArrays[value]) {
-      groupedArrays[value] = [obj];
-    } else {
-      groupedArrays[value].push(obj);
-    }
-  });
+//   array.forEach(obj => {
+//     const value = (obj as any)[key];
+//     if (!groupedArrays[value]) {
+//       groupedArrays[value] = [obj];
+//     } else {
+//       groupedArrays[value].push(obj);
+//     }
+//   });
 
-  return groupedArrays;
-}
+//   return groupedArrays;
+// }
 
 export const getMatchScore = (comp1: string, comp2: string, score1: number, score2: number) => {
     return comp1 === comp2 ? `${score1}${score2}` : `${score2}${score1}`

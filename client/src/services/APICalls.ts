@@ -409,6 +409,84 @@ export const getResults = (id: number) => {
     return {query: call, variables: { id }}
 }
 
+export const getDraw = (id: number) => {
+    const call = gql `
+        query Event($id: Int!) {
+            events (
+                where: { id: $id }
+            ) {
+                resultSeeds {
+                    seeds
+                }
+                statuses {
+                    Alt
+                    WC
+                    PR
+                    Q
+                    LL
+                    SE
+                }
+                draw {
+                    round
+                    matches {
+                        id
+                        match_no
+                        incomplete
+                        winner
+                        p1 {
+                            id
+                            first_name
+                            last_name
+                            full_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                        p2 {
+                            id
+                            first_name
+                            last_name
+                            full_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                        p1_score {
+                            s1
+                            s2
+                            s3
+                            s4
+                            s5
+                            t1
+                            t2
+                            t3
+                            t4
+                            t5
+                            incomplete
+                        }
+                        p2_score {
+                            s1
+                            s2
+                            s3
+                            s4
+                            s5
+                            t1
+                            t2
+                            t3
+                            t4
+                            t5
+                            incomplete
+                        }
+                    }
+                }
+            }
+        }
+    `
+    return {query: call, variables: { id }}
+}
+
 export const getPlayer = (id: string) => {
     const call = gql `
         query Player($id: String!) {

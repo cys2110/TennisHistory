@@ -1,29 +1,21 @@
 <script setup lang="ts">
 import { headshot, flagSrc, encodeName, status } from '../utils';
-import type { EditionDetails, MatchScore } from '../interfaces';
+import type { DrawResult, Status } from '../interfaces';
 
 const props = defineProps<{
-    edition: EditionDetails,
-    match: MatchScore,
-    name: string,
-    id: string
+    match: DrawResult
+    seeds: string[]
+    statuses: Status
 }>()
 
-const p1Scores = [
-    { set: props.match.s5p1 ?? '', tie: props.match.t5p1 ?? '' },
-    { set: props.match.s4p1 ?? '', tie: props.match.t4p1 ?? '' },
-    { set: props.match.s3p1 ?? '', tie: props.match.t3p1 ?? '' },
-    { set: props.match.s2p1 ?? '', tie: props.match.t2p1 ?? '' },
-    { set: props.match.s1p1 ?? '', tie: props.match.t1p1 ?? '' }
-]
-
-const p2Scores = [
-    { set: props.match.s5p2 ?? '', tie: props.match.t5p2 ?? '' },
-    { set: props.match.s4p2 ?? '', tie: props.match.t4p2 ?? '' },
-    { set: props.match.s3p2 ?? '', tie: props.match.t3p2 ?? '' },
-    { set: props.match.s2p2 ?? '', tie: props.match.t2p2 ?? '' },
-    { set: props.match.s1p2 ?? '', tie: props.match.t1p2 ?? '' }
-]
+const findStatus = (value: string): keyof Status | string => {
+    for (const key in props.statuses) {
+        if (props.statuses[key as keyof Status].includes(value)) {
+            return key as keyof Status
+        }
+    }
+    return ''
+}
 </script>
 
 <template>
@@ -35,10 +27,10 @@ const p2Scores = [
             <v-row>
                 <v-col
                     class="flex items-center"
-                    :cols="match.incomplete === 'WO' || match.incomplete === 'R' || match.incomplete === 'D' ? 6 : 8"
+                    :cols="match.p1_score?.incomplete || match.p2_score?.incomplete ? 6 : 8"
                 >
                     <div
-                        v-if="match.entry1"
+                        v-if="match.p1"
                         class="mx-0.5"
                     >
                         <flag-img

@@ -25,7 +25,11 @@ const findStatus = (value: string): keyof Status | string => {
     <short-card class="my-5 mx-2 text-zinc-300 text-xs sm:w-1/2 lg:w-2/5">
         <v-container>
             <v-row>
-                <v-col v-if="match.date">{{ functions.formatDate(match.date) }}</v-col>
+                <v-col>
+                    <span v-if="match.date">{{ functions.formatDate(match.date) }}</span>
+                    <span v-if="match.date && match.court"> — </span>
+                    <span v-if="match.court">{{ match.court }}</span>
+                </v-col>
                 <v-col
                     v-if="match.duration"
                     class="text-right"

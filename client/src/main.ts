@@ -40,7 +40,7 @@ const vuetify = createVuetify({
     },
       defaults: {
         ViewSheet: {
-          class: 'bg-transparent my-10 pa-3 w-75 mx-auto'
+          class: 'bg-transparent ma-10 pa-3 mx-auto'
         },
         ShortCard: {
           variant: 'text',

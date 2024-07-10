@@ -128,6 +128,11 @@ export interface Result {
     matches: MatchResult[]
 }
 
+export interface Draw {
+    round: string,
+    matches: DrawResult[]
+}
+
 export interface Status {
     WC: String[],
     Alt: String[],
@@ -148,97 +153,19 @@ export interface MatchResult {
     winner: PlayerCountry,
     loser: PlayerCountry | null,
     winner_score: Score | null,
-    loser_score: Score | null,
-    winner_seed: number | null,
-    winner_status: string | null,
-    loser_seed: number | null,
-    loser_status: string | null
+    loser_score: Score | null
 }
 
-// // Entries
-
-// export interface EntriesMatch {
-//     id: number,
-//     round: string,
-//     incomplete: string | null,
-//     s1p1: number | null,
-//     s1p2: number | null,
-//     t1p1: number | null,
-//     t1p2: number | null,
-//     s2p1: number | null,
-//     s2p2: number | null,
-//     t2p1: number | null,
-//     t2p2: number | null,
-//     s3p1: number | null,
-//     s3p2: number | null,
-//     t3p1: number | null,
-//     t3p2: number | null,
-//     s4p1: number | null,
-//     s4p2: number | null,
-//     t4p1: number | null,
-//     t4p2: number | null,
-//     s5p1: number | null,
-//     s5p2: number | null,
-//     t5p1: number | null,
-//     t5p2: number | null,
-//     winner_id: string,
-//     entry1: {
-//         rank: number | null,
-//         Player: Player
-//     },
-//     entry2: {
-//         rank: number | null,
-//         Player: Player
-//     }
-// }
-
-// // Match Scores
-// export interface BaseMatchScore {
-//     id: number,
-//     round: string,
-//     incomplete: string | null,
-//     s1p1: number | null,
-//     s1p2: number | null,
-//     t1p1: number | null,
-//     t1p2: number | null,
-//     s2p1: number | null,
-//     s2p2: number | null,
-//     t2p1: number | null,
-//     t2p2: number | null,
-//     s3p1: number | null,
-//     s3p2: number | null,
-//     t3p1: number | null,
-//     t3p2: number | null,
-//     s4p1: number | null,
-//     s4p2: number | null,
-//     t4p1: number | null,
-//     t4p2: number | null,
-//     s5p1: number | null,
-//     s5p2: number | null,
-//     t5p1: number | null,
-//     t5p2: number | null,
-//     winner_id: string | null
-// }
-
-// export interface MatchH2H extends BaseMatchScore {
-//     winner_id: string,
-//     Edition: {
-//         year: number,
-//         environment: string,
-//         surface: string,
-//         edition_no: number,
-//         Tournament: Tournament
-//     }
-// }
-
-// export interface MatchScore extends BaseMatchScore {
-//     match_no: number | null,
-//     umpire: string | null,
-//     duration_mins: number | null,
-//     date: Date | null,
-//     entry1: Entry,
-//     entry2: Entry
-// }
+export interface DrawResult {
+    id: string,
+    match_no: number,
+    incomplete: string | null,
+    winner: string,
+    p1: PlayerCountry,
+    p2: PlayerCountry | null,
+    p1_score: Score | null,
+    p2_score: Score | null
+}
 
 // // Match Stats
 
@@ -312,31 +239,6 @@ export interface MatchResult {
 //     p2_avg_sv2_kph: number | null,
 //     p2_avg_sv2_mph: number | null,
 //     MatchScore: MatchStatScore
-// }
-
-// interface MatchStatScore extends BaseMatchScore {
-//     date: Date | null,
-//     duration_mins: number | null,
-//     umpire: string | null,
-//     entry1: {
-//         seed: number | null,
-//         status: string | null,
-//         Player: Player
-//     },
-//     entry2: {
-//         seed: number | null,
-//         status: string | null,
-//         Player: Player
-//     },
-//     Edition: {
-//         year: number,
-//         environment: string,
-//         surface: string,
-//         hard_type: string,
-//         sponsor_name: string,
-//         start_date: Date,
-//         end_date: Date
-//     }
 // }
 
 // Player

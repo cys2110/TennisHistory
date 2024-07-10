@@ -28,11 +28,19 @@ watch(error, (newError) => {
 </script>
 
 <template>
-    <view-sheet>
+    <v-sheet class='bg-transparent m-16 w-75 pa-3 mx-auto'>
         <div class="!text-4xl !text-zinc-300">Upcoming Tournaments</div>
-        <div v-if="upcoming.length > 0">
-            <UpcomingCard v-for="edition in upcoming" :key="edition.id" :edition />
-        </div>
+        <v-container v-if="upcoming.length > 0">
+            <v-row>
+                <v-col
+                    cols="4"
+                    v-for="edition in upcoming"
+                    :key="edition.id"
+                >
+                    <UpcomingCard :edition />
+                </v-col>
+            </v-row>
+        </v-container>
         <div v-else class="!text-zinc-400 my-5">No upcoming tournaments</div>
-    </view-sheet>
+    </v-sheet>
 </template>
