@@ -1,21 +1,18 @@
 <script setup lang="ts">
 import { DateTime } from 'luxon';
-import { useDisplay } from 'vuetify';
 import { categorySrc, flagSrc, formattedDates, encodeName } from '../utils';
 import type { Edition } from '../interfaces';
 
 const props = defineProps<{
     edition: Edition
 }>()
-const { smAndDown } = useDisplay()
 </script>
 
 <template>
     <v-card
-        class="my-4 sm:!my-5 !bg-indigo-800 lg:w-4/5 mx-auto h-96 border-zinc-500"
+        class="my-4 sm:!my-5 !bg-indigo-800 mx-auto h-100 border-zinc-500"
         rounded="xl"
         variant="outlined"
-        ripple
     >
         <v-img
             :src="flagSrc(edition.venue.country.id)"
