@@ -21,23 +21,23 @@ const formattedScore = computed(() => {
 </script>
 
 <template>
-    <short-card class="md:min-h-64">
-        <v-container>
-            <v-row>
-                <v-col class="text-center text-2xl">
-                    <router-link
-                        class="hover-link"
-                        :to="{name: 'Edition', params: {year: event.year.id, editionNo: event.id}}"
-                    >
-                        {{ event.year.id }}
-                    </router-link>
-                </v-col>
-            </v-row>
-            <v-row 
-                v-if="display && !noFinal"
-                dense
+    <v-card
+        class="md:min-h-64 bg-indigo-800 border-zinc-500"
+        variant="outlined"
+        rounded="xl"
+    >
+        <v-card-title class="text-center text-2xl">
+            <router-link
+                class="hover-link"
+                :to="{name: 'Edition', params: {year: event.year.id, editionNo: event.id}}"
             >
-                <v-col 
+                {{ event.year.id }}
+            </router-link>
+        </v-card-title>
+        <v-container v-if="display && !noFinal">
+            <v-row dense>
+                <v-spacer />
+                <v-col
                     class="flex items-center mx-0.5"
                     cols="2"
                 >
@@ -57,7 +57,10 @@ const formattedScore = computed(() => {
                         />
                     </v-avatar>
                 </v-col>
-                <v-col class="flex items-center mx-2">
+                <v-col
+                    class="flex items-center mx-2"
+                    cols="6"
+                >
                     <router-link
                         class="hover-link"
                         :to="{name: 'Player', params: {id: event.winner.id, name: encodeName(event.winner.full_name)}}"
@@ -66,13 +69,11 @@ const formattedScore = computed(() => {
                     </router-link>
                 </v-col>
             </v-row>
-            <v-row v-if="display && !noFinal">
+            <v-row dense>
                 <v-col class="text-center text-zinc-300">d.</v-col>
             </v-row>
-            <v-row
-                v-if="display && !noFinal"
-                dense
-            >
+            <v-row dense>
+                <v-spacer/>
                 <v-col
                     class="flex items-center mx-0.5"
                     cols="2"
@@ -93,7 +94,7 @@ const formattedScore = computed(() => {
                         />
                     </v-avatar>
                 </v-col>
-                <v-col class="flex items-center mx-2">
+                <v-col class="flex items-center mx-2" cols="6">
                     <router-link
                         class="hover-link"
                         :to="{name: 'Player', params: {id: event.finalist.id, name: encodeName(event.finalist.full_name)}}"
@@ -102,24 +103,12 @@ const formattedScore = computed(() => {
                     </router-link>
                 </v-col>
             </v-row>
-            <v-row v-if="display && !noFinal">
-                <v-col class="text-center text-zinc-300" v-html="formattedScore" />
-            </v-row>
-            <!--If no final played-->
-            <v-row 
-                v-if="display && noFinal"
-                class="text-center text-zinc-300"
-            >
-                <v-col>No final played</v-col>
-            </v-row>
-
-            <!--If tournament currently in progress-->
-            <v-row
-                v-if="!display"
-                class="text-center text-zinc-300"
-            >
-                <v-col>Currently in progress</v-col>
-            </v-row>
         </v-container>
-    </short-card>
+        <v-card-subtitle
+            v-if="display && !noFinal"
+            class="text-center text-zinc-300 text-lg"
+            v-html="formattedScore"
+        />
+        <v-card-subtitle v-else>{{ display && noFinal ? 'No final played' : 'Currently in progress' }}</v-card-subtitle>
+    </v-card>
 </template>

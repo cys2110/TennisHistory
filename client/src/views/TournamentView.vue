@@ -46,7 +46,7 @@ watch(() => props.name, () => {
 </script>
 
 <template>
-    <view-sheet>
+    <v-sheet class="bg-transparent m-16 pa-3 mx-auto w-75">
         <v-container v-if="tournament">
             <v-row>
                 <div class="text-zinc-300 text-3xl">{{ tournament.name }}</div>
@@ -62,7 +62,7 @@ watch(() => props.name, () => {
                         />
                         <v-tooltip
                             content-class="!bg-indigo-800 !text-zinc-300 !text-sm"
-                            text="Go to website"
+                            text="Tournament Website"
                             activator="parent"
                             location="end"
                             height="30"
@@ -87,5 +87,5 @@ watch(() => props.name, () => {
             <div class="text-3xl mb-3 text-zinc-300">{{ name.replace('_', ' ') }}</div>
             <div class="text-zinc-400">No data available yet</div>
         </div>
-    </view-sheet>
+    </v-sheet>
 </template>
