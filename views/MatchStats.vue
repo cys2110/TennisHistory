@@ -1,59 +1,52 @@
 <script setup lang="ts">
+import { ref, type Ref, watch } from 'vue';
+import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import apolloClient from '@/apollo';
+import { getMatchStats } from '@/services/APICalls';
 // import DualStatItem from '@/components/MatchStats/DualStatItem.vue';
 // import ServiceStatItem from '@/components/MatchStats/ServiceStatItem.vue';
 // import StatItem from '@/components/MatchStats/StatItem.vue';
 // import { formatDate, formattedDates, round, formatTime, flagSrc, headshot, status, incomplete } from '@/components/utils';
-// import type { MatchStat } from '@/components/interfaces';
-// import EditionService from '@/services/EditionService';
-// import { ref, type Ref, watch, onMounted } from 'vue';
+import type { MatchStat } from '@/components/interfaces';
 // import { useDisplay } from 'vuetify';
 
-// const props = defineProps<{
-//     matchId: string,
-//     name: string,
-//     id: string,
-//     editionNo: string,
-//     p1: string,
-//     p2: string
-// }>()
-// const match: Ref<MatchStat | null> = ref(null)
-// const p1Scores: Ref<{set: number | string, tie: number | string}[]> = ref([])
-// const p2Scores: Ref<{set: number | string, tie: number | string}[]> = ref([])
+const props = defineProps<{
+    name: string,
+    id: string,
+    year: string,
+    editionNo: string,
+    matchId: string
+}>()
+
+provideApolloClient(apolloClient)
+
+const { query, variables } = getMatchStats(parseInt(props.matchId), parseInt(props.editionNo))
+const { result, loading, error} = useQuery(query, variables)
+
+const match: Ref<MatchStat | null> = ref(null)
 // const { mdAndUp } = useDisplay()
 
-// const updateDocumentTitle = () => {
-//     const p1Name = props.p1.replace(/_/g, ' ')
-//     const p2Name = props.p2.replace(/_/g, ' ')
-//     const tournamentName = props.name.replace(/_/g, ' ')
-//     document.title = `${p1Name} v. ${p2Name} | ${tournamentName} | TennisHistory`
-// }
+watch(result, (newResult) => {
+    if (newResult) {
+        match.value = newResult.matches[0]
+        console.log(match.value)
+    }
+}, {immediate: true})
 
-// onMounted(() => {
-//     EditionService.getMatchStats(parseInt(props.matchId))
-//     .then(response => {
-//         match.value = response.data
-//         console.log(match.value)
-//         p1Scores.value = [
-//             { set: match.value?.MatchScore.s5p1 ?? '', tie: match.value?.MatchScore.t5p1 ?? '' },
-//             { set: match.value?.MatchScore.s4p1 ?? '', tie: match.value?.MatchScore.t4p1 ?? '' },
-//             { set: match.value?.MatchScore.s3p1 ?? '', tie: match.value?.MatchScore.t3p1 ?? '' },
-//             { set: match.value?.MatchScore.s2p1 ?? '', tie: match.value?.MatchScore.t2p1 ?? '' },
-//             { set: match.value?.MatchScore.s1p1 ?? '', tie: match.value?.MatchScore.t1p1 ?? '' },
-//         ]
-//         p2Scores.value = [
-//             { set: match.value?.MatchScore.s5p2 ?? '', tie: match.value?.MatchScore.t5p2 ?? '' },
-//             { set: match.value?.MatchScore.s4p2 ?? '', tie: match.value?.MatchScore.t4p2 ?? '' },
-//             { set: match.value?.MatchScore.s3p2 ?? '', tie: match.value?.MatchScore.t3p2 ?? '' },
-//             { set: match.value?.MatchScore.s2p2 ?? '', tie: match.value?.MatchScore.t2p2 ?? '' },
-//             { set: match.value?.MatchScore.s1p2 ?? '', tie: match.value?.MatchScore.t1p2 ?? '' },
-//         ]
-//     })
-//     .catch(e => console.log(e))
-// })
+watch(error, (newError) => {
+    if (newError) {
+        console.error(newError)
+    }
+})
 
-// watch(() => props.name, () => {
-//     updateDocumentTitle()
-// }, {immediate: true})
+const updateDocumentTitle = () => {
+    const tournamentName = props.name.replace(/_/g, ' ')
+    document.title = `${tournamentName} ${props.year} ${props.matchId} | TennisHistory`
+}
+
+watch(() => props.name, () => {
+    updateDocumentTitle()
+}, {immediate: true})
 </script>
 
 <template>

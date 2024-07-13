@@ -1,113 +1,115 @@
 <script setup lang="ts">
-import { computed, ref, type Ref, watch, watchEffect } from 'vue';
-import { DateTime } from 'luxon';
-import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import { ref, type Ref, watch, watchEffect } from 'vue';
 import apolloClient from '@/apollo';
-import { getPlayerStats } from '@/services/APICalls';
-import type { PlayerStat, PlayerDetails } from '@/components/interfaces';
+import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import { DateTime } from 'luxon';
+import { getPlayerStats } from '@/services/PlayerService';
+import type { PlayerStat } from '@/utils/interfaces';
 import StatItem from '@/components/Player/StatItem.vue';
-
-const props = defineProps<{
-    player: PlayerDetails
-}>()
 
 provideApolloClient(apolloClient)
 
+const props = defineProps<{
+    id: string
+}>()
+
 const selectedYear = ref('Career')
 const selectedSurface = ref('All')
+
 const surfaces = ['All', 'Clay', 'Grass', 'Hard', 'Carpet']
 
-const years = computed(() => {
-    const retirementYear = props.player.retired?.id || DateTime.now().year
-    const yearArray = Array.from({length: retirementYear - props.player.turned_pro.id + 1}, (_, index) => props.player.turned_pro.id + index)
-    return ['Career', ...yearArray]
-})
+const years = ref(['Career'])
 
 const stats: Ref<PlayerStat[]> = ref([])
 
 const updateStats = () => {
-    const { query, variables } = getPlayerStats(props.player.id, selectedYear.value === 'Career' ? undefined : parseInt(selectedYear.value), selectedSurface.value === 'All' ? undefined : selectedSurface.value)
+    const { query, variables } = getPlayerStats(props.id, selectedYear.value === 'Career' ? undefined : parseInt(selectedYear.value), selectedSurface.value === 'All' ? undefined : selectedSurface.value)
     const { result, loading, error } = useQuery(query, variables)
 
     watch(result, (newResult) => {
         if (newResult) {
+            const retirementYear = newResult.players[0].retired?.id || DateTime.now().year
+            const yearArray = Array.from({length: retirementYear - newResult.players[0].turned_pro.id + 1}, (_, index) => newResult.players[0].turned_pro.id + index)
+            years.value = ['Career', ...yearArray]
+
+            const aggregate = newResult.players[0].scoresAggregate.node
             stats.value = [
-            {
-                category: 'Serve',
-                stats: [
-                    {
-                        metric: 'Aces',
-                        total: newResult.players[0].stats.aces
-                    },
-                    {
-                        metric: 'Double faults',
-                        total: newResult.players[0].stats.dfs
-                    },
-                    {
-                        metric: '1st serve',
-                        win: newResult.players[0].stats.serve1_pts,
-                        total: newResult.players[0].stats.serve1_pts + newResult.players[0].stats.serve2_pts
-                    },
-                    {
-                        metric: '1st serve points won',
-                        win: newResult.players[0].stats.serve1_pts_w,
-                        total: newResult.players[0].stats.serve1_pts
-                    },
-                    {
-                        metric: '2nd serve points won',
-                        win: newResult.players[0].stats.serve2_pts_w,
-                        total: newResult.players[0].stats.serve2_pts
-                    },
-                    {
-                        metric: 'Break points faced',
-                        total: newResult.players[0].stats.bps_faced
-                    },
-                    {
-                        metric: 'Break points saved',
-                        win: newResult.players[0].stats.bps_saved,
-                        total: newResult.players[0].stats.bps_faced
-                    },
-                    {
-                        metric: 'Total service points won',
-                        win: newResult.players[0].stats.serve1_pts_w + newResult.players[0].stats.serve2_pts_w,
-                        total: newResult.players[0].stats.serve1_pts + newResult.players[0].stats.serve2_pts
-                    }
-                ]
-            },
-            {
-                category: 'Return',
-                stats: [
-                    {
-                        metric: '1st serve return points won',
-                        win: newResult.players[0].stats.ret1_pts_w,
-                        total: newResult.players[0].stats.ret1_pts
-                    },
-                    {
-                        metric: '2nd serve return points won',
-                        win: newResult.players[0].stats.ret2_pts_w,
-                        total: newResult.players[0].stats.ret2_pts
-                    },
-                    {
-                        metric: 'Break point opportunities',
-                        total: newResult.players[0].stats.bp_opps
-                    },
-                    {
-                        metric: 'Break points converted',
-                        win: newResult.players[0].stats.bps_converted,
-                        total: newResult.players[0].stats.bp_opps
-                    },
-                    {
-                        metric: 'Return points won',
-                        win: newResult.players[0].stats.ret1_pts_w + newResult.players[0].stats.ret2_pts_w,
-                        total: newResult.players[0].stats.ret1_pts + newResult.players[0].stats.ret2_pts
-                    },
-                    {
-                        metric: 'Total points won',
-                        win: newResult.players[0].stats.serve1_pts_w + newResult.players[0].stats.serve2_pts_w + newResult.players[0].stats.ret1_pts_w + newResult.players[0].stats.ret2_pts_w,
-                        total: newResult.players[0].stats.serve1_pts + newResult.players[0].stats.serve2_pts + newResult.players[0].stats.ret1_pts + newResult.players[0].stats.ret2_pts
-                    }
-                ]
-            }
+                {
+                    category: 'Serve',
+                    stats: [
+                        {
+                            metric: 'Aces',
+                            total: aggregate.aces.sum
+                        },
+                        {
+                            metric: 'Double faults',
+                            total: aggregate.dfs.sum
+                        },
+                        {
+                            metric: '1st serve',
+                            win: aggregate.serve1_pts.sum,
+                            total: aggregate.serve1_pts.sum + aggregate.serve2_pts.sum
+                        },
+                        {
+                            metric: '1st serve points won',
+                            win: aggregate.serve1_pts_w.sum,
+                            total: aggregate.serve1_pts.sum
+                        },
+                        {
+                            metric: '2nd serve points won',
+                            win: aggregate.serve2_pts_w.sum,
+                            total: aggregate.serve2_pts.sum
+                        },
+                        {
+                            metric: 'Break points faced',
+                            total: aggregate.bps_faced.sum
+                        },
+                        {
+                            metric: 'Break points saved',
+                            win: aggregate.bps_saved.sum,
+                            total: aggregate.bps_faced.sum
+                        },
+                        {
+                            metric: 'Total service points won',
+                            win: aggregate.serve1_pts_w.sum + aggregate.serve2_pts_w.sum,
+                            total: aggregate.serve1_pts.sum + aggregate.serve2_pts.sum
+                        }
+                    ]
+                },
+                {
+                    category: 'Return',
+                    stats: [
+                        {
+                            metric: '1st serve return points won',
+                            win: aggregate.ret1_w.sum,
+                            total: aggregate.ret1.sum
+                        },
+                        {
+                            metric: '2nd serve return points won',
+                            win: aggregate.ret2_w.sum,
+                            total: aggregate.ret2.sum
+                        },
+                        {
+                            metric: 'Break point opportunities',
+                            total: aggregate.bp_opps.sum
+                        },
+                        {
+                            metric: 'Break points converted',
+                            win: aggregate.bps_converted.sum,
+                            total: aggregate.bp_opps.sum
+                        },
+                        {
+                            metric: 'Return points won',
+                            win: aggregate.ret1_w.sum + aggregate.ret2_w.sum,
+                            total: aggregate.ret1.sum + aggregate.ret2.sum
+                        },
+                        {
+                            metric: 'Total points won',
+                            win: aggregate.serve1_pts_w.sum + aggregate.serve2_pts_w.sum + aggregate.ret1_w.sum + aggregate.ret2_w.sum,
+                            total: aggregate.serve1_pts.sum + aggregate.serve2_pts.sum + aggregate.ret1.sum + aggregate.ret2.sum
+                        }
+                    ]
+                }
             ]
         }
     }, {immediate: true})
@@ -179,5 +181,4 @@ watchEffect(() => {
             </div>
         </v-row>
     </v-container>
-    
 </template>

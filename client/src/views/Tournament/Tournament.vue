@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import { computed, ref, type Ref, watch } from 'vue';
-import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import apolloClient from '@/apollo';
-import { getTournament } from '@/services/APICalls';
+import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import { getTournament } from '@/services/TournamentService';
+import type { TournamentDetails } from '@/utils/interfaces';
+import { unencodeName } from '@/utils/functions';
 import TournamentCard from '@/components/Tournament/TournamentCard.vue';
-import type { TournamentDetails } from '@/components/interfaces';
 
 provideApolloClient(apolloClient)
 
 const props = defineProps<{
-    id: string,
+    id: string
     name: string
 }>()
-const tournament: Ref<TournamentDetails | null> = ref(null)
 
 const { query, variables } = getTournament(parseInt(props.id))
 const { result, loading, error} = useQuery(query, variables)
+
+const tournament: Ref<TournamentDetails | null> = ref(null)
 
 watch(result, (newResult) => {
     if (newResult) {
@@ -29,28 +31,37 @@ watch(error, (newError) => {
     }
 })
 
-const years = computed(() => {
-    return !tournament.value?.end_year ? `${tournament.value?.start_year.id} - present` :
-        tournament.value.start_year === tournament.value.end_year ? tournament.value.start_year.id :
-        `${tournament.value.start_year.id} - ${tournament.value.end_year.id}`
-})
-
 const updateDocumentTitle = () => {
-    const tournamentName = props.name
-    document.title = `${tournamentName.replace(/_/g, ' ')} | TennisHistory`
+    document.title = `${unencodeName(props.name)} | TennisHistory`
 }
 
 watch(() => props.name, () => {
     updateDocumentTitle()
 }, {immediate: true})
+
+const years = computed(() => {
+    return !tournament.value?.end_year ? `${tournament.value?.start_year.id} - present` :
+        tournament.value.start_year === tournament.value.end_year ? tournament.value.start_year.id :
+        `${tournament.value.start_year.id} - ${tournament.value.end_year.id}`
+})
 </script>
 
 <template>
-    <v-sheet class="bg-transparent m-16 pa-3 mx-auto w-75">
-        <v-container v-if="tournament">
+    <v-sheet
+        class="bg-transparent m-16 pa-3 mx-auto w-75"
+    >
+        <v-container
+            v-if="tournament"
+        >
             <v-row>
-                <div class="text-zinc-300 text-3xl">{{ tournament.name }}</div>
-                <div class="text-xs ml-3">
+                <div
+                    class="text-zinc-300 text-3xl"
+                >
+                    {{ tournament.name }}
+                </div>
+                <div
+                    class="text-xs ml-3"
+                >
                     <a
                         v-if="tournament.website"
                         :href="tournament.website"
@@ -70,22 +81,37 @@ watch(() => props.name, () => {
                     </a>
                 </div>
             </v-row>
-            <v-row class="text-xl my-5 text-zinc-300">{{ years }}</v-row>
+            <v-row
+                class="text-xl my-5 text-zinc-300"
+            >
+                {{ years }}
+            </v-row>
             <v-row>
                 <v-col
                     v-for="event in tournament.events"
                     :key="event.id"
                     cols="12"
                     sm="6"
-                    lg="3"
+                    lg="4"
+                    xl="3"
                 >
-                    <TournamentCard :event />
+                    <TournamentCard
+                        :event
+                    />
                 </v-col>
             </v-row>
         </v-container>
         <div v-else>
-            <div class="text-3xl mb-3 text-zinc-300">{{ name.replace('_', ' ') }}</div>
-            <div class="text-zinc-400">No data available yet</div>
+            <div
+                class="text-3xl mb-3 text-zinc-300"
+            >
+                {{ unencodeName(name) }}
+            </div>
+            <div
+                class="text-zinc-400"
+            >
+                No data available yet
+            </div>
         </div>
     </v-sheet>
 </template>

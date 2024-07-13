@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { computed, ref, watch, type Ref } from 'vue';
 import apolloClient from '@/apollo';
-import { getPlayerTitles } from '@/services/APICalls';
-import type { TitlesAndFinals } from '@/components/interfaces';
+import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import { getPlayerTitles } from '@/services/PlayerService';
+import type { TitlesAndFinals } from '@/utils/interfaces';
 
 provideApolloClient(apolloClient)
 
-const props = defineProps(['id'])
+const props = defineProps<{
+    id: string
+}>()
 
 const { query, variables } = getPlayerTitles(props.id)
 const { result, loading, error } = useQuery(query, variables)

@@ -1,40 +1,56 @@
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect, type Ref } from 'vue';
-import { DateTime } from 'luxon';
-import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import { onMounted, ref, watch, watchEffect, type Ref } from 'vue';
 import apolloClient from '@/apollo';
-import { getPlayerActivity } from '@/services/APICalls';
-import type { PlayerActivity, PlayerDetails } from '@/components/interfaces';
+import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import { DateTime } from 'luxon';
+import { getPlayer, getPlayerActivity } from '@/services/PlayerService';
+import type { Activity } from '@/utils/interfaces';
 import ActivityCard from '@/components/Player/ActivityCard.vue';
 
 provideApolloClient(apolloClient)
 
 const props = defineProps<{
-    player: PlayerDetails
+    id: string
+    name: string
 }>()
 
-const selectedYear = ref(props.player.retired ?? DateTime.now().year)
-
+const selectedYear = ref(DateTime.now().year)
+const years = ref([DateTime.now().year])
+const tournaments: Ref<Activity[]> = ref([])
 const stats = ref({
     win: 0,
     loss: 0,
     titles: 0
 })
-const results: Ref<PlayerActivity[]> = ref([])
 
-const years = computed(() => {
-    const retirementYear = props.player.retired ?? DateTime.now().year
-    return Array.from({length: retirementYear - props.player.turned_pro.id + 1}, (_, index) => props.player.turned_pro.id + index)
+const updateYears = () => {
+    const { query, variables } = getPlayer(props.id)
+    const { result, loading, error } = useQuery(query,variables)
+
+    watch(result, (newResult) => {
+        if (newResult) {
+            selectedYear.value = newResult.players[0].retired?.id || DateTime.now().year
+            const retirementYear = newResult.players[0].retired?.id || DateTime.now().year
+            years.value = Array.from({length: retirementYear - newResult.players[0].turned_pro.id + 1}, (_, index) => newResult.players[0].turned_pro.id + index)
+        }
+    })
+}
+
+onMounted(() => {
+    updateYears()
 })
 
 const updateActivity = () => {
-    const { query, variables } = getPlayerActivity(props.player.id, selectedYear.value)
+    const { query, variables } = getPlayerActivity(props.id, selectedYear.value)
     const { result, loading, error } = useQuery(query, variables)
 
     watch(result, (newResult) => {
         if (newResult) {
-            stats.value = newResult.players[0].yearStats
-            results.value = newResult.players[0].tournaments
+            const results = newResult.players[0]
+            stats.value.win = results.scoreWinsAggregate.count
+            stats.value.loss = results.scoreLossesAggregate.count
+            stats.value.titles = results.titleAggregate.count
+            tournaments.value = results.eventsConnection.edges
         }
     }, {immediate: true})
 
@@ -69,13 +85,13 @@ watchEffect(() => {
                 <div class="text-xs md:text-base">TITLES</div>
             </div>
         </div>
-        <div v-if="results.length > 0">
+        <div v-if="tournaments.length > 0">
             <ActivityCard
-                v-for="event in results"
-                :key="event.id"
+                v-for="event in tournaments"
+                :key="event.node.id"
                 :event
-                :playerId="player.id"
-                :playerName="player.full_name"
+                :id="id"
+                :name="name"
             />
         </div>
         <div

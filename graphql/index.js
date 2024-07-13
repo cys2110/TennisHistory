@@ -10,9 +10,23 @@ const driver = neo4j.driver(
     neo4j.auth.basic("neo4j", "bSaIKEK1G0dW-0j9w-aMMvsE7-_BtxGFm_7ZXOy-1W0")
 );
 
-const neoSchema = new Neo4jGraphQL({ typeDefs, 
-    resolvers, 
-    driver });
+const features = {
+    filters: {
+        String: {
+            MATCHES: true
+        },
+        ID: {
+            MATCHES: true
+        }
+    }
+}
+
+const neoSchema = new Neo4jGraphQL({
+    features,
+    typeDefs,
+    resolvers,
+    driver
+});
 
 const server = new ApolloServer({
     schema: await neoSchema.getSchema(),

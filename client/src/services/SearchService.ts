@@ -1,17 +1,29 @@
-import axios from 'axios';
-import { API_URL } from '@/components/utils';
+import { gql } from "@apollo/client/core"
 
-const apiClient = axios.create({
-    baseURL: `${API_URL}search/`,
-    withCredentials: false,
-    headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-    }
-})
-
-export default {
-    search(searchTerm: string) {
-        return apiClient.get('' + searchTerm)
-    }
+export const getSearch = (searchTerm: string) => {
+    const call = gql`
+        query search($searchTerm: String!) {
+            tournaments(
+                where: {
+                    name_MATCHES: $searchTerm
+                }
+            ) {
+                id
+                name
+            }
+            searchPlayers(
+                full_name: $searchTerm
+            ) {
+                last_name
+                full_name
+                first_name
+                id
+                country {
+                name
+                id
+                }
+            }
+        }
+    `
+    return {query: call, variables: { searchTerm }}
 }

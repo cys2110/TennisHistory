@@ -1,134 +1,15 @@
 <script setup lang="ts">
-import { ref, watch, type Ref } from 'vue';
 import { useDisplay } from 'vuetify';
-import { provideApolloClient, useQuery } from '@vue/apollo-composable';
-import apolloClient from '@/apollo';
-import { getEditionDetails } from '@/services/APICalls';
 import EntryRow from '@/components/Edition/EntryRow.vue';
 import EntryHeading from '@/components/Edition/EntryHeading.vue';
 import { formatCurrency, headshot, flagSrc, encodeName } from '@/components/utils';
 import type { EditionDetails } from '@/components/interfaces';
 
-provideApolloClient(apolloClient)
-
-const props = defineProps<{
-    editionNo: string
-}>()
 const { xl } = useDisplay()
-
-const { query, variables } = getEditionDetails(parseInt(props.editionNo))
-const { result, loading, error} = useQuery(query, variables)
-
-const edition: Ref<EditionDetails | null> = ref(null)
-const prizeMoney: Ref<{round: string, pm: number, pts: number}[]> = ref([])
-
-watch(result, (newResult) => {
-    if (newResult) {
-        edition.value = newResult.events[0]
-        prizeMoney.value = [
-            {
-                round: 'WINNER',
-                pm: newResult.events[0].winner_pm,
-                pts: newResult.events[0].winner_pts
-            },
-            {
-                round: 'FINALIST',
-                pm: newResult.events[0].finalist_pm,
-                pts: newResult.events[0].finalist_pts
-            },
-            {
-                round: 'SEMIFINALIST',
-                pm: newResult.events[0].semifinalist_pm,
-                pts: newResult.events[0].semifinalist_pts
-            },
-            {
-                round: 'QUARTERFINALIST',
-                pm: newResult.events[0].quarterfinalist_pm,
-                pts: newResult.events[0].quarterfinalist_pts
-            },
-            {
-                round: 'ROUND OF 16',
-                pm: newResult.events[0].r16_pm,
-                pts: newResult.events[0].r16_pts
-            },
-            {
-                round: 'ROUND OF 32',
-                pm: newResult.events[0].r32_pm,
-                pts: newResult.events[0].r32_pts
-            },
-            {
-                round: 'ROUND OF 64',
-                pm: newResult.events[0].r64_pm,
-                pts: newResult.events[0].r64_pts
-            },
-            {
-                round: 'ROUND OF 128',
-                pm: newResult.events[0].r128_pm,
-                pts: newResult.events[0].r128_pts
-            }
-        ]
-    }
-}, {immediate: true})
-
-watch(error, (newError) => {
-    if (newError) {
-        console.error(newError)
-    }
-})
 </script>
 
 <template>
     <v-container v-if="edition">
-        <v-row>
-            <v-col class="sm:flex justify-between">
-                <div class="w-100 mx-1 text-xs lg:text-sm">
-                    <div
-                        class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between"
-                    >
-                        <span>Venue</span>
-                        <span class="text-right">{{ edition.venue.name ?? '—' }}</span>
-                    </div>
-                    <div class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between">
-                        <div>City</div>
-                        <div>{{ edition.venue.city }}</div>
-                    </div>
-                    <div class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between">
-                        <div>Surface</div>
-                        <div>{{ edition.surface.environment }} {{ edition.surface.surface }}<div v-if="edition.surface.hard_type">({{ edition.surface.hard_type }})</div></div>
-                    </div>
-                </div>
-                <div class="w-100 mx-1 text-xs lg:text-sm">
-                    <div
-                        class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between"
-                    >
-                        <div>Prize money</div>
-                        <div>{{ edition.pm ? formatCurrency(edition.currency, edition.pm) : '—' }}</div>
-                    </div>
-                    <div
-                        class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between items-center"
-                    >
-                        <div>Total financial commitment</div>
-                        <div>{{ edition.tfc ? formatCurrency(edition.currency, edition.tfc) : '—' }}</div>
-                    </div>
-                    <div
-                        class="my-2 bg-indigo-800 text-zinc-300 py-1 px-3 rounded-lg flex justify-between"
-                    >
-                        <div class="flex items-center">{{ edition.supervisors?.length === 1 ? 'Supervisor' : 'Supervisors' }}</div>
-                        <div>
-                            <div
-                                v-if="edition.supervisors.length > 0"
-                                v-for="supervisor in edition.supervisors"
-                                :key="supervisor.id"
-                                class="text-right"
-                            >
-                                {{ supervisor.id }}
-                            </div>
-                            <div v-else>—</div>
-                        </div>
-                    </div>
-                </div>
-            </v-col>
-        </v-row>
         <v-row>
             <v-col>
                 <v-table
@@ -188,41 +69,6 @@ watch(error, (newError) => {
                 </v-table>
             </v-col>
             <v-col>
-                <v-table
-                    v-if="edition.winner_pm"
-                    class="bg-transparent rounded-xl mb-3"
-                    fixed-header
-                    hover
-                    density="compact"
-                >
-                    <thead class="text-xs text-zinc-300">
-                        <tr>
-                            <th class="!font-bold text-center !bg-indigo-800"></th>
-                            <th class="!font-bold text-center !bg-indigo-800">Prize money</th>
-                            <th class="!font-bold text-center !bg-indigo-800">Points</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-xs text-zinc-300">
-                        <tr
-                            v-for="row in prizeMoney"
-                            :key="row.round"
-                        >
-                            <td v-if="row.pm || row.pts">{{ row.round }}</td>
-                            <td
-                                v-if="row.pm || row.pts"
-                                class="text-center"
-                            >
-                                {{ row.pm ? formatCurrency(edition.currency, row.pm) : '—' }}
-                            </td>
-                            <td
-                                v-if="row.pm || row.pts"
-                                class="text-center"
-                            >
-                                {{ row.pts ?? 0 }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </v-table>
                 <v-table
                     v-if="edition.lda"
                     class="bg-transparent rounded-xl my-5"

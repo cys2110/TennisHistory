@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { DateTime } from 'luxon';
-import { categorySrc, encodeName, formattedDates, flagSrc } from '../utils';
-import type { Edition } from '../interfaces';
+import type { Event } from '@/utils/interfaces';
+import { flag, formattedDates, category, encodeName } from '@/utils/functions';
 
 const props = defineProps<{
-    edition: Edition
+    event: Event
 }>()
 </script>
 
@@ -14,55 +14,76 @@ const props = defineProps<{
         rounded="xl"
         variant="outlined"
     >
-    <v-img
-            :src="flagSrc(edition.venue.country.id)"
-            :alt="edition.venue.country.name"
+        <v-img
             class="align-end opacity-75"
+            :src="flag(event.venue.country.id)"
+            :alt="event.venue.country.name"
         >
-            <div class="flex justify-between my-2 mx-1">
-                <v-chip
-                    variant="elevated"
-                    class="!bg-indigo-800 !text-zinc-300"
+            <v-chip
+                variant="elevated"
+                class="!bg-zinc-300 !text-indigo-800 my-1 mx-2"
+            >
+                {{ formattedDates(event.start_date, event.end_date) }}
+            </v-chip>
+            <v-chip
+                variant="elevated"
+                class="!text-indigo-800 !bg-zinc-300 my-1 mx-2"
+            >
+                {{ event.surface.environment }} {{ event.surface.surface }}
+                <span
+                    v-if="event.surface.hard_type"
                 >
-                    {{ formattedDates(edition.start_date, edition.end_date) }}
-                </v-chip>
-                <v-chip
-                    variant="elevated"
-                    class="!bg-indigo-800 !text-zinc-300"
-                >
-                    {{ edition.surface.environment }} {{ edition.surface.surface }}
-                    <span v-if="edition.surface.hard_type"> ({{ edition.surface.hard_type }})</span>
-                </v-chip>
-            </div>
+                    ({{ event.surface.hard_type }})
+                </span>
+            </v-chip>
         </v-img>
-        <v-row class="mt-1">
-            <v-col cols="4">
+        <v-row
+            class="mt-1"
+        >
+            <v-col
+                cols="4"
+            >
                 <v-img
-                    v-if="edition.category"
+                    v-if="event.category"
                     class="!size-20 mx-auto"
-                    :src="categorySrc(edition.category)"
-                    :alt="edition.category"
+                    :src="category(event.category)"
+                    :alt="event.category"
                 />
             </v-col>
-            <v-col cols="8">
-                <v-card-title style="text-wrap: wrap;">
+            <v-col
+                cols="8"
+            >
+                <v-card-title
+                    style="text-wrap: wrap;"
+                >
                     <router-link
-                        :to="{name: 'Tournament', params: {name: encodeName(edition.tournament.name), id: edition.tournament.id}}"
                         class="hover-link"
+                        :to="{name: 'Tournament', params: {name: encodeName(event.tournament.name), id: event.tournament.id}}"
                     >
-                        {{ edition.tournament.name }}
+                        {{ event.tournament.name }}
                     </router-link>
                 </v-card-title>
-                <v-card-subtitle v-if="edition.sponsor_name" style="text-wrap: wrap;">{{ edition.sponsor_name }}</v-card-subtitle>
-                <v-card-subtitle class="small mt-1">{{ edition.venue.city }}, {{ edition.venue.country.name }}</v-card-subtitle>
+                <v-card-subtitle
+                    v-if="event.sponsor_name"
+                    style="text-wrap: wrap;"
+                >
+                    {{ event.sponsor_name }}
+                </v-card-subtitle>
+                <v-card-subtitle
+                    class="small mt-1"
+                    style="text-wrap: wrap;"
+                >
+                    {{ event.venue.city }}, {{ event.venue.country.name }}
+                </v-card-subtitle>
             </v-col>
         </v-row>
-        <v-card-actions>
+        <v-card-actions
+            v-if="DateTime.now() > DateTime.fromISO(event.start_date)"
+        >
             <v-chip
-                v-if="DateTime.now() > DateTime.fromISO(edition.start_date)"
                 class="mx-auto text-zinc-300"
                 variant="outlined"
-                :to="{name: 'Edition', params: {name: encodeName(edition.tournament.name), id: edition.tournament.id, year: edition.year.id, editionNo: edition.id}}"
+                :to="{name: 'Event', params: {name: encodeName(event.tournament.name), id: event.tournament.id, year: event.year.id, eventId: event.id}}"
             >
                 Results
             </v-chip>

@@ -1,44 +1,46 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue';
-import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import apolloClient from '@/apollo';
-import { getWLIndex } from '@/services/APICalls';
+import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import { getWLIndex } from '@/services/PlayerService';
+import type { WLIndex } from '@/utils/interfaces';
 import WLIndexItem from '@/components/Player/WLIndexItem.vue';
-import type { WLIndex } from '@/components/interfaces';
 
 provideApolloClient(apolloClient)
 
 const props = defineProps<{
     id: string
 }>()
-const index: Ref<WLIndex[]> = ref([])
 
-const {query, variables } = getWLIndex(props.id)
+const { query, variables } = getWLIndex(props.id)
 const { result, loading, error } = useQuery(query, variables)
+
+const index: Ref<WLIndex[]> = ref([])
 
 watch(result, (newResult) => {
     if (newResult) {
+        const stats = newResult.players[0]
         index.value = [
             {
                 category: 'Match Record',
                 stats: [
                     {
                         metric: 'Overall',
-                        win: newResult.players[0].indexMatches.overallWins,
-                        total: newResult.players[0].indexMatches.overallTotal,
-                        titles: newResult.players[0].indexTitles.overallTitles
+                        win: stats.overallWins.count,
+                        total: stats.overallTotal.count,
+                        titles: stats.overallTitles.count
                     },
                     {
                         metric: 'Grand Slam',
-                        win: newResult.players[0].indexMatches.gsWins,
-                        total: newResult.players[0].indexMatches.gsTotal,
-                        titles: newResult.players[0].indexTitles.gsTitles
+                        win: stats.gsWins.count,
+                        total: stats.gsTotal.count,
+                        titles: stats.gsTitles.count
                     },
                     {
                         metric: 'ATP Masters 1000',
-                        win: newResult.players[0].indexMatches.mastersWins,
-                        total: newResult.players[0].indexMatches.mastersTotal,
-                        titles: newResult.players[0].indexMatches.mastersTitles
+                        win: stats.mastersWins.count,
+                        total: stats.mastersTotal.count,
+                        titles: stats.mastersTitles.count
                     }
                 ]
             },
@@ -47,28 +49,28 @@ watch(result, (newResult) => {
                 stats: [
                     {
                         metric: 'Tiebreaks',
-                        win: newResult.players[0].indexTb.tbWins,
-                        total: newResult.players[0].indexTb.tbTotal
+                        win: stats.indexTb.tbWins,
+                        total: stats.indexTb.tbTotal
                     },
                     {
                         metric: 'Versus Top 10',
-                        win: newResult.players[0].indexOpponents.v10Wins,
-                        total: newResult.players[0].indexOpponents.v10Total
+                        win: stats.indexOpponents.v10Wins,
+                        total: stats.indexOpponents.v10Total
                     },
                     {
                         metric: 'Finals',
-                        win: newResult.players[0].indexTitles.overallTitles,
-                        total: newResult.players[0].indexFinals + newResult.players[0].indexTitles.overallTitles
+                        win: stats.overallTitles.count,
+                        total: stats.overallTitles.count + stats.overallFinals.count
                     },
                     {
                         metric: 'Deciding set',
-                        win: newResult.players[0].indexMatches.decidersWins,
-                        total: newResult.players[0].indexMatches.decidersTotal
+                        win: stats.decidersWins.count,
+                        total: stats.decidersTotal.count
                     },
                     {
                         metric: '5th set record',
-                        win: newResult.players[0].indexMatches.set5Wins,
-                        total: newResult.players[0].indexMatches.set5Total
+                        win: stats.set5Wins.count,
+                        total: stats.set5Total.count
                     }
                 ]
             },
@@ -77,39 +79,39 @@ watch(result, (newResult) => {
                 stats:[
                     {
                         metric: 'Clay',
-                        win: newResult.players[0].indexMatches.clayWins,
-                        total: newResult.players[0].indexMatches.clayTotal,
-                        titles: newResult.players[0].indexTitles.clayTitles
+                        win: stats.clayWins.count,
+                        total: stats.clayTotal.count,
+                        titles: stats.clayTitles.count
                     },
                     {
                         metric: 'Grass',
-                        win: newResult.players[0].indexMatches.grassWins,
-                        total: newResult.players[0].indexMatches.grassTotal,
-                        titles: newResult.players[0].indexTitles.grassTitles
+                        win: stats.grassWins.count,
+                        total: stats.grassTotal.count,
+                        titles: stats.grassTitles.count
                     },
                     {
                         metric: 'Hard',
-                        win: newResult.players[0].indexMatches.hardWins,
-                        total: newResult.players[0].indexMatches.hardTotal,
-                        titles: newResult.players[0].indexTitles.hardTitles
+                        win: stats.hardWins.count,
+                        total: stats.hardTotal.count,
+                        titles: stats.hardTitles.count
                     },
                     {
                         metric: 'Carpet',
-                        win: newResult.players[0].indexMatches.carpetWins,
-                        total: newResult.players[0].indexMatches.carpetTotal,
-                        titles: newResult.players[0].indexTitles.carpetTitles
+                        win: stats.carpetWins.count,
+                        total: stats.carpetTotal.count,
+                        titles: stats.carpetTitles.count
                     },
                     {
                         metric: 'Indoor',
-                        win: newResult.players[0].indexMatches.indoorWins,
-                        total: newResult.players[0].indexMatches.indoorTotal,
-                        titles: newResult.players[0].indexTitles.indoorTitles
+                        win: stats.indoorWins.count,
+                        total: stats.indoorTotal.count,
+                        titles: stats.indoorTitles.count
                     },
                     {
                         metric: 'Outdoor',
-                        win: newResult.players[0].indexMatches.outdoorWins,
-                        total: newResult.players[0].indexMatches.outdoorTotal,
-                        titles: newResult.players[0].indexTitles.outdoorTitles
+                        win: stats.outdoorWins.count,
+                        total: stats.outdoorTotal.count,
+                        titles: stats.outdoorTitles.count
                     }
                 ]
             },
@@ -118,23 +120,23 @@ watch(result, (newResult) => {
                 stats: [
                     {
                         metric: 'After winning 1st set',
-                        win: newResult.players[0].indexOpponents.win1Wins,
-                        total: newResult.players[0].indexOpponents.win1Total
+                        win: stats.indexOpponents.win1Wins,
+                        total: stats.indexOpponents.win1Total
                     },
                     {
                         metric: 'After losing 1st set',
-                        win: newResult.players[0].indexOpponents.lose1Wins,
-                        total: newResult.players[0].indexOpponents.lose1Total
+                        win: stats.indexOpponents.lose1Wins,
+                        total: stats.indexOpponents.lose1Total
                     },
                     {
                         metric: 'vs. right-handers',
-                        win: newResult.players[0].indexOpponents.rhWins,
-                        total: newResult.players[0].indexOpponents.rhTotal
+                        win: stats.rhWins.count,
+                        total: stats.rhTotal.count
                     },
                     {
                         metric: 'vs. left-handers',
-                        win: newResult.players[0].indexOpponents.lhWins,
-                        total: newResult.players[0].indexOpponents.lhTotal
+                        win: stats.lhWins.count,
+                        total: stats.lhTotal.count
                     }
                 ]
             }
@@ -146,7 +148,7 @@ watch(error, (newError) => {
     if (newError) {
         console.error(newError)
     }
-})
+}, {immediate: true})
 </script>
 
 <template>

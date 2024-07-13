@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, type Ref } from 'vue';
 import { DateTime } from 'luxon';
-import { headshot, flagSrc, encodeName } from '../utils';
-import type { TournamentEvent } from '../interfaces';
+import type { TournamentEvent } from '@/utils/interfaces';
+import { headshot, flag, encodeName } from '@/utils/functions';
 
 const props = defineProps<{
     event: TournamentEvent
@@ -17,7 +17,7 @@ const formattedScore = computed(() => {
     if (props.event.final_score) {
         return props.event.final_score.replace(/\(/g, '<sup>').replace(/\)/g, '</sup>')
     }
-});
+})
 </script>
 
 <template>
@@ -26,23 +26,30 @@ const formattedScore = computed(() => {
         variant="outlined"
         rounded="xl"
     >
-        <v-card-title class="text-center text-2xl">
+        <v-card-title
+            class="text-center text-2xl"
+        >
             <router-link
                 class="hover-link"
-                :to="{name: 'Edition', params: {year: event.year.id, editionNo: event.id}}"
+                :to="{name: 'Event', params: {year: event.year.id, eventId: event.id}}"
             >
                 {{ event.year.id }}
             </router-link>
         </v-card-title>
-        <v-container v-if="display && !noFinal">
-            <v-row dense>
+        <v-container
+            v-if="display && !noFinal"
+        >
+            <v-row
+                dense
+            >
                 <v-spacer />
                 <v-col
                     class="flex items-center mx-0.5"
                     cols="2"
                 >
                     <flag-img
-                        :src="flagSrc(event.winner.country.id)"
+                        v-if="event.winner.country"
+                        :src="flag(event.winner.country.id)"
                         :alt="event.winner.country.name"
                     />
                 </v-col>
@@ -63,23 +70,32 @@ const formattedScore = computed(() => {
                 >
                     <router-link
                         class="hover-link"
-                        :to="{name: 'Player', params: {id: event.winner.id, name: encodeName(event.winner.full_name)}}"
+                        :to="{name: 'Player', params: {name: encodeName(event.winner.full_name), id: event.winner.id}}"
                     >
                         {{ event.winner.full_name }}
                     </router-link>
                 </v-col>
             </v-row>
-            <v-row dense>
-                <v-col class="text-center text-zinc-300">d.</v-col>
+            <v-row
+                dense
+            >
+                <v-col
+                    class="text-center text-zinc-300"
+                >
+                    d.
+                </v-col>
             </v-row>
-            <v-row dense>
-                <v-spacer/>
+            <v-row
+                dense
+            >
+                <v-spacer />
                 <v-col
                     class="flex items-center mx-0.5"
                     cols="2"
                 >
                     <flag-img
-                        :src="flagSrc(event.finalist.country.id)"
+                        v-if="event.finalist.country"
+                        :src="flag(event.finalist.country.id)"
                         :alt="event.finalist.country.name"
                     />
                 </v-col>
@@ -94,10 +110,10 @@ const formattedScore = computed(() => {
                         />
                     </v-avatar>
                 </v-col>
-                <v-col class="flex items-center mx-2" cols="6">
+                <v-col>
                     <router-link
                         class="hover-link"
-                        :to="{name: 'Player', params: {id: event.finalist.id, name: encodeName(event.finalist.full_name)}}"
+                        :to="{name: 'Player', params: {name: encodeName(event.finalist.full_name), id: event.finalist.id}}"
                     >
                         {{ event.finalist.full_name }}
                     </router-link>
@@ -109,6 +125,10 @@ const formattedScore = computed(() => {
             class="text-center text-zinc-300 text-lg"
             v-html="formattedScore"
         />
-        <v-card-subtitle v-else>{{ display && noFinal ? 'No final played' : 'Currently in progress' }}</v-card-subtitle>
+        <v-card-subtitle
+            v-else
+        >
+            {{ display && noFinal ? 'No final played' : 'Currently in progress' }}
+        </v-card-subtitle>
     </v-card>
 </template>
