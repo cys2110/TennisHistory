@@ -88,6 +88,63 @@ export interface EventDetails extends Event {
     r128_pts: number | null
 }
 
+interface Score {
+    aces: number | null,
+    avg_sv1_kph: number | null,
+    avg_sv2_kph: number | null,
+    bp_opps: number | null,
+    bps_converted: number | null,
+    bps_faced: number | null,
+    bps_saved: number | null,
+    dfs: number | null,
+    incomplete: string | null,
+    max_speed_kph: number | null,
+    net: number | null,
+    net_w: number | null,
+    ret1: number | null,
+    ret1_w: number | null,
+    ret2: number | null,
+    ret2_w: number | null,
+    s1: number | null,
+    s2: number | null,
+    s3: number | null,
+    s4: number | null,
+    s5: number | null,
+    serve1_pts: number | null,
+    serve1_pts_w: number | null,
+    serve2_pts: number | null,
+    serve2_pts_w: number | null,
+    t1: number | null,
+    t2: number | null,
+    t3: number | null,
+    t4: number | null,
+    t5: number | null,
+    ues: number | null,
+    winners: number | null,
+    player: Player
+}
+
+interface MatchStatEvent extends Event {
+    playersConnection: {
+        edges: ActivityEntry[]
+      }
+}
+
+export interface MatchStats {
+    court: string | null,
+    date: Date | null,
+    duration_mins: number | null,
+    incomplete: string | null,
+    round: string,
+    umpire: stringId | null,
+    event: MatchStatEvent,
+    winner: {
+        player: stringId
+    },
+    p1: Score,
+    p2: Score
+}
+
 export interface Player {
     id: string,
     first_name: string,

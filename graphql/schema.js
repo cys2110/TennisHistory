@@ -25,6 +25,10 @@ export const typeDefs = `#graphql
         id: String! @unique
     }
 
+    type Umpire {
+        id: String! @unique
+    }
+
     type Tournament {
         id: Int! @unique
         name: String! @unique
@@ -80,10 +84,13 @@ export const typeDefs = `#graphql
         date: Date
         duration_mins: Int
         incomplete: String
+        umpire: Umpire @relationship(type: "UMPIRED", direction: IN)
         event: Event! @relationship(type: "PLAYED", direction: OUT)
         scores: [Score!]! @relationship(type: "SCORED", direction: IN)
         winner: Winner! @relationship(type: "SCORED", direction: IN)
         loser: Loser @relationship(type: "SCORED", direction: IN)
+        p1: P1 @relationship(type: "SCORED", direction: IN)
+        p2: P2 @relationship(type: "SCORED", direction: IN)
     }
 
     type Best3 {
@@ -144,6 +151,78 @@ export const typeDefs = `#graphql
         match: Match! @relationship(type: "SCORED", direction: OUT)
         best3: Best3! @relationship(type: "SCORED", direction: OUT)
         best5: Best5! @relationship(type: "SCORED", direction: OUT)
+        player: Player! @relationship(type: "SCORED", direction: IN)
+    }
+
+    type P1 {
+        s1: Int
+        s2: Int
+        s3: Int
+        s4: Int
+        s5: Int
+        t1: Int
+        t2: Int
+        t3: Int
+        t4: Int
+        t5: Int
+        incomplete: String
+        aces: Int
+        dfs: Int
+        serve1_pts_w: Int
+        serve1_pts: Int
+        serve2_pts_w: Int
+        serve2_pts: Int
+        bps_saved: Int
+        bps_faced: Int
+        ret1_w: Int
+        ret1: Int
+        ret2_w: Int
+        ret2: Int
+        bps_converted: Int
+        bp_opps: Int
+        net_w: Int
+        net: Int
+        winners: Int
+        ues: Int
+        max_speed_kph: Int
+        avg_sv1_kph: Int
+        avg_sv2_kph: Int
+        player: Player! @relationship(type: "SCORED", direction: IN)
+    }
+
+    type P2 {
+        s1: Int
+        s2: Int
+        s3: Int
+        s4: Int
+        s5: Int
+        t1: Int
+        t2: Int
+        t3: Int
+        t4: Int
+        t5: Int
+        incomplete: String
+        aces: Int
+        dfs: Int
+        serve1_pts_w: Int
+        serve1_pts: Int
+        serve2_pts_w: Int
+        serve2_pts: Int
+        bps_saved: Int
+        bps_faced: Int
+        ret1_w: Int
+        ret1: Int
+        ret2_w: Int
+        ret2: Int
+        bps_converted: Int
+        bp_opps: Int
+        net_w: Int
+        net: Int
+        winners: Int
+        ues: Int
+        max_speed_kph: Int
+        avg_sv1_kph: Int
+        avg_sv2_kph: Int
         player: Player! @relationship(type: "SCORED", direction: IN)
     }
 

@@ -26,12 +26,6 @@ const router = createRouter({
       name: 'MatchStats',
       props: true,
       component: MatchStats
-    },
-    {
-      path: '/h2h/:p1Name/:p1Id/:p2Name/:p2Id',
-      name: 'H2H',
-      props: true,
-      component: H2HView
     }
   ]
 })

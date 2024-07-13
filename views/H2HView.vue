@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// import { onMounted, ref, watch, type Ref } from 'vue';
+
 // import { useDisplay } from 'vuetify';
 // import { DateTime } from 'luxon'
 // import H2HService from '@/services/H2HService';
@@ -10,12 +10,6 @@
 // import * as functions from '@/components/utils';
 // import type { PlayerDetails, MatchH2H } from '@/components/interfaces';
 
-// const props = defineProps<{
-//     p1Id: string,
-//     p2Id: string,
-//     p1Name: string,
-//     p2Name: string
-// }>()
 // const { mdAndUp, smAndUp } = useDisplay()
 
 // const p1: Ref<PlayerDetails | null> = ref(null)

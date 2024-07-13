@@ -159,6 +159,7 @@ if (props.match.incomplete !== 'B') {
                 v-if="match.incomplete !== 'B'"
                 class="bg-zinc-300 text-indigo-800"
                 density="compact"
+                :to="{name: 'H2H', params: {p1Name: encodeName(name), p1Id: id, p2Name: encodeName(match.oppScore[0].player.full_name), p2Id: match.oppScore[0].player.id}}"
             >
                 H2H
             </v-chip>
