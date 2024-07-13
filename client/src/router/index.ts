@@ -5,6 +5,8 @@ import Archive from '@/views/Archive/Archive.vue'
 import Tournament from '@/views/Tournament/Tournament.vue'
 import EventLayout from '@/views/Event/EventLayout.vue'
 import EventOverview from '@/views/Event/EventOverview.vue'
+import Results from '@/views/Event/Results.vue'
+import Draw from '@/views/Event/Draw.vue'
 import MatchStats from '@/views/Match/MatchStats.vue'
 import PlayerLayout from '@/views/Player/PlayerLayout.vue'
 import PlayerOverview from '@/views/Player/PlayerOverview.vue'
@@ -49,9 +51,21 @@ const router = createRouter({
             children: [
                 {
                     path: "",
-                    props: true,
                     name: 'Event',
+                    props: true,
                     component: EventOverview
+                },
+                {
+                    path: "results",
+                    name: 'Results',
+                    props: true,
+                    component: Results
+                },
+                {
+                    path: "draw",
+                    name: 'Draw',
+                    props: true,
+                    component: Draw
                 }
             ]
         },

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useDisplay } from 'vuetify';
 import SearchScrim from './SearchScrim.vue';
+import H2HScrim from './H2HScrim.vue';
 
 const { smAndDown } = useDisplay()
 
@@ -19,6 +20,11 @@ const items = [
         icon: 'fas fa-magnifying-glass',
         tooltip: 'Search',
         dialogComponent: SearchScrim
+    },
+    {
+        icon: 'fad fa-people-arrows',
+        tooltip: 'Head to Head',
+        dialogComponent: H2HScrim
     }
 ]
 </script>

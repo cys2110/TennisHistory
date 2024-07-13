@@ -249,8 +249,19 @@ watch(() => props.name, () => {
                     </v-col>
                 </v-row>
             </v-container>
-            <v-card-text>
-                {{ match.umpire?.id }}
+            <v-card-text
+                class="flex justify-between"
+            >
+                <div>{{ match.umpire?.id }}</div>
+                <div>
+                    <v-chip
+                    class="bg-zinc-300 text-indigo-800"
+                    density="compact"
+                    :to="{name: 'H2H', params: {p1Name: encodeName(match.p1.player.full_name), p1Id: match.p1.player.id, p2Name: encodeName(match.p2.player.full_name), p2Id: match.p2.player.id}}"
+                    >
+                        H2H
+                    </v-chip>
+                </div>
             </v-card-text>
         </v-card>
         <v-container
