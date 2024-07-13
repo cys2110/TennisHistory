@@ -84,6 +84,7 @@ export const typeDefs = `#graphql
         date: Date
         duration_mins: Int
         incomplete: String
+        sort_date: Date
         umpire: Umpire @relationship(type: "UMPIRED", direction: IN)
         event: Event! @relationship(type: "PLAYED", direction: OUT)
         scores: [Score!]! @relationship(type: "SCORED", direction: IN)

@@ -330,3 +330,55 @@ export interface Activity {
         }
     }
 }
+
+interface H2HPlayer extends Player {
+    bh1: boolean | null,
+    career_high: number | null,
+    ch_date: Date | null,
+    dob: Date | null,
+    height_cm: number | null,
+    loss: number,
+    pm_USD: number,
+    rh: boolean | null,
+    titles: number,
+    turned_pro: stringId,
+    win: number
+}
+
+interface H2HScore {
+    player?: Player,
+    s1: number | null,
+    s2: number | null,
+    s3: number | null,
+    s4: number | null,
+    s5: number | null,
+    t1: number | null,
+    t2: number | null,
+    t3: number | null,
+    t4: number | null,
+    t5: number | null,
+    incomplete?: string | null
+}
+
+export interface H2H {
+    p1: H2HPlayer[],
+    p2: H2HPlayer[],
+    p1Wins: {
+        count: number
+    },
+    p2Wins: {
+        count: number
+    },
+    matches: {
+        event: {
+            id: number,
+            surface: Surface,
+            year: stringId,
+            tournament: Tournament
+        },
+        match_no: number,
+        winner: H2HScore,
+        loser: H2HScore,
+        round: string
+    }[]
+}
