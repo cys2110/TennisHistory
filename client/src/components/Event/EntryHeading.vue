@@ -5,10 +5,10 @@ const props = defineProps<{
 </script>
 
 <template>
-    <thead class="text-xs text-zinc-300">
+    <thead class="text-xs">
         <tr>
             <th
-                class="!font-bold text-center !bg-indigo-800"
+                class="!font-bold text-center !bg-indigo-800 text-zinc-300 uppercase"
                 colspan="2"
             >
                 {{ heading }}

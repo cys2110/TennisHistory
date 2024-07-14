@@ -157,6 +157,206 @@ export const getEventDetails = (id: number) => {
                 supervisors {
                     id
                 }
+                seeds:playersConnection(
+                    where: {
+                        edge: {
+                            NOT: {
+                                seed: null
+                            }
+                        }
+                    },
+                    sort: [
+                        {
+                            edge: {
+                                seed: ASC
+                            }
+                        }
+                    ]
+                ) {
+                    edges {
+                        node {
+                            first_name
+                            full_name
+                            country {
+                                id
+                                name
+                            }
+                            last_name
+                            id
+                        }
+                        properties {
+                            seed
+                            rank
+                            wd
+                        }
+                    }
+                }
+                lda:playersConnection(
+                    where: {
+                        edge: {
+                            NOT: {
+                                lda: null
+                            }
+                        }
+                    }
+                ) {
+                    edges {
+                        node {
+                            first_name
+                            full_name
+                            country {
+                                id
+                                name
+                            }
+                            last_name
+                            id
+                        }
+                        properties {
+                            lda
+                            status
+                        }
+                    }
+                }
+                ret:playersConnection(
+                    where: {
+                        edge: {
+                            NOT: {
+                                ret: null
+                            }
+                        }
+                    }
+                ) {
+                    edges {
+                        node {
+                            first_name
+                            last_name
+                            full_name
+                            id
+                            country {
+                                id
+                                name
+                            }
+                        }
+                        properties {
+                            ret
+                        }
+                    }
+                }
+                wd:playersConnection(
+                    where: {
+                        edge: {
+                            NOT: {
+                                wd: null
+                            }
+                        }
+                    }
+                ) {
+                    edges {
+                        node {
+                            id
+                            first_name
+                            last_name
+                            full_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                        properties {
+                            wd
+                        }
+                    }
+                }
+                wo:playersConnection(
+                    where: {
+                        edge: {
+                            NOT: {
+                                wo: null
+                            }
+                        }
+                    }
+                ) {
+                    edges {
+                        node {
+                            id
+                            first_name
+                            last_name
+                            full_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                        properties {
+                            wo
+                        }
+                    }
+                }
+                defaulted:playersConnection(
+                    where: {
+                        edge: {
+                            NOT: {
+                                defaulted: null
+                            }
+                        }
+                    }
+                ) {
+                    edges {
+                        node {
+                            id
+                            first_name
+                            last_name
+                            full_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                        properties {
+                            defaulted
+                        }
+                    }
+                }
+                ll:playersConnection(
+                    where: {
+                        edge: {
+                            status: "LL"
+                        }
+                    }
+                ) {
+                    edges {
+                        node {
+                            id
+                            first_name
+                            last_name
+                            full_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+                alt:playersConnection(
+                    where: {
+                        edge: {
+                            status: "Alt"
+                        }
+                    }
+                ) {
+                    edges {
+                        node {
+                            id
+                            first_name
+                            last_name
+                            full_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
             }
         }
     `

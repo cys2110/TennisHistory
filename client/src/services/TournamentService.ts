@@ -16,6 +16,7 @@ export const getTournament = (id: number) => {
                     id
                 }
                 events {
+                    id
                     final_score
                     end_date
                     finalist {

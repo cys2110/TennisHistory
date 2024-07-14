@@ -9,6 +9,7 @@ const props = defineProps<{
 }>()
 const display: Ref<boolean> = ref(true)
 const noFinal: Ref<boolean> = ref(false)
+    console.log(props.event)
 
 DateTime.fromISO(props.event.end_date) < DateTime.now() ? display.value = true : display.value = false
 props.event.final_score ? noFinal.value = false : noFinal.value = true

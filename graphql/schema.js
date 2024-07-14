@@ -316,6 +316,11 @@ export const typeDefs = `#graphql
         rank: Int
         pm: Int
         points: Int
+        lda: Int
+        ret: String
+        wd: String
+        wo: String
+        defaulted: String
     }
 
     type Coach {

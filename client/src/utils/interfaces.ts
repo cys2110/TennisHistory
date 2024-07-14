@@ -65,6 +65,49 @@ export interface Event {
     draw_type?: string
 }
 
+export interface Edge {
+    node: Player
+}
+
+interface Seed extends Edge {
+    properties: {
+        seed: number,
+        rank: number | null,
+        wd: string | null
+    }
+}
+
+export interface Lda extends Edge {
+    properties: {
+        lda: number,
+        status: string | null
+    }
+}
+
+export interface Ret extends Edge {
+    properties: {
+        ret: string
+    }
+}
+
+export interface Wd extends Edge {
+    properties: {
+        wd: string
+    }
+}
+
+export interface Wo extends Edge {
+    properties: {
+        wo: string
+    }
+}
+
+export interface Defaulted extends Edge {
+    properties: {
+        defaulted: string
+    }
+}
+
 export interface EventDetails extends Event {
     currency: string,
     pm: number | null,
@@ -86,6 +129,30 @@ export interface EventDetails extends Event {
     r64_pts: number | null,
     r128_pm: number | null,
     r128_pts: number | null
+    seeds: {
+        edges: Seed[]
+    },
+    lda: {
+        edges: Lda[]
+    },
+    ret: {
+        edges: Ret[]
+    },
+    wd: {
+        edges: Wd[]
+    },
+    wo: {
+        edges: Wo[]
+    },
+    defaulted: {
+        edges: Defaulted[]
+    },
+    ll: {
+        edges: Edge[]
+    },
+    alt: {
+        edges: Edge[]
+    }
 }
 
 interface Score {

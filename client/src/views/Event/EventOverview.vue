@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue';
+import { useDisplay } from 'vuetify';
 import apolloClient from '@/apollo';
 import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { getEventDetails } from '@/services/EventService';
 import type { EventDetails } from '@/utils/interfaces';
-import { formatCurrency } from '@/utils/functions';
+import { formatCurrency, headshot, flag, encodeName } from '@/utils/functions';
+import EntryRow from '@/components/Event/EntryRow.vue';
+import EntryHeading from '@/components/Event/EntryHeading.vue';
 
 provideApolloClient(apolloClient)
+const { xl } = useDisplay()
 
 const props = defineProps<{
     eventId: string
@@ -21,6 +25,7 @@ const pm: Ref<{round: string, pm: number, pts: number}[]> = ref([])
 watch(result, (newResult) => {
     if (newResult) {
         event.value = newResult.events[0]
+        console.log(event.value)
         pm.value = [
             {
                 round: 'WINNER',
@@ -155,6 +160,80 @@ watch(error, (newError) => {
         <v-row>
             <v-col>
                 <v-table
+                    v-if="event.seeds.edges.length > 0"
+                    class="bg-transparent rounded-xl"
+                    fixed-header
+                    hover
+                    :height="xl ? '' : '30rem'"
+                >
+                    <thead class="text-xs text-zinc-300">
+                        <tr>
+                            <th class="!font-bold text-center !bg-indigo-800">Seed</th>
+                            <th class="!font-bold text-center !bg-indigo-800">Player</th>
+                            <th  class="!font-bold text-center !bg-indigo-800">Rank</th>
+                        </tr>
+                    </thead>
+                    <tbody
+                        class="text-xs text-zinc-300"
+                    >
+                        <tr
+                            v-for="seed in event.seeds.edges"
+                            :key="seed.node.id"
+                        >
+                            <td
+                                class="text-center"
+                            >
+                                {{ seed.properties.seed }}
+                            </td>
+                            <td
+                                class="flex items-center"
+                            >
+                                <div
+                                    class="mx-1"
+                                >
+                                    <flag-img
+                                        v-if="seed.node.country"
+                                        class="w-[2rem]"
+                                        :src="flag(seed.node.country.id)"
+                                        :alt="seed.node.country.name"
+                                    />
+                                </div>
+                                <div
+                                    class="mx-1"
+                                >
+                                    <v-avatar
+                                        size="small"
+                                    >
+                                        <v-img
+                                            :src="headshot(seed.node.id)"
+                                            :alt="seed.node.full_name"
+                                        />
+                                    </v-avatar>
+                                </div>
+                                <div
+                                    class="mx-1"
+                                >
+                                    <router-link
+                                        class="hover-link"
+                                        :class="{'strikethrough': seed.properties.wd}"
+                                        :to="{name: 'Player', params: {id: seed.node.id, name: encodeName(seed.node.full_name)}}"
+                                    >
+                                        {{ seed.node.full_name }}
+                                    </router-link>
+                                </div>
+                            </td>
+                            <td
+                                class="text-center"
+                                :class="{'strikethrough': seed.properties.wd}"
+                            >
+                                {{ seed.properties.rank ?? '' }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </v-table>
+            </v-col>
+            <v-col>
+                <v-table
                     v-if="event.winner_pm"
                     class="bg-transparent rounded-xl mb-3"
                     fixed-header
@@ -204,6 +283,152 @@ watch(error, (newError) => {
                                 {{ row.pts ?? 0 }}
                             </td>
                         </tr>
+                    </tbody>
+                </v-table>
+                <v-table
+                    v-if="event.lda.edges.length > 0"
+                    class="bg-transparent rounded-xl my-5"
+                    fixed-header
+                    hover
+                    density="compact"
+                >
+                    <EntryHeading
+                        heading="Last direct acceptance"
+                    />
+                    <tbody>
+                        <EntryRow
+                            v-for="player in event.lda.edges"
+                            :key="player.node.id"
+                            :player
+                        >
+                            <template #reason>
+                                {{ player.properties.status === 'PR' ? 'P' : '' }} {{ player.properties.lda === 0 ? '' : player.properties.lda }}
+                            </template>
+                        </EntryRow>
+                    </tbody>
+                </v-table>
+                <v-table
+                    v-if="event.ll.edges.length > 0"
+                    class="bg-transparent rounded-xl my-5"
+                    fixed-header
+                    hover
+                    density="compact"
+                >
+                    <EntryHeading
+                        heading="Lucky losers"
+                    />
+                    <tbody>
+                        <EntryRow
+                            v-for="player in event.ll.edges"
+                            :key="player.node.id"
+                            :player
+                        />
+                    </tbody>
+                </v-table>
+                <v-table
+                    v-if="event.alt.edges.length > 0"
+                    class="bg-transparent rounded-xl my-5"
+                    fixed-header
+                    hover
+                    density="compact"
+                >
+                    <EntryHeading
+                        heading="Alternates"
+                    />
+                    <tbody>
+                        <EntryRow
+                            v-for="player in event.alt.edges"
+                            :key="player.node.id"
+                            :player
+                        />
+                    </tbody>
+                </v-table>
+                <v-table
+                    v-if="event.wd.edges.length > 0"
+                    class="bg-transparent rounded-xl my-5"
+                    fixed-header
+                    hover
+                    density="compact"
+                >
+                    <EntryHeading
+                        heading="Withdrawals"
+                    />
+                    <tbody>
+                        <EntryRow
+                            v-for="player in event.wd.edges"
+                            :key="player.node.id"
+                            :player
+                        >
+                            <template #reason>
+                                {{ player.properties.wd !== 'true' ? player.properties.wd : '' }}
+                            </template>
+                        </EntryRow>
+                    </tbody>
+                </v-table>
+                <v-table
+                    v-if="event.ret.edges.length > 0"
+                    class="bg-transparent rounded-xl my-5"
+                    fixed-header
+                    hover
+                    density="compact"
+                >
+                    <EntryHeading
+                        heading="Retirements"
+                    />
+                    <tbody>
+                        <EntryRow
+                            v-for="player in event.ret.edges"
+                            :key="player.node.id"
+                            :player
+                        >
+                            <template #reason>
+                                {{ player.properties.ret !== 'true' ? player.properties.ret : '' }}
+                            </template>
+                        </EntryRow>
+                    </tbody>
+                </v-table>
+                <v-table
+                    v-if="event.wo.edges.length > 0"
+                    class="bg-transparent rounded-xl my-5"
+                    fixed-header
+                    hover
+                    density="compact"
+                >
+                    <EntryHeading
+                        heading="Walkovers"
+                    />
+                    <tbody>
+                        <EntryRow
+                            v-for="player in event.wo.edges"
+                            :key="player.node.id"
+                            :player
+                        >
+                            <template #reason>
+                                {{ player.properties.wo !== 'true' ? player.properties.wo : '' }}
+                            </template>
+                        </EntryRow>
+                    </tbody>
+                </v-table>
+                <v-table
+                    v-if="event.defaulted.edges.length > 0"
+                    class="bg-transparent rounded-xl my-5"
+                    fixed-header
+                    hover
+                    density="compact"
+                >
+                    <EntryHeading
+                        heading="Defaults"
+                    />
+                    <tbody>
+                        <EntryRow
+                            v-for="player in event.defaulted.edges"
+                            :key="player.node.id"
+                            :player
+                        >
+                            <template #reason>
+                                {{ player.properties.defaulted !== 'true' ? player.properties.defaulted : '' }}
+                            </template>
+                        </EntryRow>
                     </tbody>
                 </v-table>
             </v-col>

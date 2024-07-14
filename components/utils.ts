@@ -1,9 +1,5 @@
 // functions
 
-export const status = (seed: number | null, status: string | null) => {
-    return seed && status ? `(${seed} ${status})` : seed ? `(${seed})` : `(${status})`
-}
-
 export const round = (roundNumber: string) => {
     switch (roundNumber) {
         case 'Round of 128':
@@ -22,19 +18,3 @@ export const round = (roundNumber: string) => {
             return 'F'
     }
 }
-
-
-// export function groupObjectsByKey (array: EditionByPlayer[] | MatchScore[], key: string): { [key: string]: any } {
-//   const groupedArrays: { [key: string]: any[] } = {};
-
-//   array.forEach(obj => {
-//     const value = (obj as any)[key];
-//     if (!groupedArrays[value]) {
-//       groupedArrays[value] = [obj];
-//     } else {
-//       groupedArrays[value].push(obj);
-//     }
-//   });
-
-//   return groupedArrays;
-// }
