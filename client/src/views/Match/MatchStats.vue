@@ -26,7 +26,7 @@ const match: Ref<MatchStats | null> = ref(null)
 const entry1: Ref<ActivityEntry | undefined> = ref()
 const entry2: Ref<ActivityEntry | undefined> = ref()
 
-    watch(result, (newResult) => {
+watch(result, (newResult) => {
     if (newResult) {
         match.value = newResult.matches[0]
         entry1.value = match.value?.event.playersConnection.edges.find(obj => obj.node.id === match.value?.p1.player.id)

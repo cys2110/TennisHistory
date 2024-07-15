@@ -25,7 +25,6 @@ const pm: Ref<{round: string, pm: number, pts: number}[]> = ref([])
 watch(result, (newResult) => {
     if (newResult) {
         event.value = newResult.events[0]
-        console.log(event.value)
         pm.value = [
             {
                 round: 'WINNER',
@@ -185,41 +184,43 @@ watch(error, (newError) => {
                             >
                                 {{ seed.properties.seed }}
                             </td>
-                            <td
-                                class="flex items-center"
-                            >
+                            <td>
                                 <div
-                                    class="mx-1"
+                                    class="flex items-center"
                                 >
-                                    <flag-img
-                                        v-if="seed.node.country"
-                                        class="w-[2rem]"
-                                        :src="flag(seed.node.country.id)"
-                                        :alt="seed.node.country.name"
-                                    />
-                                </div>
-                                <div
-                                    class="mx-1"
-                                >
-                                    <v-avatar
-                                        size="small"
+                                    <div
+                                        class="mx-1"
                                     >
-                                        <v-img
-                                            :src="headshot(seed.node.id)"
-                                            :alt="seed.node.full_name"
+                                        <flag-img
+                                            v-if="seed.node.country"
+                                            class="w-[2rem]"
+                                            :src="flag(seed.node.country.id)"
+                                            :alt="seed.node.country.name"
                                         />
-                                    </v-avatar>
-                                </div>
-                                <div
-                                    class="mx-1"
-                                >
-                                    <router-link
-                                        class="hover-link"
-                                        :class="{'strikethrough': seed.properties.wd}"
-                                        :to="{name: 'Player', params: {id: seed.node.id, name: encodeName(seed.node.full_name)}}"
+                                    </div>
+                                    <div
+                                        class="mx-1"
                                     >
-                                        {{ seed.node.full_name }}
-                                    </router-link>
+                                        <v-avatar
+                                            size="small"
+                                        >
+                                            <v-img
+                                                :src="headshot(seed.node.id)"
+                                                :alt="seed.node.full_name"
+                                            />
+                                        </v-avatar>
+                                    </div>
+                                    <div
+                                        class="mx-1"
+                                    >
+                                        <router-link
+                                            class="hover-link"
+                                            :class="{'strikethrough': seed.properties.wd}"
+                                            :to="{name: 'Player', params: {id: seed.node.id, name: encodeName(seed.node.full_name)}}"
+                                        >
+                                            {{ seed.node.full_name }}
+                                        </router-link>
+                                    </div>
                                 </div>
                             </td>
                             <td
@@ -238,6 +239,7 @@ watch(error, (newError) => {
                     class="bg-transparent rounded-xl mb-3"
                     fixed-header
                     hover
+                    density="compact"
                 >
                     <thead
                         class="text-xs text-zinc-300"

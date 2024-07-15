@@ -155,7 +155,25 @@ export interface EventDetails extends Event {
     }
 }
 
-interface Score {
+interface BasicScore {
+    incomplete: string | null,
+    s1: number | null,
+    s2: number | null,
+    s3: number | null,
+    s4: number | null,
+    s5: number | null,
+    t1: number | null,
+    t2: number | null,
+    t3: number | null,
+    t4: number | null,
+    t5: number | null
+}
+
+interface PlayerScore extends BasicScore {
+    player: Player
+}
+
+interface Score extends PlayerScore {
     aces: number | null,
     avg_sv1_kph: number | null,
     avg_sv2_kph: number | null,
@@ -164,7 +182,6 @@ interface Score {
     bps_faced: number | null,
     bps_saved: number | null,
     dfs: number | null,
-    incomplete: string | null,
     max_speed_kph: number | null,
     net: number | null,
     net_w: number | null,
@@ -172,23 +189,23 @@ interface Score {
     ret1_w: number | null,
     ret2: number | null,
     ret2_w: number | null,
-    s1: number | null,
-    s2: number | null,
-    s3: number | null,
-    s4: number | null,
-    s5: number | null,
     serve1_pts: number | null,
     serve1_pts_w: number | null,
     serve2_pts: number | null,
     serve2_pts_w: number | null,
-    t1: number | null,
-    t2: number | null,
-    t3: number | null,
-    t4: number | null,
-    t5: number | null,
-    ues: number | null,
     winners: number | null,
-    player: Player
+    ues: number | null,
+}
+
+export interface MatchByWinner extends MatchDetail {
+    match_no: number,
+    winner: PlayerScore,
+    loser: PlayerScore | null
+}
+
+export interface Round {
+    round: string,
+    matches: MatchByWinner[],
 }
 
 interface MatchStatEvent extends Event {
@@ -197,13 +214,16 @@ interface MatchStatEvent extends Event {
       }
 }
 
-export interface MatchStats {
+interface MatchDetail {
     court: string | null,
     date: Date | null,
     duration_mins: number | null,
     incomplete: string | null,
     round: string,
     umpire: stringId | null,
+}
+
+export interface MatchStats extends MatchDetail {
     event: MatchStatEvent,
     winner: {
         player: stringId
@@ -342,33 +362,8 @@ export interface ActivityMatch {
     incomplete: string | null,
     match_no: number,
     round: string,
-    pScore: {
-        s1: number,
-        s2: number,
-        s3: number,
-        s4: number,
-        s5: number,
-        t1: number,
-        t2: number,
-        t3: number,
-        t4: number,
-        t5: number,
-        incomplete: string | null
-    }[],
-    oppScore: {
-        s1: number,
-        s2: number,
-        s3: number,
-        s4: number,
-        s5: number,
-        t1: number,
-        t2: number,
-        t3: number,
-        t4: number,
-        t5: number,
-        incomplete: string | null,
-        player: Player
-    }[],
+    pScore: BasicScore[],
+    oppScore: PlayerScore[],
     winner: {
         player: stringId
     }
@@ -412,21 +407,6 @@ interface H2HPlayer extends Player {
     win: number
 }
 
-interface H2HScore {
-    player?: Player,
-    s1: number | null,
-    s2: number | null,
-    s3: number | null,
-    s4: number | null,
-    s5: number | null,
-    t1: number | null,
-    t2: number | null,
-    t3: number | null,
-    t4: number | null,
-    t5: number | null,
-    incomplete?: string | null
-}
-
 export interface H2H {
     p1: H2HPlayer[],
     p2: H2HPlayer[],
@@ -444,8 +424,8 @@ export interface H2H {
             tournament: Tournament
         },
         match_no: number,
-        winner: H2HScore,
-        loser: H2HScore,
+        winner: BasicScore,
+        loser: PlayerScore,
         round: string
     }[]
 }
