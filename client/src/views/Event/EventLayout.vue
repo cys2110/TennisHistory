@@ -109,6 +109,8 @@ watch(() => props.name, () => {
                             </v-tab>
                             <v-tab
                                 v-if="event.draw_type !== 'Team'"
+                                value="draw"
+                                :to="{name: 'Draw'}"
                             >
                                 Draw
                             </v-tab>

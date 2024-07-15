@@ -208,6 +208,22 @@ export interface Round {
     matches: MatchByWinner[],
 }
 
+export interface MatchRound {
+    match_no: number,
+    p1: PlayerScore | null,
+    p2: PlayerScore | null,
+    incomplete: string | null,
+    winner: {
+        player: stringId
+    }
+}
+
+export interface DrawRound {
+    round: string,
+    value: number,
+    matches: MatchRound[]
+}
+
 interface MatchStatEvent extends Event {
     playersConnection: {
         edges: ActivityEntry[]

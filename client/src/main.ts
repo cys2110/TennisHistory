@@ -34,19 +34,9 @@ const vuetify = createVuetify({
         }
     },
     aliases: {
-        ViewSheet: VSheet,
-        ShortCard: VCard,
         FlagImg: VImg
     },
       defaults: {
-        ViewSheet: {
-          class: 'bg-transparent ma-10 pa-3 mx-auto'
-        },
-        ShortCard: {
-          variant: 'text',
-          class: 'bg-indigo-800',
-          rounded: 'xl'
-        },
         VAvatar: {
           variant: 'outlined',
           class: 'border-zinc-400'

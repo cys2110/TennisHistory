@@ -846,3 +846,480 @@ export const getResults = (id: number) => {
     `
     return { query: call, variables: { id }}
 }
+
+export const getDraw = (id: number) => {
+    const call = gql`
+        query Round($id: Int!) {
+            events(
+                where: {
+                    id: $id
+                }
+            ) {
+                draw_type
+                final:matches(
+                    where: {
+                        round: "Final"
+                    },
+                    options: {
+                        sort: [
+                            {match_no: ASC}
+                        ]
+                    }
+                ) {
+                    incomplete
+                    match_no
+                    winner {
+                        player {
+                            id
+                        }
+                    }
+                    p1 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            country {
+                                id
+                                name
+                            }
+                            first_name
+                            full_name
+                            id
+                            last_name
+                        }
+                    }
+                    p2 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            first_name
+                            full_name
+                            id
+                            last_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+                sf:matches(
+                    where: {
+                        round: "Semifinals"
+                    },
+                    options: {
+                        sort: [
+                            {match_no: ASC}
+                        ]
+                    }
+                ) {
+                    incomplete
+                    match_no
+                    winner {
+                        player {
+                            id
+                        }
+                    }
+                    p1 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            country {
+                                id
+                                name
+                            }
+                            first_name
+                            full_name
+                            id
+                            last_name
+                        }
+                    }
+                    p2 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            first_name
+                            full_name
+                            id
+                            last_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+                qf:matches(
+                    where: {
+                        round: "Quarterfinals"
+                    },
+                    options: {
+                        sort: [
+                            {match_no: ASC}
+                        ]
+                    }
+                ) {
+                    incomplete
+                    match_no
+                    winner {
+                        player {
+                            id
+                        }
+                    }
+                    p1 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            country {
+                                id
+                                name
+                            }
+                            first_name
+                            full_name
+                            id
+                            last_name
+                        }
+                    }
+                    p2 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            first_name
+                            full_name
+                            id
+                            last_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+                r16:matches(
+                    where: {
+                        round: "Round of 16"
+                    },
+                    options: {
+                        sort: [
+                            {match_no: ASC}
+                        ]
+                    }
+                ) {
+                    incomplete
+                    match_no
+                    winner {
+                        player {
+                            id
+                        }
+                    }
+                    p1 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            country {
+                                id
+                                name
+                            }
+                            first_name
+                            full_name
+                            id
+                            last_name
+                        }
+                    }
+                    p2 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            first_name
+                            full_name
+                            id
+                            last_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+                r32:matches(
+                    where: {
+                        round: "Round of 32"
+                    },
+                    options: {
+                        sort: [
+                            {match_no: ASC}
+                        ]
+                    }
+                ) {
+                    incomplete
+                    match_no
+                    winner {
+                        player {
+                            id
+                        }
+                    }
+                    p1 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            country {
+                                id
+                                name
+                            }
+                            first_name
+                            full_name
+                            id
+                            last_name
+                        }
+                    }
+                    p2 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            first_name
+                            full_name
+                            id
+                            last_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+                r64:matches(
+                    where: {
+                        round: "Round of 64"
+                    },
+                    options: {
+                        sort: [
+                            {match_no: ASC}
+                        ]
+                    }
+                ) {
+                    incomplete
+                    match_no
+                    winner {
+                        player {
+                            id
+                        }
+                    }
+                    p1 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            country {
+                                id
+                                name
+                            }
+                            first_name
+                            full_name
+                            id
+                            last_name
+                        }
+                    }
+                    p2 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            first_name
+                            full_name
+                            id
+                            last_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+                r128:matches(
+                    where: {
+                        round: "Round of 128"
+                    },
+                    options: {
+                        sort: [
+                            {match_no: ASC}
+                        ]
+                    }
+                ) {
+                    incomplete
+                    match_no
+                    winner {
+                        player {
+                            id
+                        }
+                    }
+                    p1 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            country {
+                                id
+                                name
+                            }
+                            first_name
+                            full_name
+                            id
+                            last_name
+                        }
+                    }
+                    p2 {
+                        incomplete
+                        s1
+                        s2
+                        s3
+                        s4
+                        s5
+                        t1
+                        t2
+                        t3
+                        t4
+                        t5
+                        player {
+                            first_name
+                            full_name
+                            id
+                            last_name
+                            country {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+                playersConnection {
+                    edges {
+                        node {
+                            id
+                        }
+                        properties {
+                            seed
+                            status
+                            points
+                            rank
+                            pm
+                        }
+                    }
+                }
+            }
+        }
+    `
+    return { query: call, variables: { id }}
+}
