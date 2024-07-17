@@ -10,7 +10,7 @@ import { getPlayer } from '@/services/SearchService';
 provideApolloClient(apolloClient)
 const { mdAndUp, smAndUp } = useDisplay()
 
-const searchP1: Ref<string> = ref('jan')
+const searchP1: Ref<string> = ref('')
 const searchP2: Ref<string> = ref('')
 const p1Results: Ref<Player[]> = ref([])
 const p2Results: Ref<Player[]> = ref([])

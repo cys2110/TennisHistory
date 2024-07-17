@@ -14,7 +14,7 @@ import { fad } from '@fortawesome/pro-duotone-svg-icons'
 import { fas } from '@fortawesome/pro-solid-svg-icons'
 import { far } from '@fortawesome/pro-regular-svg-icons'
 import { mdi } from 'vuetify/iconsets/mdi'
-import { VCard, VImg, VSheet } from 'vuetify/lib/components/index.mjs'
+import { VImg } from 'vuetify/lib/components/index.mjs'
 
 const vuetify = createVuetify({
     theme: {
