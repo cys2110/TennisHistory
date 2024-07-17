@@ -97,7 +97,7 @@ const p2Entry = props.entryInfo.find(obj => obj.node.id === props.match.p2?.play
                     cols="1"
                 >
                     <v-icon
-                        v-if="match.winner.player.id === match.p1?.player.id"
+                        v-if="match.winner && match.winner.player.id === match.p1?.player.id"
                         class="text-green-500 text-[12px]"
                         icon="fad fa-check"
                     />
@@ -201,7 +201,7 @@ const p2Entry = props.entryInfo.find(obj => obj.node.id === props.match.p2?.play
                     cols="1"
                 >
                     <v-icon
-                        v-if="match.winner.player.id === match.p2?.player.id"
+                        v-if="match.winner && match.winner.player.id === match.p2?.player.id"
                         class="text-green-500 text-[12px]"
                         icon="fad fa-check"
                     />

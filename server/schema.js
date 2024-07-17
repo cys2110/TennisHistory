@@ -88,7 +88,7 @@ export const typeDefs = `#graphql
         umpire: Umpire @relationship(type: "UMPIRED", direction: IN)
         event: Event! @relationship(type: "PLAYED", direction: OUT)
         scores: [Score!]! @relationship(type: "SCORED", direction: IN)
-        winner: Winner! @relationship(type: "SCORED", direction: IN)
+        winner: Winner @relationship(type: "SCORED", direction: IN)
         loser: Loser @relationship(type: "SCORED", direction: IN)
         p1: P1 @relationship(type: "SCORED", direction: IN)
         p2: P2 @relationship(type: "SCORED", direction: IN)

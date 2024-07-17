@@ -215,7 +215,7 @@ export interface MatchRound {
     incomplete: string | null,
     winner: {
         player: stringId
-    }
+    } | null
 }
 
 export interface DrawRound {
