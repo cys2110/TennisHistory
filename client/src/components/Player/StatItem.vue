@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { percentage } from '../utils';
+import { percentage } from '@/utils/functions';
 
 const props = defineProps<{
     metric: string,

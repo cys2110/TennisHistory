@@ -25,30 +25,9 @@
   background-size: 100% 0.1em;
 }
 
-/* .mini-flag {
-  width: 30px;
-  border-radius: 5px;
-  vertical-align: middle;
-  border: 1px solid var(--color-border)
+.small {
+  font-variant: small-caps;
 }
-
-.flag {
-  width: 150px;
-  border-radius: 15px;
-}
-
-.detail {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding-top: 6px;
-  padding-bottom: 6px;
-  padding-left: 15px;
-  padding-right: 15px;
-  margin: 10px;
-  background-color: var(--color-background-mute);
-  border-radius: 15px;
-} */
 
 .strikethrough {
   text-decoration: line-through;

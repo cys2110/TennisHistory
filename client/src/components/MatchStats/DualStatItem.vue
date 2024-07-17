@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { percentage } from '../utils';
+import { percentage } from '@/utils/functions';
+
 const props = defineProps<{
     p1Value: number,
     p1Total: number,
@@ -12,7 +13,12 @@ const props = defineProps<{
     <v-row class="text-zinc-400">
         <v-col>
             <div>
-                <div class="text-sm text-left mb-0.5">{{ p1Value }}/{{ p1Total }}</div>
+                <div
+                    class="text-sm text-left mb-0.5"
+                    :class="{'font-bold': percentage(p1Value, p1Total) > percentage(p2Value, p2Total)}"
+                >
+                    {{ p1Value }}/{{ p1Total }}
+                </div>
                 <div>
                     <v-progress-linear
                         class="bg-zinc-800"
@@ -23,7 +29,12 @@ const props = defineProps<{
                         :model-value="p1Value"
                         reverse
                     >
-                        <span class="text-sm">{{ percentage(p1Value, p1Total).toFixed(0) }}%</span>
+                        <span
+                            class="text-sm"
+                            :class="{'font-bold': percentage(p1Value, p1Total) > percentage(p2Value, p2Total)}"
+                        >
+                            {{ percentage(p1Value, p1Total).toFixed(0) }}%
+                        </span>
                     </v-progress-linear>
                 </div>
             </div>
@@ -33,7 +44,12 @@ const props = defineProps<{
         </v-col>
         <v-col>
             <div>
-                <div class="text-sm text-right mb-0.5">{{ p2Value }}/{{ p2Total }}</div>
+                <div
+                    class="text-sm text-right mb-0.5"
+                    :class="{'font-bold': percentage(p2Value, p2Total) > percentage(p1Value, p1Total)}"
+                >
+                    {{ p2Value }}/{{ p2Total }}
+                </div>
                 <div>
                     <v-progress-linear
                         class="bg-zinc-800"
@@ -43,7 +59,12 @@ const props = defineProps<{
                         color="#166534"
                         :model-value="p2Value"
                     >
-                        <span class="text-sm">{{ percentage(p2Value, p2Total).toFixed(0) }}%</span>
+                        <span
+                            class="text-sm"
+                            :class="{'font-bold': percentage(p2Value, p2Total) > percentage(p1Value, p1Total)}"
+                        >
+                            {{ percentage(p2Value, p2Total).toFixed(0) }}%
+                        </span>
                     </v-progress-linear>
                 </div>
             </div>

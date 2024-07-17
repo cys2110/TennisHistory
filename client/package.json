@@ -12,6 +12,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@apollo/client": "^3.10.5",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/pro-duotone-svg-icons": "^6.5.2",
     "@fortawesome/pro-light-svg-icons": "^6.5.2",
@@ -23,8 +24,11 @@
     "@fortawesome/sharp-solid-svg-icons": "^6.5.2",
     "@fortawesome/sharp-thin-svg-icons": "^6.5.2",
     "@fortawesome/vue-fontawesome": "^3.0.8",
+    "@vue/apollo-composable": "^4.0.2",
     "axios": "^1.7.2",
+    "convert": "^5.3.0",
     "dotenv": "^16.4.5",
+    "graphql": "^16.8.2",
     "luxon": "^3.4.4",
     "vite-plugin-vuetify": "^2.0.3",
     "vue": "^3.4.21",

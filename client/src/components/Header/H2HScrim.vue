@@ -1,29 +1,63 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue';
+import { ref, watch, type Ref } from 'vue';
 import { useDisplay } from 'vuetify';
-import PlayerService from '@/services/PlayerService';
-import { encodeName, flagSrc, headshot } from '../utils';
-import type { Player } from '../interfaces';
+import apolloClient from '@/apollo';
+import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import type { Player } from '@/utils/interfaces';
+import { encodeName, flag, headshot } from '@/utils/functions';
+import { getPlayer } from '@/services/SearchService';
 
+provideApolloClient(apolloClient)
 const { mdAndUp, smAndUp } = useDisplay()
 
-const searchP1: Ref<string> = ref('')
+const searchP1: Ref<string> = ref('jan')
 const searchP2: Ref<string> = ref('')
 const p1Results: Ref<Player[]> = ref([])
 const p2Results: Ref<Player[]> = ref([])
 const p1Id: Ref<string | null> = ref(null)
 const p2Id: Ref<string | null> = ref(null)
 
-const submitSearch1 = () => {
-    PlayerService.getPlayerByName(searchP1.value)
-    .then(response => p1Results.value = response.data)
-    .catch(e => console.log(e))
+const updateP1 = () => {
+    console.log(searchP1.value)
+    const { query, variables } = getPlayer(searchP1.value)
+    const { result, loading, error} = useQuery(query, variables)
+
+    watch(result, (newResult) => {
+        if (newResult) {
+            p1Results.value = newResult.searchPlayers
+        }
+    }, {immediate: true})
+
+    watch(error, (newError) => {
+        if (newError) {
+            console.error(newError)
+        }
+    })
 }
-const submitSearch2 = () => {
-    PlayerService.getPlayerByName(searchP2.value)
-    .then(response => p2Results.value = response.data)
-    .catch(e => console.log(e))
+const updateP2 = () => {
+    const { query, variables } = getPlayer(searchP2.value)
+    const { result, loading, error} = useQuery(query, variables)
+
+    watch(result, (newResult) => {
+        if (newResult) {
+            p2Results.value = newResult.searchPlayers
+        }
+    }, {immediate: true})
+
+    watch(error, (newError) => {
+        if (newError) {
+            console.error(newError)
+        }
+    })
 }
+
+watch(searchP1, () => {
+    updateP1()
+}, {immediate: true})
+
+watch(searchP2, () => {
+    updateP2()
+}, {immediate: true})
 
 const setP1 = (player: Player) => {
     searchP1.value = player.full_name
@@ -38,9 +72,11 @@ const setP2 = (player: Player) => {
 </script>
 
 <template>
-    <short-card
-        class="mx-auto"
+    <v-card
+        class="mx-auto bg-indigo-800 p-2"
         :width="smAndUp ? '60%' : '100%'"
+        variant="text"
+        rounded="xl"
     >
         <v-container>
             <v-row>
@@ -56,7 +92,6 @@ const setP2 = (player: Player) => {
                         rounded
                         autofocus
                         v-model="searchP1"
-                        @update:model-value="submitSearch1"
                     />
                 </v-col>
                 <v-col
@@ -70,7 +105,6 @@ const setP2 = (player: Player) => {
                         clearable
                         rounded
                         v-model="searchP2"
-                        @update:model-value="submitSearch2"
                     />
                 </v-col>
                 <v-col
@@ -95,17 +129,21 @@ const setP2 = (player: Player) => {
                         <div
                             v-for="player in p1Results"
                             :key="player.id"
-                            class="my-0.5 flex items-center"
+                            class="my-0.5 flex items-center cursor-pointer"
                             @click="setP1(player)"
                         >
-                            <div class="w-1/6 mx-0.5">
+                            <div class="mx-0.5">
                                 <flag-img
-                                    :src="flagSrc(player.country)"
-                                    :alt="player.country"
+                                    v-if="player.country"
+                                    :src="flag(player.country.id)"
+                                    :alt="player.country.name"
+                                    class="w-[2rem]"
                                 />
                             </div>
                             <div class="mx-0.5">
-                                <v-avatar>
+                                <v-avatar
+                                    size="small"
+                                >
                                     <v-img
                                         :src="headshot(player.id)"
                                         :alt="player.full_name"
@@ -126,17 +164,21 @@ const setP2 = (player: Player) => {
                         <div
                             v-for="player in p2Results"
                             :key="player.id"
-                            class="my-0.5 flex items-center"
+                            class="my-0.5 flex items-center cursor-pointer"
                             @click="setP2(player)"
                         >
-                            <div class="w-1/6 mx-0.5">
+                            <div class="mx-0.5">
                                 <flag-img
-                                    :src="flagSrc(player.country)"
-                                    :alt="player.country"
+                                    v-if="player.country"
+                                    :src="flag(player.country.id)"
+                                    :alt="player.country.name"
+                                    class="w-[2rem]"
                                 />
                             </div>
                             <div class="mx-0.5">
-                                <v-avatar>
+                                <v-avatar
+                                    size="small"
+                                >
                                     <v-img
                                         :src="headshot(player.id)"
                                         :alt="player.full_name"
@@ -149,5 +191,5 @@ const setP2 = (player: Player) => {
                 </v-col>
             </v-row>
         </v-container>
-    </short-card>
+    </v-card>
 </template>

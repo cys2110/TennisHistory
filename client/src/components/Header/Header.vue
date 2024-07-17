@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useDisplay } from 'vuetify';
-import H2HScrim from './H2HScrim.vue';
 import SearchScrim from './SearchScrim.vue';
+import H2HScrim from './H2HScrim.vue';
 
 const { smAndDown } = useDisplay()
 
@@ -14,17 +14,17 @@ const items = [
     {
         route: 'Archive',
         icon: 'far fa-calendar',
-        tooltip: 'Results Archive'
-    },
-    {
-        icon: 'fad fa-people-arrows',
-        tooltip: 'Head to Head',
-        dialogComponent: H2HScrim
+        tooltip: 'Archive'
     },
     {
         icon: 'fas fa-magnifying-glass',
         tooltip: 'Search',
         dialogComponent: SearchScrim
+    },
+    {
+        icon: 'fad fa-people-arrows',
+        tooltip: 'Head to Head',
+        dialogComponent: H2HScrim
     }
 ]
 </script>
@@ -48,7 +48,7 @@ const items = [
                 :density="smAndDown ? 'comfortable' : 'default'"
                 icon=""
             >
-                <v-icon :icon="item.icon" />
+                <v-icon :icon="item.icon"/>
                 <v-tooltip
                     content-class="!bg-indigo-600 !text-zinc-300 !text-sm"
                     :text="item.tooltip"
@@ -64,8 +64,13 @@ const items = [
                     opacity="50%"
                     scroll-strategy="reposition"
                 >
-                    <template v-slot:default="{ isActive }">
-                        <component :is="item.dialogComponent" @close="isActive.value = false" />
+                    <template
+                        v-slot:default="{ isActive }"
+                    >
+                        <component
+                            :is="item.dialogComponent"
+                            @close="isActive.value = false"
+                        />
                     </template>
                 </v-dialog>
             </v-btn>

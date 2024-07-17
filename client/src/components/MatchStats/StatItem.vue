@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { percentage } from '../utils';
+import { percentage } from '@/utils/functions';
+
 const props = defineProps<{
     p1: number,
     p2: number,

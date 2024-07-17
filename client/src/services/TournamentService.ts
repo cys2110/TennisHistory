@@ -1,17 +1,54 @@
-import axios from 'axios';
-import { API_URL } from '@/components/utils';
+import { gql } from "@apollo/client/core"
 
-const apiClient = axios.create({
-    baseURL: `${API_URL}tournaments/`,
-    withCredentials: false,
-    headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-    }
-})
-
-export default {
-    getTournamentById(id: number) {
-        return apiClient.get('id/' + id)
-    }
+export const getTournament = (id: number) => {
+    const call = gql`
+        query getTournament($id: Int!) {
+            tournaments(
+                where: { id: $id }
+            ) {
+                end_year {
+                    id
+                }
+                id
+                name
+                website
+                start_year {
+                    id
+                }
+                events {
+                    id
+                    final_score
+                    end_date
+                    finalist {
+                        first_name
+                        full_name
+                        id
+                        last_name
+                        country {
+                            id
+                            name
+                        }
+                    }
+                    year(options: {
+                        sort: [
+                            {id: DESC}
+                        ]
+                    }) {
+                        id
+                    }
+                    winner {
+                        first_name
+                        full_name
+                        id
+                        last_name
+                        country {
+                            id
+                            name
+                        }
+                    }
+                }
+            }
+        }
+    `
+    return {query: call, variables: { id }}
 }

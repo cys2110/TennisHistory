@@ -2,8 +2,6 @@
 const props = defineProps<{
     p1kph: number,
     p2kph: number,
-    p1mph: number,
-    p2mph: number
 }>()
 </script>
 
@@ -15,7 +13,7 @@ const props = defineProps<{
             sm="2"
         >
             <div :class="{'font-bold': p1kph > p2kph}">{{ p1kph }} km/h</div>
-            <div :class="{'font-bold': p1kph > p2kph}">({{ p1mph }} mph)</div>
+            <div :class="{'font-bold': p1kph > p2kph}">({{ (p1kph / 1.609344).toFixed(0) }} mph)</div>
         </v-col>
         <v-col>
             <div class="mb-0.5">
@@ -39,7 +37,7 @@ const props = defineProps<{
             sm="2"
         >
             <div :class="{'font-bold': p2kph > p1kph}">{{ p2kph }} km/h</div>
-            <div :class="{'font-bold': p2kph > p1kph}">({{ p2mph }} mph)</div>
+            <div :class="{'font-bold': p2kph > p1kph}">({{ (p2kph / 1.609344).toFixed(0) }} mph)</div>
         </v-col>
         <v-divider thickness="2" />
     </v-row>

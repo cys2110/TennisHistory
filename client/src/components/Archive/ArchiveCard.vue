@@ -1,81 +1,92 @@
 <script setup lang="ts">
 import { DateTime } from 'luxon';
-import { useDisplay } from 'vuetify';
-import { categorySrc, encodeName, formattedDates, flagSrc } from '../utils';
-import type { ArchiveEdition } from '../interfaces';
+import type { Event } from '@/utils/interfaces';
+import { flag, formattedDates, category, encodeName } from '@/utils/functions';
 
 const props = defineProps<{
-    edition: ArchiveEdition
+    event: Event
 }>()
-const { smAndDown } = useDisplay()
 </script>
 
 <template>
     <v-card
-        class="my-4 sm:!my-5 !bg-indigo-800 lg:w-4/5 mx-auto"
-        :rounded="smAndDown ? 'xl' : 'pill'"
-        variant="text"
+        class="my-4 sm:!my-5 !bg-indigo-800 mx-auto h-100 border-zinc-500"
+        rounded="xl"
+        variant="outlined"
     >
-        <v-container>
-            <v-row>
-                <v-col
-                    class="flex items-center"
-                    cols="12"
-                    sm="3"
+        <v-img
+            class="align-end opacity-75"
+            :src="flag(event.venue.country.id)"
+            :alt="event.venue.country.name"
+        >
+            <v-chip
+                variant="elevated"
+                class="!bg-zinc-300 !text-indigo-800 my-1 mx-2"
+            >
+                {{ formattedDates(event.start_date, event.end_date) }}
+            </v-chip>
+            <v-chip
+                variant="elevated"
+                class="!text-indigo-800 !bg-zinc-300 my-1 mx-2"
+            >
+                {{ event.surface.environment }} {{ event.surface.surface }}
+                <span
+                    v-if="event.surface.hard_type"
                 >
-                    <v-img
-                        v-if="edition.category"
-                        class="!size-20 mx-auto"
-                        :src="categorySrc(edition.category)"
-                        :alt="edition.category"
-                    />
-                </v-col>
-                <v-col
-                    class="text-center sm:!text-left text-zinc-300 flex-col"
-                    cols="12"
-                    sm="7"
+                    ({{ event.surface.hard_type }})
+                </span>
+            </v-chip>
+        </v-img>
+        <v-row
+            class="mt-1"
+        >
+            <v-col
+                cols="4"
+            >
+                <v-img
+                    v-if="event.category"
+                    class="!size-20 mx-auto"
+                    :src="category(event.category)"
+                    :alt="event.category"
+                />
+            </v-col>
+            <v-col
+                cols="8"
+            >
+                <v-card-title
+                    style="text-wrap: wrap;"
                 >
-                    <div
-                        v-if="edition.sponsor_name"
-                        class="py-0.5 text-xl"
+                    <router-link
+                        class="hover-link"
+                        :to="{name: 'Tournament', params: {name: encodeName(event.tournament.name), id: event.tournament.id}}"
                     >
-                        {{ edition.sponsor_name }}
-                    </div>
-                    <div class="text-xl py-0.5">
-                        <router-link
-                            class="hover-link"
-                            :to="{name: 'Tournament', params: {id: edition.Tournament.id, name: encodeName(edition.Tournament.name)}}"
-                        >
-                            {{ edition.Tournament.name }}
-                        </router-link>
-                    </div>
-                    <div class="flex justify-center sm:!justify-start py-0.5">
-                        <div>{{ edition.city }}</div>
-                        <div class="!w-9">
-                            <flag-img
-                                class="mx-1"
-                                :src="flagSrc(edition.country)"
-                                :alt="edition.country"
-                            />
-                        </div>
-                    </div>
-                    <div class="py-0.5">{{ formattedDates(edition.start_date, edition.end_date) }}</div>
-                    <div class="py-0.5">{{ edition.environment }} {{ edition.surface }}<span v-if="edition.hard_type"> ({{ edition.hard_type }})</span></div>
-                </v-col>
-                <v-col
-                    class="text-center flex justify-center items-center"
-                    cols="12"
-                    sm="2"
+                        {{ event.tournament.name }}
+                    </router-link>
+                </v-card-title>
+                <v-card-subtitle
+                    v-if="event.sponsor_name"
+                    style="text-wrap: wrap;"
                 >
-                    <v-chip
-                        v-if="DateTime.now() > DateTime.fromISO(edition.start_date)"
-                        variant="outlined"
-                        :to="{name: 'Edition', params: {name: encodeName(edition.Tournament.name), id: edition.Tournament.id, editionNo: edition.edition_no}}"
-                    >
-                        Results
-                    </v-chip>
-                </v-col>
-            </v-row>
-        </v-container>
+                    {{ event.sponsor_name }}
+                </v-card-subtitle>
+                <v-card-subtitle
+                    class="small mt-1"
+                    style="text-wrap: wrap;"
+                >
+                    {{ event.venue.city }}, {{ event.venue.country.name }}
+                </v-card-subtitle>
+            </v-col>
+        </v-row>
+        <v-card-actions
+            v-if="DateTime.now() > DateTime.fromISO(event.start_date)"
+        >
+            <v-chip
+                class="mx-auto text-zinc-300"
+                variant="outlined"
+                :to="{name: 'Event', params: {name: encodeName(event.tournament.name), id: event.tournament.id, year: event.year.id, eventId: event.id}}"
+            >
+                Results
+            </v-chip>
+        </v-card-actions>
     </v-card>
 </template>
