@@ -346,13 +346,11 @@ watch(() => [props.p1Name, props.p2Name], () => {
                                         size="small"
                                     >
                                         <v-img
-                                            v-if="match.winner.player"
                                             :src="func.headshot(match.winner.player.id)"
                                             :alt="match.winner.player.full_name"
                                         />
                                     </v-avatar>
                                     <router-link
-                                        v-if="match.winner.player"
                                         class="hover-link mx-1"
                                         :to="{name: 'Player', params: {id: match.winner.player.id, name: func.encodeName(match.winner.player.full_name)}}"
                                     >

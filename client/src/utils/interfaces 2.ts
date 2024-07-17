@@ -440,8 +440,8 @@ export interface H2H {
             tournament: Tournament
         },
         match_no: number,
-        winner: PlayerScore,
-        loser: BasicScore,
+        winner: BasicScore,
+        loser: PlayerScore,
         round: string
     }[]
 }
