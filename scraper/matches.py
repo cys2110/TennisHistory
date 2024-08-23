@@ -2,27 +2,31 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import csv
+from neo4j import GraphDatabase
+from dotenv import load_dotenv
+import os
 import json
 import time
 
 players_file = 'players.csv'
-new_players_file = 'new-players.csv'
-all_players = []
-new_players = []
-
-with open(players_file, mode='r', encoding='utf-8-sig') as player_file:
-    players_data = csv.reader(player_file, delimiter=',')
-    for player in players_data:
-        all_players.append(','.join(player))
+tid = 520
+year = 1968
+sort_date = ''
 
 filename = 'test.json'
 driver = webdriver.Chrome()
-driver.get("https://www.atptour.com/en/scores/archive/bournemouth/347/1968/draws?matchtype=singles")
+driver.get(f"https://www.atptour.com/en/scores/archive/bournemouth/{tid}/{year}/draws?matchtype=singles")
 WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'draw')))
 
 buttons = driver.find_elements(By.CLASS_NAME, 'button')
 matches = []
+
+load_status = load_dotenv("Neo4j-84ef144c-Created-2024-06-18.txt")
+if load_status is False:
+    raise RuntimeError('Environment variables not loaded.')
+
+URI = os.getenv("NEO4J_URI")
+AUTH = (os.getenv("NEO4J_USERNAME"), os.getenv("NEO4J_PASSWORD"))
 
 for index, button in enumerate(buttons):
     if button.text != 'Previous' and button.text != '':
@@ -47,11 +51,8 @@ for index, button in enumerate(buttons):
                 link = (href.replace("https://www.atptour.com/en/players/", '').replace("/overview", '')).split('/')
                 ps.append(link[1])
 
-                if index == 1 and link[1] not in all_players:
-                    new_players.append(link[1])
-
             match_info = {
-                'id': f"3471968 {button.text} {match_no}",
+                'id': f"{tid}{year} {button.text} {match_no}",
                 'match_no': len(matches) + 1,
                 'round': round_header.text,
                 'p1': {
@@ -81,15 +82,63 @@ for index, button in enumerate(buttons):
 
 driver.quit()
 
-with open(new_players_file, 'a', newline='') as csvfile:
-    playerwriter = csv.writer(csvfile)
-    if len(new_players) == 1:
-        playerwriter.writerow(new_players)
-    else:
-        for player in new_players:
-            playerwriter.writerow([player])
+def writeToDb(db):
+    for match in matches:
+        s1_properties = {
+            's1': match['p1'].get('s1'),
+            's2': match['p1'].get('s2'),
+            's3': match['p1'].get('s3'),
+            's4': match['p1'].get('s4'),
+            's5': match['p1'].get('s5')
+        }
+        s1_query = ', '.join([f"{k}: ${k}" for k, v in s1_properties.items() if v is not None])
 
-json_object = json.dumps(matches, indent=4)
+        s2_properties = {
+            's1': match['p2'].get('s1'),
+            's2': match['p2'].get('s2'),
+            's3': match['p2'].get('s3'),
+            's4': match['p2'].get('s4'),
+            's5': match['p2'].get('s5')
+        }
+        s2_query = ', '.join([f"{k}: ${k}" for k, v in s2_properties.items() if v is not None])
 
-with open(filename, 'w') as jsonfile:
-    jsonfile.write(json_object)
+        query = f"""
+            MATCH (e:Event {{id: $id}})
+            MATCH (p1:Player {{id: $p1}})
+            MATCH (p2:Player {{id: $p2}})
+            MERGE (m:Match:Best5 {{id: $id, round: $round, match_no: $match_no, sort_date: date($date)}})
+            MERGE (m)-[:PLAYED]->(e)
+            MERGE (s1:Score:P1 {{id: $score1}})
+            MERGE (s2:Score:P2 {{id: $score2}})
+            MERGE (p1)-[:SCORED]->(s1)
+            MERGE (s1)-[:SCORED]->(m)
+            MERGE (p2)-[:SCORED]->(s2)
+            MERGE (s2)-[:SCORED]->(m)
+        """
+
+        if s1_query:
+            query += f" SET s1 += {{{s1_query}}}"
+
+        if s2_query:
+            query += f" SET s2 += {{{s2_query}}}"
+
+        params = {
+            'id': f"{tid}{year}",
+            'p1': match['p1']['id'],
+            'p2': match['p2']['id'],
+            'id': match['id'],
+            'round': match['round'],
+            'match_no': match['match_no'],
+            'date': sort_date,
+            'score1': f"{match['id']} {match['p1']['id']}",
+            'score2': f"{match['id']} {match['p2']['id']}",
+        }
+
+        params.update({k: v for k, v in s1_properties.items() if v is not None})
+        params.update({k: v for k, v in s2_properties.items() if v is not None})
+
+        db.run(query, **params)
+
+with GraphDatabase.driver(URI, auth=AUTH) as driver:
+    with driver.session(database="neo4j") as session:
+        records = session.execute_write(writeToDb)
