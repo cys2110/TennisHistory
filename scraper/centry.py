@@ -6,8 +6,8 @@ from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os
 
-players = [""]
-# check = []
+players =
+# check =
 player = players[0]
 year = 1968
 

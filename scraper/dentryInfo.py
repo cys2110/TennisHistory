@@ -7,7 +7,7 @@ from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os
 
-tid = 520
+tid = 560
 year = 1968
 player_entry = []
 
