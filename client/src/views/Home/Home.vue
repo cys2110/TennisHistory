@@ -15,15 +15,11 @@ const { result, loading, error } = useQuery(query, variables)
 const events: Ref<Event[]> = ref([])
 
 watch(result, (newResult) => {
-    if (newResult) {
-        events.value = newResult.events
-    }
+    if (newResult) events.value = newResult.events
 }, { immediate: true })
 
 watch(error, (newError) => {
-    if (newError) {
-        console.error(newError)
-    }
+    if (newError) console.error(newError)
 })
 </script>
 
@@ -34,7 +30,7 @@ watch(error, (newError) => {
         </div>
         <v-container v-if="events.length > 0">
             <v-row>
-                <v-col v-for="event in events" :key="event.id" cols="12" sm="6" lg="4" xl="3">
+                <v-col v-for="event in events" :key="event.id" cols="12" sm="4" xl="3">
                     <UpcomingCard :event />
                 </v-col>
             </v-row>
