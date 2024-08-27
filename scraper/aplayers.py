@@ -9,8 +9,8 @@ players_file = 'players.csv'
 players = []
 new_players = []
 
-tid = 560
-year = 1968
+tid = 713
+year = 1969
 
 with open(players_file, mode='r', encoding='utf-8-sig') as csvfile:
     players_data = list(csv.reader(csvfile, delimiter=','))

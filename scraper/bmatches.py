@@ -8,10 +8,10 @@ import os
 import time
 
 players_file = 'players.csv'
-tid = 560
-year = 1968
-sort_date = '1968-08-29'
-draw = 'Best5'
+tid = 713
+year = 1969
+sort_date = '1968-12-30'
+draw = 'Best3'
 
 driver = webdriver.Chrome()
 driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws?matchtype=singles")

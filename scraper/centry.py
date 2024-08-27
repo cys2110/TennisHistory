@@ -6,10 +6,10 @@ from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os
 
-players =
+players = ["s129", "f039", "c233", "w088", "f135", "c079", "j225", "le06", "r076", "o425", "b198", "h0fk", "c020", "k002", "b227", "w0by", "f0eh", "s0pj", "g070", "n0d0", "a060", "h0fl", "t050", "d140", "t080", "d164", "b123", "k0gx", "m139", "n249", "b106", "kf37", "k101", "h0fm", "m0kh", "b224", "r073", "k0gy", "p148", "r141", "c093", "s103", "w115", "s248"]
 # check =
 player = players[0]
-year = 1968
+year = 1969
 
 driver = webdriver.Chrome()
 driver.get(f"https://www.atptour.com/en/players/x/{player}/player-activity?matchType=Singles&year={year}&tournament=all")
