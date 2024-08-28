@@ -32,7 +32,7 @@ export interface TournamentDetails extends Tournament {
   website: string | null;
   start_year: numberId;
   end_year: numberId | null;
-  events: TournamentEvent[];
+  events: Event[];
 }
 
 interface EntryInfo {

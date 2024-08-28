@@ -5,7 +5,9 @@ import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon'
 import { getEventsByYear } from '@/services/EventService';
 import type { Event } from '@/utils/interfaces';
-import ArchiveCard from '@/components/Archive/ArchiveCard.vue';
+import EventCard from '@/components/EventCard.vue';
+import Title from '@/components/Title.vue'
+import Loading from '@/components/Loading.vue'
 
 provideApolloClient(apolloClient)
 
@@ -38,8 +40,10 @@ watchEffect(() => updateResults())
     <v-sheet class='bg-transparent m-16 w-75 pa-3 mx-auto'>
         <v-container>
             <v-row class="flex items-center">
-                <v-col class="text-4xl text-zinc-300">
-                    Results Archive
+                <v-col>
+                    <Title>
+                        <template #title>Results Archive</template>
+                    </Title>
                 </v-col>
                 <v-col cols="12" sm="3">
                     <v-combobox class="text-zinc-300" variant="underlined" v-model="searchYear" :items="years" />
@@ -47,13 +51,12 @@ watchEffect(() => updateResults())
             </v-row>
             <v-row>
                 <v-col v-if="events.length > 0" v-for="event in events" :key="event.id" cols="12" sm="4" xl="3">
-                    <ArchiveCard :event />
+                    <EventCard :event />
                 </v-col>
-                <v-col v-else-if="load" class="text-zinc-400 my-5 text-3xl">
-                    Loading...
-                </v-col>
-                <v-col v-else class="text-zinc-400">
-                    No data available
+                <v-col>
+                    <Loading :loading="load">
+                        <template #None>No data available</template>
+                    </Loading>
                 </v-col>
             </v-row>
         </v-container>
