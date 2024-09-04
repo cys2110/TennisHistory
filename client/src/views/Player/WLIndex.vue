@@ -4,6 +4,7 @@ import apolloClient from '@/apollo';
 import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { getWLIndex } from '@/services/PlayerService';
 import type { WLIndex } from '@/utils/interfaces';
+import Loading from '@/components/Loading.vue'
 import WLIndexItem from '@/components/Player/WLIndexItem.vue';
 
 provideApolloClient(apolloClient)
@@ -145,9 +146,7 @@ watch(result, (newResult) => {
 }, { immediate: true })
 
 watch(error, (newError) => {
-    if (newError) {
-        console.error(newError)
-    }
+    if (newError) console.error(newError)
 }, { immediate: true })
 </script>
 
@@ -165,6 +164,9 @@ watch(error, (newError) => {
             </WLIndexItem>
         </div>
     </v-container>
-    <div v-else-if="loading">{{ loading }}</div>
-    <div v-else class="text-zinc-300">No data available</div>
+    <div v-else>
+        <Loading :loading>
+            <template #None>No data available</template>
+        </Loading>
+    </div>
 </template>

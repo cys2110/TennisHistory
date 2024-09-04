@@ -25,6 +25,8 @@ export const formatCurrency = (currency: string, amount: number) => {
   return amount.toLocaleString("en-gb", {
     style: "currency",
     currency: currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   });
 };
 

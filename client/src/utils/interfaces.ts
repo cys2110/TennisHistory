@@ -278,14 +278,14 @@ export interface PlayerLayout extends Player {
   };
 }
 
-interface Major {
+export interface Major {
   event: {
     id: number;
     year: numberId;
   };
 }
 
-interface MajorAgg {
+export interface MajorAgg {
   node: {
     round: {
       longest: string | null;

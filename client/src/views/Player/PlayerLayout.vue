@@ -7,6 +7,7 @@ import { getPlayerLayout } from '@/services/PlayerService';
 import type { PlayerLayout } from '@/utils/interfaces';
 import { unencodeName, formatDate, formatCurrency, headshot, gladiator, flag, smallDate } from '@/utils/functions';
 import Loading from '@/components/Loading.vue'
+import OverviewStat from '@/components/Player/OverviewStat.vue'
 
 provideApolloClient(apolloClient)
 const { mdAndUp } = useDisplay()
@@ -85,41 +86,23 @@ watch(error, (newError) => {
                     </div>
                     <div
                         class="sm:!flex sm:!flex-wrap sm:!justify-evenly sm:!items-center bg-indigo-800 rounded-xl p-3 lg:!mt-6">
-                        <div v-if="player.ch_date" class="flex-col text-center m-2">
-                            <div class="font-bold lg:text-2xl">
-                                {{ player.career_high }}
-                            </div>
-                            <div class="text-xs lg:text-sm">
-                                {{ formatDate(player.ch_date) }}
-                            </div>
-                            <div class="text-xs lg:text-sm">
-                                CAREER HIGH
-                            </div>
-                        </div>
-                        <div class="flex-col text-center m-2">
-                            <div class="font-bold lg:text-2xl">
-                                {{ player.win }}-{{ player.loss }}
-                            </div>
-                            <div class="text-xs lg:text-sm">
-                                WIN-LOSS
-                            </div>
-                        </div>
-                        <div class="flex-col text-center m-2">
-                            <div class="font-bold lg:text-2xl">
-                                {{ player.titles }}
-                            </div>
-                            <div class="text-xs lg:text-sm">
-                                TITLES
-                            </div>
-                        </div>
-                        <div class="flex-col text-center m-2">
-                            <div class="font-bold lg:text-2xl">
-                                {{ formatCurrency('USD', player.pm_USD) }}
-                            </div>
-                            <div class="text-xs lg:text-sm">
-                                PRIZE MONEY
-                            </div>
-                        </div>
+                        <OverviewStat v-if="player.ch_date">
+                            <template #stat>{{ player.career_high }}</template>
+                            <template #date>{{ formatDate(player.ch_date) }}</template>
+                            <template #stat-name>CAREER HIGH</template>
+                        </OverviewStat>
+                        <OverviewStat>
+                            <template #stat>{{ player.win }}-{{ player.loss }}</template>
+                            <template #stat-name>WIN-LOSS</template>
+                        </OverviewStat>
+                        <OverviewStat>
+                            <template #stat>{{ player.titles }}</template>
+                            <template #stat-name>TITLES</template>
+                        </OverviewStat>
+                        <OverviewStat>
+                            <template #stat>{{ formatCurrency('USD', player.pm_USD) }}</template>
+                            <template #stat-name>PRIZE MONEY</template>
+                        </OverviewStat>
                     </div>
                 </v-col>
                 <v-col cols="12" md="3" :order="mdAndUp ? 2 : 1">
