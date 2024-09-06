@@ -131,7 +131,7 @@ def writeToDb(db):
                 MATCH (e:Event {{id: $id}})
                 MERGE (p1:Player {{id: $p1}})
                 MERGE (p2:Player {{id: $p2}})
-                MERGE (m:Match:{draw} {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date)}})
+                MERGE (m:Match:Update:{draw} {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date)}})
                 MERGE (m)-[:PLAYED]->(e)
                 MERGE (s1:Score:P1 {{id: $score1}})
                 MERGE (s2:Score:P2 {{id: $score2}})

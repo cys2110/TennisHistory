@@ -9,10 +9,10 @@ import time
 
 # For stat matches
 
-tid = 451
-year = 1994
-sort_date = '1994-01-03'
-draw = 'Best3'
+tid = 580
+year = 2001
+sort_date = '2001-01-15'
+draw = 'Best5'
 
 driver = webdriver.Chrome()
 driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws?matchtype=singles")
@@ -69,9 +69,12 @@ for index, button in enumerate(buttons):
                 match_info['p2'] = {}
                 match_info['p2'] = ps[1]
 
-            stat = match.find_element(By.CLASS_NAME, 'stats-cta')
-            stats_link = stat.find_elements(By.TAG_NAME, 'a')
-            matches_links.append(stats_link[1].get_attribute('href'))
+            try:
+                stat = match.find_element(By.CLASS_NAME, 'stats-cta')
+                stats_link = stat.find_elements(By.TAG_NAME, 'a')
+                matches_links.append(stats_link[1].get_attribute('href'))
+            except:
+                continue
 
             matches.append(match_info)
 
@@ -94,7 +97,7 @@ def writeToDb(db):
                 MATCH (e:Event {{id: $id}})
                 MERGE (p1:Player {{id: $p1}})
                 MERGE (p2:Player {{id: $p2}})
-                MERGE (m:Match:{draw} {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date)}})
+                MERGE (m:Match:Update:{draw} {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date)}})
                 MERGE (m)-[:PLAYED]->(e)
                 MERGE (s1:Score:P1 {{id: $score1}})
                 MERGE (s2:Score:P2 {{id: $score2}})
