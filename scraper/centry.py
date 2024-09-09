@@ -5,11 +5,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os
+import time
 
-players = ["k293", "o098", "b484", "e155", "m873", "s675", "k260", "h284", "c524", "o099", "b545", "s381", "n210", "s772", "p387", "a092", "b585", "m614", "b350", "d291", "f316", "s550", "k237", "s402", "l311", "l290", "s809", "h380", "p485", "f292", "r255", "l386", "s604", "c433", "s741"]
-# check =
-# player = players[0]
-year = 2001
+players = ["sx50", "me82", "ce77", "k0e6", "d864", "be90", "pc11", "mo44", "pl56", "y268", "d923", "c977", "bk92", "me89", "mh30", "bm95", "d994", "gh92", "db63", "sd32", "mk66", "n732", "ki95", "gc89", "re44", "kb05", "ke29", "kc56"]
+year = 2021
 entries = []
 
 driver = webdriver.Chrome()
@@ -18,6 +17,7 @@ for player in players:
     try:
         driver.get(f"https://www.atptour.com/en/players/x/{player}/player-activity?matchType=Singles&year={year}&tournament=all")
         WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'tournament-footer')))
+        time.sleep(3)
 
         result = {
             'pid': player,
