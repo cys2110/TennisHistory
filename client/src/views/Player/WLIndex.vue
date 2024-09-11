@@ -4,6 +4,7 @@ import apolloClient from '@/apollo';
 import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { getWLIndex } from '@/services/PlayerService';
 import type { WLIndex } from '@/utils/interfaces';
+import Loading from '@/components/Loading.vue'
 import WLIndexItem from '@/components/Player/WLIndexItem.vue';
 
 provideApolloClient(apolloClient)
@@ -76,7 +77,7 @@ watch(result, (newResult) => {
             },
             {
                 category: 'Environment',
-                stats:[
+                stats: [
                     {
                         metric: 'Clay',
                         win: stats.clayWins.count,
@@ -142,37 +143,30 @@ watch(result, (newResult) => {
             }
         ]
     }
-}, {immediate: true})
+}, { immediate: true })
 
 watch(error, (newError) => {
-    if (newError) {
-        console.error(newError)
-    }
-}, {immediate: true})
+    if (newError) console.error(newError)
+}, { immediate: true })
 </script>
 
 <template>
     <v-container v-if="index.length > 0">
-        <div
-            v-for="category in index"
-            :key="category.category"
-            class="mb-2"
-        >
+        <div v-for="category in index" :key="category.category" class="mb-2">
             <v-row>
                 <v-col class="text-center">
                     <div class="font-bold text-uppercase">{{ category.category }}</div>
                 </v-col>
             </v-row>
-            <WLIndexItem
-                v-for="index in category.stats"
-                :key="index.win"
-                :win="index.win"
-                :total="index.total"
-                :titles="index.titles"
-            >
+            <WLIndexItem v-for="index in category.stats" :key="index.win" :win="index.win" :total="index.total"
+                :titles="index.titles">
                 <template #metric>{{ index.metric }}</template>
             </WLIndexItem>
         </div>
     </v-container>
-    <div v-else class="text-zinc-300">No data available</div>
+    <div v-else>
+        <Loading :loading>
+            <template #None>No data available</template>
+        </Loading>
+    </div>
 </template>

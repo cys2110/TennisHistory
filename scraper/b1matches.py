@@ -7,14 +7,15 @@ from dotenv import load_dotenv
 import os
 import time
 
-players_file = 'players.csv'
-tid = 560
-year = 1968
-sort_date = '1968-08-29'
+# For no stats matches
+
+tid = 520
+year = 1987
+sort_date = '1987-05-25'
 draw = 'Best5'
 
 driver = webdriver.Chrome()
-driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws?matchtype=singles")
+driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws")
 WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'draw')))
 
 buttons = driver.find_elements(By.CLASS_NAME, 'button')
@@ -72,14 +73,26 @@ for index, button in enumerate(buttons):
 
             p1 = scores[0].find_elements(By.CLASS_NAME, 'score-item')
             for index, p in enumerate(p1):
-                if p.text != '' and p.text != '-':
-                    match_info['p1'][f"s{index + 1}"] = int(p.text)
+                try:
+                    if p.text != '' and p.text != '-':
+                        match_info['p1'][f"s{index + 1}"] = int(p.text)
+                except:
+                    spans = p.find_elements(By.TAG_NAME, 'span')
+                    match_info['p1'][f"s{index + 1}"] = int(spans[0].text)
+                    if len(spans) > 1:
+                        match_info['p1'][f"t{index + 1}"] = int(spans[1].text)
 
 
             p2 = scores[1].find_elements(By.CLASS_NAME, 'score-item')
             for index, p in enumerate(p2):
-                if p.text != '' and p.text != '-':
-                    match_info['p2'][f"s{index + 1}"] = int(p.text)
+                try:
+                    if p.text != '' and p.text != '-':
+                        match_info['p2'][f"s{index + 1}"] = int(p.text)
+                except:
+                    spans = p.find_elements(By.TAG_NAME, 'span')
+                    match_info['p2'][f"s{index + 1}"] = int(spans[0].text)
+                    if len(spans) > 1:
+                        match_info['p2'][f"t{index + 1}"] = int(spans[1].text)
 
             matches.append(match_info)
 
@@ -116,9 +129,9 @@ def writeToDb(db):
 
             query = f"""
                 MATCH (e:Event {{id: $id}})
-                MATCH (p1:Player {{id: $p1}})
-                MATCH (p2:Player {{id: $p2}})
-                MERGE (m:Match:{draw} {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date)}})
+                MERGE (p1:Player {{id: $p1}})
+                MERGE (p2:Player {{id: $p2}})
+                MERGE (m:Match:Update:{draw} {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date)}})
                 MERGE (m)-[:PLAYED]->(e)
                 MERGE (s1:Score:P1 {{id: $score1}})
                 MERGE (s2:Score:P2 {{id: $score2}})
@@ -144,7 +157,7 @@ def writeToDb(db):
         elif match.get('p1') is not None:
             query = f"""
                 MATCH (e:Event {{id: $id}})
-                MATCH (p1:Player {{id: $p1}})
+                MERGE (p1:Player {{id: $p1}})
                 MERGE (m:Match {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date), incomplete: 'B'}})
                 MERGE (m)-[:PLAYED]->(e)
                 MERGE (s1:Score:P1:Winner {{id: $score1}})
@@ -159,7 +172,7 @@ def writeToDb(db):
         elif match.get('p2') is not None:
             query = f"""
                 MATCH (e:Event {{id: $id}})
-                MATCH (p2:Player {{id: $p2}})
+                MERGE (p2:Player {{id: $p2}})
                 MERGE (m:Match {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date)}})
                 MERGE (m)-[:PLAYED]->(e)
                 MERGE (s2:Score:P2:Winner {{id: $score2}})
@@ -170,6 +183,13 @@ def writeToDb(db):
 
             params['p2'] = match['p2']['id']
             params['score2'] = f"{match['id']} {match['p2']['id']}"
+
+        else:
+            query = f"""
+                MATCH (e:Event {{id: $id}})
+                MERGE (m:Match {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date)}})
+                MERGE (m)-[:PLAYED]->(e)
+            """
 
         db.run(query, **params)
 

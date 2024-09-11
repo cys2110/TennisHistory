@@ -7,12 +7,12 @@ from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os
 
-tid = 560
-year = 1968
+tid = 8994
+year = 2021
 player_entry = []
 
 driver = webdriver.Chrome()
-driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws?matchtype=singles")
+driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws")
 WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'draw')))
 
 button = driver.find_element(By.CLASS_NAME, 'button-round-1')
