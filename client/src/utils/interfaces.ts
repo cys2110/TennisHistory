@@ -214,7 +214,7 @@ export interface MatchRound {
 
 export interface DrawRound {
   round: string;
-  value: number;
+  number: number;
   matches: MatchRound[];
 }
 

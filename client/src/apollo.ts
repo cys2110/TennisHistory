@@ -1,17 +1,21 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client/core';
-import { provideApolloClient } from '@vue/apollo-composable';
+import {
+  ApolloClient,
+  InMemoryCache,
+  createHttpLink,
+} from "@apollo/client/core";
+import { provideApolloClient } from "@vue/apollo-composable";
 
 const httpLink = createHttpLink({
-  uri: 'https://tennis-history-backend-a82162895ecd.herokuapp.com/',
+  uri: "https://tennis-history-backend-a82162895ecd.herokuapp.com/",
 });
 
-const cache = new InMemoryCache()
+const cache = new InMemoryCache();
 
 const apolloClient = new ApolloClient({
   link: httpLink,
   cache,
-})
+});
 
-provideApolloClient(apolloClient)
+provideApolloClient(apolloClient);
 
-export default apolloClient
+export default apolloClient;

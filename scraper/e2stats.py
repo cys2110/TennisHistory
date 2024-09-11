@@ -9,9 +9,11 @@ import os
 
 # For stats matches where winner is 1st in results and p1 in stats
 
-tid = 438
-year = 2021
-matches = ['https://www.atptour.com/en/scores/stats-centre/archive/2021/438/ms014', 'https://www.atptour.com/en/scores/stats-centre/archive/2021/438/ms015', 'https://www.atptour.com/en/scores/stats-centre/archive/2021/438/ms004', 'https://www.atptour.com/en/scores/stats-centre/archive/2021/438/ms005', 'https://www.atptour.com/en/scores/stats-centre/archive/2021/438/ms006', 'https://www.atptour.com/en/scores/stats-centre/archive/2021/438/ms007', 'https://www.atptour.com/en/scores/stats-centre/archive/2021/438/ms002', 'https://www.atptour.com/en/scores/stats-centre/archive/2021/438/ms003', 'https://www.atptour.com/en/scores/stats-centre/archive/2021/438/ms001']
+tid = 404
+year = 2023
+matches = ['https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms070', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms078', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms082', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms086', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms089', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms090']
+# ['https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms094', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms097', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms098', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms101', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms102', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms105', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms106', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms109', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms110', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms113', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms114', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms117', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms118', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms121', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms122', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms125', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms126', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms032', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms033', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms034', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms035', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms036', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms037', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms038', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms039', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms040', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms041', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms042', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms043', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms044', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms045', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms046', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms047', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms048', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms049', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms050', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms051', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms052', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms053', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms054', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms055', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms056', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms057', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms058', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms059', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms060', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms061', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms062', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms063', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms016', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms017', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms018', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms019', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms020', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms021', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms022', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms023', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms024', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms025', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms026', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms027', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms028', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms029', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms030', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms031', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms008', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms009', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms010', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms011', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms012', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms013', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms014', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms015', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms004', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms005', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms006', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms007', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms002', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms003', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/404/ms001']
+# ['https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms031', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms027', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms029', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms009', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms012', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms013', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms014', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms015', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms004', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms005', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms006', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms007', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms002', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms003', 'https://www.atptour.com/en/scores/stats-centre/archive/2023/807/ms001']
 matches_info = []
 
 driver = webdriver.Chrome()
@@ -19,15 +21,10 @@ driver = webdriver.Chrome()
 for match in matches:
     try:
         driver.get(match)
-        try:
-            time.sleep(5)
-            WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.XPATH, '//*[@id="cf-chl-widget-c1j48"]')))
-            box = driver.find_element(By.XPATH, '//*[@id="MDjtu6"]/div/label/input').click()
-        except:
-            continue
-
-        WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'atp_match-stats')))
         time.sleep(10)
+
+        WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'wrapper')))
+
 
         duration = driver.find_element(By.XPATH, '/html/body/div[3]/div/div[2]/div/div[3]/div/div[2]/div[2]/div[2]/div[1]/span[2]')
         times = duration.text.split(":")
@@ -65,46 +62,74 @@ for match in matches:
         p1_stat = driver.find_elements(By.CLASS_NAME, 'player1')
         match_info['p1']['aces'] = int(p1_stat[2].text)
         match_info['p1']['dfs'] = int(p1_stat[4].text)
-        winner_serve1 = p1_stat[8].text.split(" ")[0].split("/")
-        match_info['p1']['serve1_pts_w'] = int(winner_serve1[0])
-        match_info['p1']['serve1_pts'] = int(winner_serve1[1])
-        winner_serve2 = p1_stat[10].text.split(" ")[0].split("/")
-        match_info['p1']['serve2_pts_w'] = int(winner_serve2[0])
-        match_info['p1']['serve2_pts'] = int(winner_serve2[1])
-        winner_bps_saved = p1_stat[12].text.split(" ")[0].split("/")
-        match_info['p1']['bps_saved'] = int(winner_bps_saved[0])
-        match_info['p1']['bps_faced'] = int(winner_bps_saved[1])
-        winner_ret1 = p1_stat[18].text.split(" ")[0].split("/")
-        match_info['p1']['ret1_w'] = int(winner_ret1[0])
-        match_info['p1']['ret1'] = int(winner_ret1[1])
-        winner_ret2 = p1_stat[20].text.split(" ")[0].split("/")
-        match_info['p1']['ret2_w'] = int(winner_ret2[0])
-        match_info['p1']['ret2'] = int(winner_ret2[1])
-        winner_bps_converted = p1_stat[22].text.split(" ")[0].split("/")
-        match_info['p1']['bps_converted'] = int(winner_bps_converted[0])
-        match_info['p1']['bp_opps'] = int(winner_bps_converted[1])
+        p1_serve1 = p1_stat[8].text.split(" ")[0].split("/")
+        match_info['p1']['serve1_pts_w'] = int(p1_serve1[0])
+        match_info['p1']['serve1_pts'] = int(p1_serve1[1])
+        p1_serve2 = p1_stat[10].text.split(" ")[0].split("/")
+        match_info['p1']['serve2_pts_w'] = int(p1_serve2[0])
+        match_info['p1']['serve2_pts'] = int(p1_serve2[1])
+        p1_bps_saved = p1_stat[12].text.split(" ")[0].split("/")
+        match_info['p1']['bps_saved'] = int(p1_bps_saved[0])
+        match_info['p1']['bps_faced'] = int(p1_bps_saved[1])
+        p1_ret1 = p1_stat[18].text.split(" ")[0].split("/")
+        match_info['p1']['ret1_w'] = int(p1_ret1[0])
+        match_info['p1']['ret1'] = int(p1_ret1[1])
+        p1_ret2 = p1_stat[20].text.split(" ")[0].split("/")
+        match_info['p1']['ret2_w'] = int(p1_ret2[0])
+        match_info['p1']['ret2'] = int(p1_ret2[1])
+        p1_bps_converted = p1_stat[22].text.split(" ")[0].split("/")
+        match_info['p1']['bps_converted'] = int(p1_bps_converted[0])
+        match_info['p1']['bp_opps'] = int(p1_bps_converted[1])
 
         p2_stat = driver.find_elements(By.CLASS_NAME, 'player2')
         match_info['p2']['aces'] = int(p2_stat[2].text)
         match_info['p2']['dfs'] = int(p2_stat[4].text)
-        winner_serve1 = p2_stat[8].text.split(" ")[0].split("/")
-        match_info['p2']['serve1_pts_w'] = int(winner_serve1[0])
-        match_info['p2']['serve1_pts'] = int(winner_serve1[1])
-        winner_serve2 = p2_stat[10].text.split(" ")[0].split("/")
-        match_info['p2']['serve2_pts_w'] = int(winner_serve2[0])
-        match_info['p2']['serve2_pts'] = int(winner_serve2[1])
-        winner_bps_saved = p2_stat[12].text.split(" ")[0].split("/")
-        match_info['p2']['bps_saved'] = int(winner_bps_saved[0])
-        match_info['p2']['bps_faced'] = int(winner_bps_saved[1])
-        winner_ret1 = p2_stat[18].text.split(" ")[0].split("/")
-        match_info['p2']['ret1_w'] = int(winner_ret1[0])
-        match_info['p2']['ret1'] = int(winner_ret1[1])
-        winner_ret2 = p2_stat[20].text.split(" ")[0].split("/")
-        match_info['p2']['ret2_w'] = int(winner_ret2[0])
-        match_info['p2']['ret2'] = int(winner_ret2[1])
-        winner_bps_converted = p2_stat[22].text.split(" ")[0].split("/")
-        match_info['p2']['bps_converted'] = int(winner_bps_converted[0])
-        match_info['p2']['bp_opps'] = int(winner_bps_converted[1])
+        p2_serve1 = p2_stat[8].text.split(" ")[0].split("/")
+        match_info['p2']['serve1_pts_w'] = int(p2_serve1[0])
+        match_info['p2']['serve1_pts'] = int(p2_serve1[1])
+        p2_serve2 = p2_stat[10].text.split(" ")[0].split("/")
+        match_info['p2']['serve2_pts_w'] = int(p2_serve2[0])
+        match_info['p2']['serve2_pts'] = int(p2_serve2[1])
+        p2_bps_saved = p2_stat[12].text.split(" ")[0].split("/")
+        match_info['p2']['bps_saved'] = int(p2_bps_saved[0])
+        match_info['p2']['bps_faced'] = int(p2_bps_saved[1])
+        p2_ret1 = p2_stat[18].text.split(" ")[0].split("/")
+        match_info['p2']['ret1_w'] = int(p2_ret1[0])
+        match_info['p2']['ret1'] = int(p2_ret1[1])
+        p2_ret2 = p2_stat[20].text.split(" ")[0].split("/")
+        match_info['p2']['ret2_w'] = int(p2_ret2[0])
+        match_info['p2']['ret2'] = int(p2_ret2[1])
+        p2_bps_converted = p2_stat[22].text.split(" ")[0].split("/")
+        match_info['p2']['bps_converted'] = int(p2_bps_converted[0])
+        match_info['p2']['bp_opps'] = int(p2_bps_converted[1])
+
+        try:
+            net_heading = driver.find_element(By.XPATH, '//*[@id="RGMatchStats"]/div[8]/div/div[2]/div[1]/div[2]/div')
+            if net_heading.text == "NET POINTS WON":
+                p1_net = p1_stat[26].text.split(" ")[0].split("/")
+                match_info['p1']['net_w'] = int(p1_net[0])
+                match_info['p1']['net'] = int(p1_net[1])
+                match_info['p1']['winner'] = int(p1_stat[28].text)
+                match_info['p1']['ues'] = int(p1_stat[30].text)
+                p2_net = p2_stat[26].text.split(" ")[0].split("/")
+                match_info['p2']['net_w'] = int(p2_net[0])
+                match_info['p2']['net'] = int(p2_net[1])
+                match_info['p2']['winner'] = int(p2_stat[28].text)
+                match_info['p2']['ues'] = int(p2_stat[30].text)
+        except:
+            pass
+
+        try:
+            p1_serves = driver.find_elements(By.CLASS_NAME, 'speedkmh1')
+            p2_serves = driver.find_elements(By.CLASS_NAME, 'speedkmh2')
+            match_info['p1']['max_speed_kph'] = int(p1_serves[0].text.replace('\nkm/h', ''))
+            match_info['p1']['avg_sv1_kph'] = int(p1_serves[2].text.replace('\nkm/h', ''))
+            match_info['p1']['avg_sv2_kph'] = int(p1_serves[4].text.replace('\nkm/h', ''))
+            match_info['p2']['max_speed_kph'] = int(p2_serves[0].text.replace('\nkm/h', ''))
+            match_info['p2']['avg_sv1_kph'] = int(p2_serves[2].text.replace('\nkm/h', ''))
+            match_info['p2']['avg_sv2_kph'] = int(p2_serves[4].text.replace('\nkm/h', ''))
+        except:
+            pass
 
         matches_info.append(match_info)
     except:

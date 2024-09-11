@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import os
 import time
 
-players = ["sx50", "me82", "ce77", "k0e6", "d864", "be90", "pc11", "mo44", "pl56", "y268", "d923", "c977", "bk92", "me89", "mh30", "bm95", "d994", "gh92", "db63", "sd32", "mk66", "n732", "ki95", "gc89", "re44", "kb05", "ke29", "kc56"]
+players = ["mm58", "hg86", "mw02", "mu94", "sl08", "sd32", "rh16", "cd85", "v708", "ce25", "tc61", "a596", "ki63", "l987", "hh26", "ki95", "cf59", "q927", "ta12", "pc11", "bd06", "ke29", "pf39", "ki74", "l397", "sl28", "me82", "tb69"]
 year = 2021
 entries = []
 

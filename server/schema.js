@@ -71,14 +71,14 @@ export const typeDefs = `#graphql
         venue: Venue @relationship(type: "TOOK_PLACE_IN", direction: OUT)
         winner: Player @relationship(type: "WON", direction: IN)
         finalist: Player @relationship(type: "FINALIST", direction: IN)
+        rounds: [Round!]! @relationship(type: "ROUND_OF", direction: IN)
         supervisors: [Supervisor!]! @relationship(type: "SUPERVISED", direction: IN)
-        matches: [Match!]! @relationship(type: "PLAYED", direction: IN)
         players: [Player!]! @relationship(type: "PLAYED", properties: "EntryInfo", direction: IN)
     }
 
     type Match {
         id: String! @unique
-        round: String
+        round: Round @relationship(type: "PLAYED", direction: OUT)
         match_no: Int
         court: String
         date: Date
@@ -333,7 +333,9 @@ export const typeDefs = `#graphql
     type Round {
         id: String!
         round: String!
+        number: Int!
         event: Event! @relationship(type: "ROUND_OF", direction: OUT)
+        matches: [Match!]! @relationship(type: "PLAYED", direction: IN)
     }
 
     type TitlesFinals {
@@ -474,8 +476,8 @@ export const typeDefs = `#graphql
     type Query {
         searchPlayers(full_name: String!): [Player] @cypher(statement: """
             MATCH (p:Player)
-            WHERE p.first_name + ' ' + p.last_name =~ '(?i)'+ $full_name + '.*'
+            WHERE p.first_name + ' ' + p.last_name =~ '(?i).*'+ $full_name + '.*'
             RETURN p AS players
         """, columnName: "players")
     }
-`
+`;

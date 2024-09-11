@@ -9,13 +9,13 @@ import time
 
 # For stat matches
 
-tid = 438
+tid = 8994
 year = 2021
-sort_date = '2021-10-18'
+sort_date = '2021-06-20'
 draw = 'Best3'
 
 driver = webdriver.Chrome()
-driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws?matchtype=singles")
+driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws")
 WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'draw')))
 
 buttons = driver.find_elements(By.CLASS_NAME, 'button')
@@ -74,7 +74,7 @@ for index, button in enumerate(buttons):
                 stats_link = stat.find_elements(By.TAG_NAME, 'a')
                 matches_links.append(stats_link[1].get_attribute('href'))
             except:
-                continue
+                pass
 
             matches.append(match_info)
 
