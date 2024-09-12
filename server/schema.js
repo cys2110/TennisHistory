@@ -327,7 +327,6 @@ export const typeDefs = `#graphql
         id: String!
         first_name: String
         last_name: String
-        full_name: String! @customResolver(requires: "first_name last_name")
     }
 
     type Round {

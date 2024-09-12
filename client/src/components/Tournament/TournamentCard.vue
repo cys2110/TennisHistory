@@ -7,11 +7,6 @@ import { headshot, flag, encodeName } from '@/utils/functions';
 const props = defineProps<{
     event: EventDetails
 }>()
-const display: Ref<boolean> = ref(true)
-const noFinal: Ref<boolean> = ref(false)
-
-DateTime.fromISO(props.event.end_date) < DateTime.now() ? display.value = true : display.value = false
-props.event.final_score ? noFinal.value = false : noFinal.value = true
 
 const formattedScore = computed(() => {
     if (props.event.final_score) return props.event.final_score.replace(/\(/g, '<sup>').replace(/\)/g, '</sup>')
@@ -25,7 +20,7 @@ const formattedScore = computed(() => {
                 {{ event.year.id }}
             </router-link>
         </v-card-title>
-        <v-container v-if="display && !noFinal">
+        <v-container v-if="DateTime.fromISO(event.end_date) < DateTime.now() && event.final_score">
             <v-row dense>
                 <v-spacer />
                 <v-col class="flex items-center mx-0.5" cols="2">
@@ -69,10 +64,10 @@ const formattedScore = computed(() => {
                 </v-col>
             </v-row>
         </v-container>
-        <v-card-subtitle v-if="display && !noFinal" class="text-center text-zinc-300 text-lg mb-1"
-            v-html="formattedScore" />
-        <v-card-subtitle v-else class="text-center text-zinc-300 text-lg mb-1">
-            {{ display && noFinal ? 'No final played' : 'Currently in progress' }}
-        </v-card-subtitle>
+        <v-card-subtitle v-if="DateTime.fromISO(event.end_date) < DateTime.now() && event.final_score"
+            class="text-center text-zinc-300 text-lg mb-1" v-html="formattedScore" />
+        <v-card-subtitle v-else class="text-center text-zinc-300 text-lg mb-1">{{ DateTime.fromISO(event.end_date) <
+            DateTime.now() ? 'No final player' : DateTime.fromISO(event.start_date) < DateTime.now()
+            ? 'Currently in progress' : 'Upcoming' }} </v-card-subtitle>
     </v-card>
 </template>

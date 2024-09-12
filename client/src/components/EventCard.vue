@@ -21,8 +21,8 @@ const props = defineProps<{
                 {{ event.tournament.name }}
             </router-link>
         </v-card-title>
-        <v-card-subtitle v-if="event.sponsor_name" style="text-wrap: wrap;" class="small text-center">
-            {{ event.sponsor_name }}
+        <v-card-subtitle style="text-wrap: wrap;" class="small text-center">
+            {{ event.sponsor_name ?? '—' }}
         </v-card-subtitle>
         <v-card-text v-if="event.start_date && event.venue && event.surface" class="mt-1 text-zinc-300 text-center"
             style="text-wrap: wrap;">
@@ -35,10 +35,19 @@ const props = defineProps<{
                 </span>
             </div>
         </v-card-text>
-        <v-card-actions v-if="DateTime.now() > DateTime.fromISO(event.start_date)">
-            <v-chip v-if="event.tournament" class="mx-auto text-zinc-300" variant="outlined"
+        <!--If event has started-->
+        <v-card-actions v-if="DateTime.now() > DateTime.fromISO(event.start_date) && event.tournament">
+            <v-chip class="mx-auto text-zinc-300" variant="outlined"
                 :to="{ name: 'Event', params: { name: encodeName(event.tournament.name), id: event.tournament.id, year: event.year.id, eventId: event.id } }">
+                Overview
+            </v-chip>
+            <v-chip class="mx-auto text-zinc-300" variant="outlined"
+                :to="{ name: 'Results', params: { name: encodeName(event.tournament.name), id: event.tournament.id, year: event.year.id, eventId: event.id } }">
                 Results
+            </v-chip>
+            <v-chip class="mx-auto text-zinc-300" variant="outlined"
+                :to="{ name: 'Draw', params: { name: encodeName(event.tournament.name), id: event.tournament.id, year: event.year.id, eventId: event.id } }">
+                Draw
             </v-chip>
         </v-card-actions>
     </v-card>
