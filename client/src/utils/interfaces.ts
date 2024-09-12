@@ -191,15 +191,22 @@ interface Score extends PlayerScore {
   ues: number | null;
 }
 
-export interface MatchByWinner extends MatchDetail {
-  match_no: number;
-  winner: PlayerScore;
-  loser: PlayerScore | null;
+export interface MatchDetail {
+  court: string | null;
+  date: Date | null;
+  duration_mins: number | null;
+  incomplete: string | null;
+  round: string;
+  umpire: stringId | null;
+  match_no?: number;
+  winner?: PlayerScore;
+  loser?: PlayerScore | null;
 }
 
 export interface Round {
   round: string;
-  matches: MatchByWinner[];
+  number: number;
+  matches: MatchDetail[];
 }
 
 export interface MatchRound {
@@ -222,15 +229,6 @@ interface MatchStatEvent extends Event {
   playersConnection: {
     edges: ActivityEntry[];
   };
-}
-
-interface MatchDetail {
-  court: string | null;
-  date: Date | null;
-  duration_mins: number | null;
-  incomplete: string | null;
-  round: string;
-  umpire: stringId | null;
 }
 
 export interface MatchStats extends MatchDetail {

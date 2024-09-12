@@ -5,6 +5,7 @@ import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { getResults } from '@/services/EventService';
 import type { ActivityEntry, Round } from '@/utils/interfaces';
 import ResultCard from '@/components/Event/ResultCard.vue';
+import Loading from '@/components/Loading.vue';
 
 provideApolloClient(apolloClient)
 
@@ -28,10 +29,8 @@ watch(result, (newResult) => {
 }, { immediate: true })
 
 watch(error, (newError) => {
-    if (newError) {
-        console.error(newError)
-    }
-})
+    if (newError) console.error(newError)
+}, { immediate: true })
 </script>
 
 <template>
@@ -41,7 +40,7 @@ watch(error, (newError) => {
                 {{ round.round }}
             </v-tab>
         </v-tabs>
-        <v-window v-model="tab" direction="vertical">
+        <v-window v-model="tab" direction="vertical" class="mt-5">
             <v-window-item v-for="round in rounds" :key="round.round" :value="round.round">
                 <div class="flex flex-wrap justify-center">
                     <ResultCard v-for="match in round.matches" :key="match.match_no" :match :entryInfo />
@@ -49,7 +48,7 @@ watch(error, (newError) => {
             </v-window-item>
         </v-window>
     </v-container>
-    <div v-else class="text-zinc-400 text-xl text-center">
-        No data available
-    </div>
+    <Loading v-else :loading>
+        <template #None>No data available</template>
+    </Loading>
 </template>
