@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 import os
 import time
 
-players = ["c0e9", "pf39", "r09x", "pd31", "o513", "n0am", "v708", "gf95", "k0a3", "me82", "c0h0", "mc65", "m0gz", "o660", "s0la", "m0jf", "t0a1", "z0a1", "s0gr", "sx91"]
-year = 1984
+players = ["l397", "wb08", "gh92", "ke17"]
+year = 2023
 entries = []
 
 driver = webdriver.Chrome()

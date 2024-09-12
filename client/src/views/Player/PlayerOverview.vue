@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 import type { PlayerDetails, MajorAgg, Major } from '@/utils/interfaces';
 import { bh, plays, encodeName, convertToFt } from '@/utils/functions';
 import Loading from '@/components/Loading.vue'
-import OverviewDetail from '@/components/Player/OverviewDetail.vue'
+import OverviewDetail from '@/components/OverviewDetail.vue'
 import ResultsRow from '@/components/Player/ResultsRow.vue'
 
 provideApolloClient(apolloClient)
@@ -123,7 +123,7 @@ watch(error, (newError) => {
                             <div v-if="player.dob" class="text-right">
                                 <div>{{
                                     Math.floor(Math.abs(DateTime.fromISO(player.dob).diffNow('years').toObject().years))
-                                }}</div>
+                                    }}</div>
                                 <div>({{ DateTime.fromISO(player.dob).setLocale('gb').toLocaleString(DateTime.DATE_FULL)
                                     }})
                                 </div>

@@ -60,7 +60,7 @@ export interface Edge {
   node: Player;
 }
 
-interface Seed extends Edge {
+export interface Seed extends Edge {
   properties: {
     seed: number;
     rank: number | null;
