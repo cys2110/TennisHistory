@@ -4,7 +4,7 @@ import apolloClient from '@/apollo';
 import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { getWLIndex } from '@/services/PlayerService';
 import type { WLIndex } from '@/utils/interfaces';
-import Loading from '@/components/Loading.vue'
+import Loading from '@/components/Global/Loading.vue'
 import WLIndexItem from '@/components/Player/WLIndexItem.vue';
 
 provideApolloClient(apolloClient)
@@ -51,7 +51,7 @@ watch(result, (newResult) => {
                     {
                         metric: 'Tiebreaks',
                         win: stats.indexTb.tbWins,
-                        total: stats.indexTb.tbTotal
+                        total: stats.indexTb.tbWins + stats.indexTb.tbLosses
                     },
                     {
                         metric: 'Versus Top 10',
@@ -164,9 +164,7 @@ watch(error, (newError) => {
             </WLIndexItem>
         </div>
     </v-container>
-    <div v-else>
-        <Loading :loading>
-            <template #None>No data available</template>
-        </Loading>
-    </div>
+    <Loading v-else :loading>
+        <template #none>No data available</template>
+    </Loading>
 </template>

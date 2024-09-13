@@ -4,43 +4,39 @@ export const getTournament = (id: number) => {
   const call = gql`
     query getTournament($id: Int!) {
       tournaments(where: { id: $id }) {
-        end_year {
-          id
-        }
         id
         name
         website
         start_year {
           id
         }
+        end_year {
+          id
+        }
         events {
           id
-          final_score
-          start_date
-          end_date
-          finalist {
-            first_name
-            full_name
-            id
-            last_name
-            country {
-              id
-              name
-            }
-          }
           year(options: { sort: [{ id: DESC }] }) {
             id
           }
+          start_date
+          end_date
           winner {
-            first_name
-            full_name
             id
-            last_name
+            full_name
             country {
               id
               name
             }
           }
+          finalist {
+            id
+            full_name
+            country {
+              id
+              name
+            }
+          }
+          final_score
         }
       }
     }

@@ -9,12 +9,9 @@ import os
 
 # For stats matches where winner is 1st in results and p1 in stats
 
-# tid = 7694
-year = 2023
-# matches = ['https://www.atptour.com/en/scores/stats-centre/archive/2023/7694/ms009']
-
-tid = 321
-matches = ['https://www.atptour.com/en/scores/stats-centre/archive/2023/321/ms010']
+tid = 375
+year = 2022
+matches = ['https://www.atptour.com/en/scores/stats-centre/archive/2022/375/ms017']
 matches_info = []
 
 driver = webdriver.Chrome()

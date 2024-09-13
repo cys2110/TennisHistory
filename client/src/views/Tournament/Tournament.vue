@@ -5,9 +5,9 @@ import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { getTournament } from '@/services/TournamentService';
 import type { TournamentDetails } from '@/utils/interfaces';
 import { unencodeName } from '@/utils/functions';
+import Title from '@/components/Global/Title.vue';
+import Loading from '@/components/Global/Loading.vue';
 import TournamentCard from '@/components/Tournament/TournamentCard.vue';
-import Title from '@/components/Title.vue';
-import Loading from '@/components/Loading.vue';
 
 provideApolloClient(apolloClient)
 
@@ -57,9 +57,7 @@ const years = computed(() => {
                     </a>
                 </div>
             </v-row>
-            <v-row class="text-xl my-5 text-zinc-300">
-                {{ years }}
-            </v-row>
+            <v-row class="text-xl my-5 text-zinc-300">{{ years }}</v-row>
             <v-row>
                 <v-col v-for="event in tournament.events" :key="event.id" cols="12" sm="4" xl="3">
                     <TournamentCard :event />
@@ -71,7 +69,7 @@ const years = computed(() => {
                 <template #title>{{ unencodeName(name) }}</template>
             </Title>
             <Loading :loading>
-                <template #None>No events played</template>
+                <template #none>No events played</template>
             </Loading>
         </div>
     </v-sheet>

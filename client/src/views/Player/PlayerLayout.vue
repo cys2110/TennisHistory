@@ -4,13 +4,14 @@ import { useDisplay } from 'vuetify';
 import apolloClient from '@/apollo';
 import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { getPlayerLayout } from '@/services/PlayerService';
-import type { PlayerLayout } from '@/utils/interfaces';
+import type { PlayerDetails } from '@/utils/interfaces';
 import { unencodeName, formatDate, formatCurrency, headshot, gladiator, flag, smallDate } from '@/utils/functions';
-import Loading from '@/components/Loading.vue'
+import Title from '@/components/Global/Title.vue'
+import Loading from '@/components/Global/Loading.vue'
 import OverviewStat from '@/components/Player/OverviewStat.vue'
 
-provideApolloClient(apolloClient)
 const { mdAndUp } = useDisplay()
+provideApolloClient(apolloClient)
 
 const props = defineProps<{
     id: string,
@@ -20,7 +21,7 @@ const props = defineProps<{
 const { query, variables } = getPlayerLayout(props.id)
 const { result, loading, error } = useQuery(query, variables)
 
-const player: Ref<PlayerLayout | null> = ref(null)
+const player: Ref<PlayerDetails | null> = ref(null)
 const tab: Ref<string> = ref('Overview')
 
 const tabs = [
@@ -53,12 +54,12 @@ watch(error, (newError) => {
                 <v-col class="text-zinc-300" cols="12" md="9" :order="mdAndUp ? 1 : 2">
                     <div class="my-10">
                         <div class="my-2 text-center sm:!flex sm:!justify-center md:!justify-start sm:!items-center">
-                            <div class="text-xl sm:text-3xl lg:text-5xl">
+                            <div v-if="player.first_name && player.last_name" class="text-xl sm:text-3xl lg:text-5xl">
                                 {{ player.first_name }} {{ player.last_name.toUpperCase() }}
                             </div>
                         </div>
                         <div class="flex justify-evenly items-center md:justify-start my-3 lg:!mt-6">
-                            <div class="w-1/3 md:w-1/5 px-1">
+                            <div class="w-1/3 md:w-1/5 px-1" v-if="player.countryConnection">
                                 <flag-img class="mx-1" :src="flag(player.countryConnection.edges[0].node.id)"
                                     :alt="player.countryConnection.edges[0].node.name" :width="mdAndUp ? 100 : 150">
                                     <v-tooltip v-if="player.countryConnection.edges[0].properties.start_date"
@@ -70,7 +71,7 @@ watch(error, (newError) => {
                                     </v-tooltip>
                                 </flag-img>
                             </div>
-                            <div v-if="player.prev_countriesConnection.edges.length > 0"
+                            <div v-if="player.prev_countriesConnection && player.prev_countriesConnection.edges.length > 0"
                                 v-for="country in player.prev_countriesConnection.edges" :key="country.node.id"
                                 class="w-1/3 md:w-1/5 px-1">
                                 <flag-img class="mx-1" :src="flag(country.node.id)" :alt="country.node.name"
@@ -86,21 +87,21 @@ watch(error, (newError) => {
                     </div>
                     <div
                         class="sm:!flex sm:!flex-wrap sm:!justify-evenly sm:!items-center bg-indigo-800 rounded-xl p-3 lg:!mt-6">
-                        <OverviewStat v-if="player.ch_date">
+                        <OverviewStat v-if="player.career_high && player.ch_date">
                             <template #stat>{{ player.career_high }}</template>
                             <template #date>{{ formatDate(player.ch_date) }}</template>
                             <template #stat-name>CAREER HIGH</template>
                         </OverviewStat>
-                        <OverviewStat>
+                        <OverviewStat v-if="player.win && player.loss">
                             <template #stat>{{ player.win }}-{{ player.loss }}</template>
                             <template #stat-name>WIN-LOSS</template>
                         </OverviewStat>
-                        <OverviewStat>
+                        <OverviewStat v-if="player.titles">
                             <template #stat>{{ player.titles }}</template>
                             <template #stat-name>TITLES</template>
                         </OverviewStat>
                         <OverviewStat>
-                            <template #stat>{{ formatCurrency('USD', player.pm_USD) }}</template>
+                            <template #stat v-if="player.pm_USD">{{ formatCurrency('USD', player.pm_USD) }}</template>
                             <template #stat-name>PRIZE MONEY</template>
                         </OverviewStat>
                     </div>
@@ -116,25 +117,21 @@ watch(error, (newError) => {
                 <v-col>
                     <v-toolbar class="rounded-t-xl bg-zinc-700">
                         <v-tabs v-model="tab" show-arrows color="#d4d4d8">
-                            <v-tab v-for="tab in tabs" :key="tab.id" :to="{ name: tab.to }">
-                                {{ tab.name }}
-                            </v-tab>
+                            <v-tab v-for="tab in tabs" :key="tab.id" :to="{ name: tab.to }">{{ tab.name }}</v-tab>
                         </v-tabs>
                     </v-toolbar>
                 </v-col>
             </v-row>
             <v-row>
-                <v-col>
-                    <router-view :player />
-                </v-col>
+                <router-view :player />
             </v-row>
         </v-container>
         <div v-else>
-            <div class="text-3xl text-zinc-300">
-                {{ unencodeName(name) }}
-            </div>
+            <Title>
+                <template #title>{{ unencodeName(name) }}</template>
+            </Title>
             <Loading :loading>
-                <template #None>No data available yet</template>
+                <template #none>No data available</template>
             </Loading>
         </div>
     </v-sheet>

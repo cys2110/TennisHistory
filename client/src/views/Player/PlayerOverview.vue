@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue';
 import apolloClient from '@/apollo';
-import { getPlayer } from '@/services/PlayerService';
 import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
-import type { PlayerDetails, MajorAgg, Major } from '@/utils/interfaces';
+import { getPlayer } from '@/services/PlayerService';
+import type { PlayerDetails, MajorYears } from '@/utils/interfaces';
 import { bh, plays, encodeName, convertToFt } from '@/utils/functions';
-import Loading from '@/components/Loading.vue'
-import OverviewDetail from '@/components/OverviewDetail.vue'
+import Loading from '@/components/Global/Loading.vue'
+import OverviewDetail from '@/components/Global/OverviewDetail.vue'
 import ResultsRow from '@/components/Player/ResultsRow.vue'
 
 provideApolloClient(apolloClient)
@@ -21,7 +21,7 @@ const { query, variables } = getPlayer(props.id)
 const { result, loading, error } = useQuery(query, variables)
 
 const player: Ref<PlayerDetails | null> = ref(null)
-const results: Ref<{ name: string, id: number, round: MajorAgg, events: Major[] }[]> = ref([])
+const results: Ref<{ name: string, id: number, events: MajorYears[] }[]> = ref([])
 
 watch(result, (newResult) => {
     if (newResult) {
@@ -30,49 +30,41 @@ watch(result, (newResult) => {
             {
                 name: "Australian Open",
                 id: 580,
-                round: newResult.players[0].aoAgg,
                 events: newResult.players[0].ao
             },
             {
                 name: 'Roland Garros',
                 id: 520,
-                round: newResult.players[0].rgAgg,
                 events: newResult.players[0].rg
             },
             {
                 name: 'Wimbledon',
                 id: 540,
-                round: newResult.players[0].wimbledonAgg,
                 events: newResult.players[0].wimbledon
             },
             {
                 name: 'US Open',
                 id: 560,
-                round: newResult.players[0].usoAgg,
                 events: newResult.players[0].uso
             },
             {
                 name: 'ATP Finals',
                 id: 605,
-                round: newResult.players[0].finalsAgg,
                 events: newResult.players[0].finals
             },
             {
                 name: 'Davis Cup',
                 id: 8099,
-                round: newResult.players[0].davisAgg,
                 events: newResult.players[0].davis
             },
             {
                 name: 'Olympics',
                 id: 96,
-                round: newResult.players[0].olympicsAgg,
                 events: newResult.players[0].olympics
             },
             {
                 name: 'Hopman Cup',
                 id: 10003,
-                round: newResult.players[0].hopmanAgg,
                 events: newResult.players[0].hopman
             }
         ]
@@ -91,7 +83,7 @@ watch(error, (newError) => {
                 <div class="w-100 mx-1 text-xs lg:text-sm">
                     <OverviewDetail>
                         <template #detailName>Active</template>
-                        <template #detail>
+                        <template #detail v-if="player.turned_pro">
                             <div v-if="player.retired" class="text-right">
                                 <div>{{ player.retired.id - player.turned_pro.id }} years</div>
                                 <div>{{ player.turned_pro.id }}-{{ player.retired.id }}</div>
@@ -113,7 +105,7 @@ watch(error, (newError) => {
                     </OverviewDetail>
                     <OverviewDetail>
                         <template #detailName>Plays</template>
-                        <template #detail>{{ player.rh !== null ? plays(player.rh) : '—' }}</template>
+                        <template #detail>{{ player.rh && player.rh !== null ? plays(player.rh) : '—' }}</template>
                     </OverviewDetail>
                 </div>
                 <div class="w-100 mx-1 text-xs lg:text-sm">
@@ -135,14 +127,14 @@ watch(error, (newError) => {
                     </OverviewDetail>
                     <OverviewDetail>
                         <template #detailName>Backhand</template>
-                        <template #detail>{{ player.bh1 !== null ? bh(player.bh1) : '—' }}</template>
+                        <template #detail>{{ player.bh1 && player.bh1 !== null ? bh(player.bh1) : '—' }}</template>
                     </OverviewDetail>
-                    <OverviewDetail>
+                    <OverviewDetail v-if="player.coaches">
                         <template #detailName>{{ player.coaches.length === 1 ? 'Coach' : 'Coaches' }}</template>
                         <template #detail>
                             <div v-if="player.coaches.length > 0" v-for="coach in player.coaches" :key="coach.id"
                                 class="text-right">
-                                <router-link v-if="coach.first_name" class="hover-link"
+                                <router-link v-if="coach.full_name" class="hover-link"
                                     :to="{ name: 'Player', params: { name: encodeName(coach.full_name), id: coach.id } }">
                                     {{ coach.full_name }}
                                 </router-link>
@@ -163,26 +155,20 @@ watch(error, (newError) => {
                 <v-table class="bg-transparent rounded-lg" density="comfortable">
                     <thead>
                         <tr class="bg-indigo-800 text-zinc-300">
-                            <th class="text-center !font-bold">
-                                Tournament
-                            </th>
-                            <th class="text-center !font-bold">
-                                Best Result
-                            </th>
-                            <th class="text-center !font-bold">
-                                Year(s) achieved
-                            </th>
+                            <th class="text-center !font-bold">Tournament</th>
+                            <th class="text-center !font-bold">Best Result</th>
+                            <th class="text-center !font-bold">Year(s) achieved</th>
                         </tr>
                     </thead>
                     <tbody class="text-zinc-300">
                         <ResultsRow v-for="result in results" :key="result.name" :tournamentName="result.name"
-                            :tournamentId="result.id" :round="result.round" :events="result.events" />
+                            :tournamentId="result.id" :events="result.events" />
                     </tbody>
                 </v-table>
             </v-col>
         </v-row>
     </v-container>
     <Loading v-else class="mx-5" :loading>
-        <template #None>No data available</template>
+        <template #none>No data available</template>
     </Loading>
 </template>

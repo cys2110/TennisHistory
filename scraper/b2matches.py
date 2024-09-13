@@ -9,9 +9,9 @@ import time
 
 # For stat matches
 
-tid = 321
-year = 2023
-sort_date = '2023-06-12'
+tid = 375
+year = 2022
+sort_date = '2022-01-31'
 draw = 'Best3'
 
 driver = webdriver.Chrome()

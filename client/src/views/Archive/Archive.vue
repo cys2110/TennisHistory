@@ -5,9 +5,9 @@ import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon'
 import { getEventsByYear } from '@/services/EventService';
 import type { Event } from '@/utils/interfaces';
-import EventCard from '@/components/EventCard.vue';
-import Title from '@/components/Title.vue'
-import Loading from '@/components/Loading.vue'
+import Title from '@/components/Global/Title.vue'
+import Loading from '@/components/Global/Loading.vue'
+import EventCard from '@/components/Global/EventCard.vue';
 
 provideApolloClient(apolloClient)
 
@@ -23,21 +23,24 @@ const updateResults = () => {
     const { result, loading, error } = useQuery(query, variables)
 
     watch(result, (newResult) => {
-        if (newResult) events.value = newResult.events
+        if (newResult) {
+            events.value = newResult.events
+            load.value = false
+        }
     }, { immediate: true })
 
     watch(loading, (newLoad) => load.value = newLoad)
 
     watch(error, (newError) => {
         if (newError) console.error(newError)
-    })
+    }, { immediate: true })
 }
 
 watchEffect(() => updateResults())
 </script>
 
 <template>
-    <v-sheet class='bg-transparent m-16 w-75 pa-3 mx-auto'>
+    <v-sheet class="bg-transparent m-16 w-75 pa-3 mx-auto">
         <v-container>
             <v-row class="flex items-center">
                 <v-col>
@@ -53,9 +56,9 @@ watchEffect(() => updateResults())
                 <v-col v-if="events.length > 0" v-for="event in events" :key="event.id" cols="12" sm="4" xl="3">
                     <EventCard :event />
                 </v-col>
-                <v-col>
+                <v-col v-else>
                     <Loading :loading="load">
-                        <template #None>No data available</template>
+                        <template #none>No data available</template>
                     </Loading>
                 </v-col>
             </v-row>

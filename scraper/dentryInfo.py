@@ -7,8 +7,8 @@ from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os
 
-tid = 321
-year = 2023
+tid = 375
+year = 2022
 player_entry = []
 
 driver = webdriver.Chrome()
