@@ -17,11 +17,6 @@ interface Surface {
   surface: string;
 }
 
-interface Tournament {
-  id: number;
-  name: string;
-}
-
 interface Venue {
   name?: string;
   city: string;
@@ -223,6 +218,11 @@ export interface Title {
 export interface Titles {
   titlesByYear: Title[];
   finalsByYear: Title[];
+}
+
+export interface Tournament {
+  id: number;
+  name: string;
 }
 
 export interface TournamentDetails extends Tournament {

@@ -73,3 +73,38 @@ export const getEventsByYear = (year: number) => {
   `;
   return { query: call, variables: { year } };
 };
+
+export const getEvent = (id: number) => {
+  const call = gql`
+    query EventLayout($id: Int!) {
+      events(where: { id: $id }) {
+        category
+        draw_type
+        sponsor_name
+        start_date
+        end_date
+        id
+        surface {
+          environment
+          surface
+          hard_type
+        }
+        tournament {
+          id
+          name
+        }
+        venue {
+          city
+          country {
+            id
+            name
+          }
+        }
+        year {
+          id
+        }
+      }
+    }
+  `;
+  return { query: call, variables: { id } };
+};

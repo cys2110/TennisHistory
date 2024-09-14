@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { useDisplay } from 'vuetify';
-// import SearchScrim from './SearchScrim.vue';
-// import H2HScrim from './H2HScrim.vue';
+import SearchScrim from './SearchScrim.vue';
+import H2HScrim from './H2HScrim.vue';
+import { ref } from 'vue';
 
 const { smAndDown } = useDisplay()
+const searchDialog = ref(false)
+const h2hDialog = ref(false)
 
 const items = [
     {
@@ -16,16 +19,16 @@ const items = [
         icon: 'far fa-calendar',
         tooltip: 'Archive'
     },
-    // {
-    //     icon: 'fas fa-magnifying-glass',
-    //     tooltip: 'Search',
-    //     dialogComponent: SearchScrim
-    // },
-    // {
-    //     icon: 'fad fa-people-arrows',
-    //     tooltip: 'Head to Head',
-    //     dialogComponent: H2HScrim
-    // }
+    {
+        icon: 'fas fa-magnifying-glass',
+        tooltip: 'Search',
+        dialogComponent: SearchScrim
+    },
+    {
+        icon: 'fad fa-people-arrows',
+        tooltip: 'Head to Head',
+        dialogComponent: H2HScrim
+    }
 ]
 </script>
 
@@ -38,23 +41,12 @@ const items = [
                 <v-icon :icon="item.icon" />
                 <v-tooltip content-class="!bg-indigo-600 !text-zinc-300 !text-sm" :text="item.tooltip"
                     activator="parent" location="bottom" height="30" />
-                <!-- <v-dialog
-                    v-if="item.dialogComponent"
-                    activator="parent"
-                    transition="dialog-bottom-transition"
-                    height="70%"
-                    opacity="50%"
-                    scroll-strategy="reposition"
-                >
-                    <template
-                        v-slot:default="{ isActive }"
-                    >
-                        <component
-                            :is="item.dialogComponent"
-                            @close="isActive.value = false"
-                        />
+                <v-dialog v-if="item.dialogComponent" activator="parent" transition="dialog-bottom-transition"
+                    height="70%" opacity="50%" scroll-strategy="reposition">
+                    <template v-slot:default="{ isActive }">
+                        <component :is="item.dialogComponent" @close="isActive.value = false" />
                     </template>
-</v-dialog> -->
+                </v-dialog>
             </v-btn>
         </div>
     </v-app-bar>

@@ -486,5 +486,10 @@ export const typeDefs = `#graphql
             WHERE p.first_name + ' ' + p.last_name =~ '(?i).*'+ $full_name + '.*'
             RETURN p AS players
         """, columnName: "players")
+        searchTournaments (name: String!): [Tournament] @cypher(statement: """
+            MATCH (t:Tournament)
+            WHERE t.name =~ '(?i).*' + $name + '.*'
+            RETURN t as tournaments
+        """, columnName: "tournaments")
     }
 `;

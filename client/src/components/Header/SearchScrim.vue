@@ -15,26 +15,22 @@ const tournamentResults: Ref<Tournament[]> = ref([])
 const playerResults: Ref<Player[]> = ref([])
 
 const updateSearch = () => {
-    console.log(searchTerm.value)
     const { query, variables } = getSearch(searchTerm.value)
     const { result, loading, error } = useQuery(query, variables)
 
     watch(result, (newResult) => {
         if (newResult) {
-            tournamentResults.value = newResult.tournaments
+            tournamentResults.value = newResult.searchTournaments
             playerResults.value = newResult.searchPlayers
-            console.log(newResult)
         }
     }, { immediate: true })
 
     watch(error, (newError) => {
-        if (newError) {
-            console.error(newError)
-        }
+        if (newError) console.error(newError)
     })
 }
 
-watchEffect(() => {
+watch(searchTerm, () => {
     updateSearch()
 })
 </script>
