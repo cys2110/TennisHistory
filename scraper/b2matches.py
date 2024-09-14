@@ -9,7 +9,7 @@ import time
 
 # For stat matches
 
-tid = 717
+tid = 360
 year = 2022
 sort_date = '2022-04-04'
 draw = 'Best3'
