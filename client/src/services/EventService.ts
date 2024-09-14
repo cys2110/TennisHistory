@@ -383,7 +383,7 @@ export const getDraw = (id: number) => {
         rounds(options: { sort: [{ number: DESC }] }) {
           round
           number
-          matches(options: { sort: [{ match_no: ASC }] }) {
+          matches(options: { sort: [{ id: ASC }] }) {
             incomplete
             match_no
             id
