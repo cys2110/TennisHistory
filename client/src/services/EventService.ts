@@ -44,15 +44,19 @@ export const getEventsByYear = (year: number) => {
         where: { year: { id: $year } }
         options: { sort: [{ start_date: ASC }] }
       ) {
+        id
         category
         end_date
-        id
         sponsor_name
         start_date
         surface {
           environment
           hard_type
           surface
+        }
+        tournament {
+          id
+          name
         }
         venue {
           city
@@ -63,10 +67,6 @@ export const getEventsByYear = (year: number) => {
         }
         year {
           id
-        }
-        tournament {
-          id
-          name
         }
       }
     }
@@ -86,8 +86,8 @@ export const getEvent = (id: number) => {
         id
         surface {
           environment
-          hard_type
           surface
+          hard_type
         }
         tournament {
           id
@@ -295,9 +295,8 @@ export const getEventDetails = (id: number) => {
 
 export const getResults = (id: number) => {
   const call = gql`
-    query Round($id: Int!) {
+    query Results($id: Int!) {
       events(where: { id: $id }) {
-        draw_type
         rounds(options: { sort: { number: DESC } }) {
           round
           matches {
@@ -379,15 +378,15 @@ export const getResults = (id: number) => {
 
 export const getDraw = (id: number) => {
   const call = gql`
-    query Round($id: Int!) {
+    query Draw($id: Int!) {
       events(where: { id: $id }) {
-        draw_type
-        rounds(options: { sort: { number: DESC } }) {
+        rounds(options: { sort: [{ number: DESC }] }) {
           round
           number
           matches {
             incomplete
             match_no
+            id
             winner {
               player {
                 id

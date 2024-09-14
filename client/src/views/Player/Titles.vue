@@ -3,7 +3,9 @@ import { computed, ref, watch, type Ref } from 'vue';
 import apolloClient from '@/apollo';
 import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { getPlayerTitles } from '@/services/PlayerService';
-import type { TitlesAndFinals } from '@/utils/interfaces';
+import type { Titles } from '@/utils/interfaces';
+import Loading from '@/components/Global/Loading.vue';
+import TitlesTable from '@/components/Player/TitlesTable.vue';
 
 provideApolloClient(apolloClient)
 
@@ -14,11 +16,12 @@ const props = defineProps<{
 const { query, variables } = getPlayerTitles(props.id)
 const { result, loading, error } = useQuery(query, variables)
 
-const results: Ref<TitlesAndFinals> = ref({ titlesByYear: [], finalsByYear: [] })
+const results: Ref<Titles | null> = ref(null)
 const selection = ref('Titles')
 const items = ['Titles', 'Finals']
 
 const selectedArray = computed(() => {
+    // @ts-ignore
     return selection.value === 'Titles' ? results.value.titlesByYear : results.value.finalsByYear
 })
 
@@ -39,48 +42,21 @@ watch(error, (newError) => {
                     density="compact" />
             </v-col>
         </v-row>
-        <v-row>
-            <v-table
-                v-if="selection === 'Titles' && results.titlesByYear.length > 0 || selection === 'Finals' && results.finalsByYear.length > 0"
-                class="text-zinc-300 bg-transparent mx-auto">
-                <thead>
-                    <tr>
-                        <th class="text-center">Year</th>
-                        <th class="text-center">Total</th>
-                        <th>Tournaments</th>
-                        <th>Surface</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="year in selectedArray" :key="year.year">
-                        <td class="text-center">{{ year.year }}</td>
-                        <td class="text-center">{{ year.count }}</td>
-                        <td class="text-nowrap">
-                            <div v-for="event in year.events">
-                                <span v-if="event.sponsor_name">{{ event.sponsor_name }} | </span>
-                                <span>
-                                    <router-link class="hover-link"
-                                        :to="{ name: 'Tournament', params: { name: event.tournament_name, id: event.tournament_id } }">
-                                        {{ event.tournament_name }}
-                                    </router-link>
-                                </span>
-                            </div>
-                        </td>
-                        <td class="text-nowrap">
-                            <div v-for="event in year.events">
-                                <span>{{ event.environment }} {{ event.surface }}</span>
-                                <span v-if="event.hard_type"> ({{ event.hard_type }})</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </v-table>
-            <div v-else-if="loading" class="text-zinc-400 mx-auto text-2xl">
-                Loading...
-            </div>
-            <div v-else class="text-zinc-400 mx-auto">
-                {{ selection === 'Titles' ? 'No titles won' : 'No finals played' }}
-            </div>
-        </v-row>
+        <v-table v-if="results" class="text-zinc-300 bg-transparent mx-auto">
+            <thead>
+                <tr class="border-zinc-400 border-b-2">
+                    <th class="text-center">Year</th>
+                    <th class="text-center">Total</th>
+                    <th>Tournaments</th>
+                    <th>Surface</th>
+                </tr>
+            </thead>
+            <tbody>
+                <TitlesTable v-for="year in selectedArray" :key="year.year" :year />
+            </tbody>
+        </v-table>
+        <Loading v-else :loading>
+            <template #none>{{ selection === 'Titles' ? 'No titles won' : 'No finals played' }}</template>
+        </Loading>
     </v-container>
 </template>

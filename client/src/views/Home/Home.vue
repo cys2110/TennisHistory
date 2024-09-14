@@ -5,9 +5,9 @@ import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
 import { getUpcomingEvents } from '@/services/EventService';
 import type { Event } from '@/utils/interfaces';
-import EventCard from '@/components/EventCard.vue'
-import Loading from '@/components/Loading.vue'
-import Title from '@/components/Title.vue'
+import Title from '@/components/Global/Title.vue';
+import Loading from '@/components/Global/Loading.vue';
+import EventCard from '@/components/Global/EventCard.vue';
 
 provideApolloClient(apolloClient)
 
@@ -26,7 +26,7 @@ watch(error, (newError) => {
 </script>
 
 <template>
-    <v-sheet class='bg-transparent m-16 w-75 pa-3 mx-auto'>
+    <v-sheet class="bg-transparent m-16 w-75 pa-3 mx-auto">
         <Title>
             <template #title>Upcoming Tournaments</template>
         </Title>
@@ -37,10 +37,8 @@ watch(error, (newError) => {
                 </v-col>
             </v-row>
         </v-container>
-        <div v-else>
-            <Loading :loading>
-                <template #None>No upcoming tournaments</template>
-            </Loading>
-        </div>
+        <Loading v-else :loading>
+            <template #none>No upcoming tournaments</template>
+        </Loading>
     </v-sheet>
 </template>

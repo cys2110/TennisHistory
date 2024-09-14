@@ -327,7 +327,6 @@ export const typeDefs = `#graphql
         id: String!
         first_name: String
         last_name: String
-        full_name: String! @customResolver(requires: "first_name last_name")
     }
 
     type Round {
@@ -356,7 +355,7 @@ export const typeDefs = `#graphql
 
     type Tiebreak {
         tbWins: Int!
-        tbTotal: Int!
+        tbLosses: Int!
     }
 
     type Opponent {
@@ -366,6 +365,11 @@ export const typeDefs = `#graphql
         win1Total: Int!
         lose1Wins: Int!
         lose1Total: Int!
+    }
+
+    type Years {
+        earliest: Int
+        latest: Int
     }
 
     type Player {
@@ -426,29 +430,28 @@ export const typeDefs = `#graphql
         scoreWins: [Winner!]! @relationship(type: "SCORED", direction: OUT)
         scoreLosses: [Loser!]! @relationship(type: "SCORED", direction: OUT)
         indexTb: Tiebreak! @cypher(statement: """
-            OPTIONAL MATCH (this)-[:SCORED]->(s1:Score)-[]->(m)<-[]-(s2:Score)<-[:SCORED]-(p2:Player)
-            WHERE m:Best3 OR m:Best5
+            OPTIONAL MATCH (this)-[:SCORED]->(s1:Score)-[]->(m:Best3|Best5)<-[]-(s2:Score)<-[:SCORED]-(p2:Player)
             WITH s1, s2,
                 CASE
-                    WHEN s1.t1 > s2.t1 THEN 1
-                    WHEN s1.t2 > s2.t2 THEN 1
-                    WHEN s1.t3 > s2.t3 THEN 1
-                    WHEN s1.t4 > s2.t4 THEN 1
-                    WHEN s1.t5 > s2.t5 THEN 1
+                    WHEN s1.s1 = 7 AND s2.s1 = 6 THEN 1
+                    WHEN s1.s2 = 7 AND s2.s2 = 6 THEN 1
+                    WHEN s1.s3 = 7 AND s2.s3 = 6 THEN 1
+                    WHEN s1.s4 = 7 AND s2.s4 = 6 THEN 1
+                    WHEN s1.s5 = 7 AND s2.s5 = 6 THEN 1
                     ELSE 0
                 END AS tbWins
             WITH s1, s2, tbWins,
                 CASE
-                    WHEN s1.t1 IS NOT NULL THEN 1
-                    WHEN s1.t2 IS NOT NULL THEN 1
-                    WHEN s1.t3 IS NOT NULL THEN 1
-                    WHEN s1.t4 IS NOT NULL THEN 1
-                    WHEN s1.t5 IS NOT NULL THEN 1
+                    WHEN s1.s1 = 6 AND s2.s1 = 7 THEN 1
+                    WHEN s1.s2 = 6 AND s2.s2 = 7 THEN 1
+                    WHEN s1.s3 = 6 AND s2.s3 = 7 THEN 1
+                    WHEN s1.s4 = 6 AND s2.s4 = 7 THEN 1
+                    WHEN s1.s5 = 6 AND s2.s5 = 7 THEN 1
                     ELSE 0
-                END AS tbTotal
+                END AS tbLosses
             RETURN {
                 tbWins: sum(tbWins),
-                tbTotal: sum(tbTotal)
+                tbLosses: sum(tbLosses)
             } AS indexTb
         """, columnName: "indexTb")
         indexOpponents: Opponent! @cypher(statement: """
@@ -471,6 +474,10 @@ export const typeDefs = `#graphql
             } AS indexOpponents
         """, columnName: "indexOpponents")
         events: [Event!]! @relationship(type: "PLAYED", properties: "EntryInfo", direction: OUT)
+        years: Years @cypher(statement: """
+            MATCH (this)-[:PLAYED]-(:Event)-[:TOOK_PLACE_IN]-(y:Year)
+            RETURN {earliest: min(y.id), latest: max(y.id)} AS years
+        """, columnName: "years")
     }
 
     type Query {
@@ -479,5 +486,10 @@ export const typeDefs = `#graphql
             WHERE p.first_name + ' ' + p.last_name =~ '(?i).*'+ $full_name + '.*'
             RETURN p AS players
         """, columnName: "players")
+        searchTournaments (name: String!): [Tournament] @cypher(statement: """
+            MATCH (t:Tournament)
+            WHERE t.name =~ '(?i).*' + $name + '.*'
+            RETURN t as tournaments
+        """, columnName: "tournaments")
     }
 `;

@@ -1,54 +1,45 @@
-import { gql } from "@apollo/client/core"
+import { gql } from "@apollo/client/core";
 
 export const getTournament = (id: number) => {
-    const call = gql`
-        query getTournament($id: Int!) {
-            tournaments(
-                where: { id: $id }
-            ) {
-                end_year {
-                    id
-                }
-                id
-                name
-                website
-                start_year {
-                    id
-                }
-                events {
-                    id
-                    final_score
-                    end_date
-                    finalist {
-                        first_name
-                        full_name
-                        id
-                        last_name
-                        country {
-                            id
-                            name
-                        }
-                    }
-                    year(options: {
-                        sort: [
-                            {id: DESC}
-                        ]
-                    }) {
-                        id
-                    }
-                    winner {
-                        first_name
-                        full_name
-                        id
-                        last_name
-                        country {
-                            id
-                            name
-                        }
-                    }
-                }
-            }
+  const call = gql`
+    query getTournament($id: Int!) {
+      tournaments(where: { id: $id }) {
+        id
+        name
+        website
+        start_year {
+          id
         }
-    `
-    return {query: call, variables: { id }}
-}
+        end_year {
+          id
+        }
+        events {
+          id
+          year(options: { sort: [{ id: DESC }] }) {
+            id
+          }
+          start_date
+          end_date
+          winner {
+            id
+            full_name
+            country {
+              id
+              name
+            }
+          }
+          finalist {
+            id
+            full_name
+            country {
+              id
+              name
+            }
+          }
+          final_score
+        }
+      }
+    }
+  `;
+  return { query: call, variables: { id } };
+};

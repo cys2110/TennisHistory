@@ -9,10 +9,10 @@ import time
 
 # For no stats matches
 
-tid = 520
-year = 1987
-sort_date = '1987-05-25'
-draw = 'Best5'
+tid = 417
+year = 1986
+sort_date = '1986-07-21'
+draw = 'Best3'
 
 driver = webdriver.Chrome()
 driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws")

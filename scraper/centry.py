@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 import os
 import time
 
-players = ["mm58", "hg86", "mw02", "mu94", "sl08", "sd32", "rh16", "cd85", "v708", "ce25", "tc61", "a596", "ki63", "l987", "hh26", "ki95", "cf59", "q927", "ta12", "pc11", "bd06", "ke29", "pf39", "ki74", "l397", "sl28", "me82", "tb69"]
-year = 2021
+players = ["mm58", "d874", "mc10", "mo44", "sl28", "bg23", "ce77", "b0bi", "mq75", "bd06", "su55", "hg86", "n732", "e687", "kc56", "bh09", "hh26", "db63", "rc91", "hb71", "te51", "ae14", "t786", "dh58", "c977", "m0ej", "p09z", "f724", "a0e2", "k926", "v812", "pl56", "bm95", "ke29", "r772", "k0ah", "dh50", "ki95", "ag37", "re44", "me82", "mu94", "da81", "f510", "cd85", "cf59", "gb88", "c0bc", "rh24", "s0ag", "gj37", "c0au", "o449", "mc65", "kf17", "n0ae", "c0c8", "l987", "rh16", "l949", "pd31", "mh30", "bk92", "n0am", "g09o", "sd32", "d0co", "n771", "sm37", "kd46", "g628", "su87", "d875", "ke73", "cg80", "v306", "z355"]
+year = 2022
 entries = []
 
 driver = webdriver.Chrome()

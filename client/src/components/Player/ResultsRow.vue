@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import type { MajorAgg, Major } from '@/utils/interfaces';
+import type { MajorYears } from '@/utils/interfaces';
 import { encodeName } from '@/utils/functions'
 
 const props = defineProps<{
     tournamentName: string,
     tournamentId: number,
-    round: MajorAgg,
-    events: Major[]
+    events: MajorYears[]
 }>()
 </script>
 
@@ -19,15 +18,15 @@ const props = defineProps<{
             </router-link>
         </td>
         <td class="text-center">
-            <span v-if="round.node.round.longest">
-                {{ round.node.round.longest }} ({{ round.count }})
+            <span v-if="events.length > 0">
+                {{ events[0].round }} ({{ events.length }})
             </span>
             <span v-else>
                 —
             </span>
         </td>
         <td>
-            <div v-if="events.length > 0" class="d-flex flex-col py-1">
+            <div v-if="events.length > 0" class="d-flex flex-col py-1 text-center">
                 <router-link v-for="round in events" :key="round.event.id" class="hover-link"
                     :to="{ name: 'Event', params: { name: encodeName(tournamentName), id: tournamentId, year: round.event.year.id, eventId: round.event.id } }">
                     {{ round.event.year.id }}

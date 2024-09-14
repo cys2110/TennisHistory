@@ -5,6 +5,8 @@ import { provideApolloClient, useQuery } from '@vue/apollo-composable';
 import { getTournament } from '@/services/TournamentService';
 import type { TournamentDetails } from '@/utils/interfaces';
 import { unencodeName } from '@/utils/functions';
+import Title from '@/components/Global/Title.vue';
+import Loading from '@/components/Global/Loading.vue';
 import TournamentCard from '@/components/Tournament/TournamentCard.vue';
 
 provideApolloClient(apolloClient)
@@ -44,9 +46,9 @@ const years = computed(() => {
     <v-sheet class="bg-transparent m-16 pa-3 mx-auto w-75">
         <v-container v-if="tournament">
             <v-row>
-                <div class="text-zinc-300 text-3xl">
-                    {{ tournament.name }}
-                </div>
+                <Title>
+                    <template #title>{{ tournament.name }}</template>
+                </Title>
                 <div class="text-xs ml-3">
                     <a v-if="tournament.website" :href="tournament.website" target="_blank">
                         <v-icon icon="fad fa-arrow-up-right-from-square" :href="tournament.website" />
@@ -55,9 +57,7 @@ const years = computed(() => {
                     </a>
                 </div>
             </v-row>
-            <v-row class="text-xl my-5 text-zinc-300">
-                {{ years }}
-            </v-row>
+            <v-row class="text-xl my-5 text-zinc-300">{{ years }}</v-row>
             <v-row>
                 <v-col v-for="event in tournament.events" :key="event.id" cols="12" sm="4" xl="3">
                     <TournamentCard :event />
@@ -65,15 +65,12 @@ const years = computed(() => {
             </v-row>
         </v-container>
         <div v-else>
-            <div class="text-3xl mb-3 text-zinc-300">
-                {{ unencodeName(name) }}
-            </div>
-            <div v-if="loading" class="text-zinc-400 text-2xl">
-                Loading...
-            </div>
-            <div v-else class="text-zinc-400">
-                No data available yet
-            </div>
+            <Title>
+                <template #title>{{ unencodeName(name) }}</template>
+            </Title>
+            <Loading :loading>
+                <template #none>No events played</template>
+            </Loading>
         </div>
     </v-sheet>
 </template>

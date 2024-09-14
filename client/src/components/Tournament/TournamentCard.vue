@@ -1,17 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, type Ref } from 'vue';
 import { DateTime } from 'luxon';
-import type { EventDetails } from '@/utils/interfaces';
-import { headshot, flag, encodeName } from '@/utils/functions';
+import type { Event } from '@/utils/interfaces';
+import TournamentPlayer from '@/components/Tournament/TournamentPlayer.vue';
 
 const props = defineProps<{
-    event: EventDetails
+    event: Event
 }>()
-const display: Ref<boolean> = ref(true)
-const noFinal: Ref<boolean> = ref(false)
-
-DateTime.fromISO(props.event.end_date) < DateTime.now() ? display.value = true : display.value = false
-props.event.final_score ? noFinal.value = false : noFinal.value = true
 
 const formattedScore = computed(() => {
     if (props.event.final_score) return props.event.final_score.replace(/\(/g, '<sup>').replace(/\)/g, '</sup>')
@@ -25,24 +20,9 @@ const formattedScore = computed(() => {
                 {{ event.year.id }}
             </router-link>
         </v-card-title>
-        <v-container v-if="display && !noFinal">
+        <v-container v-if="event.winner && event.finalist">
             <v-row dense>
-                <v-spacer />
-                <v-col class="flex items-center mx-0.5" cols="2">
-                    <flag-img v-if="event.winner?.country" :src="flag(event.winner.country.id)"
-                        :alt="event.winner.country.name" />
-                </v-col>
-                <v-col class="flex items-center mx-0.5" cols="2">
-                    <v-avatar>
-                        <v-img v-if="event.winner" :src="headshot(event.winner.id)" :alt="event.winner.full_name" />
-                    </v-avatar>
-                </v-col>
-                <v-col class="flex items-center mx-2" cols="6">
-                    <router-link v-if="event.winner" class="hover-link"
-                        :to="{ name: 'Player', params: { name: encodeName(event.winner.full_name), id: event.winner.id } }">
-                        {{ event.winner.full_name }}
-                    </router-link>
-                </v-col>
+                <TournamentPlayer :player="event.winner" />
             </v-row>
             <v-row dense>
                 <v-col class="text-center text-zinc-300">
@@ -50,29 +30,13 @@ const formattedScore = computed(() => {
                 </v-col>
             </v-row>
             <v-row dense>
-                <v-spacer />
-                <v-col class="flex items-center mx-0.5" cols="2">
-                    <flag-img v-if="event.finalist?.country" :src="flag(event.finalist.country.id)"
-                        :alt="event.finalist.country.name" />
-                </v-col>
-                <v-col class="flex items-center mx-0.5" cols="2">
-                    <v-avatar>
-                        <v-img v-if="event.finalist" :src="headshot(event.finalist.id)"
-                            :alt="event.finalist.full_name" />
-                    </v-avatar>
-                </v-col>
-                <v-col class="flex items-center mx-2" cols="6">
-                    <router-link v-if="event.finalist" class="hover-link"
-                        :to="{ name: 'Player', params: { name: encodeName(event.finalist.full_name), id: event.finalist.id } }">
-                        {{ event.finalist.full_name }}
-                    </router-link>
-                </v-col>
+                <TournamentPlayer :player="event.finalist" />
             </v-row>
         </v-container>
-        <v-card-subtitle v-if="display && !noFinal" class="text-center text-zinc-300 text-lg mb-1"
+        <v-card-subtitle v-if="event.final_score" class="text-center text-zinc-300 text-lg mb-1"
             v-html="formattedScore" />
-        <v-card-subtitle v-else class="text-center text-zinc-300 text-lg mb-1">
-            {{ display && noFinal ? 'No final played' : 'Currently in progress' }}
-        </v-card-subtitle>
+        <v-card-subtitle v-else class="text-center text-zinc-300 text-lg mb-1">{{ DateTime.fromISO(event.end_date) <
+            DateTime.now() ? 'No final player' : DateTime.fromISO(event.start_date) < DateTime.now()
+            ? 'Currently in progress' : 'Upcoming' }} </v-card-subtitle>
     </v-card>
 </template>

@@ -3,15 +3,13 @@ import { gql } from "@apollo/client/core";
 export const getSearch = (searchTerm: string) => {
   const call = gql`
     query search($searchTerm: String!) {
-      tournaments(where: { name_MATCHES: $searchTerm }) {
+      searchTournaments(name: $searchTerm) {
         id
         name
       }
       searchPlayers(full_name: $searchTerm) {
-        last_name
-        full_name
-        first_name
         id
+        full_name
         country {
           name
           id
@@ -26,9 +24,7 @@ export const getPlayer = (searchTerm: string) => {
   const call = gql`
     query search($searchTerm: String!) {
       searchPlayers(full_name: $searchTerm) {
-        last_name
         full_name
-        first_name
         id
         country {
           name
