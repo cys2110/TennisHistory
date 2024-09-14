@@ -10,10 +10,12 @@ const props = defineProps<{
         matches: Match[]
     },
     players: {
-        node: {
-            id: string;
-        };
-        properties: EntryInfo;
+        edges: {
+            node: {
+                id: string;
+            };
+            properties: EntryInfo;
+        }
     }[]
 }>()
 
@@ -70,7 +72,7 @@ if (props.round.matches[0].incomplete !== 'B') {
         <td v-else class="text-center">
             {{ entry?.properties.rank }}
         </td>
-        <td class="text-center">
+        <td class="text-center" v-if="round.matches[0].winner?.player">
             <v-icon :class="round.matches[0].winner?.player.id === id ? 'text-green-600' : 'text-red-600'"
                 :icon="round.matches[0].winner?.player.id === id ? 'fad fa-check' : 'fas fa-x'" />
         </td>
