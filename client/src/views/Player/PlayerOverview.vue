@@ -105,7 +105,8 @@ watch(error, (newError) => {
                     </OverviewDetail>
                     <OverviewDetail>
                         <template #detailName>Plays</template>
-                        <template #detail>{{ player.rh && player.rh !== null ? plays(player.rh) : '—' }}</template>
+                        <template #detail>{{ player.rh !== null && player.rh !== undefined ? plays(player.rh) : '—'
+                            }}</template>
                     </OverviewDetail>
                 </div>
                 <div class="w-100 mx-1 text-xs lg:text-sm">
@@ -127,7 +128,8 @@ watch(error, (newError) => {
                     </OverviewDetail>
                     <OverviewDetail>
                         <template #detailName>Backhand</template>
-                        <template #detail>{{ player.bh1 && player.bh1 !== null ? bh(player.bh1) : '—' }}</template>
+                        <template #detail>{{ player.bh1 !== null && player.bh1 !== undefined ? bh(player.bh1) : '—'
+                            }}</template>
                     </OverviewDetail>
                     <OverviewDetail v-if="player.coaches">
                         <template #detailName>{{ player.coaches.length === 1 ? 'Coach' : 'Coaches' }}</template>

@@ -9,9 +9,9 @@ import time
 
 # For no stats matches
 
-tid = 6242
-year = 2023
-sort_date = '2023-08-20'
+tid = 417
+year = 1986
+sort_date = '1986-07-21'
 draw = 'Best3'
 
 driver = webdriver.Chrome()

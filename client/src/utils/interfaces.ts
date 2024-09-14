@@ -68,51 +68,16 @@ export interface Event {
   }[];
 }
 
-export interface Match {
-  match_no: number;
-  round: {
-    round: string;
+export interface H2H {
+  p1: PlayerDetails[];
+  p2: PlayerDetails[];
+  p1Wins: {
+    count: number;
   };
-  incomplete: string | null;
-  winner?: {
-    player: stringId;
+  p2Wins: {
+    count: number;
   };
-  pScore?: Score[];
-  oppScore: Score[];
-}
-
-export interface Score {
-  incomplete: string | null;
-  s1: number | null;
-  s2: number | null;
-  s3: number | null;
-  s4: number | null;
-  s5: number | null;
-  t1: number | null;
-  t2: number | null;
-  t3: number | null;
-  t4: number | null;
-  t5: number | null;
-  player?: Player;
-}
-
-export interface Title {
-  year: number;
-  count: number;
-  events: {
-    id: number;
-    sponsor_name: string;
-    tournament_id: number;
-    tournament_name: string;
-    environment: string;
-    surface: string;
-    hard_type: string;
-  }[];
-}
-
-export interface Titles {
-  titlesByYear: Title[];
-  finalsByYear: Title[];
+  matches: Match[];
 }
 
 export interface MajorYears {
@@ -121,6 +86,25 @@ export interface MajorYears {
     id: number;
     year: numberId;
   };
+}
+
+export interface Match {
+  match_no: number;
+  round: {
+    round: string;
+    event?: Event;
+  };
+  incomplete: string | null;
+  date?: Date | null;
+  court?: string | null;
+  duration_mins?: number | null;
+  winner?: Score;
+  loser?: Score;
+  pScore?: Score[];
+  oppScore: Score[];
+  p1?: Score;
+  p2?: Score;
+  umpire?: stringId;
 }
 
 export interface Player {
@@ -184,6 +168,61 @@ export interface PlayerStats {
     win?: number;
     total: number;
   }[];
+}
+
+export interface Score {
+  incomplete: string | null;
+  s1: number | null;
+  s2: number | null;
+  s3: number | null;
+  s4: number | null;
+  s5: number | null;
+  t1: number | null;
+  t2: number | null;
+  t3: number | null;
+  t4: number | null;
+  t5: number | null;
+  player?: Player;
+  aces?: number | null;
+  avg_sv1_kph?: number | null;
+  avg_sv2_kph?: number | null;
+  bp_opps?: number | null;
+  bps_converted?: number | null;
+  bps_faced?: number | null;
+  bps_saved?: number | null;
+  dfs?: number | null;
+  max_speed_kph?: number | null;
+  net?: number | null;
+  net_w?: number | null;
+  ret1?: number | null;
+  ret1_w?: number | null;
+  ret2?: number | null;
+  ret2_w?: number | null;
+  serve1_pts?: number | null;
+  serve1_pts_w?: number | null;
+  serve2_pts?: number | null;
+  serve2_pts_w?: number | null;
+  winners?: number | null;
+  ues?: number | null;
+}
+
+export interface Title {
+  year: number;
+  count: number;
+  events: {
+    id: number;
+    sponsor_name: string;
+    tournament_id: number;
+    tournament_name: string;
+    environment: string;
+    surface: string;
+    hard_type: string;
+  }[];
+}
+
+export interface Titles {
+  titlesByYear: Title[];
+  finalsByYear: Title[];
 }
 
 export interface TournamentDetails extends Tournament {
