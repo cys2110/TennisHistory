@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { useDisplay } from 'vuetify';
-import type { ActivityEntry, MatchDetail } from '@/utils/interfaces';
+import type { EntryInfo, Match } from '@/utils/interfaces';
 import * as func from '@/utils/functions'
 import PlayerRow from '@/components/Event/PlayerRow.vue';
 
 const { xl } = useDisplay()
 
 const props = defineProps<{
-    match: MatchDetail
-    entryInfo: ActivityEntry[]
+    match: Match
+    entryInfo: { node: { id: string }; properties: EntryInfo; }[]
 }>()
 
-const winnerEntry = props.entryInfo.find(obj => obj.node.id === props.match.winner?.player.id)
-const loserEntry = props.entryInfo.find(obj => obj.node.id === props.match.loser?.player.id)
+const winnerEntry = props.entryInfo.find(obj => obj.node.id === props.match.winner?.player?.id)
+const loserEntry = props.entryInfo.find(obj => obj.node.id === props.match.loser?.player?.id)
 </script>
 
 <template>
@@ -28,7 +28,7 @@ const loserEntry = props.entryInfo.find(obj => obj.node.id === props.match.loser
         <v-container>
             <v-row>
                 <v-col class="flex items-center" cols="7">
-                    <PlayerRow v-if="match.winner" :player="match.winner.player">
+                    <PlayerRow v-if="match.winner?.player" :player="match.winner.player">
                         <template #status>
                             <small v-if="winnerEntry?.properties.seed || winnerEntry?.properties.status">
                                 ({{ winnerEntry.properties.seed }}{{ winnerEntry.properties.status }})
@@ -49,7 +49,7 @@ const loserEntry = props.entryInfo.find(obj => obj.node.id === props.match.loser
             </v-row>
             <v-row>
                 <v-col v-if="match.loser" class="flex items-center" cols="7">
-                    <PlayerRow v-if="match.loser" :player="match.loser.player">
+                    <PlayerRow v-if="match.loser.player" :player="match.loser.player">
                         <template #status>
                             <small v-if="loserEntry?.properties.seed || loserEntry?.properties.status">
                                 ({{ loserEntry.properties.seed }}{{ loserEntry.properties.status }})
@@ -75,7 +75,7 @@ const loserEntry = props.entryInfo.find(obj => obj.node.id === props.match.loser
                 </v-col>
             </v-row>
         </v-container>
-        <v-card-actions v-if="match.winner && match.loser" class="flex justify-between">
+        <v-card-actions v-if="match.winner?.player && match.loser?.player" class="flex justify-between">
             <div class="ml-2">{{ match.umpire?.id ?? '' }}</div>
             <div>
                 <v-chip class="mx-1"

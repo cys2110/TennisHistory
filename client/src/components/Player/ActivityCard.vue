@@ -57,7 +57,7 @@ const props = defineProps<{
                         <tbody>
                             <template v-for="round in event.node.rounds" :key="round.round">
                                 <MatchRow v-if="event.node.playersConnection" :round :id :name
-                                    :players="event.node.playersConnection.edges" />
+                                    :players="event.node.playersConnection" />
                             </template>
                         </tbody>
                     </v-table>
