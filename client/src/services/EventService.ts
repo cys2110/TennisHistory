@@ -297,7 +297,10 @@ export const getResults = (id: number) => {
   const call = gql`
     query Results($id: Int!) {
       events(where: { id: $id }) {
-        rounds(options: { sort: { number: DESC } }) {
+        rounds(
+          where: { NOT: { round: "Win" } }
+          options: { sort: { number: DESC } }
+        ) {
           round
           matches(options: { sort: [{ match_no: ASC }] }) {
             court
@@ -380,7 +383,10 @@ export const getDraw = (id: number) => {
   const call = gql`
     query Draw($id: Int!) {
       events(where: { id: $id }) {
-        rounds(options: { sort: [{ number: DESC }] }) {
+        rounds(
+          where: { NOT: { round: "Win" } }
+          options: { sort: [{ number: DESC }] }
+        ) {
           round
           number
           matches(options: { sort: [{ match_no: ASC }] }) {
