@@ -299,7 +299,7 @@ export const getResults = (id: number) => {
       events(where: { id: $id }) {
         rounds(options: { sort: { number: DESC } }) {
           round
-          matches {
+          matches(options: { sort: [{ match_no: DESC }] }) {
             court
             date
             duration_mins
@@ -383,7 +383,7 @@ export const getDraw = (id: number) => {
         rounds(options: { sort: [{ number: DESC }] }) {
           round
           number
-          matches {
+          matches(options: { sort: [{ match_no: DESC }] }) {
             incomplete
             match_no
             id
