@@ -7,7 +7,7 @@ from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os
 
-tid = 404
+tid = 403
 year = 2022
 player_entry = []
 

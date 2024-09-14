@@ -47,6 +47,7 @@ export interface Event {
   tournament?: Tournament;
   year: numberId;
   venue?: Venue;
+  draw_type?: string;
   winner?: Player;
   finalist?: Player;
   final_score?: string;
@@ -59,8 +60,98 @@ export interface Event {
   }[];
   rounds?: {
     round: string;
+    number?: number;
     matches: Match[];
   }[];
+}
+
+export interface Edge {
+  node: Player;
+}
+
+export interface Seed extends Edge {
+  properties: {
+    seed: number;
+    rank: number | null;
+    wd: string | null;
+  };
+}
+
+export interface Lda extends Edge {
+  properties: {
+    lda: number;
+    status: string | null;
+  };
+}
+
+export interface Ret extends Edge {
+  properties: {
+    ret: string;
+  };
+}
+
+export interface Wd extends Edge {
+  properties: {
+    wd: string;
+  };
+}
+
+export interface Wo extends Edge {
+  properties: {
+    wo: string;
+  };
+}
+
+export interface Defaulted extends Edge {
+  properties: {
+    defaulted: string;
+  };
+}
+
+export interface EventDetails extends Event {
+  pm?: number | null;
+  tfc?: number | null;
+  supervisors?: stringId[];
+  winner_pm?: number | null;
+  winner_pts?: number | null;
+  finalist_pm?: number | null;
+  finalist_pts?: number | null;
+  semifinalist_pm?: number | null;
+  semifinalist_pts?: number | null;
+  quarterfinalist_pm?: number | null;
+  quarterfinalist_pts?: number | null;
+  r16_pm?: number | null;
+  r16_pts?: number | null;
+  r32_pm?: number | null;
+  r32_pts?: number | null;
+  r64_pm?: number | null;
+  r64_pts?: number | null;
+  r128_pm?: number | null;
+  r128_pts?: number | null;
+  seeds?: {
+    edges: Seed[];
+  };
+  lda?: {
+    edges: Lda[];
+  };
+  ret?: {
+    edges: Ret[];
+  };
+  wd?: {
+    edges: Wd[];
+  };
+  wo?: {
+    edges: Wo[];
+  };
+  defaulted?: {
+    edges: Defaulted[];
+  };
+  ll?: {
+    edges: Edge[];
+  };
+  alt?: {
+    edges: Edge[];
+  };
 }
 
 export interface H2H {
