@@ -6,13 +6,15 @@ from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os
 import time
+import re
 
 # For no stats matches
 
-tid = 417
-year = 1986
-sort_date = '1986-07-21'
+year = 1979
 draw = 'Best3'
+
+tid = 303
+sort_date = '1979-11-19'
 
 driver = webdriver.Chrome()
 driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws")
@@ -21,7 +23,7 @@ WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NA
 buttons = driver.find_elements(By.CLASS_NAME, 'button')
 matches = []
 
-load_status = load_dotenv("Neo4j-84ef144c-Created-2024-06-18.txt")
+load_status = load_dotenv("Neo4j-27ea30cf-Created-2024-09-23.txt")
 if load_status is False:
     raise RuntimeError('Environment variables not loaded.')
 
@@ -54,10 +56,9 @@ for index, button in enumerate(buttons):
 
             for player in players:
                 try:
-                    player_link = player.find_element(By.TAG_NAME, 'a')
-                    href = player_link.get_attribute('href')
-                    link = (href.replace("https://www.atptour.com/en/players/", '').replace("/overview", '')).split('/')
-                    ps.append(link[1])
+                    player_link = player.find_element(By.TAG_NAME, 'a').get_attribute('href')
+                    id = re.search('/([a-zA-Z0-9]{4})/', player_link)
+                    ps.append(id.group(1))
                 except:
                     ps.append(None)
 

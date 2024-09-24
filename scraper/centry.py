@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 import os
 import time
 
-players = ["ag37", "bt68", "mv14", "ta12", "z419", "ki82", "da31", "v812", "r772", "m0ej", "te16", "h997", "v708", "j267", "l0bv", "db63", "dh50", "ce77", "mq75", "be67", "l949", "g628", "k09f", "gj37", "d874", "sh90", "cf01", "cf59", "gb88", "d923", "a596", "e687"]
-year = 2022
+players = ["m066", "d036"]
+year = 1979
 entries = []
 
 driver = webdriver.Chrome()
@@ -54,7 +54,7 @@ for player in players:
 
 driver.quit()
 
-load_status = load_dotenv("Neo4j-84ef144c-Created-2024-06-18.txt")
+load_status = load_dotenv("Neo4j-27ea30cf-Created-2024-09-23.txt")
 if load_status is False:
     raise RuntimeError('Environment variables not loaded.')
 

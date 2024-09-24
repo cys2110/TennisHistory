@@ -491,5 +491,9 @@ export const typeDefs = `#graphql
             WHERE t.name =~ '(?i).*' + $name + '.*'
             RETURN t as tournaments
         """, columnName: "tournaments")
+        eventsPlayed (id: String!, year: Int!): [Event] @cypher(statement: """
+            MATCH (:Player {id: $id})-[]-(:Score)-[]-(:Match)-[]-(:Round)-[]-(e:Event)-[]-(:Year {id: $year})
+            RETURN DISTINCT(e) as events
+        """, columnName: "events")
     }
 `;

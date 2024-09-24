@@ -328,10 +328,8 @@ export const getResults = (id: number) => {
                   id
                   name
                 }
-                first_name
                 full_name
                 id
-                last_name
               }
             }
             loser {
@@ -347,10 +345,8 @@ export const getResults = (id: number) => {
               t4
               t5
               player {
-                first_name
                 full_name
                 id
-                last_name
                 country {
                   id
                   name
@@ -415,10 +411,8 @@ export const getDraw = (id: number) => {
                   id
                   name
                 }
-                first_name
                 full_name
                 id
-                last_name
               }
             }
             p2 {
@@ -434,10 +428,8 @@ export const getDraw = (id: number) => {
               t4
               t5
               player {
-                first_name
                 full_name
                 id
-                last_name
                 country {
                   id
                   name

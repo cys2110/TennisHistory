@@ -6,23 +6,25 @@ from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os
 import time
+import re
 
 # For stat matches
 
-tid = 360
-year = 2022
-sort_date = '2022-04-04'
+tid = 747
+year = 2024
+sort_date = '2024-09-26'
 draw = 'Best3'
 
 driver = webdriver.Chrome()
-driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws")
+# driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws")
+driver.get(f"https://www.atptour.com/en/scores/current/x/{tid}/draws")
 WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'draw')))
 
 buttons = driver.find_elements(By.CLASS_NAME, 'button')
 matches = []
 matches_links = []
 
-load_status = load_dotenv("Neo4j-84ef144c-Created-2024-06-18.txt")
+load_status = load_dotenv("Neo4j-27ea30cf-Created-2024-09-23.txt")
 if load_status is False:
     raise RuntimeError('Environment variables not loaded.')
 
@@ -55,10 +57,9 @@ for index, button in enumerate(buttons):
 
             for player in players:
                 try:
-                    player_link = player.find_element(By.TAG_NAME, 'a')
-                    href = player_link.get_attribute('href')
-                    link = (href.replace("https://www.atptour.com/en/players/", '').replace("/overview", '')).split('/')
-                    ps.append(link[1])
+                    player_link = player.find_element(By.TAG_NAME, 'a').get_attribute('href')
+                    id = re.search("/([a-zA-Z0-9]{4})/", player_link)
+                    ps.append(id.group(1))
                 except:
                     ps.append(None)
 
@@ -93,12 +94,26 @@ def writeToDb(db):
 
         if match.get('p1') is not None and match.get('p2') is not None:
 
+            # query = f"""
+            #     MATCH (:Event {{id: $id}})
+            #     MERGE (p1:Player {{id: $p1}})
+            #     MERGE (p2:Player {{id: $p2}})
+            #     MERGE (m:Match:Update:{draw} {{id: $mid, match_no: $match_no, sort_date: date($date)}})
+            #     MERGE (m)-[:PLAYED]->(e)
+            #     MERGE (s1:Score:P1 {{id: $score1}})
+            #     MERGE (s2:Score:P2 {{id: $score2}})
+            #     MERGE (p1)-[:SCORED]->(s1)
+            #     MERGE (s1)-[:SCORED]->(m)
+            #     MERGE (p2)-[:SCORED]->(s2)
+            #     MERGE (s2)-[:SCORED]->(m)
+            # """
+
             query = f"""
-                MATCH (e:Event {{id: $id}})
-                MERGE (p1:Player {{id: $p1}})
-                MERGE (p2:Player {{id: $p2}})
-                MERGE (m:Match:Update:{draw} {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date)}})
-                MERGE (m)-[:PLAYED]->(e)
+                MATCH (:Event {{id: $id}})-[]-(r:Round {{round: $round}})
+                MATCH (p1:Entry {{id: toString($id) + ' ' + $p1}})
+                MATCH (p2:Entry {{id: toString($id) + ' ' + $p2}})
+                MERGE (m:Match:Update:{draw} {{id: $mid, match_no: $match_no, sort_date: date($date)}})
+                MERGE (m)-[:PLAYED]->(r)
                 MERGE (s1:Score:P1 {{id: $score1}})
                 MERGE (s2:Score:P2 {{id: $score2}})
                 MERGE (p1)-[:SCORED]->(s1)
@@ -113,11 +128,22 @@ def writeToDb(db):
             params['score2'] = f"{match['id']} {match['p2']}"
 
         elif match.get('p1') is not None:
+            # query = f"""
+            #     MATCH (e:Event {{id: $id}})
+            #     MERGE (p1:Player {{id: $p1}})
+            #     MERGE (m:Match {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date), incomplete: 'B'}})
+            #     MERGE (m)-[:PLAYED]->(e)
+            #     MERGE (s1:Score:P1:Winner {{id: $score1}})
+            #     MERGE (p1)-[:SCORED]->(s1)
+            #     MERGE (s1)-[:SCORED]->(m)
+            #     SET m.incomplete = 'B'
+            # """
+
             query = f"""
-                MATCH (e:Event {{id: $id}})
-                MERGE (p1:Player {{id: $p1}})
-                MERGE (m:Match {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date), incomplete: 'B'}})
-                MERGE (m)-[:PLAYED]->(e)
+                MATCH (e:Event {{id: $id}})-[]-(r:Round {{round: $round}})
+                MATCH (p1:Entry {{id: toString($id) + ' ' + $p1}})
+                MERGE (m:Match {{id: $mid, match_no: $match_no, sort_date: date($date), incomplete: 'B'}})
+                MERGE (m)-[:PLAYED]->(r)
                 MERGE (s1:Score:P1:Winner {{id: $score1}})
                 MERGE (p1)-[:SCORED]->(s1)
                 MERGE (s1)-[:SCORED]->(m)
@@ -128,11 +154,22 @@ def writeToDb(db):
             params['score1'] = f"{match['id']} {match['p1']}"
 
         elif match.get('p2') is not None:
+            # query = f"""
+            #     MATCH (e:Event {{id: $id}})
+            #     MERGE (p2:Player {{id: $p2}})
+            #     MERGE (m:Match {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date)}})
+            #     MERGE (m)-[:PLAYED]->(e)
+            #     MERGE (s2:Score:P2:Winner {{id: $score2}})
+            #     MERGE (p2)-[:SCORED]->(s2)
+            #     MERGE (s2)-[:SCORED]->(m)
+            #     SET m.incomplete = 'B'
+            # """
+
             query = f"""
-                MATCH (e:Event {{id: $id}})
-                MERGE (p2:Player {{id: $p2}})
-                MERGE (m:Match {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date)}})
-                MERGE (m)-[:PLAYED]->(e)
+                MATCH (e:Event {{id: $id}})-[]-(r:Round {{round: $round}})
+                MATCH (p2:Entry {{id: toString($id) + ' ' + $p2}})
+                MERGE (m:Match {{id: $mid, match_no: $match_no, sort_date: date($date)}})
+                MERGE (m)-[:PLAYED]->(r)
                 MERGE (s2:Score:P2:Winner {{id: $score2}})
                 MERGE (p2)-[:SCORED]->(s2)
                 MERGE (s2)-[:SCORED]->(m)
@@ -144,9 +181,9 @@ def writeToDb(db):
 
         else:
             query = f"""
-                MATCH (e:Event {{id: $id}})
+                MATCH (e:Event {{id: $id}})-[]-(r:Round {{round: $round}})
                 MERGE (m:Match {{id: $mid, round: $round, match_no: $match_no, sort_date: date($date)}})
-                MERGE (m)-[:PLAYED]->(e)
+                MERGE (m)-[:PLAYED]->(r)
             """
 
         db.run(query, **params)

@@ -6,9 +6,10 @@ import time
 from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os
+import re
 
-tid = 360
-year = 2022
+tid = 401
+year = 1979
 player_entry = []
 
 driver = webdriver.Chrome()
@@ -20,7 +21,7 @@ button.click()
 time.sleep(1)
 
 round = driver.find_element(By.XPATH, '/html/body/div[3]/div/div[2]/div[2]/div[1]/div[2]/div[2]/div/div[3]/div/div[5]/div/div[1]/div[2]')
-matches_list = round.find_elements(By.CLASS_NAME, 'draw-item')
+matches_list = round.find_elements(By.CLASS_NAME, 'player-info')
 
 for match in matches_list:
     players = match.find_elements(By.CLASS_NAME, 'name')
@@ -28,14 +29,12 @@ for match in matches_list:
         try:
             status = player.find_element(By.TAG_NAME, 'span')
             if status.text != '':
-                link = player.find_element(By.TAG_NAME, 'a')
-                href = link.get_attribute('href')
-
-                id = (href.replace("https://www.atptour.com/en/players/", '').replace("/overview", '')).split('/')
+                link = player.find_element(By.TAG_NAME, 'a').get_attribute('href')
+                id = re.search("/([a-zA-Z0-9]{4})/", link)
 
                 item = status.text.replace('(', '').replace(')', '')
                 dictionary = {
-                    'id': id[1]
+                    'id': id.group(1)
                 }
                 if item.isnumeric():
                     dictionary['seed'] = int(item)
@@ -53,7 +52,7 @@ for match in matches_list:
         except:
             continue
 
-load_status = load_dotenv("Neo4j-84ef144c-Created-2024-06-18.txt")
+load_status = load_dotenv("Neo4j-27ea30cf-Created-2024-09-23.txt")
 if load_status is False:
     raise RuntimeError('Environment variables not loaded.')
 
