@@ -1,0 +1,41 @@
+@layer tailwind-base, antd
+
+@layer tailwind-base {
+  @tailwind base;
+}
+@tailwind components;
+@tailwind utilities;
+
+#root {
+  max-width: 100vw;
+  width: 100%;
+}
+
+.ant-select > span > span {
+  color: #d4d4d8;
+}
+
+.hover-link {
+  color: #d4d4d8;
+  text-decoration: none;
+  background-image: linear-gradient(#d4d4d8, #d4d4d8);
+  background-size: 0% 0.1em;
+  background-position-y: 105%;
+  background-position-x: 50%;
+  background-repeat: no-repeat;
+  transition: background-size 0.4s ease-in-out;
+}
+
+.hover-link:hover,
+.hover-link:focus,
+.hover-link:active {
+  background-size: 100% 0.1em;
+  color: #d4d4d8;
+}
+
+.custom-disabled {
+  &.ant-btn-disabled {
+    color: #a1a1aa !important;
+    border-color: #71717a !important;
+  }
+}
