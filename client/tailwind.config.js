@@ -1,9 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./src/**/*.{html,js,vue,ts}"],
+  content: ["./src/**/*.{html,js,jsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        fira: ["Fira Sans", "sans-serif"],
+      },
+    },
   },
   plugins: [],
-}
-
+};

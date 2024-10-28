@@ -58,7 +58,116 @@ export const GET_PLAYER = gql`
 `;
 
 export const GET_EVENTS_PLAYED = gql`
-query
+  query Activity($id: String!, $year: Int!) {
+    players(where: { id: $id }) {
+      years {
+        earliest
+        latest
+      }
+      entries(
+        where: {
+          scores_SOME: { match: { round: { event: { year: { id: $year } } } } }
+        }
+      ) {
+        pm
+        points
+        rank
+        seed
+        status
+        scores {
+          match {
+            round {
+              event {
+                id
+                category
+                end_date
+                start_date
+                sponsor_name
+                currency
+                surface {
+                  environment
+                  surface
+                }
+                tournament {
+                  id
+                  name
+                }
+                venue {
+                  city
+                  country {
+                    id
+                    name
+                  }
+                }
+              }
+              round
+            }
+            incomplete
+            match_no
+            winner {
+              player {
+                player {
+                  id
+                }
+              }
+            }
+            p2 {
+              s1
+              s2
+              s3
+              s4
+              s5
+              t1
+              t2
+              t3
+              t4
+              t5
+              incomplete
+              player(where: { NOT: { player: { id: $id } } }) {
+                rank
+                seed
+                status
+                player {
+                  full_name
+                  id
+                  country {
+                    name
+                    id
+                  }
+                }
+              }
+            }
+            p1 {
+              s1
+              s2
+              s3
+              s4
+              s5
+              t1
+              t2
+              t3
+              t4
+              t5
+              incomplete
+              player(where: { NOT: { player: { id: $id } } }) {
+                rank
+                seed
+                status
+                player {
+                  full_name
+                  id
+                  country {
+                    id
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 `;
 
 export const GET_TITLES = gql`

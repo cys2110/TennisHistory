@@ -299,3 +299,74 @@ export const GET_RESULTS = gql`
     }
   }
 `;
+
+export const GET_DRAW = gql`
+  query Draw($id: Int!) {
+    events(where: { id: $id }) {
+      rounds(where: { number_GT: 0 }) {
+        round
+        matches {
+          incomplete
+          match_no
+          p1 {
+            s1
+            s2
+            s3
+            s4
+            s5
+            t1
+            t2
+            t3
+            t4
+            t5
+            incomplete
+            player {
+              player {
+                country {
+                  id
+                  name
+                }
+                full_name
+                id
+              }
+              seed
+              status
+            }
+          }
+          p2 {
+            s1
+            s2
+            s3
+            s4
+            s5
+            t1
+            t2
+            t3
+            t4
+            t5
+            incomplete
+            player {
+              seed
+              status
+              player {
+                country {
+                  id
+                  name
+                }
+                full_name
+                id
+              }
+            }
+          }
+          winner {
+            player {
+              player {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;

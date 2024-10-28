@@ -10,9 +10,9 @@ import re
 
 # For stats matches where p1 first in results and in stats
 
-tid = 328
+tid = 337
 year = 2024
-matches = ['https://www.atptour.com/en/scores/stats-centre/archive/2024/328/ms020', 'https://www.atptour.com/en/scores/stats-centre/archive/2024/328/ms027', 'https://www.atptour.com/en/scores/stats-centre/archive/2024/328/ms019', 'https://www.atptour.com/en/scores/stats-centre/archive/2024/328/ms030', 'https://www.atptour.com/en/scores/stats-centre/archive/2024/328/ms026', 'https://www.atptour.com/en/scores/stats-centre/archive/2024/328/ms017', 'https://www.atptour.com/en/scores/stats-centre/archive/2024/328/ms021']
+matches = ['https://www.atptour.com/en/scores/stats-centre/archive/2024/337/ms001']
 matches_info = []
 
 driver = webdriver.Chrome()

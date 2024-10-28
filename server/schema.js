@@ -68,6 +68,8 @@ export const typeDefs = `#graphql
         id: Int! @unique
         seed: Int
         rank: Int
+        pm: Int
+        points: Int
         status: String
         player: Player! @relationship(type: "ENTERED", direction: IN)
         scores: [Score!]! @relationship(type: "SCORED", direction: OUT)
@@ -204,7 +206,7 @@ export const typeDefs = `#graphql
         max_speed_kph: Int
         avg_sv1_kph: Int
         avg_sv2_kph: Int
-        player: Entry! @relationship(type: "SCORED", direction: IN)
+        player: Entry @relationship(type: "SCORED", direction: IN)
     }
 
     type P2 {
@@ -240,7 +242,7 @@ export const typeDefs = `#graphql
         max_speed_kph: Int
         avg_sv1_kph: Int
         avg_sv2_kph: Int
-        player: Entry! @relationship(type: "SCORED", direction: IN)
+        player: Entry @relationship(type: "SCORED", direction: IN)
     }
 
     type Winner {
@@ -547,10 +549,6 @@ export const typeDefs = `#graphql
             bps_converted: sum(s.bps_converted)
             } as stats
         """, columnName: "stats")
-        events (year: Int): @cypher(statement: """
-            MATCH a=(this)-[:ENTERED]-(:Entry)-[:SCORED]-(:Score)-[:SCORED]-(:Match)-[:PLAYED]-(:Round)-[:ROUND_OF]-(e:Event)-[:TOOK_PLACE_IN]-(:Year {id: $year})
-            RETURN DISTINCT(e)
-        """)
     }
 
     type Query {
@@ -564,9 +562,5 @@ export const typeDefs = `#graphql
             WHERE t.name =~ '(?i).*' + $name + '.*'
             RETURN t as tournaments
         """, columnName: "tournaments")
-        eventsPlayed (id: String!, year: Int!): [Event] @cypher(statement: """
-            MATCH (:Player {id: $id})-[]-(:Score)-[]-(:Match)-[]-(:Round)-[]-(e:Event)-[]-(:Year {id: $year})
-            RETURN DISTINCT(e) as events
-        """, columnName: "events")
     }
 `;

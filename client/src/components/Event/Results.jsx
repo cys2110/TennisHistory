@@ -28,7 +28,9 @@ export default function Results() {
   return (
     <>
       <Helmet>
-        <title>{`Results | ${unencodeName(tname)} ${year}`}</title>
+        <title>
+          Results | {unencodeName(tname)} {year}
+        </title>
       </Helmet>
       <EventBreadcrumbs
         tname={unencodeName(tname)}

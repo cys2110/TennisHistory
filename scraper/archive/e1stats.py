@@ -10,9 +10,9 @@ import re
 
 # For stats matches where winner is 1st in results and stats
 
-year = 2004
-tid = 451
-matches = ['https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms016', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms017', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms018', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms019', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms020', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms021', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms022', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms023', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms024', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms025', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms026', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms027', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms028', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms029', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms030', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms031', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms008', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms009', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms010', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms011', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms012', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms013', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms014', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms015', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms004', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms005', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms006', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms007', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms002', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms003', 'https://www.atptour.com/en/scores/match-stats/archive/2004/451/ms001']
+year = 2018
+tid = 605
+matches = ['https://www.atptour.com/en/scores/match-stats/archive/2018/605/ms021']
 matches_info = []
 
 driver = webdriver.Chrome()
@@ -184,8 +184,8 @@ def writeToDb(db):
         #     """, winner=match['winner_id'], loser=match['loser_id'], eid=int(f"{tid}{year}"), winner_stats=match['winner'], loser_stats=match['loser'], minutes=match['duration_mins'])
 
         result = db.run("""
-            MATCH (:Player {id: $winner})-[]-(w:Score)-[]-(m:Match)-[]-(l:Score)-[]-(:Player {id: $loser})
-            WHERE (m)-[]-(:Event {id: $eid})
+            MATCH (:Player {id: $winner})-[]-(:Entry)-[]-(w:Score)-[]-(m:Match)-[]-(l:Score)-[]-(:Entry)-[]-(:Player {id: $loser})
+            WHERE (m)-[]-(:Round)-[]-(:Event {id: $eid})
             SET w += $winner_stats, w:Winner, l += $loser_stats, l:Loser, m.duration_mins = $minutes
             """, winner=match['winner_id'], loser=match['loser_id'], eid=int(f"{tid}{year}"), winner_stats=match['winner'], loser_stats=match['loser'], minutes=match['duration_mins'])
 
