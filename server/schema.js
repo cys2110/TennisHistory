@@ -65,7 +65,7 @@ export const typeDefs = `#graphql
     }
 
     type Entry {
-        id: Int! @unique
+        id: String! @unique
         seed: Int
         rank: Int
         pm: Int

@@ -10,6 +10,7 @@ export default function PlayerItem({ player, entry }) {
           alt={player.country.name}
           src={`/flags/${player.country.id}.svg`}
           className="rounded"
+          preview={false}
         />
       </Col>
       <Col span={3}>

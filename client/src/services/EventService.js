@@ -12,9 +12,7 @@ export const GET_UPCOMING = gql`
       sponsor_name
       start_date
       surface {
-        environment
-        hard_type
-        surface
+        id
       }
       tournament {
         id
@@ -46,9 +44,7 @@ export const GET_ARCHIVE = gql`
       sponsor_name
       start_date
       surface {
-        environment
-        hard_type
-        surface
+        id
       }
       tournament {
         id
@@ -69,7 +65,7 @@ export const GET_ARCHIVE = gql`
 `;
 
 export const GET_EVENT = gql`
-  query Event($id: Int!) {
+  query Event($id: Int!, $idString: String!) {
     events(where: { id: $id }) {
       category
       draw_type
@@ -81,9 +77,7 @@ export const GET_EVENT = gql`
       tfc
       currency
       surface {
-        environment
-        surface
-        hard_type
+        id
       }
       tournament {
         id
@@ -224,6 +218,16 @@ export const GET_EVENT = gql`
             id
             name
           }
+        }
+      }
+    }
+    entries(where: { id_STARTS_WITH: $idString }) {
+      player {
+        id
+        full_name
+        country {
+          id
+          name
         }
       }
     }

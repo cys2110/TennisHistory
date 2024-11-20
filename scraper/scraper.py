@@ -8,7 +8,7 @@ import os
 import time
 import re
 
-tid = 352
+tid = 4787
 draw = 'Best3'
 year = 2024
 
@@ -137,7 +137,7 @@ def addEventToDb(db):
         query = f"""
             MATCH (e:Event {{id: $eid}})
             MATCH (r:Round {{id: $round}})
-            MERGE (m:Match:Update:{draw} {{id: $mid, match_no: $match_no}})
+            MERGE (m:Match:{draw} {{id: $mid, match_no: $match_no}})
             MERGE (m)-[:PLAYED]->(r)
         """
 
@@ -171,6 +171,9 @@ def addEventToDb(db):
                 """
                 params['p1status'] = match['p1']['status']
 
+            if match['bye'] == True:
+                query += f"""SET s1:Winner"""
+
         if match.get('p2') is not None and match['p2'].get('id') is not None:
             query += f"""
                 MERGE (p2:Player {{id: $p2id}})
@@ -197,6 +200,9 @@ def addEventToDb(db):
                     SET f2.status = $p2status
                 """
                 params['p2status'] = match['p2']['status']
+
+            if match['bye'] == True:
+                query += f"""SET s2:Winner"""
 
         db.run(query, **params)
 

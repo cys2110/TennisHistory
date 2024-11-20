@@ -7,7 +7,6 @@ import { GET_RESULTS } from "../../services/EventService";
 import Loading from "../Global/Loading";
 import Title from "../Global/Title";
 import ResultCard from "./ResultCard";
-import EventBreadcrumbs from "./EventBreadcrumbs";
 
 export default function Results() {
   const { tname, tid, year, eid } = useParams();
@@ -32,12 +31,6 @@ export default function Results() {
           Results | {unencodeName(tname)} {year}
         </title>
       </Helmet>
-      <EventBreadcrumbs
-        tname={unencodeName(tname)}
-        tid={tid}
-        year={year}
-        eid={eid}
-      />
       <Title title="Results" />
       {data && (
         <Row>

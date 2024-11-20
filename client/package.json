@@ -14,6 +14,7 @@
     "@apollo/client": "^3.11.8",
     "antd": "^5.21.4",
     "convert": "^5.4.1",
+    "echarts": "^5.5.1",
     "graphql": "^16.9.0",
     "luxon": "^3.5.0",
     "react": "^18.3.1",

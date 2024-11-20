@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@apollo/client";
-import { Row, Col, Select } from "antd";
 import { DateTime } from "luxon";
+import { Row, Col, Select } from "antd";
 import { GET_ARCHIVE } from "../../services/EventService";
 import Title from "../Global/Title";
 import Loading from "../Global/Loading";
@@ -26,12 +26,12 @@ export default function Archive() {
   const { loading, error, data } = useQuery(GET_ARCHIVE, {
     variables: { year: selectedYear },
   });
-  if (error) console.log(error);
+  if (error) console.error(error);
 
   return (
     <>
       <Helmet>
-        <title>Results Archive</title>
+        <title>Results Archive | TennisHistory</title>
       </Helmet>
       <Row align="middle" justify="space-between" className="mb-5">
         <Col xs={24} sm={20} xl={22}>

@@ -10,9 +10,9 @@ import re
 
 # For stats matches where p1 first in results and in stats
 
-tid = 337
+tid = 605
 year = 2024
-matches = ['https://www.atptour.com/en/scores/stats-centre/archive/2024/337/ms001']
+matches = ['https://www.atptour.com/en/scores/stats-centre/archive/2024/605/ms001']
 matches_info = []
 
 driver = webdriver.Chrome()
@@ -20,7 +20,7 @@ driver = webdriver.Chrome()
 for match in matches:
     try:
         driver.get(match)
-        time.sleep(15)
+        time.sleep(10)
 
         WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'wrapper')))
 
@@ -51,80 +51,84 @@ for match in matches:
                     match_info['p1'][f"s{idx + 1}"] = int(spans[0].text)
                     if len(spans) > 1:
                         match_info['p1'][f"t{idx + 1}"] = int(spans[1].text)
+                        if int(spans[1].text) < 6:
+                            match_info['p2'][f"t{idx + 1}"] = 7
+                        else:
+                            match_info['p2'][f"t{idx + 1}"] = int(spans[1].text) + 2
                 else:
                     match_info['p2'][f"s{idx + 1}"] = int(spans[0].text)
                     if len(spans) > 1:
                         match_info['p2'][f"t{idx + 1}"] = int(spans[1].text)
+                        if int(spans[1].text) < 6:
+                            match_info['p1'][f"t{idx + 1}"] = 7
+                        else:
+                            match_info['p1'][f"t{idx + 1}"] = int(spans[1].text) + 2
 
         p1_stat = driver.find_elements(By.CLASS_NAME, 'player1')
         match_info['p1']['aces'] = int(p1_stat[2].text)
         match_info['p1']['dfs'] = int(p1_stat[4].text)
-        p1_serve1 = p1_stat[8].text.split(" ")[0].split("/")
-        match_info['p1']['serve1_pts_w'] = int(p1_serve1[0])
-        match_info['p1']['serve1_pts'] = int(p1_serve1[1])
-        p1_serve2 = p1_stat[10].text.split(" ")[0].split("/")
-        match_info['p1']['serve2_pts_w'] = int(p1_serve2[0])
-        match_info['p1']['serve2_pts'] = int(p1_serve2[1])
-        p1_bps_saved = p1_stat[12].text.split(" ")[0].split("/")
-        match_info['p1']['bps_saved'] = int(p1_bps_saved[0])
-        match_info['p1']['bps_faced'] = int(p1_bps_saved[1])
-        p1_ret1 = p1_stat[18].text.split(" ")[0].split("/")
-        match_info['p1']['ret1_w'] = int(p1_ret1[0])
-        match_info['p1']['ret1'] = int(p1_ret1[1])
-        p1_ret2 = p1_stat[20].text.split(" ")[0].split("/")
-        match_info['p1']['ret2_w'] = int(p1_ret2[0])
-        match_info['p1']['ret2'] = int(p1_ret2[1])
-        p1_bps_converted = p1_stat[22].text.split(" ")[0].split("/")
-        match_info['p1']['bps_converted'] = int(p1_bps_converted[0])
-        match_info['p1']['bp_opps'] = int(p1_bps_converted[1])
+        p1_serve1 = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p1_stat[8].text)
+        match_info['p1']['serve1_pts_w'] = int(p1_serve1.group(1))
+        match_info['p1']['serve1_pts'] = int(p1_serve1.group(2))
+        p1_serve2 = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p1_stat[10].text)
+        match_info['p1']['serve2_pts_w'] = int(p1_serve2.group(1))
+        match_info['p1']['serve2_pts'] = int(p1_serve2.group(2))
+        p1_bps_saved = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p1_stat[12].text)
+        match_info['p1']['bps_saved'] = int(p1_bps_saved.group(1))
+        match_info['p1']['bps_faced'] = int(p1_bps_saved.group(2))
+        p1_ret1 = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p1_stat[18].text)
+        match_info['p1']['ret1_w'] = int(p1_ret1.group(1))
+        match_info['p1']['ret1'] = int(p1_ret1.group(2))
+        p1_ret2 = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p1_stat[20].text)
+        match_info['p1']['ret2_w'] = int(p1_ret2.group(1))
+        match_info['p1']['ret2'] = int(p1_ret2.group(2))
+        p1_bps_converted = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p1_stat[22].text)
+        match_info['p1']['bps_converted'] = int(p1_bps_converted.group(1))
+        match_info['p1']['bp_opps'] = int(p1_bps_converted.group(2))
 
         p2_stat = driver.find_elements(By.CLASS_NAME, 'player2')
         match_info['p2']['aces'] = int(p2_stat[2].text)
         match_info['p2']['dfs'] = int(p2_stat[4].text)
-        p2_serve1 = p2_stat[8].text.split(" ")[0].split("/")
-        match_info['p2']['serve1_pts_w'] = int(p2_serve1[0])
-        match_info['p2']['serve1_pts'] = int(p2_serve1[1])
-        p2_serve2 = p2_stat[10].text.split(" ")[0].split("/")
-        match_info['p2']['serve2_pts_w'] = int(p2_serve2[0])
-        match_info['p2']['serve2_pts'] = int(p2_serve2[1])
-        p2_bps_saved = p2_stat[12].text.split(" ")[0].split("/")
-        match_info['p2']['bps_saved'] = int(p2_bps_saved[0])
-        match_info['p2']['bps_faced'] = int(p2_bps_saved[1])
-        p2_ret1 = p2_stat[18].text.split(" ")[0].split("/")
-        match_info['p2']['ret1_w'] = int(p2_ret1[0])
-        match_info['p2']['ret1'] = int(p2_ret1[1])
-        p2_ret2 = p2_stat[20].text.split(" ")[0].split("/")
-        match_info['p2']['ret2_w'] = int(p2_ret2[0])
-        match_info['p2']['ret2'] = int(p2_ret2[1])
-        p2_bps_converted = p2_stat[22].text.split(" ")[0].split("/")
-        match_info['p2']['bps_converted'] = int(p2_bps_converted[0])
-        match_info['p2']['bp_opps'] = int(p2_bps_converted[1])
-
+        p2_serve1 = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p2_stat[8].text)
+        match_info['p2']['serve1_pts_w'] = int(p2_serve1.group(1))
+        match_info['p2']['serve1_pts'] = int(p2_serve1.group(2))
+        p2_serve2 = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p2_stat[10].text)
+        match_info['p2']['serve2_pts_w'] = int(p2_serve2.group(1))
+        match_info['p2']['serve2_pts'] = int(p2_serve2.group(2))
+        p2_bps_saved = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p2_stat[12].text)
+        match_info['p2']['bps_saved'] = int(p2_bps_saved.group(1))
+        match_info['p2']['bps_faced'] = int(p2_bps_saved.group(2))
+        p2_ret1 = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p2_stat[18].text)
+        match_info['p2']['ret1_w'] = int(p2_ret1.group(1))
+        match_info['p2']['ret1'] = int(p2_ret1.group(2))
+        p2_ret2 = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p2_stat[20].text)
+        match_info['p2']['ret2_w'] = int(p2_ret2.group(1))
+        match_info['p2']['ret2'] = int(p2_ret2.group(2))
+        p2_bps_converted = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p2_stat[22].text)
+        match_info['p2']['bps_converted'] = int(p2_bps_converted.group(1))
+        match_info['p2']['bp_opps'] = int(p2_bps_converted.group(2))
         try:
-            net_heading = driver.find_element(By.XPATH, '//*[@id="RGMatchStats"]/div[8]/div/div[2]/div[1]/div[2]/div')
-            if net_heading.text == "NET POINTS WON":
-                p1_net = p1_stat[26].text.split(" ")[0].split("/")
-                match_info['p1']['net_w'] = int(p1_net[0])
-                match_info['p1']['net'] = int(p1_net[1])
-                match_info['p1']['winner'] = int(p1_stat[28].text)
-                match_info['p1']['ues'] = int(p1_stat[30].text)
-                p2_net = p2_stat[26].text.split(" ")[0].split("/")
-                match_info['p2']['net_w'] = int(p2_net[0])
-                match_info['p2']['net'] = int(p2_net[1])
-                match_info['p2']['winner'] = int(p2_stat[28].text)
-                match_info['p2']['ues'] = int(p2_stat[30].text)
+            p1_net = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p1_stat[26].text)
+            match_info['p1']['net_w'] = int(p1_net.group(1))
+            match_info['p1']['net'] = int(p1_net.group(2))
+            match_info['p1']['winner'] = int(p1_stat[28].text)
+            match_info['p1']['ues'] = int(p1_stat[30].text)
+            p2_net = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p2_stat[26].text)
+            match_info['p2']['net_w'] = int(p2_net.group(1))
+            match_info['p2']['net'] = int(p2_net.group(2))
+            match_info['p2']['winner'] = int(p2_stat[28].text)
+            match_info['p2']['ues'] = int(p2_stat[30].text)
         except:
             pass
-
         try:
             p1_serves = driver.find_elements(By.CLASS_NAME, 'speedkmh1')
             p2_serves = driver.find_elements(By.CLASS_NAME, 'speedkmh2')
-            match_info['p1']['max_speed_kph'] = int(p1_serves[0].text.replace('\nkm/h', ''))
-            match_info['p1']['avg_sv1_kph'] = int(p1_serves[2].text.replace('\nkm/h', ''))
-            match_info['p1']['avg_sv2_kph'] = int(p1_serves[4].text.replace('\nkm/h', ''))
-            match_info['p2']['max_speed_kph'] = int(p2_serves[0].text.replace('\nkm/h', ''))
-            match_info['p2']['avg_sv1_kph'] = int(p2_serves[2].text.replace('\nkm/h', ''))
-            match_info['p2']['avg_sv2_kph'] = int(p2_serves[4].text.replace('\nkm/h', ''))
+            match_info['p1']['max_speed_kph'] = int(re.search(r'\b(\d{3})\b', p1_serves[0].text).group())
+            match_info['p1']['avg_sv1_kph'] = int(re.search(r'\b(\d{3})\b', p1_serves[2].text).group())
+            match_info['p1']['avg_sv2_kph'] = int(re.search(r'\b(\d{3})\b', p1_serves[4].text).group())
+            match_info['p2']['max_speed_kph'] = int(re.search(r'\b(\d{3})\b', p2_serves[0].text).group())
+            match_info['p2']['avg_sv1_kph'] = int(re.search(r'\b(\d{3})\b', p2_serves[2].text).group())
+            match_info['p2']['avg_sv2_kph'] = int(re.search(r'\b(\d{3})\b', p2_serves[4].text).group())
         except:
             pass
 

@@ -1,21 +1,21 @@
 import { useQuery } from "@apollo/client";
 import { DateTime } from "luxon";
+import { Col, Row } from "antd";
 import { GET_UPCOMING } from "../../services/EventService";
 import Title from "../Global/Title";
 import Loading from "../Global/Loading";
 import EventCard from "../Global/EventCard";
-import { Col, Row } from "antd";
 
 export default function Home() {
   const { loading, error, data } = useQuery(GET_UPCOMING, {
     variables: { date: DateTime.now().toISODate() },
   });
-  if (error) console.log(error);
+  if (error) console.error(error);
 
   return (
     <>
       <Title title="Upcoming Events" />
-      {data && (
+      {data && data.events.length > 0 && (
         <Row justify="space-evenly" align="stretch" gutter={[0, 32]}>
           {data.events.map((event) => {
             return (
@@ -26,7 +26,9 @@ export default function Home() {
           })}
         </Row>
       )}
-      {!data && <Loading loading={loading} none="No upcoming events" />}
+      {(!data || data.events.length === 0) && (
+        <Loading loading={loading} none="No upcoming events" />
+      )}
     </>
   );
 }

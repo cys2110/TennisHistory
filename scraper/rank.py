@@ -5,7 +5,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from neo4j import GraphDatabase
 from dotenv import load_dotenv
 import os
-import time
 import re
 
 selenium_driver = webdriver.Chrome()
@@ -21,7 +20,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
     driver.verify_connectivity()
 
     records, summary, keys = driver.execute_query(
-        "MATCH (p:Player)-[]-(f:Entry) WHERE f.id STARTS WITH \"3522024\" RETURN p.id",
+        "MATCH (p:Player)-[]-(f:Entry) WHERE f.id STARTS WITH \"6052024\" RETURN p.id",
         database_="neo4j"
     )
 
@@ -41,7 +40,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
 
     driver.execute_query("""
         UNWIND $players as player
-        MATCH (:Player {id: player.id})-[]-(f:Entry) WHERE f.id STARTS WITH "3522024"
+        MATCH (:Player {id: player.id})-[]-(f:Entry) WHERE f.id STARTS WITH "6052024"
         SET f.rank = player.rank
         """, players=players)
 

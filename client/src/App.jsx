@@ -41,7 +41,10 @@ function App() {
         },
       }}
     >
-      <Layout className="font-fira">
+      <Layout
+        className="font-fira"
+        style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      >
         <Header
           style={{
             position: "sticky",
