@@ -17,9 +17,7 @@ export const GET_MATCH_STATS = gql`
           category
           id
           surface {
-            hard_type
-            environment
-            surface
+            id
           }
           venue {
             city

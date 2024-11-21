@@ -1,15 +1,16 @@
 import { useMatch, useParams } from "react-router";
 import { Link } from "react-router-dom";
+import { useQuery } from "@apollo/client";
 import { Breadcrumb } from "antd";
 import { unencodeName } from "../../utils/utils";
-import { useQuery } from "@apollo/client";
 import { GET_TOURNAMENT_YEARS } from "../../services/TournamentService";
 
 export default function TournamentBreadcrumbs() {
-  const { tname, tid, year, eid } = useParams();
+  const { tname, tid, year, eid, mid } = useParams();
   const eventOverview = useMatch("/tournaments/:tname/:tid/:year/:eid");
   const eventResults = useMatch("/tournaments/:tname/:tid/:year/:eid/results");
   const eventDraw = useMatch("/tournaments/:tname/:tid/:year/:eid/draw");
+  const matchPage = useMatch("/tournaments/:tname/:tid/:year/:eid/:mid");
 
   const { loading, error, data } = useQuery(GET_TOURNAMENT_YEARS, {
     variables: { id: parseInt(tid) },
@@ -86,6 +87,10 @@ export default function TournamentBreadcrumbs() {
               },
         ].filter(Boolean),
       },
+    },
+    mid && {
+      title: mid,
+      key: mid,
     },
   ].filter(Boolean);
   return <Breadcrumb items={breadcrumbs} />;

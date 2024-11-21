@@ -56,6 +56,7 @@ export default function EntryInfo({ entryInfo }) {
               align: "left",
             },
           },
+          itemStyle: { color: "#7c3aed" },
           expandAndCollapse: true,
           animationDuration: 550,
           animationDurationUpdate: 750,

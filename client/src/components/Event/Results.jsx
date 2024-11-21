@@ -44,7 +44,7 @@ export default function Results() {
             {data.events[0].rounds.map((round) => {
               return (
                 <div key={round.number} id={round.round}>
-                  <div className="text-4xl mb-5">{round.round}</div>
+                  <div className="text-4xl my-5">{round.round}</div>
                   <Row justify="space-evenly" gutter={[0, 32]}>
                     {round.matches.map((match) => {
                       return (
