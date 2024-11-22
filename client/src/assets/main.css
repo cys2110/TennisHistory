@@ -1,1 +1,19 @@
 @import './base.css';
+
+.hover-link {
+  color: #d4d4d8;
+  text-decoration: none;
+  background-image: linear-gradient(#d4d4d8, #d4d4d8);
+  background-size: 0% 0.1em;
+  background-position-y: 105%;
+  background-position-x: 50%;
+  background-repeat: no-repeat;
+  transition: background-size 0.4s ease-in-out;
+}
+
+.hover-link:hover,
+.hover-link:focus,
+.hover-link:active {
+  background-size: 100% 0.1em;
+  color: #d4d4d8;
+}

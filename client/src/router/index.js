@@ -1,5 +1,20 @@
-import HomeView from '@/views/Home/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import {
+  HomeView,
+  ArchiveView,
+  TournamentView,
+  EventDetailsView,
+  ResultsView,
+  DrawView,
+  MatchView,
+  PlayerDetailsView,
+  ActivityView,
+  IndexView,
+  TitlesView,
+  StatsView,
+  SearchView,
+  H2HView,
+} from './pages'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,52 +25,81 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
+      path: '/archive',
+      name: 'archive',
+      component: ArchiveView,
     },
-    // {
-    //   name: 'archive'
-    // },
-    // {
-    //   name: 'tournament'
-    // },
-    // {
-    //   name: 'event',
-    //   children: [
-    //     {
-    //       name: 'overview'
-    //     },
-    //     {
-    //       name: 'results'
-    //     },
-    //     {
-    //       name: 'draw'
-    //     }
-    //   ]
-    // },
-    // {
-    //   name: 'match-stats'
-    // },
-    // {
-    //   name: 'player',
-    //   children: [
-    //     {name: 'overview'},
-    //     {name: 'activity'},
-    //     {name: 'titles'},
-    //     {name: 'index'},
-    //     {name: 'player-stats'}
-    //   ],
-    // },
-    // {
-    //   name: 'h2h'
-    // },
-    // {
-    //   name: 'search'
-    // }
+    {
+      path: '/tournaments/:name/:id',
+      name: 'tournament',
+      props: true,
+      component: TournamentView,
+    },
+    {
+      path: '/tournaments/:name/:id/:year/:eid/overview',
+      name: 'event',
+      props: true,
+      component: EventDetailsView,
+    },
+    {
+      path: '/tournaments/:name/:id/:year/:eid/results',
+      name: 'results',
+      props: true,
+      component: ResultsView,
+    },
+    {
+      path: '/tournaments/:name/:id/:year/:eid/draw',
+      name: 'draw',
+      props: true,
+      component: DrawView,
+    },
+    {
+      path: '/tournaments/:name/:id/:year/:eid/:mid',
+      name: 'match',
+      props: true,
+      component: MatchView,
+    },
+    {
+      path: '/players/:name/:id/overview',
+      name: 'player',
+      props: true,
+      component: PlayerDetailsView,
+    },
+    {
+      path: '/players/:name/:id/activity',
+      name: 'activity',
+      props: true,
+      component: ActivityView,
+    },
+    {
+      path: '/players/:name/:id/titles-and-finals',
+      name: 'titles',
+      props: true,
+      component: TitlesView,
+    },
+    {
+      path: '/players/:name/:id/index',
+      name: 'index',
+      props: true,
+      component: IndexView,
+    },
+    {
+      path: '/players/:name/:id/stats',
+      name: 'stats',
+      props: true,
+      component: StatsView,
+    },
+    {
+      path: '/h2h/:p1Name/:p1Id/:p2Name/:p2Id',
+      name: 'h2h',
+      props: true,
+      component: H2HView,
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: SearchView,
+    },
   ],
 })
 

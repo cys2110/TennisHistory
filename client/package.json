@@ -11,11 +11,15 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@apollo/client": "^3.11.10",
     "@apollo/server": "^4.11.2",
     "@neo4j/graphql": "^6.1.0",
+    "@vue/apollo-composable": "^4.2.1",
     "ant-design-vue": "^4.2.6",
     "echarts": "^5.5.1",
     "graphql": "^16.9.0",
+    "graphql-tag": "^2.12.6",
+    "luxon": "^3.5.0",
     "neo4j-driver": "^5.26.0",
     "pinia": "^2.2.6",
     "vue": "^3.5.12",
