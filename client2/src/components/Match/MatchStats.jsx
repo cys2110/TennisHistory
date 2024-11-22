@@ -1,9 +1,10 @@
 import { useParams } from "react-router";
+import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@apollo/client";
 import { Anchor, Avatar, Col, ConfigProvider, Image, Row } from "antd";
 import { GET_MATCH_STATS } from "../../services/MatchStatService";
-import { unencodeName } from "../../utils/utils";
+import { encodeName, unencodeName } from "../../utils/utils";
 import Title from "../Global/Title";
 import Loading from "../Global/Loading";
 import MatchDetails from "./MatchDetails";
@@ -52,6 +53,11 @@ export default function MatchStats() {
                   href: "#points-stats",
                   title: "Points Stats",
                 },
+                {
+                  key: "4",
+                  href: "#service-speed",
+                  title: "Service Speed",
+                },
               ]}
             />
           </Col>
@@ -87,7 +93,14 @@ export default function MatchStats() {
                       />
                     </Col>
                     <Col span={19} className="text-xl pl-5">
-                      {match.p1.player.player.full_name}
+                      <Link
+                        className="hover-link"
+                        to={`/players/${encodeName(
+                          match.p1.player.player.full_name
+                        )}/${match.p1.player.player.id}`}
+                      >
+                        {match.p1.player.player.full_name}
+                      </Link>
                     </Col>
                   </Row>
                 </Col>
@@ -117,7 +130,14 @@ export default function MatchStats() {
                       />
                     </Col>
                     <Col span={19} className="text-xl pl-5">
-                      {match.p2.player.player.full_name}
+                      <Link
+                        className="hover-link"
+                        to={`/players/${encodeName(
+                          match.p2.player.player.full_name
+                        )}/${match.p2.player.player.id}`}
+                      >
+                        {match.p2.player.player.full_name}
+                      </Link>
                     </Col>
                   </Row>
                 </Col>

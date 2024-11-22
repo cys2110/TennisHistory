@@ -1,12 +1,12 @@
 import { Helmet } from "react-helmet-async";
 import { Outlet, useMatch, useParams } from "react-router";
+import { Col, Image, Row } from "antd";
 import { unencodeName } from "../../utils/utils";
 import { useQuery } from "@apollo/client";
 import { GET_PLAYER } from "../../services/PlayerService";
+import Title from "../Global/Title";
 import Loading from "../Global/Loading";
 import PlayerBreadcrumbs from "./PlayerBreadcrumbs";
-import Title from "../Global/Title";
-import { Col, Image, Row } from "antd";
 import PlayerDetails from "./PlayerDetails";
 
 export default function Player() {
@@ -26,7 +26,7 @@ export default function Player() {
       {parentPage && (
         <>
           <Helmet>
-            <title>{unencodeName(pname)}</title>
+            <title>{unencodeName(pname)} | TennisHistory</title>
           </Helmet>
           <Title title="Player Overview" />
           {data && (

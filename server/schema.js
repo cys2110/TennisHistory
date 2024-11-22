@@ -428,6 +428,12 @@ export const typeDefs = `#graphql
         bps_converted: Int!
     }
 
+    type MajorResults {
+    eventId: Int
+    round: String
+    year: Int
+    }
+
     type Player {
         id: String! @unique
         first_name: String!
@@ -444,6 +450,7 @@ export const typeDefs = `#graphql
         height_cm: Int
         rh: Boolean
         bh1: Boolean
+        coaches: [Coach!]! @relationship(type: "COACHES", direction: IN)
         country: Country! @relationship(type: "REPRESENTS", properties: "Represents", direction: OUT)
         prev_countries: [Country!]! @relationship(type: "REPRESENTED", properties: "Represents", direction: OUT)
         turned_pro: Year! @relationship(type: "TURNED_PRO", direction: OUT)

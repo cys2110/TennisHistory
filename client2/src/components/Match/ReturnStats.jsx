@@ -21,7 +21,7 @@ export default function ReturnStats({
       p1Value: p1Ret1Win,
       p1Max: p1Ret1,
       p2Value: p2Ret1Win,
-      p2Value: p2Ret1,
+      p2Max: p2Ret1,
     },
     {
       name: "2nd Serve Return Points Won",
