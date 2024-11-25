@@ -77,6 +77,7 @@ watch(error, (newError) => {
 </script>
 
 <template>
+    <!--[ADD EVENT BREADCRUMBS]-->
     <Title>
         <template #title>{{ unencodeName(name) }} {{ year }}</template>
         <template #subtitle>Event Details</template>
@@ -88,7 +89,7 @@ watch(error, (newError) => {
             </a-config-provider>
         </a-col>
         <a-col :span=20>
-            <Details :event />
+            <EventOverview :event />
             <PrizeMoney :rounds="event.rounds" :currency="event.currency" />
             <Seeds :seeds="event.seeds" />
             <EntryInfo :entryInfo />

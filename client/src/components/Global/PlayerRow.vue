@@ -1,5 +1,5 @@
 <script setup>
-import { flag, headshot } from '@/utils/functions';
+import { encodeName, flag, headshot } from '@/utils/functions';
 
 const props = defineProps(['player', 'entry'])
 </script>
@@ -14,8 +14,9 @@ const props = defineProps(['player', 'entry'])
         <!--[FIX AVATAR SPACING/SIZE]-->
     </a-col>
     <a-col :span=18>
-        <!--[ADD PLAYER LINK]-->
-        {{ player.full_name }}
+        <router-link class="hover-link"
+            :to="{ name: 'player', params: { name: encodeName(player.full_name), id: player.id } }">{{ player.full_name
+            }}</router-link>
         <!--[ADD ENTRY DETAIL]-->
     </a-col>
 </template>

@@ -17,6 +17,7 @@ const props = defineProps(['winner', 'loser'])
             }}</sup>
         {{ winner.s5 ? `${winner.s5}${loser.s5}` : '' }}<sup v-if="winner.t5">{{ getLowerTb(winner.t5, loser.t5)
             }}</sup>
+        <!--[FIX INCOMPLETE STYLING]-->
         {{ loser.incomplete ? INCOMPLETES[loser.incomplete] : "" }}
     </div>
 </template>

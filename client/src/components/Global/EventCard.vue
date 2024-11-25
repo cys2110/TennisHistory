@@ -1,10 +1,10 @@
 <script setup>
 import { computed } from 'vue';
-import { SURFACES } from '@/utils/variables';
+import { DateTime } from 'luxon';
 import { category, encodeName, flag, formattedDates } from '@/utils/functions';
+import { SURFACES } from '@/utils/variables';
 
 const cardTheme = { colorBgContainer: "#5b21b6" }
-
 const props = defineProps(['event'])
 
 const coverImage = computed(() => {
@@ -19,6 +19,8 @@ const eventPages = [
     { title: 'Results', name: 'results' },
     { title: 'Draw', name: 'draw' }
 ]
+
+const isDisabled = DateTime.now() < DateTime.fromISO(props.event.start_date)
 </script>
 
 <template>
@@ -27,7 +29,22 @@ const eventPages = [
             <template #cover>
                 <a-image :alt="coverImage.alt" :src="coverImage.src" :preview="false" />
             </template>
-            <!--[FIX COVER STYLING AND EVENT BUTTONS]-->
+            <template #actions>
+                <!--[FIX BUTTON STYLING]-->
+                <a-tooltip v-if="isDisabled" v-for="page in eventPages" :key="page.name"
+                    title="Event has not started yet">
+                    <a-button type="dashed" :ghost="true" shape="round" size="small" :block="true" :disabled="true"
+                        class="!w-11/12 custom-disabled !text-zinc-300 !border-zinc-300 hover:!text-zinc-400 hover:!border-zinc-400"
+                        :href="`/tournaments/${encodeName(event.tournament.name)}/${event.tournament.id}/${event.year.id}/${event.id}/${page.name}`">{{
+                            page.title }}</a-button>
+                </a-tooltip>
+                <a-button v-else v-for="page in eventPages" :key="page.name" type="dashed" :ghost="true" shape="round"
+                    size="small" :block="true"
+                    class="!w-11/12 custom-disabled !text-zinc-300 !border-zinc-300 hover:!text-zinc-400 hover:!border-zinc-400"
+                    :href="`/tournaments/${encodeName(event.tournament.name)}/${event.tournament.id}/${event.year.id}/${event.id}/${page.name}`">{{
+                        page.title }}</a-button>
+            </template>
+            <!--[FIX COVER STYLING]-->
             <a-card-meta :description="event.sponsor_name ?? ''">
                 <template #title><router-link class="hover-link"
                         :to="{ name: 'tournament', params: { name: encodeName(event.tournament.name), id: event.tournament.id } }">{{

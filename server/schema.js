@@ -428,10 +428,14 @@ export const typeDefs = `#graphql
         bps_converted: Int!
     }
 
+    type MajorResult {
+        round: String!
+        year: Int!
+        eid: Int!
+    }
+
     type MajorResults {
-    eventId: Int
-    round: String
-    year: Int
+        events: [MajorResult]
     }
 
     type Player {
@@ -463,7 +467,7 @@ export const typeDefs = `#graphql
             id: e.id,
             tournament_name: t.name,
             tournament_id: t.id,
-            surface: s.environment + ' ' + s.surface
+            surface: s.id
             }) as titles
             RETURN {year: year, count: count, events: titles} AS titlesByYear
             ORDER BY year
@@ -475,7 +479,7 @@ export const typeDefs = `#graphql
             id: e.id,
             tournament_name: t.name,
             tournament_id: t.id,
-            surface: s.environment + ' ' + s.surface
+            surface: s.id
             }) as finals
             RETURN {year: year, count: count, events: finals} AS finalsByYear
             ORDER BY year
@@ -569,5 +573,21 @@ export const typeDefs = `#graphql
             WHERE t.name =~ '(?i).*' + $name + '.*'
             RETURN t as tournaments
         """, columnName: "tournaments")
+        majorResults (id: String!, tournament: Int!): MajorResults @cypher(statement: """
+            MATCH (p:Player {id: $id})
+            MATCH (t:Tournament {id: $tournament})
+            OPTIONAL MATCH (p)-[:ENTERED]-(:Entry)-[:SCORED]-(:Winner)-[:SCORED]-(:Match)-[:PLAYED]-(r:Round {round: 'Final'})-[:ROUND_OF]-(e:Event)-[:EDITION_OF]-(t)
+            OPTIONAL MATCH (e)-[:TOOK_PLACE_IN]-(y:Year)
+            WITH collect( CASE WHEN e IS NOT NULL THEN {eid: e.id, year: y.id, round: r.round} ELSE NULL END) AS wins, p, t
+            OPTIONAL MATCH (p)-[:ENTERED]-(:Entry)-[:SCORED]-(:Loser)-[:SCORED]-(:Match)-[:PLAYED]-(r:Round)-[:ROUND_OF]-(:Event)-[:EDITION_OF]-(t)
+            WITH apoc.agg.minItems(r, r.number) AS minItems, wins
+            UNWIND minItems.items as round
+            MATCH b=(round)-[:ROUND_OF]-(e:Event)-[:TOOK_PLACE_IN]-(y:Year)
+            WITH collect({round: round.round, eid: e.id, year: y.id}) as lowestRounds, wins
+            RETURN CASE
+            WHEN size(wins) > 0 THEN {events: wins}
+            ELSE {events: lowestRounds}
+            END AS results
+        """, columnName: "results")
     }
 `;

@@ -2,9 +2,9 @@
 import { RouterView } from 'vue-router'
 import { theme } from 'ant-design-vue'
 
-const tokenColours = {
-  colorPrimary: "#5b21b6"
-}
+// [GLOBAL: CLEAN UP CODE (.MAP, REMOVE CONSOLE.LOGS, DOCUMENT TITLES, WATCH IMMEDIATE, ADD COMMENTS, USE COLOUR VARIABLES, ETC)]
+
+const tokenColours = { colorPrimary: "#5b21b6" }
 </script>
 
 <template>

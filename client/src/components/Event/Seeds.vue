@@ -6,7 +6,6 @@ import { BarChart, LineChart } from 'echarts/charts'
 import { DatasetComponent, GridComponent, ToolboxComponent, TooltipComponent } from 'echarts/components'
 import { UniversalTransition } from 'echarts/features'
 import VChart, { THEME_KEY } from 'vue-echarts'
-import { formatCurrency } from '@/utils/functions'
 
 const props = defineProps(['seeds'])
 
