@@ -79,3 +79,11 @@ export const convertToFt = (cm) => {
 export const getLowerTb = (score1, score2) => {
   return score1 > score2 ? score2 : score1
 }
+
+export const getEntry = (entry) => {
+  if (entry.seed && entry.status) {
+    return `(${entry.seed} ${entry.status})`
+  } else if (entry.seed || entry.status) {
+    return `(${entry.seed || entry.status})`
+  }
+}

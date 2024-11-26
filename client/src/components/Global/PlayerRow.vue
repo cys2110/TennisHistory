@@ -16,7 +16,6 @@ const props = defineProps(['player', 'entry'])
     <a-col :span=18>
         <router-link class="hover-link"
             :to="{ name: 'player', params: { name: encodeName(player.full_name), id: player.id } }">{{ player.full_name
-            }}</router-link>
-        <!--[ADD ENTRY DETAIL]-->
+            }}</router-link> <small v-if="entry">{{ entry }}</small>
     </a-col>
 </template>

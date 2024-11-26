@@ -3,7 +3,6 @@ import { flag, headshot } from '@/utils/functions';
 import { STATUS_INFO } from '@/utils/variables';
 
 const cardTheme = { colorBgContainer: "#5b21b6" }
-
 const props = defineProps(['entries'])
 // [FIX CARD STYLING]
 </script>

@@ -6,6 +6,7 @@ import { GET_MATCH } from '@/services/MatchService';
 import { percentage, unencodeName } from '@/utils/functions';
 
 // [TODO: UPDATE DOCUMENT TITLE]
+// [TODO: SCOREBOX AND PLAYER IMAGES]
 
 const props = defineProps(['name', 'id', 'eid', 'year', 'mid'])
 const match = ref(null)

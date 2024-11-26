@@ -239,3 +239,150 @@ export const GET_EVENT = (id, idString) => {
   `
   return { query: call, variables: { id, idString } }
 }
+
+export const GET_RESULTS = (id) => {
+  const call = gql`
+    query Results($id: Int!) {
+      events(where: { id: $id }) {
+        rounds(where: { number_GT: 0 }, options: { sort: { number: DESC } }) {
+          number
+          round
+          matches(options: { sort: [{ match_no: ASC }] }) {
+            court
+            date
+            duration_mins
+            incomplete
+            match_no
+            umpire {
+              id
+            }
+            winner {
+              s1
+              s2
+              s3
+              s4
+              s5
+              t1
+              t2
+              t3
+              t4
+              t5
+              player {
+                seed
+                status
+                player {
+                  id
+                  full_name
+                  country {
+                    id
+                    name
+                  }
+                }
+              }
+            }
+            loser {
+              s1
+              s2
+              s3
+              s4
+              s5
+              t1
+              t2
+              t3
+              t4
+              t5
+              incomplete
+              player {
+                seed
+                status
+                player {
+                  id
+                  full_name
+                  country {
+                    id
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `
+  return { query: call, variables: { id } }
+}
+
+export const GET_DRAW = (id) => {
+  const call = gql`
+    query Draw($id: Int!) {
+      events(where: { id: $id }) {
+        rounds(where: { number_GT: 0 }) {
+          round
+          matches {
+            incomplete
+            match_no
+            p1 {
+              s1
+              s2
+              s3
+              s4
+              s5
+              t1
+              t2
+              t3
+              t4
+              t5
+              incomplete
+              player {
+                player {
+                  country {
+                    id
+                    name
+                  }
+                  full_name
+                  id
+                }
+                seed
+                status
+              }
+            }
+            p2 {
+              s1
+              s2
+              s3
+              s4
+              s5
+              t1
+              t2
+              t3
+              t4
+              t5
+              incomplete
+              player {
+                seed
+                status
+                player {
+                  country {
+                    id
+                    name
+                  }
+                  full_name
+                  id
+                }
+              }
+            }
+            winner {
+              player {
+                player {
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `
+  return { query: call, variables: { id } }
+}
