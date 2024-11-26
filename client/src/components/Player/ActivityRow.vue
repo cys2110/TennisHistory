@@ -5,8 +5,6 @@ import { SHORT_ROUNDS } from '@/utils/variables';
 import { encodeName, flag, headshot } from '@/utils/functions';
 
 const props = defineProps(['event', 'match', 'id', 'name'])
-console.log(props.match)
-console.log(props.event)
 const player = ref(null)
 const opponent = ref(null)
 

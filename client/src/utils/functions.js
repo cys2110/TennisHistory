@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon'
+import { DateTime, Duration } from 'luxon'
 import convert from 'convert'
 
 export const encodeName = (name) => {

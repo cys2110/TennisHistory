@@ -19,7 +19,6 @@ const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
     if (newResult) player.value = newResult.players[0]
-    if (newResult) console.log(player.value)
 })
 watch(error, (newError) => {
     if (newError) console.error(newError)
@@ -27,7 +26,7 @@ watch(error, (newError) => {
 </script>
 
 <template>
-    <!--[ADD PLAYER BREADCRUMBS]-->
+    <PlayerBreadcrumbs :name :id />
     <Title>
         <template #title>{{ unencodeName(name) }}</template>
         <template #subtitle>Player Overview</template>

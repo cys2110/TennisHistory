@@ -54,13 +54,6 @@ export const GET_PLAYER = (id) => {
             }
           }
         }
-        rg: majorResults(tournament: 520) {
-          events {
-            eid
-            round
-            year
-          }
-        }
       }
     }
   `
