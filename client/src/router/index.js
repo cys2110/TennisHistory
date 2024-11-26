@@ -14,6 +14,7 @@ import {
   StatsView,
   SearchView,
   H2HView,
+  AboutView,
 } from './pages'
 
 const router = createRouter({
@@ -99,6 +100,11 @@ const router = createRouter({
       path: '/search',
       name: 'search',
       component: SearchView,
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: AboutView,
     },
   ],
 })

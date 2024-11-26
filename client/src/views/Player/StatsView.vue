@@ -34,7 +34,6 @@ const { query, variables } = GET_PLAYER_STATS(props.id, selectedYear.value, sele
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
-    if (newResult) console.log(newResult)
     if (newResult) {
         const playerStats = newResult.players[0].stats
         pieStats.value = [{

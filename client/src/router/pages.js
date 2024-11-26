@@ -12,6 +12,7 @@ import TitlesView from '@/views/Player/TitlesView.vue'
 import IndexView from '@/views/Player/IndexView.vue'
 import StatsView from '@/views/Player/StatsView.vue'
 import SearchView from '@/views/Search/SearchView.vue'
+import AboutView from '@/views/AboutView.vue'
 
 export {
   HomeView,
@@ -28,4 +29,5 @@ export {
   IndexView,
   StatsView,
   SearchView,
+  AboutView,
 }

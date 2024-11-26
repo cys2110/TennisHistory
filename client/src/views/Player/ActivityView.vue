@@ -73,6 +73,7 @@ watchEffect(() => {
                 <a-anchor :items="anchorItems" :offset-top="75" />
             </a-config-provider>
         </a-col>
+        <!--[TODO: INCLUDE YEAR STATS]-->
         <a-col :span="20">
             <ActivityCard v-for="event in events" :key="event.scores[0].match.round.event.id" :event :name :id />
         </a-col>
