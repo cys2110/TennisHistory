@@ -74,3 +74,19 @@ export const STATUS_INFO = {
   Q: 'Qualifier',
   Alt: 'Alternate',
 }
+
+export const COLOURS = {
+  red600: '#dc2626',
+  green800: '#166534',
+  green600: '#16a34a',
+  sky600: '#0284c7',
+  fuchsia600: '#c026d3',
+  violet600: '#7c3aed',
+  violet700: '#6d28d9',
+}
+
+export const CHART_OPTIONS = {
+  darkMode: true,
+  backgroundColor: 'transparent',
+  textStyle: { color: '#a1a1aa', fontSize: 14 },
+}

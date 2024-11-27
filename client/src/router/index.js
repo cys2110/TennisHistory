@@ -15,6 +15,7 @@ import {
   SearchView,
   H2HView,
   AboutView,
+  PlayerLayout,
 } from './pages'
 
 const router = createRouter({
@@ -61,34 +62,41 @@ const router = createRouter({
       component: MatchView,
     },
     {
-      path: '/players/:name/:id/overview',
-      name: 'player',
+      path: '/players/:name/:id',
+      component: PlayerLayout,
       props: true,
-      component: PlayerDetailsView,
-    },
-    {
-      path: '/players/:name/:id/activity',
-      name: 'activity',
-      props: true,
-      component: ActivityView,
-    },
-    {
-      path: '/players/:name/:id/titles-and-finals',
-      name: 'titles',
-      props: true,
-      component: TitlesView,
-    },
-    {
-      path: '/players/:name/:id/index',
-      name: 'index',
-      props: true,
-      component: IndexView,
-    },
-    {
-      path: '/players/:name/:id/stats',
-      name: 'stats',
-      props: true,
-      component: StatsView,
+      children: [
+        {
+          path: 'overview',
+          name: 'player',
+          props: true,
+          component: PlayerDetailsView,
+        },
+        {
+          path: 'activity',
+          name: 'activity',
+          props: true,
+          component: ActivityView,
+        },
+        {
+          path: 'titles-and-finals',
+          name: 'titles',
+          props: true,
+          component: TitlesView,
+        },
+        {
+          path: 'index',
+          name: 'index',
+          props: true,
+          component: IndexView,
+        },
+        {
+          path: 'stats',
+          name: 'stats',
+          props: true,
+          component: StatsView,
+        },
+      ],
     },
     {
       path: '/h2h/:p1Name/:p1Id/:p2Name/:p2Id',

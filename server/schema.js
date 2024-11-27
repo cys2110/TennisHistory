@@ -73,6 +73,8 @@ export const typeDefs = `#graphql
         status: String
         player: Player! @relationship(type: "ENTERED", direction: IN)
         scores: [Score!]! @relationship(type: "SCORED", direction: OUT)
+        wins: [Winner!]! @relationship(type: "SCORED", direction: OUT)
+        losses: [Loser!]! @relationship(type: "SCORED", direction: OUT)
     }
 
     type LDA @relationshipProperties {
@@ -562,6 +564,12 @@ export const typeDefs = `#graphql
         """, columnName: "stats")
     }
 
+    type YearStats {
+        wins: Int!
+        losses: Int!
+        titles: Int!
+    }
+
     type Query {
         searchPlayers(full_name: String!): [Player] @cypher(statement: """
             MATCH (p:Player)
@@ -589,5 +597,14 @@ export const typeDefs = `#graphql
             ELSE {events: lowestRounds}
             END AS results
         """, columnName: "results")
+        yearStats (id: String!, year: Int!): YearStats @cypher(statement: """
+            OPTIONAL MATCH (p:Player {id: $id})-[:ENTERED]-(:Entry)-[:SCORED]-(w:Winner)-[:SCORED]-(:Match)-[:PLAYED]-(:Round)-[:ROUND_OF]-(:Event)-[:TOOK_PLACE_IN]-(y:Year {id: $year})
+            WITH p, y, count(w) as wins
+            OPTIONAL MATCH (p)-[:ENTERED]-(:Entry)-[:SCORED]-(l:Loser)-[:SCORED]-(:Match)-[:PLAYED]-(:Round)-[:ROUND_OF]-(:Event)-[:TOOK_PLACE_IN]-(y)
+            WITH wins, count(l) as losses, p, y
+            OPTIONAL MATCH (p)-[:ENTERED]-(:Entry)-[:SCORED]-(t:Winner)-[:SCORED]-(:Match)-[:PLAYED]-(:Round {round: 'Final'})-[:ROUND_OF]-(:Event)-[:TOOK_PLACE_IN]-(y)
+            WITH wins, losses, count(t) as titles
+            RETURN {wins: wins, losses: losses, titles: titles} as yearStats
+        """, columnName: "yearStats")
     }
 `;

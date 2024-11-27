@@ -20,18 +20,19 @@ watch(() => props.match, () => {
 </script>
 
 <template>
-    <a-row>
-        <!--[TODO: FIX STYLING]-->
-        <a-col :span="1">{{ SHORT_ROUNDS[match.round.round] }}</a-col>
-        <a-col :span="1">
-            <a-image v-if="opponent?.player" :alt="opponent.player.player.country.name"
-                :src="flag(opponent.player.player.country.id)" class="rounded" />
+    <a-row class="flex items-center">
+        <a-col :span="2">{{ SHORT_ROUNDS[match.round.round] }}</a-col>
+        <a-col :span="1" class="flex justify-end">
+            <div>
+                <a-image v-if="opponent?.player" :alt="opponent.player.player.country.name"
+                    :src="flag(opponent.player.player.country.id)" class="rounded" />
+            </div>
         </a-col>
-        <a-col :span="2">
+        <a-col :span="1">
             <a-avatar v-if="opponent?.player" :alt="opponent.player.player.full_name"
                 :src="headshot(opponent.player.player.id)" class="border-zinc-300 mx-2" />
         </a-col>
-        <a-col :span="10">
+        <a-col :span="10" class="pl-3">
             <div v-if="match.incomplete === 'B'">BYE</div>
             <router-link v-else class="hover-link"
                 :to="{ name: 'player', params: { name: encodeName(opponent.player.player.full_name), id: opponent.player.player.id } }">{{
@@ -51,8 +52,10 @@ watch(() => props.match, () => {
             </router-link>
         </a-col>
         <a-col :span="3">
-            <router-link v-if="opponent?.player" class="hover-link"
-                :to="{ name: 'h2h', params: { p1Name: name, p1Id: id, p2Name: encodeName(opponent.player.player.full_name), p2Id: opponent.player.player.id } }">H2H</router-link>
+            <div v-if="opponent?.player" class="border-zinc-400 border-2 rounded-xl text-center">
+                <router-link class="hover:text-zinc-300"
+                    :to="{ name: 'h2h', params: { p1Name: name, p1Id: id, p2Name: encodeName(opponent.player.player.full_name), p2Id: opponent.player.player.id } }">H2H</router-link>
+            </div>
         </a-col>
     </a-row>
 </template>

@@ -3,24 +3,22 @@ import { ref, provide } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart } from 'echarts/charts'
-import { DatasetComponent, GridComponent, ToolboxComponent, TooltipComponent } from 'echarts/components'
-import { UniversalTransition } from 'echarts/features'
+import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/components'
 import VChart, { THEME_KEY } from 'vue-echarts'
+import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
 
+// Variables
 const props = defineProps(['player'])
-console.log(props.player)
+const categoryColours = {
+    "Match Record": COLOURS.sky600,
+    "Pressure Points": COLOURS.fuchsia600,
+    "Environment": COLOURS.violet600,
+    "Other": COLOURS.green600
+}
 
 const getIndexValue = (win, loss) => {
     return (win / (win + loss)).toFixed(3)
 }
-
-const categoryColours = {
-    "Match Record": { code: '#0284c7', color: 'bg-sky-600' },
-    "Pressure Points": { code: '#c026d3', color: 'bg-fuchsia-600' },
-    "Environment": { code: '#7c3aed', color: 'bg-violet-600' },
-    "Other": { code: '#16a34a', color: 'bg-green-600' }
-}
-
 const data = [
     {
         category: 'Other',
@@ -159,31 +157,20 @@ const data = [
     }
 ]
 
-use([
-    DatasetComponent,
-    ToolboxComponent,
-    TooltipComponent,
-    GridComponent,
-    BarChart,
-    UniversalTransition,
-    CanvasRenderer,
-])
+use([DatasetComponent, TooltipComponent, GridComponent, BarChart, CanvasRenderer])
 provide(THEME_KEY, 'dark')
 
 const option = ref({
-    grid: {
-        left: "20%"
-    },
-    darkMode: true,
-    backgroundColor: 'transparent',
+    ...CHART_OPTIONS,
+    grid: { left: "20%" },
     tooltip: {
         formatter: function (params) {
-            const stat = params.value[params.dimensionNames[1]];
-            const index = params.value[params.dimensionNames[5]];
-            const wins = params.value[params.dimensionNames[2]];
-            const losses = params.value[params.dimensionNames[3]];
-            const titles = params.value[params.dimensionNames[4]];
-            return `${stat}<br/ >Index: ${index}<br />W-L: ${wins}-${losses}${titles ? `<br />Titles: ${titles}` : ''
+            const stat = params.value.stat;
+            const index = params.value.value;
+            const wins = params.value.win;
+            const losses = params.value.loss;
+            const titles = params.value.titles;
+            return `${stat}<br/ >W-L: ${wins}-${losses} (${index})${titles >= 0 ? `<br />Titles: ${titles}` : ''
                 }`
         },
     },
@@ -191,7 +178,6 @@ const option = ref({
         source: data,
         dimensions: ['category', 'stat', 'win', 'loss', 'titles', 'value']
     },
-    textStyle: { color: "#a1a1aa", fontSize: 14 },
     xAxis: { type: 'value' },
     yAxis: { type: 'category', data: data.map(item => item.stat) },
     series: [
@@ -200,8 +186,7 @@ const option = ref({
             encode: { x: 'value', y: 'stat' },
             itemStyle: {
                 color: function (param) {
-                    const category = param.data.category
-                    return categoryColours[category].code
+                    return categoryColours[param.data.category]
                 }
             }
         }
@@ -212,7 +197,7 @@ const option = ref({
 <template>
     <div class="flex justify-center">
         <div v-for="(entry, index) in Object.entries(categoryColours)" :key="index" class="mx-5 flex">
-            <div class="rounded-lg !w-9 mx-2" :class="entry[1].color"></div>
+            <div class="rounded-lg !w-9 mx-2" :style="{ backgroundColor: entry[1] }"></div>
             <div class="text-zinc-400">{{ entry[0] }}</div>
         </div>
     </div>

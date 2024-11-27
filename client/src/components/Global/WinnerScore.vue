@@ -1,6 +1,6 @@
 <script setup>
 import { getLowerTb } from '@/utils/functions';
-import { INCOMPLETES } from '@/utils/variables';
+import { COLOURS, INCOMPLETES } from '@/utils/variables';
 
 const props = defineProps(['winner', 'loser'])
 </script>
@@ -17,7 +17,6 @@ const props = defineProps(['winner', 'loser'])
             }}</sup>
         {{ winner.s5 ? `${winner.s5}${loser.s5}` : '' }}<sup v-if="winner.t5">{{ getLowerTb(winner.t5, loser.t5)
             }}</sup>
-        <!--[FIX INCOMPLETE STYLING]-->
-        {{ loser.incomplete ? INCOMPLETES[loser.incomplete] : "" }}
+        <a-tag v-if="loser.incomplete" :color="COLOURS.red600">{{ INCOMPLETES[loser.incomplete] }}</a-tag>
     </div>
 </template>

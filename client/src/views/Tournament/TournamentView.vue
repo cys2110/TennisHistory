@@ -1,19 +1,17 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
-import apolloClient from '@/apollo';
-import { provideApolloClient, useQuery } from '@vue/apollo-composable';
-import { unencodeName } from '@/utils/functions';
+import { useQuery } from '@vue/apollo-composable';
 import { GET_TOURNAMENT } from '@/services/TournamentService';
+import { unencodeName, updateDocumentTitle } from '@/utils/functions';
 
+// Variables
 const props = defineProps(['id', 'name'])
 const tournament = ref(null)
 
-const updateDocumentTitle = () => document.title = `${unencodeName(props.name)} | TennisHistory`
-watch(() => props.name, () => {
-    updateDocumentTitle()
-}, { immediate: true })
+// Update document title
+watch(() => props.name, () => updateDocumentTitle(`${unencodeName(props.name)} | TennisHistory`), { immediate: true })
 
-provideApolloClient(apolloClient)
+// API call
 const { query, variables } = GET_TOURNAMENT(parseInt(props.id))
 const { result, loading, error } = useQuery(query, variables)
 
@@ -37,7 +35,7 @@ const years = computed(() => {
         <template v-if="tournament" #subtitle>{{ years }}</template>
     </Title>
     <a-row v-if="tournament?.events.length > 0" justify="space-evenly" :gutter="[0, 32]">
-        <a-col v-for="event in tournament.events" :key="event.id" :span=5>
+        <a-col v-for="event in tournament.events" :key="event.id" :span="5">
             <TournamentCard :event :id :name />
         </a-col>
     </a-row>

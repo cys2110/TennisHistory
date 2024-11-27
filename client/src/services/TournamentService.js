@@ -35,6 +35,7 @@ export const GET_TOURNAMENT = (id) => {
           end_date
           rounds(where: { round: "Final" }) {
             matches {
+              match_no
               winner {
                 player {
                   player {

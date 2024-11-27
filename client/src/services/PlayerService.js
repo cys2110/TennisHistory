@@ -63,6 +63,11 @@ export const GET_PLAYER = (id) => {
 export const GET_ACTIVITY = (id, year) => {
   const call = gql`
     query Activity($id: String!, $year: Int!) {
+      yearStats(id: $id, year: $year) {
+        losses
+        titles
+        wins
+      }
       players(where: { id: $id }) {
         years {
           earliest

@@ -3,69 +3,59 @@ import { computed } from 'vue';
 import { encodeName } from '@/utils/functions';
 import { SURFACES } from '@/utils/variables';
 
+// Variables
 const props = defineProps(['events'])
-
-const flattenedEvents = computed(() => {
-    return props.events.reduce((acc, event) => {
-        const { year, count, events: eventList } = event;
-        const rows = eventList.map((e, index) => ({
+const flattenedEvents = computed(() =>
+    props.events.flatMap(({ year, count, events: eventList }) =>
+        eventList.map((event, index) => ({
             year: index === 0 ? year : "",
             count: index === 0 ? count : "",
-            event: e,
+            event,
             rowSpan: index === 0 ? count : 0,
-        }));
-        return acc.concat(rows);
-    }, [])
-})
+        }))
+    )
+);
+
+// Table styling
+const customHeaderStyle = { style: { backgroundColor: '#5b21b6', textAlign: 'center' } }
+const customHeaderCell = () => customHeaderStyle;
+const customCell = record => ({ rowSpan: record.rowSpan, align: 'center' });
 
 const columns = [
     {
         title: "Year",
         dataIndex: "year",
         key: "year",
-        customCell: (record) => {
-            return { rowSpan: record.rowSpan }
-        },
-        customHeaderCell: () => {
-            return { style: { backgroundColor: '#5b21b6' } }
-        }
+        customCell,
+        customHeaderCell
     },
     {
         title: "Total",
         dataIndex: "count",
         key: "count",
-        customCell: (record) => {
-            return { rowspan: record.rowSpan }
-        },
-        customHeaderCell: () => {
-            return { style: { backgroundColor: '#5b21b6' } }
-        }
+        customCell,
+        customHeaderCell
     },
     {
-        title: "Event Name",
+        title: "Event",
         dataIndex: "event",
         key: "eventName",
-        customHeaderCell: () => {
-            return { style: { backgroundColor: '#5b21b6' } }
-        }
+        customHeaderCell
     },
     {
         title: "Surface",
         dataIndex: ["event", "surface"],
         key: "surface",
-        customHeaderCell: () => {
-            return { style: { backgroundColor: '#5b21b6' } }
-        }
+        customHeaderCell
     },
 ];
 
 </script>
 
 <template>
-    <!--[FIX SPACING]-->
     <a-table :columns :data-source="flattenedEvents">
         <template #bodyCell="{ column, record }">
-            <template v-if="column.title === 'Event Name'">
+            <template v-if="column.title === 'Event'">
                 <router-link class="hover-link"
                     :to="{ name: 'tournament', params: { name: encodeName(record.event.tournament_name), id: record.event.tournament_id } }">{{
                         record.event.tournament_name }}</router-link>

@@ -1,19 +1,19 @@
 <script setup>
 import { ref, watch } from 'vue';
-import apolloClient from '@/apollo';
-import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import { useQuery } from '@vue/apollo-composable';
 import { GET_PLAYER } from '@/services/PlayerService';
-import { gladiator, headshot, unencodeName } from '@/utils/functions';
+import { gladiator, headshot, unencodeName, updateDocumentTitle } from '@/utils/functions';
 
+// [TODO: FIGURE OUT MAJOR RESULTS APICALL]
+
+// Variables
 const props = defineProps(['name', 'id'])
 const player = ref(null)
 
-const updateDocumentTitle = () => document.title = `${unencodeName(props.name)} | TennisHistory`
-watch(() => props.name, () => {
-    updateDocumentTitle()
-}, { immediate: true })
+// Update document title
+watch(() => props.name, () => updateDocumentTitle(`${unencodeName(props.name)} | TennisHistory`), { immediate: true })
 
-provideApolloClient(apolloClient)
+// API call
 const { query, variables } = GET_PLAYER(props.id)
 const { result, loading, error } = useQuery(query, variables)
 
@@ -26,19 +26,14 @@ watch(error, (newError) => {
 </script>
 
 <template>
-    <PlayerBreadcrumbs :name :id />
-    <Title>
-        <template #title>{{ unencodeName(name) }}</template>
-        <template #subtitle>Player Overview</template>
-    </Title>
     <a-row v-if="player">
-        <a-col :span=4>
+        <a-col :span="4">
             <a-image :alt="player.full_name" :src="player.gladiator ? gladiator(player.id) : headshot(player.id)"
-                :preview="false" />
+                :preview="false" class="rounded-full" />
         </a-col>
-        <a-col :span=20>
+        <a-col :span="20">
             <PlayerDetails :player />
-            <!--[INSERT MAJOR RESULTS TABLE]-->
+            <!--[TODO: INSERT MAJOR RESULTS TABLE]-->
         </a-col>
     </a-row>
     <Loading v-else :loading>

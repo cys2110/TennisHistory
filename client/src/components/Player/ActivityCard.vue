@@ -1,46 +1,75 @@
 <script setup>
-import { encodeName, formattedDates } from '@/utils/functions';
-import { CURRENCIES, SURFACES } from '@/utils/variables';
+import { encodeName, formatCurrency, formattedDates } from '@/utils/functions';
+import { SURFACES } from '@/utils/variables';
 
-const cardTheme = { colorBgContainer: "#5b21b6" }
 const props = defineProps(['event', 'id', 'name'])
 const eventDetails = props.event.scores[0].match.round.event
+const earnings = {
+    Seed: props.event.seed,
+    Status: props.event.status,
+    Points: props.event.points,
+    Rank: props.event.rank,
+    "Prize Money": formatCurrency(eventDetails.currency, props.event.pm)
+}
+const actionButtons = [
+    { title: 'Details', name: 'event' },
+    { title: 'Results', name: 'results' },
+    { title: 'Draw', name: 'draw' }
+]
+const tournamentParams = {
+    name: encodeName(eventDetails.tournament.name),
+    id: eventDetails.tournament.id
+}
+const eventParams = {
+    ...tournamentParams,
+    year: eventDetails.year.id,
+    eid: eventDetails.id
+}
 </script>
 
 <template>
-    <a-config-provider :theme="{ components: { Card: cardTheme } }">
-        <a-card :id="eventDetails.tournament.name">
-            <template #title>
-                <div><span v-if="eventDetails.sponsor_name">{{ eventDetails.sponsor_name }} | </span>
-                    <router-link class="hover-link"
-                        :to="{ name: 'tournament', params: { name: encodeName(eventDetails.tournament.name), id: eventDetails.tournament.id } }">{{
-                            eventDetails.tournament.name }}</router-link>
+    <a-card :id="eventDetails.tournament.name" class="p-3">
+        <template #title>
+            <div><span v-if="eventDetails.sponsor_name">{{ eventDetails.sponsor_name }} | </span>
+                <router-link class="hover-link" :to="{ name: 'tournament', params: tournamentParams }">{{
+                    eventDetails.tournament.name }}</router-link>
+            </div>
+            <div>{{ formattedDates(eventDetails.start_date, eventDetails.end_date) }} | {{ eventDetails.venue.city
+                }},
+                {{ eventDetails.venue.country.name }}</div>
+        </template>
+        <template #extra>
+            <div class="text-right">
+                <div>{{ eventDetails.category }}</div>
+                <div>{{ SURFACES[eventDetails.surface.id] }}</div>
+            </div>
+        </template>
+        <a-row class="text-center">
+            <a-col :span="3" class="text-left font-bold">ROUND</a-col>
+            <a-col :span="1"></a-col>
+            <a-col :span="8" class="font-bold">OPPONENT</a-col>
+            <a-col :span="4" class="font-bold">RANK</a-col>
+            <a-col :span="5" class="text-left font-bold">SCORE</a-col>
+            <a-col :span="3"></a-col>
+        </a-row>
+        <ActivityRow v-for="(match, index) in event.scores" :key="index" :match="match.match" :event="eventDetails"
+            :name :id class="my-2" />
+        <a-card-meta>
+            <template #description>
+                <div class="flex mt-2">
+                    <template v-for="(value, key) in earnings">
+                        <div v-if="value" class="mr-2">{{ key }}: {{ value }}</div>
+                    </template>
                 </div>
-                <div>{{ formattedDates(eventDetails.start_date, eventDetails.end_date) }} | {{ eventDetails.venue.city
-                    }},
-                    {{ eventDetails.venue.country.name }}</div>
             </template>
-            <template #extra>
-                <div>
-                    <div>{{ eventDetails.category }}</div>
-                    <div>{{ SURFACES[eventDetails.surface.id] }}</div>
-                </div>
-            </template>
-            <ActivityRow v-for="(match, index) in event.scores" :key="index" :match="match.match" :event="eventDetails"
-                :name :id />
-            <a-card-meta>
-                <template #description>
-                    <!--[TODO: SPACING]-->
-                    <div class="flex">
-                        <div v-if="event.seed">Seed: {{ event.seed }}</div>
-                        <div v-if="event.status">Status: {{ event.status }}</div>
-                        <div>Points: {{ event.points }}</div>
-                        <div>Rank: {{ event.rank }}</div>
-                        <!--[TODO: THOUSAND SEPARATOR]-->
-                        <div>Prize Money: {{ CURRENCIES[eventDetails.currency] }}{{ event.pm }}</div>
-                    </div>
-                </template>
-            </a-card-meta>
-        </a-card>
-    </a-config-provider>
+        </a-card-meta>
+        <template #actions>
+            <a-button v-for="button in actionButtons" :key="button.name" type="dashed" :ghost="true" shape="round"
+                size="small" class="!border-zinc-300 hover:!border-zinc-400">
+                <router-link class="!text-zinc-300 hover:!text-zinc-400"
+                    :to="{ name: button.name, params: eventParams }">
+                    {{ button.title }}</router-link>
+            </a-button>
+        </template>
+    </a-card>
 </template>

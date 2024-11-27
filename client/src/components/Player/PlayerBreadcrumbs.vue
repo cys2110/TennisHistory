@@ -1,32 +1,11 @@
 <script setup>
-
-import { unencodeName } from '@/utils/functions';
 import { useRoute } from 'vue-router';
+import { unencodeName } from '@/utils/functions';
+
+// Variables
 const props = defineProps(['name', 'id'])
 const route = useRoute()
-
-const pages = [
-    {
-        name: 'player',
-        title: 'Details'
-    },
-    {
-        name: 'activity',
-        title: 'Activity'
-    },
-    {
-        name: 'titles',
-        title: 'Titles and Finals'
-    },
-    {
-        name: 'index',
-        title: 'Win-Loss Index'
-    },
-    {
-        name: 'stats',
-        title: 'Stats'
-    }
-]
+const pages = [{ name: 'player', title: 'Details' }, { name: 'activity', title: 'Activity' }, { name: 'titles', title: 'Titles and Finals' }, { name: 'index', title: 'Win-Loss Index' }, { name: 'stats', title: 'Stats' }]
 </script>
 
 <template>
@@ -40,8 +19,7 @@ const pages = [
                 <a-menu>
                     <template v-for="(page, index) in pages" :key="index">
                         <a-menu-item v-if="route.name !== page.name">
-                            <router-link :to="{ name: page.name, params: { name: name, id: id } }">{{ page.title
-                                }}</router-link>
+                            <router-link :to="{ name: page.name }">{{ page.title }}</router-link>
                         </a-menu-item>
                     </template>
                 </a-menu>

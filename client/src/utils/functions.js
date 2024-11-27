@@ -26,11 +26,11 @@ export const flag = (country) => {
 }
 
 export const percentage = (value1, total) => {
-  return (value1 / total) * 100
+  return ((value1 / total) * 100).toFixed(0)
 }
 
 export const formatCurrency = (currency, amount) => {
-  return amount.toLocaleString('en-gb', {
+  return amount.toLocaleString('en-GB', {
     style: 'currency',
     currency: currency,
     maximumFractionDigits: 0,
@@ -86,4 +86,8 @@ export const getEntry = (entry) => {
   } else if (entry.seed || entry.status) {
     return `(${entry.seed || entry.status})`
   }
+}
+
+export const updateDocumentTitle = (title) => {
+  document.title = title
 }

@@ -20,7 +20,6 @@ const { query, variables } = GET_H2H(props.p1Id, props.p2Id)
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
-    if (newResult) console.log(newResult)
     if (newResult) {
         h2h.value = newResult
         pieStats.value = [{

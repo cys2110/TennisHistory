@@ -1,4 +1,6 @@
 <script setup>
+import { encodeName } from '@/utils/functions';
+
 const props = defineProps(['tournament'])
 </script>
 
@@ -11,8 +13,11 @@ const props = defineProps(['tournament'])
             {{ tournament.name }}
             <template #overlay>
                 <a-menu>
-                    <a-menu-item v-for="event in tournament.events" :key="event.id">{{ event.year.id }}</a-menu-item>
-                    <!--[INSERT EVENT LINKS]-->
+                    <a-menu-item v-for="event in tournament.events" :key="event.id">
+                        <router-link
+                            :to="{ name: 'event', params: { id: tournament.id, name: encodeName(tournament.name), year: event.year.id, eid: event.id } }">{{
+                                event.year.id }}</router-link>
+                    </a-menu-item>
                 </a-menu>
             </template>
         </a-breadcrumb-item>
