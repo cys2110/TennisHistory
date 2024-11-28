@@ -181,26 +181,26 @@ export const GET_ACTIVITY = (id, year) => {
 
 export const GET_TITLES = (id) => {
   const call = gql`
-    query Titles($id: String!) {
-      players(where: { id: $id }) {
-        titlesByYear {
-          year
+    query PlayerTitlesAndFinals($id: String!) {
+      playerTitlesAndFinals(id: $id) {
+        finals {
           count
           events {
-            id
-            tournament_id
-            tournament_name
+            tid
             surface
+            id
+            tname
           }
+          year
         }
-        finalsByYear {
+        titles {
           year
           count
           events {
             id
-            tournament_id
-            tournament_name
             surface
+            tid
+            tname
           }
         }
       }

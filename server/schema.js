@@ -1,363 +1,128 @@
 export const typeDefs = `#graphql
-    type Year {
-        id: Int! @unique
-    }
 
-    type Surface {
-        id: String!
-        environment: String!
-        surface: String!
-        hard_type: String
-    }
-
-    type Country {
+    type Active {
+        bh1: Boolean
+        career_high: Int
+        ch_date: Date
+        coaches: [Coach!]! @relationship(type: "COACHES", direction: IN)
+        country: Country! @relationship(type: "REPRESENTS", direction: OUT, properties: "RepresentsProperties")
+        dob: Date
+        dod: Date
+        entries: [Entry!]! @relationship (type: "ENTERED", direction: OUT)
+        first_name: String
+        full_name: String! @customResolver(requires: "first_name last_name")
+        gladiator: Boolean
+        height_cm: Int
+        hof: Int
         id: String! @unique
-        name: String! @unique
-    }
-
-    type Venue {
-        name: String @unique
-        city: String! @unique
-        country: Country! @relationship(type: "LOCATED_IN", direction: OUT)
-    }
-
-    type Supervisor {
-        id: String! @unique
-    }
-
-    type Umpire {
-        id: String! @unique
-    }
-
-    type Tournament {
-        id: Int! @unique
-        name: String! @unique
-        website: String
-        start_year: Year! @relationship(type: "ESTABLISHED", direction: OUT)
-        end_year: Year @relationship(type: "ABOLISHED", direction: OUT)
-        events: [Event!]! @relationship(type: "EDITION_OF", direction: IN)
-    }
-
-    type Event {
-        id: Int! @unique
-        sponsor_name: String
-        category: String
-        start_date: Date
-        end_date: Date
-        draw_type: String
-        pm: Int
-        tfc: Int
-        currency: String
-        tournament: Tournament! @relationship(type: "EDITION_OF", direction: OUT)
-        year: Year! @relationship(type: "TOOK_PLACE_IN", direction: OUT)
-        surface: Surface @relationship(type: "ON_SURFACE", direction: OUT)
-        venue: Venue @relationship(type: "TOOK_PLACE_IN", direction: OUT)
-        rounds: [Round!]! @relationship(type: "ROUND_OF", direction: IN)
-        supervisors: [Supervisor!]! @relationship(type: "SUPERVISED", direction: IN)
-        seeds: [Entry!]! @relationship(type: "SEEDED", direction: IN)
-        lda: Entry @relationship(type: "LDA", direction: IN, properties: "LDA")
-        wd: [Entry!]! @relationship(type: "WITHDREW", direction: IN, properties: "Withdrew")
-        ret: [Entry!]! @relationship(type: "RETIRED", direction: IN, properties: "Retired")
-        wo: [Entry!]! @relationship(type: "WALKOVER", direction: IN, properties: "Walkover")
-        defaulted: [Entry!]! @relationship(type: "DEFAULTED", direction: IN, properties: "Defaulted")
-        lls: [Entry!]! @relationship(type: "LUCKY_LOSER", direction: IN)
-        alt: [Entry!]! @relationship(type: "ALTERNATE", direction: IN)
-    }
-
-    type Entry {
-        id: String! @unique
-        seed: Int
-        rank: Int
-        pm: Int
-        points: Int
-        status: String
-        player: Player! @relationship(type: "ENTERED", direction: IN)
-        scores: [Score!]! @relationship(type: "SCORED", direction: OUT)
-        wins: [Winner!]! @relationship(type: "SCORED", direction: OUT)
-        losses: [Loser!]! @relationship(type: "SCORED", direction: OUT)
-    }
-
-    type LDA @relationshipProperties {
-        rank: Int
-    }
-
-    type Retired @relationshipProperties {
-        reason: String
-    }
-
-    type Walkover @relationshipProperties {
-        reason: String
-    }
-
-    type Defaulted @relationshipProperties {
-        reason: String
-    }
-
-    type Withdrew @relationshipProperties {
-        reason: String
-    }
-
-    type Match {
-        id: String! @unique
-        round: Round @relationship(type: "PLAYED", direction: OUT)
-        match_no: Int
-        court: String
-        date: Date
-        duration_mins: Int
-        incomplete: String
-        sort_date: Date
-        umpire: Umpire @relationship(type: "UMPIRED", direction: IN)
-        scores: [Score!]! @relationship(type: "SCORED", direction: IN)
-        winner: Winner @relationship(type: "SCORED", direction: IN)
-        loser: Loser @relationship(type: "SCORED", direction: IN)
-        p1: P1 @relationship(type: "SCORED", direction: IN)
-        p2: P2 @relationship(type: "SCORED", direction: IN)
+        last_name: String
+        loss: Int
+        pm_USD: Int
+        prev_countries: [Country!]! @relationship(type: "REPRESENTED", direction: OUT, properties: "RepresentsProperties")
+        retired: Year @relationship(type: "RETIRED", direction: OUT)
+        rh: Boolean
+        titles: Int
+        turned_pro: Year @relationship(type: "TURNED_PRO", direction: OUT)
+        win: Int
     }
 
     type Best3 {
-        id: String! @unique
-        round: String
-        match_no: Int
         court: String
         date: Date
         duration_mins: Int
+        group: String
+        id: String! @unique
         incomplete: String
-        event: Event! @relationship(type: "PLAYED", direction: OUT)
+        loser: Loser @relationship(type: "SCORED", direction: IN)
+        match_no: Int
+        p1: P1 @relationship(type: "SCORED", direction: IN)
+        p2: P2 @relationship(type: "SCORED", direction: IN)
+        round: Round @relationship(type: "PLAYED", direction: OUT)
+        scores: [Score!]! @relationship(type: "SCORED", direction: IN)
+        sort_date: Date
+        umpire: Umpire @relationship(type: "UMPIRED", direction: IN)
+        winner: Winner @relationship(type: "SCORED", direction: IN)
     }
 
     type Best5 {
-        id: String! @unique
-        round: String
-        match_no: Int
         court: String
         date: Date
         duration_mins: Int
+        group: String
+        id: String! @unique
         incomplete: String
-        event: Event! @relationship(type: "PLAYED", direction: OUT)
-    }
-
-    type Score {
-        s1: Int
-        s2: Int
-        s3: Int
-        s4: Int
-        s5: Int
-        t1: Int
-        t2: Int
-        t3: Int
-        t4: Int
-        t5: Int
-        incomplete: String
-        aces: Int
-        dfs: Int
-        serve1_pts_w: Int
-        serve1_pts: Int
-        serve2_pts_w: Int
-        serve2_pts: Int
-        bps_saved: Int
-        bps_faced: Int
-        ret1_w: Int
-        ret1: Int
-        ret2_w: Int
-        ret2: Int
-        bps_converted: Int
-        bp_opps: Int
-        net_w: Int
-        net: Int
-        winners: Int
-        ues: Int
-        max_speed_kph: Int
-        avg_sv1_kph: Int
-        avg_sv2_kph: Int
-        match: Match! @relationship(type: "SCORED", direction: OUT)
-        best3: Best3! @relationship(type: "SCORED", direction: OUT)
-        best5: Best5! @relationship(type: "SCORED", direction: OUT)
-        player: Entry! @relationship(type: "SCORED", direction: IN)
-    }
-
-    type P1 {
-        s1: Int
-        s2: Int
-        s3: Int
-        s4: Int
-        s5: Int
-        t1: Int
-        t2: Int
-        t3: Int
-        t4: Int
-        t5: Int
-        incomplete: String
-        aces: Int
-        dfs: Int
-        serve1_pts_w: Int
-        serve1_pts: Int
-        serve2_pts_w: Int
-        serve2_pts: Int
-        bps_saved: Int
-        bps_faced: Int
-        ret1_w: Int
-        ret1: Int
-        ret2_w: Int
-        ret2: Int
-        bps_converted: Int
-        bp_opps: Int
-        net_w: Int
-        net: Int
-        winners: Int
-        ues: Int
-        max_speed_kph: Int
-        avg_sv1_kph: Int
-        avg_sv2_kph: Int
-        player: Entry @relationship(type: "SCORED", direction: IN)
-    }
-
-    type P2 {
-        s1: Int
-        s2: Int
-        s3: Int
-        s4: Int
-        s5: Int
-        t1: Int
-        t2: Int
-        t3: Int
-        t4: Int
-        t5: Int
-        incomplete: String
-        aces: Int
-        dfs: Int
-        serve1_pts_w: Int
-        serve1_pts: Int
-        serve2_pts_w: Int
-        serve2_pts: Int
-        bps_saved: Int
-        bps_faced: Int
-        ret1_w: Int
-        ret1: Int
-        ret2_w: Int
-        ret2: Int
-        bps_converted: Int
-        bp_opps: Int
-        net_w: Int
-        net: Int
-        winners: Int
-        ues: Int
-        max_speed_kph: Int
-        avg_sv1_kph: Int
-        avg_sv2_kph: Int
-        player: Entry @relationship(type: "SCORED", direction: IN)
-    }
-
-    type Winner {
-        s1: Int
-        s2: Int
-        s3: Int
-        s4: Int
-        s5: Int
-        t1: Int
-        t2: Int
-        t3: Int
-        t4: Int
-        t5: Int
-        incomplete: String
-        aces: Int
-        dfs: Int
-        serve1_pts_w: Int
-        serve1_pts: Int
-        serve2_pts_w: Int
-        serve2_pts: Int
-        bps_saved: Int
-        bps_faced: Int
-        ret1_w: Int
-        ret1: Int
-        ret2_w: Int
-        ret2: Int
-        bps_converted: Int
-        bp_opps: Int
-        net_w: Int
-        net: Int
-        winners: Int
-        ues: Int
-        max_speed_kph: Int
-        avg_sv1_kph: Int
-        avg_sv2_kph: Int
-        match: Match! @relationship(type: "SCORED", direction: OUT)
-        best3: Best3! @relationship(type: "SCORED", direction: OUT)
-        best5: Best5! @relationship(type: "SCORED", direction: OUT)
-        player: Entry! @relationship(type: "SCORED", direction: IN)
-    }
-
-    type Loser {
-        s1: Int
-        s2: Int
-        s3: Int
-        s4: Int
-        s5: Int
-        t1: Int
-        t2: Int
-        t3: Int
-        t4: Int
-        t5: Int
-        incomplete: String
-        aces: Int
-        dfs: Int
-        serve1_pts_w: Int
-        serve1_pts: Int
-        serve2_pts_w: Int
-        serve2_pts: Int
-        bps_saved: Int
-        bps_faced: Int
-        ret1_w: Int
-        ret1: Int
-        ret2_w: Int
-        ret2: Int
-        bps_converted: Int
-        bp_opps: Int
-        net_w: Int
-        net: Int
-        winners: Int
-        ues: Int
-        max_speed_kph: Int
-        avg_sv1_kph: Int
-        avg_sv2_kph: Int
-        match: Match! @relationship(type: "SCORED", direction: OUT)
-        best3: Best3! @relationship(type: "SCORED", direction: OUT)
-        best5: Best5! @relationship(type: "SCORED", direction: OUT)
-        player: Entry! @relationship(type: "SCORED", direction: IN)
-    }
-
-    type Represents @relationshipProperties {
-        start_date: Date
-        end_date: Date
+        loser: Loser @relationship(type: "SCORED", direction: IN)
+        match_no: Int
+        p1: P1 @relationship(type: "SCORED", direction: IN)
+        p2: P2 @relationship(type: "SCORED", direction: IN)
+        round: Round @relationship(type: "PLAYED", direction: OUT)
+        scores: [Score!]! @relationship(type: "SCORED", direction: IN)
+        sort_date: Date
+        umpire: Umpire @relationship(type: "UMPIRED", direction: IN)
+        winner: Winner @relationship(type: "SCORED", direction: IN)
     }
 
     type Coach {
-        id: String!
+        id: String! @unique
         first_name: String
         last_name: String
         full_name: String! @customResolver(requires: "first_name last_name")
     }
 
-    type Round {
-        id: String!
-        round: String!
-        number: Int!
+    type Country {
+        country1Ties: [Tie!]! @relationship(type: "COUNTRY1", direction: OUT)
+        country2Ties: [Tie!]! @relationship(type: "COUNTRY2", direction: OUT)
+        formerPlayers: [Player!]! @relationship(type: "REPRESENTED", direction: IN, properties: "RepresentsProperties")
+        id: String! @unique
+        name: String! @unique
+        players: [Player!]! @relationship(type: "REPRESENTS", direction: IN, properties: "RepresentsProperties")
+        venues: [Venue!]! @relationship(type: "LOCATED_IN", direction: IN)
+    }
+
+    type DefaultedProperties @relationshipProperties {
+        reason: String
+    }
+
+    type Entry {
+        scores: [Score!]! @relationship(type: "SCORED", direction: OUT)
+        wins: [Winner!]! @relationship(type: "SCORED", direction: OUT)
+        id: String! @unique
+        losses: [Loser!]! @relationship(type: "SCORED", direction: OUT)
+        player: Player @relationship(type: "ENTERED", direction: IN)
         pm: Int
         points: Int
-        event: Event! @relationship(type: "ROUND_OF", direction: OUT)
-        matches: [Match!]! @relationship(type: "PLAYED", direction: IN)
+        rank: Int
+        seed: Int
+        status: String
+        team: String
     }
 
-    type TitlesFinals {
-        year: Int!
-        count: Int!
-        events: [EventFinal!]!
-    }
-
-    type EventFinal {
-        id: Int!
-        tournament_id: Int!
-        tournament_name: String!
-        surface: String!
+    type Event {
+        alt: [Entry!]! @relationship(type: "ALTERNATE", direction: IN)
+        category: String
+        currency: String
+        defaulted: [Entry!]! @relationship(type: "DEFAULTED", direction: IN, properties: "DefaultedProperties")
+        draw_type: String!
+        end_date: Date!
+        id: Int! @unique
+        lda: [Entry!]! @relationship(type: "LDA", direction: IN, properties: "LdaProperties")
+        lls: [Entry!]! @relationship(type: "LUCKY_LOSER", direction: IN)
+        pm: Int
+        qualifiers: [Entry!]! @relationship(type: "QUALIFIED", direction: IN)
+        ret: [Entry!]! @relationship(type: "RETIRED", direction: IN, properties: "RetiredProperties")
+        rounds: [Round!]! @relationship(type: "ROUND_OF", direction: IN)
+        seeds: [Entry!]! @relationship(type: "SEEDED", direction: IN)
+        sponsor_name: String
+        start_date: Date!
+        supervisors: [Supervisor!]! @relationship(type: "SUPERVISED", direction: IN)
+        surface: Surface @relationship(type: "ON_SURFACE", direction: OUT)
+        tfc: Int
+        tournament: Tournament! @relationship(type: "EDITION_OF", direction: OUT)
+        venue: Venue @relationship(type: "TOOK_PLACE_IN", direction: OUT)
+        wc: [Entry!]! @relationship(type: "WILD_CARD", direction: IN)
+        wd: [Entry!]! @relationship(type: "WITHDREW", direction: IN, properties: "WithdrewProperties")
+        wo: [Entry!]! @relationship(type: "WALKOVER", direction: IN, properties: "WalkoverProperties")
+        year: Year! @relationship(type: "TOOK_PLACE_IN", direction: OUT)
     }
 
     type Index {
@@ -408,84 +173,163 @@ export const typeDefs = `#graphql
         lhLosses: Int!
     }
 
-    type Years {
-        earliest: Int
-        latest: Int
+    type LdaProperties @relationshipProperties {
+        rank: Int
     }
 
-    type Stats {
-        aces: Int!
-        dfs: Int!
-        serve1_w: Int!
-        serve1: Int!
-        serve2_w: Int!
-        serve2: Int!
-        ret1_w: Int!
-        ret1: Int!
-        ret2_w: Int!
-        ret2: Int!
-        bps_faced: Int!
-        bps_saved: Int!
-        bp_opps: Int!
-        bps_converted: Int!
+    type Loser {
+        aces: Int
+        avg_sv1_kph: Int
+        avg_sv2_kph: Int
+        best3: Best3! @relationship(type: "SCORED", direction: OUT)
+        best5: Best5! @relationship(type: "SCORED", direction: OUT)
+        bp_opps: Int
+        bps_converted: Int
+        bps_faced: Int
+        bps_saved: Int
+        dfs: Int
+        id: String!
+        incomplete: String
+        match: Match! @relationship(type: "SCORED", direction: OUT)
+        max_speed_kph: Int
+        net: Int
+        net_w: Int
+        player: Entry! @relationship(type: "SCORED", direction: IN)
+        ret1: Int
+        ret1_w: Int
+        ret2: Int
+        ret2_w: Int
+        s1: Int
+        s2: Int
+        s3: Int
+        s4: Int
+        s5: Int
+        serve1_pts: Int
+        serve1_pts_w: Int
+        serve2_pts: Int
+        serve2_pts_w: Int
+        t1: Int
+        t2: Int
+        t3: Int
+        t4: Int
+        t5: Int
+        ues: Int
+        winners: Int
     }
 
-    type MajorResult {
-        round: String!
-        year: Int!
-        eid: Int!
+    type Match {
+        court: String
+        date: Date
+        duration_mins: Int
+        group: String
+        id: String! @unique
+        incomplete: String
+        loser: Loser @relationship(type: "SCORED", direction: IN)
+        match_no: Int
+        p1: P1 @relationship(type: "SCORED", direction: IN)
+        p2: P2 @relationship(type: "SCORED", direction: IN)
+        round: Round @relationship(type: "PLAYED", direction: OUT)
+        scores: [Score!]! @relationship(type: "SCORED", direction: IN)
+        sort_date: Date
+        umpire: Umpire @relationship(type: "UMPIRED", direction: IN)
+        winner: Winner @relationship(type: "SCORED", direction: IN)
     }
 
-    type MajorResults {
-        events: [MajorResult]
+    type P1 {
+        aces: Int
+        avg_sv1_kph: Int
+        avg_sv2_kph: Int
+        best3: Best3! @relationship(type: "SCORED", direction: OUT)
+        best5: Best5! @relationship(type: "SCORED", direction: OUT)
+        bp_opps: Int
+        bps_converted: Int
+        bps_faced: Int
+        bps_saved: Int
+        dfs: Int
+        id: String!
+        incomplete: String
+        match: Match! @relationship(type: "SCORED", direction: OUT)
+        max_speed_kph: Int
+        net: Int
+        net_w: Int
+        player: Entry! @relationship(type: "SCORED", direction: IN)
+        ret1: Int
+        ret1_w: Int
+        ret2: Int
+        ret2_w: Int
+        s1: Int
+        s2: Int
+        s3: Int
+        s4: Int
+        s5: Int
+        serve1_pts: Int
+        serve1_pts_w: Int
+        serve2_pts: Int
+        serve2_pts_w: Int
+        t1: Int
+        t2: Int
+        t3: Int
+        t4: Int
+        t5: Int
+        ues: Int
+        winners: Int
+    }
+
+    type P2 {
+        aces: Int
+        avg_sv1_kph: Int
+        avg_sv2_kph: Int
+        best3: Best3! @relationship(type: "SCORED", direction: OUT)
+        best5: Best5! @relationship(type: "SCORED", direction: OUT)
+        bp_opps: Int
+        bps_converted: Int
+        bps_faced: Int
+        bps_saved: Int
+        dfs: Int
+        id: String!
+        incomplete: String
+        match: Match! @relationship(type: "SCORED", direction: OUT)
+        max_speed_kph: Int
+        net: Int
+        net_w: Int
+        player: Entry! @relationship(type: "SCORED", direction: IN)
+        ret1: Int
+        ret1_w: Int
+        ret2: Int
+        ret2_w: Int
+        s1: Int
+        s2: Int
+        s3: Int
+        s4: Int
+        s5: Int
+        serve1_pts: Int
+        serve1_pts_w: Int
+        serve2_pts: Int
+        serve2_pts_w: Int
+        t1: Int
+        t2: Int
+        t3: Int
+        t4: Int
+        t5: Int
+        ues: Int
+        winners: Int
     }
 
     type Player {
-        id: String! @unique
-        first_name: String!
-        last_name: String!
-        full_name: String! @customResolver(requires: "first_name last_name")
+        bh1: Boolean
         career_high: Int
         ch_date: Date
-        win: Int!
-        loss: Int!
-        titles: Int!
-        pm_USD: Int!
-        gladiator: Boolean!
-        dob: Date
-        height_cm: Int
-        rh: Boolean
-        bh1: Boolean
         coaches: [Coach!]! @relationship(type: "COACHES", direction: IN)
-        country: Country! @relationship(type: "REPRESENTS", properties: "Represents", direction: OUT)
-        prev_countries: [Country!]! @relationship(type: "REPRESENTED", properties: "Represents", direction: OUT)
-        turned_pro: Year! @relationship(type: "TURNED_PRO", direction: OUT)
-        retired: Year @relationship(type: "RETIRED", direction: OUT)
+        country: Country! @relationship(type: "REPRESENTS", direction: OUT, properties: "RepresentsProperties")
+        dob: Date
+        dod: Date
         entries: [Entry!]! @relationship (type: "ENTERED", direction: OUT)
-        titlesByYear: [TitlesFinals!]! @cypher(statement: """
-            MATCH (this)-[]-(:Entry)-[]-(:Winner)-[]-(:Match)-[]-(:Round {round: 'Final'})-[]-(e:Event)-[]-(y:Year)
-            MATCH (s:Surface)-[]-(e)-[]-(t:Tournament)
-            WITH y.id as year, count(e) as count, collect({
-            id: e.id,
-            tournament_name: t.name,
-            tournament_id: t.id,
-            surface: s.id
-            }) as titles
-            RETURN {year: year, count: count, events: titles} AS titlesByYear
-            ORDER BY year
-        """, columnName: "titlesByYear")
-        finalsByYear: [TitlesFinals!]! @cypher(statement: """
-            MATCH (this)-[]-(:Entry)-[]-(:Loser)-[]-(:Match)-[]-(:Round {round: 'Final'})-[]-(e:Event)-[]-(y:Year)
-            MATCH (s:Surface)-[]-(e)-[]-(t:Tournament)
-            WITH y.id as year, count(e) as count, collect({
-            id: e.id,
-            tournament_name: t.name,
-            tournament_id: t.id,
-            surface: s.id
-            }) as finals
-            RETURN {year: year, count: count, events: finals} AS finalsByYear
-            ORDER BY year
-        """, columnName: "finalsByYear")
+        first_name: String
+        full_name: String! @customResolver(requires: "first_name last_name")
+        gladiator: Boolean
+        height_cm: Int
+        hof: Int
+        id: String! @unique
         index: Index @cypher(statement: """
             MATCH (this)-[:ENTERED]-(g1:Entry)-[:SCORED]-(f:Score)-[:SCORED]-(m:Match)-[:SCORED]-(f2:Score)-[:SCORED]-(g2:Entry)-[:ENTERED]-(p2:Player)
             MATCH (m)-[:PLAYED]-(r:Round)-[:ROUND_OF]-(e:Event)-[:ON_SURFACE]-(s:Surface)
@@ -528,19 +372,21 @@ export const typeDefs = `#graphql
             outdoorLosses: sum(CASE WHEN s.environment = 'Outdoor' AND f:Loser THEN 1 ELSE 0 END),
             outdoorTitles: sum(CASE WHEN s.environment = 'Outdoor' AND f:Winner AND r.round = 'Final' THEN 1 ELSE 0 END),
             win1Wins: sum(CASE WHEN f.s1 > f2.s1 AND f:Winner THEN 1 ELSE 0 END),
-            win1Losses: sum(CASE WHEN f.s1 > f2.s1 AND f:Winner THEN 1 ELSE 0 END),
+            win1Losses: sum(CASE WHEN f.s1 < f2.s1 AND f:Loser THEN 1 ELSE 0 END),
             lose1Wins: sum(CASE WHEN f.s1 < f2.s1 AND f:Winner THEN 1 ELSE 0 END),
-            lose1Losses: sum(CASE WHEN f.s1 < f2.s1 AND f:Winner THEN 1 ELSE 0 END),
+            lose1Losses: sum(CASE WHEN f.s1 > f2.s1 AND f:Loser THEN 1 ELSE 0 END),
             rhWins: sum(CASE WHEN p2.rh = true AND f:Winner THEN 1 ELSE 0 END),
             rhLosses: sum(CASE WHEN p2.rh = true AND f:Loser THEN 1 ELSE 0 END),
             lhWins: sum(CASE WHEN p2.rh = false AND f:Winner THEN 1 ELSE 0 END),
             lhLosses: sum(CASE WHEN p2.rh = false AND f:Loser THEN 1 ELSE 0 END)
             } as index
         """, columnName: "index")
-        years: Years @cypher(statement: """
-            MATCH (this)-[:ENTERED]-(:Entry)-[:SCORED]-(:Score)-[:SCORED]-(:Match)-[:PLAYED]-(:Round)-[:ROUND_OF]-(:Event)-[:TOOK_PLACE_IN]-(y:Year)
-            RETURN {earliest: min(y.id), latest: max(y.id)} AS years
-        """, columnName: "years")
+        last_name: String
+        loss: Int
+        pm_USD: Int
+        prev_countries: [Country!]! @relationship(type: "REPRESENTED", direction: OUT, properties: "RepresentsProperties")
+        retired: Year @relationship(type: "RETIRED", direction: OUT, properties: "RetiredProperties")
+        rh: Boolean
         stats (year: Int, surface: String): Stats @cypher(statement: """
             MATCH (this)-[:ENTERED]-(:Entry)-[]-(s:Score)-[]-(:Match)-[]-(:Round)-[]-(e:Event)-[]-(y:Year)
             WHERE $year IS NULL OR y.id = $year
@@ -562,12 +408,234 @@ export const typeDefs = `#graphql
             bps_converted: sum(s.bps_converted)
             } as stats
         """, columnName: "stats")
+        titles: Int
+        turned_pro: Year @relationship(type: "TURNED_PRO", direction: OUT)
+        win: Int
+        years: Years @cypher(statement: """
+            MATCH (this)-[:ENTERED]-(:Entry)-[:SCORED]-(:Score)-[:SCORED]-(:Match)-[:PLAYED]-(:Round)-[:ROUND_OF]-(:Event)-[:TOOK_PLACE_IN]-(y:Year)
+            RETURN {earliest: min(y.id), latest: max(y.id)} AS years
+        """, columnName: "years")
+    }
+
+    type RepresentsProperties @relationshipProperties {
+        end_date: Date
+        start_date: Date
+    }
+
+    type RetiredProperties @relationshipProperties {
+        reason: String
+    }
+
+    type Round {
+        end_date: Date
+        fourth_place: Int
+        id: String! @unique
+        matches: [Match!]! @relationship(type: "PLAYED", direction: IN)
+        number: Int
+        participation: Int
+        pm: Int
+        points: Int
+        round: String!
+        event: Event! @relationship(type: "ROUND_OF", direction: OUT)
+        stage: String
+        start_date: Date
+        third_place: Int
+        tiesTieOf: [Tie!]! @relationship(type: "TIE_OF", direction: IN)
+        undefeated_bonus: Int
+        win_1: Int
+        win_2: Int
+        win_3: Int
+    }
+
+    type Score {
+        aces: Int
+        avg_sv1_kph: Int
+        avg_sv2_kph: Int
+        best3: Best3! @relationship(type: "SCORED", direction: OUT)
+        best5: Best5! @relationship(type: "SCORED", direction: OUT)
+        bp_opps: Int
+        bps_converted: Int
+        bps_faced: Int
+        bps_saved: Int
+        dfs: Int
+        id: String!
+        incomplete: String
+        match: Match! @relationship(type: "SCORED", direction: OUT)
+        max_speed_kph: Int
+        net: Int
+        net_w: Int
+        player: Entry! @relationship(type: "SCORED", direction: IN)
+        ret1: Int
+        ret1_w: Int
+        ret2: Int
+        ret2_w: Int
+        s1: Int
+        s2: Int
+        s3: Int
+        s4: Int
+        s5: Int
+        serve1_pts: Int
+        serve1_pts_w: Int
+        serve2_pts: Int
+        serve2_pts_w: Int
+        t1: Int
+        t2: Int
+        t3: Int
+        t4: Int
+        t5: Int
+        ues: Int
+        winners: Int
+    }
+
+    type Stats {
+        aces: Int!
+        dfs: Int!
+        serve1_w: Int!
+        serve1: Int!
+        serve2_w: Int!
+        serve2: Int!
+        ret1_w: Int!
+        ret1: Int!
+        ret2_w: Int!
+        ret2: Int!
+        bps_faced: Int!
+        bps_saved: Int!
+        bp_opps: Int!
+        bps_converted: Int!
+    }
+
+    type Supervisor {
+        id: String! @unique
+        eventS: [Event!]! @relationship(type: "SUPERVISED", direction: OUT)
+    }
+
+    type Surface {
+        environment: String!
+        events: [Event!]! @relationship(type: "ON_SURFACE", direction: IN)
+        hard_type: String
+        id: String! @unique
+        surface: String!
+    }
+
+    type Tie @node {
+        countriesCountry1: [Country!]! @relationship(type: "COUNTRY1", direction: IN)
+        countriesCountry2: [Country!]! @relationship(type: "COUNTRY2", direction: IN)
+        id: String!
+        number: Int!
+        tieOfRounds: [Round!]! @relationship(type: "TIE_OF", direction: OUT)
+    }
+
+    type TitleFinalArray {
+        id: Int
+        tid: Int
+        tname: String
+        surface: String
+    }
+
+    type TitleFinalObject {
+        year: Int
+        count: Int
+        events: [TitleFinalArray!]!
+    }
+
+    type TitlesFinals {
+        titles: [TitleFinalObject!]!
+        finals: [TitleFinalObject!]!
+    }
+
+    type Tournament {
+        start_year: Year! @relationship(type: "ESTABLISHED", direction: OUT)
+        end_year: Year @relationship(type: "ABOLISHED", direction: OUT)
+        events: [Event!]! @relationship(type: "EDITION_OF", direction: IN)
+        id: Int! @unique
+        name: String! @unique
+        website: String
+    }
+
+    type Umpire {
+        id: String! @unique
+        matches: [Match!]! @relationship(type: "UMPIRED", direction: OUT)
+    }
+
+    type Venue {
+        city: String!
+        events: [Event!]! @relationship(type: "TOOK_PLACE_IN", direction: IN)
+        country: Country! @relationship(type: "LOCATED_IN", direction: OUT)
+        name: String @unique
+    }
+
+    type WalkoverProperties @relationshipProperties {
+        reason: String
+    }
+
+    type Winner {
+        aces: Int
+        avg_sv1_kph: Int
+        avg_sv2_kph: Int
+        best3: Best3! @relationship(type: "SCORED", direction: OUT)
+        best5: Best5! @relationship(type: "SCORED", direction: OUT)
+        bp_opps: Int
+        bps_converted: Int
+        bps_faced: Int
+        bps_saved: Int
+        dfs: Int
+        id: String!
+        incomplete: String
+        match: Match! @relationship(type: "SCORED", direction: OUT)
+        max_speed_kph: Int
+        net: Int
+        net_w: Int
+        player: Entry! @relationship(type: "SCORED", direction: IN)
+        ret1: Int
+        ret1_w: Int
+        ret2: Int
+        ret2_w: Int
+        s1: Int
+        s2: Int
+        s3: Int
+        s4: Int
+        s5: Int
+        serve1_pts: Int
+        serve1_pts_w: Int
+        serve2_pts: Int
+        serve2_pts_w: Int
+        t1: Int
+        t2: Int
+        t3: Int
+        t4: Int
+        t5: Int
+        ues: Int
+        winners: Int
+    }
+
+    type WithdrewProperties @relationshipProperties {
+        reason: String
+    }
+
+    type Year {
+        events: [Event!]! @relationship(type: "TOOK_PLACE_IN", direction: IN)
+        id: Int! @unique
+    }
+
+    type Years {
+        earliest: Int
+        latest: Int
     }
 
     type YearStats {
         wins: Int!
         losses: Int!
         titles: Int!
+    }
+
+    type MajorResult {
+        round: String!
+        year: Int!
+        eid: Int!
+    }
+
+    type MajorResults {
+        events: [MajorResult]
     }
 
     type Query {
@@ -581,6 +649,26 @@ export const typeDefs = `#graphql
             WHERE t.name =~ '(?i).*' + $name + '.*'
             RETURN t as tournaments
         """, columnName: "tournaments")
+        playerTitlesAndFinals (id: String!): TitlesFinals! @cypher(statement: """
+            MATCH (p:Player {id: $id})
+            OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(s1:Score)-[:SCORED]->(:Match)-[:PLAYED]->(:Round {round: 'Final'})-[:ROUND_OF]-(e:Event)-[:TOOK_PLACE_IN]-(y:Year)
+            OPTIONAL MATCH (s:Surface)-[]-(e)-[]-(t:Tournament)
+            WITH y,
+                COLLECT(CASE WHEN s1:Winner THEN {id: e.id, tname: t.name, tid: t.id, surface: s.id} ELSE null END) AS title_events,
+                COLLECT(CASE WHEN s1:Loser THEN {id: e.id, tname: t.name, tid: t.id, surface: s.id} ELSE null END) AS final_events
+            WITH y,
+                SIZE([x IN title_events WHERE x IS NOT NULL]) AS title_count,
+                [x IN title_events WHERE x IS NOT NULL] AS title_events,
+                SIZE([x IN final_events WHERE x IS NOT NULL]) AS final_count,
+                [x IN final_events WHERE x IS NOT NULL] AS final_events
+            WITH
+            COLLECT(CASE WHEN title_count > 0 THEN {year: y.id, count: title_count, events: title_events} ELSE null END) AS filtered_titles,
+            COLLECT(CASE WHEN final_count > 0 THEN {year: y.id, count: final_count, events: final_events} ELSE null END) AS filtered_finals
+            RETURN {
+            titles: [x IN filtered_titles WHERE x IS NOT NULL],
+            finals: [x IN filtered_finals WHERE x IS NOT NULL]
+            } AS result
+        """, columnName: "result")
         majorResults (id: String!, tournament: Int!): MajorResults @cypher(statement: """
             MATCH (p:Player {id: $id})
             MATCH (t:Tournament {id: $tournament})
@@ -608,3 +696,25 @@ export const typeDefs = `#graphql
         """, columnName: "yearStats")
     }
 `;
+
+// type Player
+// worldCapEvent2S: [Event2!]! @relationship(type: "WORLD_CAP", direction: OUT)
+// worldVcapEvent2S: [Event2!]! @relationship(type: "WORLD_VCAP", direction: OUT)
+// europeCapEvent2S: [Event2!]! @relationship(type: "EUROPE_CAP", direction: OUT)
+// europeVcapEvent2S: [Event2!]! @relationship(type: "EUROPE_VCAP", direction: OUT)
+
+// type Entry
+// alternateEvent2S: [Event2!]! @relationship(type: "ALTERNATE", direction: OUT)
+// ldaEvent2S: [Event2!]! @relationship(type: "LDA", direction: OUT, properties: "LdaProperties")
+// luckyLoserEvent2S: [Event2!]! @relationship(type: "LUCKY_LOSER", direction: OUT)
+// qualifiedEvent2S: [Event2!]! @relationship(type: "QUALIFIED", direction: OUT)
+// seededEvent2S: [Event2!]! @relationship(type: "SEEDED", direction: OUT)
+// walkoverEvent2S: [Event2!]! @relationship(type: "WALKOVER", direction: OUT, properties: "WalkoverProperties")
+// wildCardEvent2S: [Event2!]! @relationship(type: "WILD_CARD", direction: OUT)
+// withdrewEvent2S: [Event2!]! @relationship(type: "WITHDREW", direction: OUT, properties: "WithdrewProperties")
+
+// type Event
+// player2SEuropeCap: [Player2!]! @relationship(type: "EUROPE_CAP", direction: IN)
+//         player2SEuropeVcap: [Player2!]! @relationship(type: "EUROPE_VCAP", direction: IN)
+//         playersWorldCap: [Player!]! @relationship(type: "WORLD_CAP", direction: IN)
+//         playersWorldVcap: [Player!]! @relationship(type: "WORLD_VCAP", direction: IN)

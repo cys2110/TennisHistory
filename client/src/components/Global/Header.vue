@@ -13,11 +13,11 @@ const links = [
         icon: CalendarOutlined,
         tooltip: 'Results Archive'
     },
-    // {
-    //     route: 'h2h',
-    //     icon: TeamOutlined,
-    //     tooltip: 'Head to Head'
-    // },
+    {
+        route: 'h2h',
+        icon: TeamOutlined,
+        tooltip: 'Head to Head'
+    },
     {
         route: 'search',
         icon: SearchOutlined,

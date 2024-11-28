@@ -18,7 +18,7 @@ const { query, variables } = GET_TITLES(props.id)
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
-    if (newResult) events.value = newResult.players[0]
+    if (newResult) events.value = newResult.playerTitlesAndFinals
 }, { immediate: true })
 
 watch(error, (newError) => {
@@ -26,7 +26,7 @@ watch(error, (newError) => {
 }, { immediate: true })
 
 const selectedArray = computed(() => {
-    return selection.value === 'titles' ? events.value.titlesByYear : events.value.finalsByYear
+    return selection.value === 'titles' ? events.value.titles : events.value.finals
 })
 </script>
 

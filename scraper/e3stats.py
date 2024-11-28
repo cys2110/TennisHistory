@@ -111,12 +111,12 @@ for match in matches:
             p1_net = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p1_stat[26].text)
             match_info['p1']['net_w'] = int(p1_net.group(1))
             match_info['p1']['net'] = int(p1_net.group(2))
-            match_info['p1']['winner'] = int(p1_stat[28].text)
+            match_info['p1']['winners'] = int(p1_stat[28].text)
             match_info['p1']['ues'] = int(p1_stat[30].text)
             p2_net = re.search(r'\b(\d{1,2})/(\d{1,2})\b', p2_stat[26].text)
             match_info['p2']['net_w'] = int(p2_net.group(1))
             match_info['p2']['net'] = int(p2_net.group(2))
-            match_info['p2']['winner'] = int(p2_stat[28].text)
+            match_info['p2']['winners'] = int(p2_stat[28].text)
             match_info['p2']['ues'] = int(p2_stat[30].text)
         except:
             pass

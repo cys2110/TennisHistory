@@ -26,7 +26,7 @@ export const flag = (country) => {
 }
 
 export const percentage = (value1, total) => {
-  return ((value1 / total) * 100).toFixed(0)
+  return parseInt(((value1 / total) * 100).toFixed(0))
 }
 
 export const formatCurrency = (currency, amount) => {

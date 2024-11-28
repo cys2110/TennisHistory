@@ -1,36 +1,37 @@
 <script setup>
 import { ref, watch } from 'vue';
-import apolloClient from '@/apollo';
-import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import { useQuery } from '@vue/apollo-composable';
 import { GET_H2H } from '@/services/MiscService';
-import { headshot, unencodeName } from '@/utils/functions';
+import { headshot, unencodeName, updateDocumentTitle } from '@/utils/functions';
+import { COLOURS } from '@/utils/variables';
 
-// [TODO: ADD BASE H2H PAGE AND SEARCH FUNCTION]
+// [TODO: SEARCH FUNCTION]
 const props = defineProps(['p1Name', 'p1Id', 'p2Name', 'p2Id'])
+const p1 = ref({ name: props.p1Name ? unencodeName(props.p1Name) : 'Jannik Sinner', id: props.p1Id || 's0ag' })
+const p2 = ref({ name: props.p2Name ? unencodeName(props.p2Name) : 'Alexander Zverev', id: props.p2Id || 'z355' })
 const h2h = ref(null)
 const pieStats = ref(null)
 
 // Update document title
-const updateDocumentTitle = () => document.title = `${unencodeName(props.p1Name)} v. ${unencodeName(props.p2Name)} | TennisHistory`
-watch(() => [props.p1Name, props.p2Name], () => updateDocumentTitle(), { immediate: true })
+watch(() => [props.p1, props.p2], () => updateDocumentTitle(`${p1.value.name} v. ${p2.value.name} | TennisHistory`), { immediate: true })
 
 // API call
-provideApolloClient(apolloClient)
-const { query, variables } = GET_H2H(props.p1Id, props.p2Id)
+const { query, variables } = GET_H2H(p1.value.id, p2.value.id)
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
     if (newResult) {
         h2h.value = newResult
+        console.log(h2h.value)
         pieStats.value = [{
             name: unencodeName(props.p1Name),
             value: h2h.value.p1Wins.count,
-            itemStyle: { color: '#6d28d9' }
+            itemStyle: { color: COLOURS.violet700 }
         },
         {
             name: unencodeName(props.p2Name),
             value: h2h.value.p2Wins.count,
-            itemStyle: { color: '#166534' }
+            itemStyle: { color: COLOURS.green800 }
         }]
     }
 })
@@ -42,11 +43,11 @@ watch(error, (newError) => {
 
 <template>
     <Title>
-        <template #title>{{ unencodeName(p1Name) }} v. {{ unencodeName(p2Name) }}</template>
+        <template #title>{{ p1.name }} v. {{ p2.name }}</template>
     </Title>
     <a-row v-if="h2h" :gutter="32">
         <a-col :span="6">
-            <a-image class="border-2 border-zinc-400 mx-auto rounded-full" :src="headshot(h2h.p1[0].id)"
+            <a-image class="border-2 border-zinc-400 mx-auto rounded-full my-5" :src="headshot(h2h.p1[0].id)"
                 :alt="h2h.p1[0].full_name" :preview="false" />
             <PlayerTable :player="h2h.p1[0]" :number="1" />
         </a-col>
@@ -55,7 +56,7 @@ watch(error, (newError) => {
             <H2HTable :p1="h2h.p1[0]" :p2="h2h.p2[0]" />
         </a-col>
         <a-col :span="6">
-            <a-image class="border-2 border-zinc-400 mx-auto rounded-full" :src="headshot(h2h.p2[0].id)"
+            <a-image class="border-2 border-zinc-400 mx-auto rounded-full my-5" :src="headshot(h2h.p2[0].id)"
                 :alt="h2h.p2[0].full_name" :preview="false" />
             <PlayerTable :player="h2h.p2[0]" :number="2" />
         </a-col>

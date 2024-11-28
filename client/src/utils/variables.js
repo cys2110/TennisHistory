@@ -58,12 +58,14 @@ export const SHORT_ROUNDS = {
 
 export const ENTRY_INFO = {
   ldaConnection: 'Last direct acceptance',
-  lls: 'Lucky losers',
-  alts: 'Alternates',
+  llsConnection: 'Lucky losers',
+  altsConnection: 'Alternates',
   wdConnection: 'Withdrawals',
   retConnection: 'Retirements',
   woConnection: 'Walkovers',
   defaultedConnection: 'Defaults',
+  wcConnection: 'Wild cards',
+  qualifiersConnection: 'Qualifiers',
 }
 
 export const STATUS_INFO = {
@@ -83,10 +85,11 @@ export const COLOURS = {
   fuchsia600: '#c026d3',
   violet600: '#7c3aed',
   violet700: '#6d28d9',
+  zinc400: '#a1a1aa',
 }
 
 export const CHART_OPTIONS = {
   darkMode: true,
   backgroundColor: 'transparent',
-  textStyle: { color: '#a1a1aa', fontSize: 14 },
+  textStyle: { color: COLOURS.zinc400, fontSize: 14 },
 }

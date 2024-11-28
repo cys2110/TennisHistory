@@ -201,28 +201,64 @@ export const GET_EVENT = (id, idString) => {
             }
           }
         }
-        lls {
-          player {
-            full_name
-            id
-            country {
-              id
-              name
+        llsConnection {
+          edges {
+            node {
+              player {
+                full_name
+                id
+                country {
+                  id
+                  name
+                }
+              }
             }
           }
         }
-        alt {
-          player {
-            full_name
-            id
-            country {
-              id
-              name
+        altConnection {
+          edges {
+            node {
+              player {
+                full_name
+                id
+                country {
+                  id
+                  name
+                }
+              }
+            }
+          }
+        }
+        wcConnection {
+          edges {
+            node {
+              player {
+                full_name
+                id
+                country {
+                  id
+                  name
+                }
+              }
+            }
+          }
+        }
+        qualifiersConnection {
+          edges {
+            node {
+              player {
+                full_name
+                id
+                country {
+                  id
+                  name
+                }
+              }
             }
           }
         }
       }
-      entries(where: { id_STARTS_WITH: $idString }) {
+      entries(where: { id_STARTS_WITH: $idString }, options: { sort: { rank: ASC } }) {
         player {
           id
           full_name
@@ -319,6 +355,7 @@ export const GET_DRAW = (id) => {
       events(where: { id: $id }) {
         rounds(where: { number_GT: 0 }) {
           round
+          number
           matches {
             incomplete
             match_no

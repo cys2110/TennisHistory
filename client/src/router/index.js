@@ -16,6 +16,7 @@ import {
   H2HView,
   AboutView,
   PlayerLayout,
+  EventLayout,
 } from './pages'
 
 const router = createRouter({
@@ -34,26 +35,33 @@ const router = createRouter({
     {
       path: '/tournaments/:name/:id',
       name: 'tournament',
-      props: true,
       component: TournamentView,
-    },
-    {
-      path: '/tournaments/:name/:id/:year/:eid/overview',
-      name: 'event',
-      props: true,
-      component: EventDetailsView,
-    },
-    {
-      path: '/tournaments/:name/:id/:year/:eid/results',
-      name: 'results',
-      props: true,
-      component: ResultsView,
-    },
-    {
-      path: '/tournaments/:name/:id/:year/:eid/draw',
-      name: 'draw',
-      props: true,
-      component: DrawView,
+      children: [
+        {
+          path: ':year/:eid',
+          component: EventLayout,
+          children: [
+            {
+              path: 'overview',
+              name: 'event',
+              props: true,
+              component: EventDetailsView,
+            },
+            {
+              path: 'results',
+              name: 'results',
+              props: true,
+              component: ResultsView,
+            },
+            {
+              path: 'draw',
+              name: 'draw',
+              props: true,
+              component: DrawView,
+            },
+          ],
+        },
+      ],
     },
     {
       path: '/tournaments/:name/:id/:year/:eid/:mid',
@@ -99,7 +107,7 @@ const router = createRouter({
       ],
     },
     {
-      path: '/h2h/:p1Name/:p1Id/:p2Name/:p2Id',
+      path: '/h2h/:p1Name?/:p2Name?/:p1Id?/:p2Id?',
       name: 'h2h',
       props: true,
       component: H2HView,

@@ -5,6 +5,7 @@ import { CanvasRenderer } from 'echarts/renderers'
 import { PieChart } from 'echarts/charts'
 import VChart, { THEME_KEY } from 'vue-echarts'
 import { percentage } from '@/utils/functions'
+import { CHART_OPTIONS } from '@/utils/variables'
 
 const props = defineProps(['stats'])
 
@@ -12,17 +13,15 @@ use([PieChart, CanvasRenderer])
 provide(THEME_KEY, 'dark')
 
 const option = ref({
-    darkMode: true,
-    backgroundColor: 'transparent',
-    textStyle: { color: "#a1a1aa", fontSize: 14 },
+    ...CHART_OPTIONS,
     series: [
         {
             type: 'pie',
-            radius: ['40%', '70%'],
+            radius: ['40%', '60%'],
             data: props.stats,
             label: {
                 formatter: function () {
-                    return `${props.stats[0].value}—${props.stats[1].value}\n${percentage(props.stats[0].value, props.stats[0].value + props.stats[1].value).toFixed(0)}%`
+                    return `${props.stats[0].value}—${props.stats[1].value}\n${percentage(props.stats[0].value, props.stats[0].value + props.stats[1].value)}%`
                 },
                 position: 'center',
                 fontWeight: 'bolder',

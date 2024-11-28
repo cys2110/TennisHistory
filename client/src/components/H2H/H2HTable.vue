@@ -1,53 +1,29 @@
 <script setup>
-import { percentage } from '@/utils/functions';
+import { formatCurrency, percentage } from '@/utils/functions';
+import { COLOURS } from '@/utils/variables';
 
 const props = defineProps(['p1', 'p2'])
+
+const comparisons = [
+    { title: 'Win-Loss', p1: `${props.p1.win}/${props.p1.loss}`, p2: `${props.p2.win}/${props.p2.loss}`, percent: percentage(percentage(props.p1.win, props.p1.win + props.p1.loss), percentage(props.p1.win, props.p1.win + props.p1.loss) + percentage(props.p2.win, props.p2.win + props.p2.loss)) },
+    { title: 'Titles', p1: props.p1.titles, p2: props.p2.titles, percent: percentage(props.p1.titles, props.p1.titles + props.p2.titles) },
+    { title: 'Prize Money', p1: formatCurrency('USD', props.p1.pm_USD), p2: formatCurrency('USD', props.p2.pm_USD), percent: percentage(props.p1.pm_USD, props.p1.pm_USD + props.p2.pm_USD) },
+    { title: 'Career High', p1: props.p1.career_high, p2: props.p2.career_high, percent: percentage(props.p1.career_high, props.p1.career_high + props.p2.career_high) },
+]
 </script>
 
 <template>
-    <a-row>
-        <a-col :span="5" class="text-lg">{{ p1.win }}/{{ p1.loss }}</a-col>
-        <a-col :span="14" class="text-zinc-400 font-bold text-center text-lg">Win-Loss</a-col>
-        <a-col :span="5" class="text-lg text-right">{{ p2.win }}/{{ p2.loss }}</a-col>
-    </a-row>
-    <a-row>
-        <a-col :span="24">
-            <a-progress size="small"
-                :percent="percentage(percentage(p1.win, p1.win + p1.loss), percentage(p1.win, p1.win + p1.loss) + percentage(p2.win, p2.win + p2.loss))"
-                :showInfo="false" strokeColor="#6d28d9" trailColor="#166534" />
-        </a-col>
-    </a-row>
-    <a-row>
-        <a-col :span="5" class="text-lg">{{ p1.titles }}</a-col>
-        <a-col :span="14" class="text-zinc-400 font-bold text-center text-lg">Titles</a-col>
-        <a-col :span="5" class="text-lg text-right">{{ p2.titles }}</a-col>
-    </a-row>
-    <a-row>
-        <a-col :span="24">
-            <a-progress size="small" :percent="percentage(p1.titles, p1.titles + p2.titles)" :showInfo="false"
-                strokeColor="#6d28d9" trailColor="#166534" />
-        </a-col>
-    </a-row>
-    <a-row>
-        <a-col :span="5" class="text-lg">${{ p1.pm_USD }}</a-col>
-        <a-col :span="14" class="text-zinc-400 font-bold text-center text-lg">Prize Money</a-col>
-        <a-col :span="5" class="text-lg text-right">${{ p2.pm_USD }}</a-col>
-    </a-row>
-    <a-row>
-        <a-col :span="24">
-            <a-progress size="small" :percent="percentage(p1.pm_USD, p1.pm_USD + p2.pm_USD)" :showInfo="false"
-                strokeColor="#6d28d9" trailColor="#166534" />
-        </a-col>
-    </a-row>
-    <a-row>
-        <a-col :span="5" class="text-lg">{{ p1.career_high }}</a-col>
-        <a-col :span="14" class="text-zinc-400 font-bold text-center text-lg">Career high</a-col>
-        <a-col :span="5" class="text-lg text-right">{{ p2.career_high }}</a-col>
-    </a-row>
-    <a-row>
-        <a-col :span="24">
-            <a-progress size="small" :percent="percentage(p1.career_high, p1.career_high + p2.career_high)"
-                :showInfo="false" strokeColor="#6d28d9" trailColor="#166534" />
-        </a-col>
-    </a-row>
+    <div v-for="comparison in comparisons" :key="comparison.title">
+        <a-row>
+            <a-col :span="8" class="text-lg">{{ comparison.p1 }}</a-col>
+            <a-col :span="8" class="text-zinc-400 font-bold text-center text-lg">{{ comparison.title }}</a-col>
+            <a-col :span="8" class="text-lg text-right">{{ comparison.p2 }}</a-col>
+        </a-row>
+        <a-row>
+            <a-col :span="24">
+                <a-progress size="small" :percent="comparison.percent" :showInfo="false"
+                    :strokeColor="COLOURS.violet700" :trailColor="COLOURS.green800" />
+            </a-col>
+        </a-row>
+    </div>
 </template>

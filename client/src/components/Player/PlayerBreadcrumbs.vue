@@ -9,7 +9,7 @@ const pages = [{ name: 'player', title: 'Details' }, { name: 'activity', title: 
 </script>
 
 <template>
-    <a-breadcrumb separator=">">
+    <a-breadcrumb>
         <a-breadcrumb-item>
             <router-link :to="{ name: 'home' }">Home</router-link>
         </a-breadcrumb-item>

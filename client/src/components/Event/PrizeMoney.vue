@@ -6,6 +6,7 @@ import { ScatterChart } from 'echarts/charts'
 import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/components'
 import VChart, { THEME_KEY } from 'vue-echarts'
 import { formatCurrency } from '@/utils/functions'
+import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
 
 const props = defineProps(['rounds', 'currency'])
 
@@ -13,22 +14,17 @@ use([CanvasRenderer, ScatterChart, DatasetComponent, GridComponent, TooltipCompo
 provide(THEME_KEY, 'dark')
 
 const option = ref({
+    ...CHART_OPTIONS,
     dataset: {
         source: props.rounds,
         dimensions: ['round', 'points', 'pm']
     },
-    textStyle: { color: "#a1a1aa", fontSize: 12 },
-    backgroundColor: 'transparent',
     tooltip: {
         formatter: function (params) {
-            return `${params.value[params.dimensionNames[0]]}<br/>Points: ${params.value[params.dimensionNames[1]]
-                }<br/>Prize Money: ${formatCurrency(
-                    props.currency,
-                    params.value[params.dimensionNames[2]]
-                )}`;
+            return `<span style="font-weight: bold">${params.value.round}</span><br/>Points: ${params.value.points}<br/>Prize Money: ${formatCurrency(props.currency, params.value.pm)}`;
         },
         backgroundColor: "transparent",
-        textStyle: { color: "#a1a1aa" },
+        textStyle: { color: COLOURS.zinc400 },
     },
     xAxis: {
         type: "value",
@@ -38,9 +34,7 @@ const option = ref({
     yAxis: {
         type: "value",
         name: "Prize Money",
-        axisLabel: {
-            formatter: (value) => `${formatCurrency(props.currency, value)}`,
-        },
+        axisLabel: { formatter: (value) => `${formatCurrency(props.currency, value)}`, },
         splitLine: { show: false },
     },
     series: [
@@ -48,7 +42,7 @@ const option = ref({
             symbolSize: 20,
             type: "scatter",
             encode: { x: "points", y: "pm" },
-            itemStyle: { color: "#7c3aed" },
+            itemStyle: { color: COLOURS.violet700 },
         },
     ],
 })

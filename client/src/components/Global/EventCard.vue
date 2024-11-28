@@ -31,7 +31,7 @@ const coverImage = computed(() => {
         </template>
         <template #actions>
             <a-button v-for="page in eventPages" :key="page.name" type="dashed" :ghost="true" shape="round" size="small"
-                :block="true" :disabled="isDisabled" class="!w-11/12 !border-zinc-300 hover:!border-zinc-400">
+                :disabled="isDisabled" class=" !border-zinc-300 hover:!border-zinc-400">
                 <template v-if="isDisabled">
                     <a-tooltip title="Event has not started yet">{{ page.title }}</a-tooltip>
                 </template>

@@ -4,6 +4,7 @@ import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { TreeChart } from 'echarts/charts'
 import VChart, { THEME_KEY } from 'vue-echarts'
+import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
 
 const props = defineProps(['entryInfo'])
 
@@ -30,8 +31,7 @@ use([TreeChart, CanvasRenderer]);
 provide(THEME_KEY, 'dark')
 
 const option = ref({
-    darkMode: true,
-    backgroundColor: 'transparent',
+    ...CHART_OPTIONS,
     series: [
         {
             type: "tree",
@@ -54,14 +54,13 @@ const option = ref({
                     align: "left",
                 },
             },
-            itemStyle: { color: "#7c3aed" },
+            itemStyle: { color: COLOURS.violet700 },
             expandAndCollapse: true,
             animationDuration: 550,
             animationDurationUpdate: 750,
         },
     ],
 })
-console.log(props.entryInfo)
 </script>
 
 <template>

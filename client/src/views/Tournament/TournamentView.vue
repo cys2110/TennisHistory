@@ -3,16 +3,17 @@ import { computed, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_TOURNAMENT } from '@/services/TournamentService';
 import { unencodeName, updateDocumentTitle } from '@/utils/functions';
+import { useRoute } from 'vue-router';
 
 // Variables
-const props = defineProps(['id', 'name'])
+const route = useRoute()
 const tournament = ref(null)
 
 // Update document title
-watch(() => props.name, () => updateDocumentTitle(`${unencodeName(props.name)} | TennisHistory`), { immediate: true })
+watch(() => route.params.name, () => updateDocumentTitle(`${unencodeName(route.params.name)} | TennisHistory`), { immediate: true })
 
 // API call
-const { query, variables } = GET_TOURNAMENT(parseInt(props.id))
+const { query, variables } = GET_TOURNAMENT(parseInt(route.params.id))
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
@@ -29,17 +30,20 @@ const years = computed(() => {
 </script>
 
 <template>
-    <TournamentBreadcrumbs v-if="tournament" :tournament />
-    <Title>
-        <template #title>{{ unencodeName(name) }}</template>
-        <template v-if="tournament" #subtitle>{{ years }}</template>
-    </Title>
-    <a-row v-if="tournament?.events.length > 0" justify="space-evenly" :gutter="[0, 32]">
-        <a-col v-for="event in tournament.events" :key="event.id" :span="5">
-            <TournamentCard :event :id :name />
-        </a-col>
-    </a-row>
-    <Loading v-else :loading>
-        <template #none>No events played</template>
-    </Loading>
+    <TournamentBreadcrumbs />
+    <div v-if="route.name === 'tournament'">
+        <Title>
+            <template #title>{{ unencodeName(route.params.name) }}</template>
+            <template v-if="tournament" #subtitle>{{ years }}</template>
+        </Title>
+        <a-row v-if="tournament?.events.length > 0" justify="space-evenly" :gutter="[0, 32]">
+            <a-col v-for="event in tournament.events" :key="event.id" :span="5">
+                <TournamentCard :event :id="route.params.id" :name="route.params.name" />
+            </a-col>
+        </a-row>
+        <Loading v-else :loading>
+            <template #none>No events played</template>
+        </Loading>
+    </div>
+    <router-view />
 </template>

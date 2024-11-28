@@ -3,9 +3,9 @@ import { ref, provide } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart, LineChart } from 'echarts/charts'
-import { DatasetComponent, GridComponent, ToolboxComponent, TooltipComponent } from 'echarts/components'
-import { UniversalTransition } from 'echarts/features'
+import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/components'
 import VChart, { THEME_KEY } from 'vue-echarts'
+import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
 
 const props = defineProps(['seeds'])
 
@@ -13,76 +13,40 @@ const flattenedSeeds = props.seeds.map((seed) => ({
     seed: seed.seed,
     rank: seed.rank,
     name: seed.player.full_name,
-    countryId: seed.player.country.id,
-    countryName: seed.player.country.name,
-    id: seed.player.id,
 }));
 
-use([
-    DatasetComponent,
-    ToolboxComponent,
-    TooltipComponent,
-    GridComponent,
-    BarChart,
-    LineChart,
-    UniversalTransition,
-    CanvasRenderer,
-]);
+use([DatasetComponent, TooltipComponent, GridComponent, BarChart, LineChart, CanvasRenderer]);
 provide(THEME_KEY, 'dark')
 
 const option = ref({
-    grid: {
-        bottom: "30%",
-    },
-    backgroundColor: 'transparent',
-    dataset: {
-        source: flattenedSeeds,
-        dimensions: [
-            "seed",
-            "rank",
-            "name",
-            "countryId",
-            "countryName",
-            "id",
-        ],
-    },
-    textStyle: { color: "#a1a1aa", fontSize: 14 },
+    ...CHART_OPTIONS,
+    grid: { bottom: "30%" },
+    dataset: { source: flattenedSeeds, dimensions: ["seed", "rank", "name"] },
     tooltip: {
         trigger: "axis",
-        axisPointer: {
-            type: "shadow",
-        },
+        axisPointer: { type: "shadow" },
     },
     xAxis: {
         type: "category",
-        axisLabel: {
-            rotate: 60,
-            interval: 0,
-        },
+        axisLabel: { rotate: 60, interval: 0 },
     },
     yAxis: [
-        {
-            type: "value",
-            name: "Seed",
-        },
-        {
-            type: "value",
-            name: "Rank",
-        },
+        { type: "value", name: "Seed" },
+        { type: "value", name: "Rank" },
     ],
     series: [
         {
             name: "Seed",
             type: "line",
             encode: { x: "name", y: "seed" },
-            itemStyle: { color: "#a1a1aa" },
+            itemStyle: { color: COLOURS.green600 },
         },
         {
             name: "Rank",
             type: "bar",
             encode: { x: "name", y: "rank" },
             yAxisIndex: 1,
-            itemStyle: { color: "#7c3aed" },
+            itemStyle: { color: COLOURS.violet700 },
         },
     ]
 })

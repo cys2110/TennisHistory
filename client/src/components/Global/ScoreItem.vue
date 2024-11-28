@@ -4,5 +4,7 @@ const scoreArray = Array.from({ length: 5 }, (_, i) => i + 1)
 </script>
 
 <template>
-    <div v-for="set in scoreArray" class="mr-1">{{ score[`s${set}`] }}<sup>{{ score[`t${set}`] }}</sup></div>
+    <div class="flex">
+        <div v-for="set in scoreArray" class="mr-1">{{ score[`s${set}`] }}<sup>{{ score[`t${set}`] }}</sup></div>
+    </div>
 </template>

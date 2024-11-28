@@ -1,6 +1,7 @@
 import HomeView from '@/views/Home/HomeView.vue'
 import ArchiveView from '@/views/Archive/ArchiveView.vue'
 import TournamentView from '@/views/Tournament/TournamentView.vue'
+import EventLayout from '@/views/Event/EventLayout.vue'
 import EventDetailsView from '@/views/Event/EventDetailsView.vue'
 import ResultsView from '@/views/Event/ResultsView.vue'
 import DrawView from '@/views/Event/DrawView.vue'
@@ -19,6 +20,7 @@ export {
   HomeView,
   ArchiveView,
   TournamentView,
+  EventLayout,
   EventDetailsView,
   ResultsView,
   DrawView,
