@@ -11,7 +11,7 @@ const pageNames = {
 </script>
 
 <template>
-    <Title>
+    <Title v-if="route.name !== 'match'">
         <template #title>{{ unencodeName(route.params.name) }} {{ route.params.year }}</template>
         <template #subtitle>{{ pageNames[route.name] }}</template>
     </Title>

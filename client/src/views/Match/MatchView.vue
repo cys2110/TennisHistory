@@ -1,18 +1,17 @@
 <script setup>
 import { ref, watch } from 'vue';
-import apolloClient from '@/apollo';
-import { provideApolloClient, useQuery } from '@vue/apollo-composable';
+import { useQuery } from '@vue/apollo-composable';
 import { GET_MATCH } from '@/services/MatchService';
-import { percentage, unencodeName } from '@/utils/functions';
+import { encodeName, flag, headshot, percentage, unencodeName } from '@/utils/functions';
+import { COLOURS } from '@/utils/variables';
 
 // [TODO: UPDATE DOCUMENT TITLE]
 // [TODO: SCOREBOX AND PLAYER IMAGES]
 
+// Variables
 const props = defineProps(['name', 'id', 'eid', 'year', 'mid'])
 const match = ref(null)
-const serviceStats = ref(null)
-const returnStats = ref(null)
-const pointStats = ref(null)
+const stats = ref(null)
 const serviceSpeed = ref(null)
 const anchorItems = ref([
     {
@@ -32,7 +31,16 @@ const anchorItems = ref([
     }
 ])
 
-provideApolloClient(apolloClient)
+// Get player params
+const playerParams = (player) => {
+    const name = encodeName(player.player.player.full_name)
+    return {
+        name: name,
+        id: player.player.player.id
+    }
+}
+
+// API call
 const { query, variables } = GET_MATCH(parseInt(props.mid), parseInt(props.eid))
 const { result, loading, error } = useQuery(query, variables)
 
@@ -40,7 +48,7 @@ watch(result, (newResult) => {
     if (newResult) {
         match.value = newResult.matches[0]
         console.log(match.value)
-        serviceStats.value = [
+        const serviceStats = [
             {
                 category: 'Aces',
                 p1Value: match.value.p1.aces,
@@ -53,140 +61,142 @@ watch(result, (newResult) => {
             },
             {
                 category: 'First serve',
-                p1Value: percentage(match.value.p1.serve1_pts, match.value.p1.serve1_pts + match.value.p1.serve2_pts).toFixed(0),
+                p1Value: percentage(match.value.p1.serve1_pts, match.value.p1.serve1_pts + match.value.p1.serve2_pts),
                 p1Actual: match.value.p1.serve1_pts,
                 p1Max: match.value.p1.serve1_pts + match.value.p1.serve2_pts,
-                p2Value: percentage(match.value.p2.serve1_pts, match.value.p2.serve1_pts + match.value.p2.serve2_pts).toFixed(0),
+                p2Value: percentage(match.value.p2.serve1_pts, match.value.p2.serve1_pts + match.value.p2.serve2_pts),
                 p2Actual: match.value.p2.serve1_pts,
                 p2Max: match.value.p2.serve1_pts + match.value.p2.serve2_pts
             },
             {
                 category: '1st serve points won',
-                p1Value: percentage(match.value.p1.serve1_pts_w, match.value.p1.serve1_pts).toFixed(0),
+                p1Value: percentage(match.value.p1.serve1_pts_w, match.value.p1.serve1_pts),
                 p1Actual: match.value.p1.serve1_pts_w,
                 p1Max: match.value.p1.serve1_pts,
-                p2Value: percentage(match.value.p2.serve1_pts_w, match.value.p2.serve1_pts).toFixed(0),
+                p2Value: percentage(match.value.p2.serve1_pts_w, match.value.p2.serve1_pts),
                 p2Actual: match.value.p2.serve1_pts_w,
                 p2Max: match.value.p2.serve1_pts
             },
             {
                 category: '2nd serve points won',
-                p1Value: percentage(match.value.p1.serve2_pts_w, match.value.p1.serve2_pts).toFixed(0),
+                p1Value: percentage(match.value.p1.serve2_pts_w, match.value.p1.serve2_pts),
                 p1Actual: match.value.p1.serve2_pts_w,
                 p1Max: match.value.p1.serve2_pts,
-                p2Value: percentage(match.value.p2.serve2_pts_w, match.value.p2.serve1_pts).toFixed(0),
+                p2Value: percentage(match.value.p2.serve2_pts_w, match.value.p2.serve1_pts),
                 p2Actual: match.value.p2.serve2_pts_w,
                 p2Max: match.value.p2.serve1_pts
             },
             {
                 category: 'Break points saved',
-                p1Value: percentage(match.value.p1.bps_saved, match.value.p1.bps_faced).toFixed(0),
                 p1Actual: match.value.p1.bps_saved,
                 p1Max: match.value.p1.bps_faced,
-                p2Value: percentage(match.value.p2.bps_saved, match.value.p2.bps_faced).toFixed(0),
                 p2Actual: match.value.p2.bps_saved,
                 p2Max: match.value.p2.bps_faced
             }
         ]
-        returnStats.value = [
+        serviceStats.map(stat => {
+            if (stat.p1Max) {
+                stat.p1Value = percentage(stat.p1Actual, stat.p1Max)
+                stat.p2Value = percentage(stat.p2Actual, stat.p2Max)
+            }
+        })
+        const returnStats = [
             {
                 category: '1st serve return points won',
-                p1Value: percentage(match.value.p1.ret1_w, match.value.p1.ret1).toFixed(0),
+                p1Value: percentage(match.value.p1.ret1_w, match.value.p1.ret1),
                 p1Actual: match.value.p1.ret1_w,
                 p1Max: match.value.p1.ret1,
-                p2Value: percentage(match.value.p2.ret1_w, match.value.p2.ret1).toFixed(0),
+                p2Value: percentage(match.value.p2.ret1_w, match.value.p2.ret1),
                 p2Actual: match.value.p2.ret1_w,
                 p2Max: match.value.p2.ret1
             },
             {
                 category: '2nd serve return points won',
-                p1Value: percentage(match.value.p1.ret2_w, match.value.p1.ret2).toFixed(0),
+                p1Value: percentage(match.value.p1.ret2_w, match.value.p1.ret2),
                 p1Actual: match.value.p1.ret2_w,
                 p1Max: match.value.p1.ret2,
-                p2Value: percentage(match.value.p2.ret2_w, match.value.p2.ret2).toFixed(0),
+                p2Value: percentage(match.value.p2.ret2_w, match.value.p2.ret2),
                 p2Actual: match.value.p2.ret2_w,
                 p2Max: match.value.p2.ret2
             },
             {
                 category: 'Break points converted',
-                p1Value: percentage(match.value.p1.bps_converted, match.value.p1.bp_opps).toFixed(0),
+                p1Value: percentage(match.value.p1.bps_converted, match.value.p1.bp_opps),
                 p1Actual: match.value.p1.bps_converted,
                 p1Max: match.value.p1.bp_opps,
-                p2Value: percentage(match.value.p2.bps_converted, match.value.p2.bp_opps).toFixed(0),
+                p2Value: percentage(match.value.p2.bps_converted, match.value.p2.bp_opps),
                 p2Actual: match.value.p2.bps_converted,
                 p2Max: match.value.p2.bp_opps
             }
         ]
+        returnStats.map(stat => {
+            stat.p1Value = percentage(stat.p1Actual, stat.p1Max)
+            stat.p2Value = percentage(stat.p2Actual, stat.p2Max)
+        })
 
-        pointStats.value = [
+        let pointStats = [
             {
                 category: 'Service points won',
-                p1Value: percentage(match.value.p1.serve1_pts_w + match.value.p1.serve2_pts_w, match.value.p1.serve1_pts + match.value.p1.serve2_pts).toFixed(0),
                 p1Actual: match.value.p1.serve1_pts_w + match.value.p1.serve2_pts_w,
                 p1Max: match.value.p1.serve1_pts + match.value.p1.serve2_pts,
-                p2Value: percentage(match.value.p2.serve1_pts_w + match.value.p2.serve2_pts_w, match.value.p2.serve1_pts + match.value.p2.serve2_pts).toFixed(0),
                 p2Actual: match.value.p2.serve1_pts_w + match.value.p2.serve2_pts_w,
                 p2Max: match.value.p2.serve1_pts + match.value.p2.serve2_pts
             },
             {
                 category: 'Return points won',
-                p1Value: percentage(match.value.p1.ret1_w + match.value.p1.ret2_w, match.value.p1.ret1 + match.value.p1.ret2).toFixed(0),
                 p1Actual: match.value.p1.ret1_w + match.value.p1.ret2_w,
                 p1Max: match.value.p1.ret1 + match.value.p1.ret2,
-                p2Value: percentage(match.value.p2.ret1_w + match.value.p2.ret2_w, match.value.p2.ret1 + match.value.p2.ret2).toFixed(0),
                 p2Actual: match.value.p2.ret1_w + match.value.p2.ret2_w,
                 p2Max: match.value.p2.ret1 + match.value.p2.ret2
             }
         ]
         if (match.value.p1.net) {
-            const netPoints = {
+            pointStats = [{
                 category: 'Net points won',
-                p1Value: percentage(match.value.p1.net_w, match.value.p1.net).toFixed(0),
                 p1Actual: match.value.p1.net_w,
                 p1Max: match.value.p1.net,
-                p2Value: percentage(match.value.p2.net_w, match.value.p2.net).toFixed(0),
                 p2Actual: match.value.p2.net_w,
                 p2Max: match.value.p2.net
-            }
-            pointStats.value = [netPoints, ...pointStats.value]
+            }, ...pointStats]
         }
         if (match.value.p1.winners) {
-            const winnerPoints = {
+            pointStats.push({
                 category: 'Winners',
                 p1Value: match.value.p1.winners,
                 p2Value: match.value.p2.winners
-            }
-            pointStats.value = [...pointStats.value, winnerPoints]
+            })
         }
         if (match.value.p1.ues) {
-            const uePoints = {
+            pointStats.push({
                 category: 'Unforced errors',
                 p1Value: match.value.p1.ues,
                 p2Value: match.value.p2.ues
-            }
-            pointStats.value = [...pointStats.value, uePoints]
+            })
         }
-        pointStats.value = [...pointStats.value, {
+        pointStats.push({
             category: 'Total Points Won',
-            p1Value: percentage(match.value.p1.serve1_pts_w +
-                match.value.p1.serve2_pts_w +
-                match.value.p1.ret1_w +
-                match.value.p1.ret2_w, match.value.p1.serve1_pts + match.value.p1.serve2_pts + match.value.p1.ret1 + match.value.p1.ret2).toFixed(0),
             p1Actual: match.value.p1.serve1_pts_w +
                 match.value.p1.serve2_pts_w +
                 match.value.p1.ret1_w +
                 match.value.p1.ret2_w,
             p1Max: match.value.p1.serve1_pts + match.value.p1.serve2_pts + match.value.p1.ret1 + match.value.p1.ret2,
-            p2Value: percentage(match.value.p2.serve1_pts_w +
-                match.value.p2.serve2_pts_w +
-                match.value.p2.ret1_w +
-                match.value.p2.ret2_w, match.value.p1.serve1_pts + match.value.p1.serve2_pts + match.value.p1.ret1 + match.value.p1.ret2).toFixed(0),
             p2Actual: match.value.p2.serve1_pts_w +
                 match.value.p2.serve2_pts_w +
                 match.value.p2.ret1_w +
                 match.value.p2.ret2_w,
             p2Max: match.value.p1.serve1_pts + match.value.p1.serve2_pts + match.value.p1.ret1 + match.value.p1.ret2
-        }]
+        })
+        pointStats.map(stat => {
+            if (stat.p1Max) {
+                stat.p1Value = percentage(stat.p1Actual, stat.p1Max)
+                stat.p2Value = percentage(stat.p2Actual, stat.p2Max)
+            }
+        })
+        stats.value = [
+            { category: 'Service Stats', stats: serviceStats, id: 'service-stats' },
+            { category: 'Return Stats', stats: returnStats, id: 'return-stats' },
+            { category: 'Point Stats', stats: pointStats, id: 'points-stats' }
+        ]
         if (match.value.p1.max_speed_kph) {
             anchorItems.value.push(
                 {
@@ -221,32 +231,80 @@ watch(error, (newError) => {
 </script>
 
 <template>
-    <!--[TODO: ADD MATCH BREADCRUMBS]-->
-    <Title>
+    <Title v-if="match">
         <template #title>{{ unencodeName(name) }} {{ year }}</template>
-        <template v-if="match" #subtitle>{{ match.round.round }}</template>
+        <template #subtitle>{{ match.round.round }}</template>
     </Title>
     <a-row v-if="match">
         <a-col :span="4">
-            <a-config-provider :theme="{ components: { Anchor: { colorPrimary: '#6d28d9' } } }">
-                <a-anchor :items="anchorItems" :offset-top="75" />
-            </a-config-provider>
+            <a-anchor :items="anchorItems" :offset-top="75" />
         </a-col>
         <a-col :span="20">
             <MatchDetails :match />
-            <!--[TODO: ITERATE]-->
-            <div id="service-stats" class="text-3xl text-zinc-400">SERVICE STATS</div>
-            <StatsChart :stats="serviceStats" :p1="match.p1.player.player.full_name"
-                :p2="match.p2.player.player.full_name" />
-
-            <div id="return-stats" class="text-3xl text-zinc-400">RETURN STATS</div>
-            <StatsChart :stats="returnStats" :p1="match.p1.player.player.full_name"
-                :p2="match.p2.player.player.full_name" />
-            <div id="points-stats" class="text-3xl text-zinc-400">POINT STATS</div>
-            <StatsChart :stats="pointStats" :p1="match.p1.player.player.full_name"
-                :p2="match.p2.player.player.full_name" />
-            <div id="service-speed" class="text-3xl text-zinc-400">SERVICE SPEED</div>
-            <ServiceSpeed :stats="serviceSpeed" />
+            <a-row class="flex items-center mb-5">
+                <a-col :span="6">
+                    <a-card class="h-full flex flex-col justify-between pt-5 items-center">
+                        <template #cover>
+                            <a-image :alt="match.p1.player.player.full_name" :src="headshot(match.p1.player.player.id)"
+                                class="!rounded-full !border-zinc-300 border-[1.5px] !w-28" :preview="false" />
+                        </template>
+                        <a-card-meta class="text-center">
+                            <template #title>
+                                <a-row class="flex items-center">
+                                    <a-col :span="4">
+                                        <a-image :alt="match.p1.player.player.country.name"
+                                            :src="flag(match.p1.player.player.country.id)" :preview="false"
+                                            class="rounded" />
+                                    </a-col>
+                                    <a-col :span="20">
+                                        <router-link class="hover-link text-lg"
+                                            :to="{ name: 'player', params: playerParams(match.p1) }">{{
+                                                match.p1.player.player.full_name }}</router-link>
+                                    </a-col>
+                                </a-row>
+                            </template>
+                        </a-card-meta>
+                    </a-card>
+                </a-col>
+                <a-col :span="12" class="px-3">
+                    <ScoreBox :p1="match.p1" :p2="match.p2" :winner="match.winner.player.player.id" />
+                </a-col>
+                <a-col :span="6">
+                    <a-config-provider :theme="{ components: { Card: { colorBgContainer: COLOURS.green800 } } }">
+                        <a-card class="h-full flex flex-col justify-between pt-5 items-center">
+                            <template #cover>
+                                <a-image :alt="match.p2.player.player.full_name"
+                                    :src="headshot(match.p2.player.player.id)"
+                                    class="!rounded-full !border-zinc-300 border-[1.5px] !w-28" :preview="false" />
+                            </template>
+                            <a-card-meta class="text-center">
+                                <template #title>
+                                    <a-row class="flex items-center">
+                                        <a-col :span="4">
+                                            <a-image :alt="match.p2.player.player.country.name"
+                                                :src="flag(match.p2.player.player.country.id)" :preview="false"
+                                                class="rounded" />
+                                        </a-col>
+                                        <a-col :span="20">
+                                            <router-link class="hover-link text-lg"
+                                                :to="{ name: 'player', params: playerParams(match.p2) }">{{
+                                                    match.p2.player.player.full_name }}</router-link>
+                                        </a-col>
+                                    </a-row>
+                                </template>
+                            </a-card-meta>
+                        </a-card>
+                    </a-config-provider>
+                </a-col>
+            </a-row>
+            <div v-for="stat in stats" :key="stat.category">
+                <div :id="stat.id" class="text-3xl text-zinc-400 uppercase">{{ stat.category }}</div>
+                <StatsChart :stats="stat.stats" :p1="match.p1.player.player.full_name"
+                    :p2="match.p2.player.player.full_name" />
+            </div>
+            <div v-if="match.p1.max_speed_kph" id="service-speed" class="text-3xl text-zinc-400">SERVICE SPEED
+            </div>
+            <ServiceSpeed v-if="match.p1.max_speed_kph" :stats="serviceSpeed" />
         </a-col>
     </a-row>
     <Loading v-else :loading>

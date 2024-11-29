@@ -1,21 +1,22 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import { theme } from 'ant-design-vue'
+import { COLOURS } from './utils/variables';
 
 // [GLOBAL: CLEAN UP CODE (.MAP, REMOVE CONSOLE.LOGS, DOCUMENT TITLES, WATCH IMMEDIATE, ADD COMMENTS, USE COLOUR VARIABLES, URL QUERIES, PAGE LAYOUTS, UPDATEDOCUMENTTITLE UTIL, ENCODE ANCHOR LINKS, ORDER OF IMPORTS, ETC)]
 // [GLOBAL: ADD RESPONSIVE DESIGN]
 // [FUTURE: CONVERT TO TYPESCRIPT?]
 
-const tokenColours = { colorPrimary: "#5b21b6" }
+const tokenColours = { colorPrimary: COLOURS.violet800 }
 const componentThemes = {
-  Card: { colorBgContainer: "#5b21b6" },
+  Card: { colorBgContainer: COLOURS.violet800 },
   Select: {
-    activeBorderColor: "#5b21b6",
-    hoverBorderColor: "#5b21b6",
-    colorBorder: "#5b21b6",
-    colorText: "#d4d4d8",
+    activeBorderColor: COLOURS.violet800,
+    hoverBorderColor: COLOURS.violet800,
+    colorBorder: COLOURS.violet800,
+    colorText: COLOURS.zinc300,
   },
-  Anchor: { colorPrimary: '#6d28d9' }
+  Anchor: { colorPrimary: COLOURS.violet700 },
 }
 </script>
 

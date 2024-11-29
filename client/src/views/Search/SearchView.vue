@@ -1,4 +1,6 @@
 <script setup>
 </script>
 
-<template></template>
+<template>
+    <div class="text-5xl text-zinc-400">UNDER CONSTRUCTION</div>
+</template>

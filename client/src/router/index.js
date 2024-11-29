@@ -59,15 +59,15 @@ const router = createRouter({
               props: true,
               component: DrawView,
             },
+            {
+              path: ':mid',
+              name: 'match',
+              props: true,
+              component: MatchView,
+            },
           ],
         },
       ],
-    },
-    {
-      path: '/tournaments/:name/:id/:year/:eid/:mid',
-      name: 'match',
-      props: true,
-      component: MatchView,
     },
     {
       path: '/players/:name/:id',

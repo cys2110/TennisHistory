@@ -3,34 +3,22 @@ import { ref, provide } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart } from 'echarts/charts'
-import { DatasetComponent, GridComponent, ToolboxComponent, TooltipComponent } from 'echarts/components'
-import { UniversalTransition } from 'echarts/features'
+import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/components'
 import VChart, { THEME_KEY } from 'vue-echarts'
+import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
 
 const props = defineProps(['stats', 'p1', 'p2'])
 
-use([
-    DatasetComponent,
-    ToolboxComponent,
-    TooltipComponent,
-    GridComponent,
-    BarChart,
-    UniversalTransition,
-    CanvasRenderer,
-])
+use([DatasetComponent, TooltipComponent, GridComponent, BarChart, CanvasRenderer])
 provide(THEME_KEY, 'dark')
 
 const option = ref({
-    grid: {
-        left: '20%'
-    },
-    darkMode: true,
-    backgroundColor: 'transparent',
+    ...CHART_OPTIONS,
+    grid: { left: '20%' },
     dataset: {
         source: props.stats,
         dimensions: ['category', 'p1Value', 'p1Actual', 'p1Max', 'p2Value', 'p2actual', 'p2Max']
     },
-    textStyle: { color: "#a1a1aa", fontSize: 14 },
     xAxis: { type: 'value' },
     yAxis: { type: 'category', inverse: true },
     tooltip: {
@@ -52,13 +40,13 @@ const option = ref({
             name: props.p1,
             type: 'bar',
             encode: { x: 'p1Value', y: 'category' },
-            itemStyle: { color: "#6d28d9" },
+            itemStyle: { color: COLOURS.violet700 },
         },
         {
             name: props.p2,
             type: 'bar',
             encode: { x: 'p2Value', y: 'category' },
-            itemStyle: { color: "#166534" },
+            itemStyle: { color: COLOURS.green800 },
         }
     ]
 })

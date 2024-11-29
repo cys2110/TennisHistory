@@ -85,6 +85,8 @@ export const COLOURS = {
   fuchsia600: '#c026d3',
   violet600: '#7c3aed',
   violet700: '#6d28d9',
+  violet800: '#5b21b6',
+  zinc300: '#d4d4d8',
   zinc400: '#a1a1aa',
 }
 

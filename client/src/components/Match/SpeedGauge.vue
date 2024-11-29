@@ -4,6 +4,7 @@ import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { GaugeChart } from 'echarts/charts'
 import VChart, { THEME_KEY } from 'vue-echarts'
+import { COLOURS } from '@/utils/variables'
 
 const props = defineProps(['stat'])
 
@@ -16,19 +17,19 @@ const kmhData = [
         name: props.stat.name,
         title: { offsetCenter: ["0%", "100%"], color: "#a1a1aa" },
         detail: {
-            offsetCenter: ["-75%", "100%"],
-            color: "#6d28d9",
-            borderColor: "#6d28d9",
+            offsetCenter: ["-100%", "100%"],
+            color: COLOURS.violet700,
+            borderColor: COLOURS.violet700,
         },
-        itemStyle: { color: "#6d28d9" },
+        itemStyle: { color: COLOURS.violet700 }
     },
     {
         value: props.stat.p2,
-        itemStyle: { color: "#166534" },
+        itemStyle: { color: COLOURS.green800 },
         detail: {
-            offsetCenter: ["75%", "100%"],
-            color: "#166534",
-            borderColor: "#166534",
+            offsetCenter: ["100%", "100%"],
+            color: COLOURS.green800,
+            borderColor: COLOURS.green800
         },
     }
 ]
