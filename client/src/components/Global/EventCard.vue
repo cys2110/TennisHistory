@@ -1,46 +1,65 @@
-<script setup lang="ts">
+<script setup>
+import { computed } from 'vue';
 import { DateTime } from 'luxon';
-import type { Event } from '@/utils/interfaces';
-import { flag, formattedDates, category, encodeName } from '@/utils/functions';
-import Chip from '@/components/Global/EventCardChip.vue';
+import { category, encodeName, flag, formattedDates } from '@/utils/functions';
+import { SURFACES } from '@/utils/variables';
 
-const props = defineProps<{
-    event: Event
-}>()
+// Variables
+const props = defineProps(['event'])
+const eventPages = [
+    { title: 'Details', name: 'event' },
+    { title: 'Results', name: 'results' },
+    { title: 'Draw', name: 'draw' }
+]
+const isDisabled = DateTime.now() < DateTime.fromISO(props.event.start_date)
+const tournamentParams = { name: encodeName(props.event.tournament.name), id: props.event.tournament.id }
+const eventParams = { ...tournamentParams, year: props.event.year.id, eid: props.event.id }
+
+const coverImage = computed(() => {
+    return {
+        alt: props.event.venue?.country.name || props.event.category,
+        src: props.event.venue ? flag(props.event.venue.country.id) : category(props.event.category)
+    }
+})
+
 </script>
 
 <template>
-    <v-card class="my-4 sm:my-5 bg-indigo-800 mx-auto h-100 border-zinc-500" rounded="xl" variant="outlined">
-        <v-img v-if="event.venue" class="align-end opacity-75" :src="flag(event.venue.country.id)"
-            :alt="event.venue.country.name">
-            <v-img v-if="event.category" class="!size-20 mx-2 my-1 bg-white rounded-circle"
-                :src="category(event.category)" :alt="event.category" />
-        </v-img>
-        <v-card-title class="text-center" style="text-wrap: wrap;">
-            <router-link v-if="event.tournament" class="hover-link"
-                :to="{ name: 'Tournament', params: { name: encodeName(event.tournament.name), id: event.tournament?.id } }">
-                {{ event.tournament.name }}
-            </router-link>
-        </v-card-title>
-        <v-card-subtitle class="small text-center" style="text-wrap: wrap;">{{ event.sponsor_name ?? '—'
-            }}</v-card-subtitle>
-        <v-card-text class="mt-1 text-zinc-300 text-center" style="text-wrap: wrap;">
-            <div>{{ formattedDates(event.start_date, event.end_date) }}</div>
-            <div>{{ event.venue?.city }}, {{ event.venue?.country.name }}</div>
-            <div>{{ event.surface?.environment }} {{ event.surface?.surface }} <span v-if="event.surface?.hard_type">({{
-                event.surface.hard_type }})</span></div>
-        </v-card-text>
-        <!--If event has started-->
-        <v-card-actions v-if="DateTime.now() > DateTime.fromISO(event.start_date)">
-            <Chip :event name="Event">
-                <template #page>Overview</template>
-            </Chip>
-            <Chip :event name="Results">
-                <template #page>Results</template>
-            </Chip>
-            <Chip :event name="Draw">
-                <template #page>Draw</template>
-            </Chip>
-        </v-card-actions>
-    </v-card>
+    <a-card class="h-full flex flex-col justify-between">
+        <template #cover>
+            <a-image :alt="coverImage.alt" :src="coverImage.src" :preview="false" />
+        </template>
+        <template #actions>
+            <a-button v-for="page in eventPages" :key="page.name" type="dashed" :ghost="true" shape="round" size="small"
+                :disabled="isDisabled" class=" !border-zinc-300 hover:!border-zinc-400">
+                <template v-if="isDisabled">
+                    <a-tooltip title="Event has not started yet">{{ page.title }}</a-tooltip>
+                </template>
+                <template v-else>
+                    <router-link class="!text-zinc-300 hover:!text-zinc-400"
+                        :to="{ name: page.name, params: eventParams }">
+                        {{ page.title }}</router-link>
+                </template>
+            </a-button>
+        </template>
+        <a-card-meta :description="event.sponsor_name ?? ''">
+            <template #title><router-link class="hover-link" :to="{ name: 'tournament', params: tournamentParams }">{{
+                event.tournament.name }}</router-link></template>
+        </a-card-meta>
+        <a-row>
+            <a-col :span="18">
+                <div class="mt-3 flex flex-col justify-center">
+                    <div v-if="event.venue">{{ event.venue.city }}, {{ event.venue.country.name }}</div>
+                    <div>{{ formattedDates(event.start_date, event.end_date) }}</div>
+                    <div v-if="event.surface">{{ SURFACES[event.surface.id] }}</div>
+                </div>
+            </a-col>
+            <a-col :span="6" class="self-center">
+                <div class="w-full">
+                    <a-image v-if="event.category && event.venue" :alt="event.category" :src="category(event.category)"
+                        class="object-cover" />
+                </div>
+            </a-col>
+        </a-row>
+    </a-card>
 </template>

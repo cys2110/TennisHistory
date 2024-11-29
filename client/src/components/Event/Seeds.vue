@@ -1,47 +1,58 @@
-<script setup lang="ts">
-import type { Seed } from '@/utils/interfaces';
-import { flag, headshot, encodeName } from '@/utils/functions';
+<script setup>
+import { ref, provide } from 'vue'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { BarChart, LineChart } from 'echarts/charts'
+import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/components'
+import VChart, { THEME_KEY } from 'vue-echarts'
+import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
 
-const props = defineProps<{
-    seeds: Seed[]
-}>()
+const props = defineProps(['seeds'])
+
+const flattenedSeeds = props.seeds.map((seed) => ({
+    seed: seed.seed,
+    rank: seed.rank,
+    name: seed.player.full_name,
+}));
+
+use([DatasetComponent, TooltipComponent, GridComponent, BarChart, LineChart, CanvasRenderer]);
+provide(THEME_KEY, 'dark')
+
+const option = ref({
+    ...CHART_OPTIONS,
+    grid: { bottom: "30%" },
+    dataset: { source: flattenedSeeds, dimensions: ["seed", "rank", "name"] },
+    tooltip: {
+        trigger: "axis",
+        axisPointer: { type: "shadow" },
+    },
+    xAxis: {
+        type: "category",
+        axisLabel: { rotate: 60, interval: 0 },
+    },
+    yAxis: [
+        { type: "value", name: "Seed" },
+        { type: "value", name: "Rank" },
+    ],
+    series: [
+        {
+            name: "Seed",
+            type: "line",
+            encode: { x: "name", y: "seed" },
+            itemStyle: { color: COLOURS.green600 },
+        },
+        {
+            name: "Rank",
+            type: "bar",
+            encode: { x: "name", y: "rank" },
+            yAxisIndex: 1,
+            itemStyle: { color: COLOURS.violet700 },
+        },
+    ]
+})
 </script>
 
 <template>
-    <v-table class="bg-transparent rounded-xl" fixed-header hover>
-        <thead class="text-xs text-zinc-300">
-            <tr>
-                <th class="!font-bold text-center !bg-indigo-800">Seed</th>
-                <th class="!font-bold text-center !bg-indigo-800">Player</th>
-                <th class="!font-bold text-center !bg-indigo-800">Rank</th>
-            </tr>
-        </thead>
-        <tbody class="text-xs text-zinc-300">
-            <tr v-for="seed in seeds" :key="seed.node.id">
-                <td class="text-center">{{ seed.properties.seed }}</td>
-                <td>
-                    <div class="flex items-center">
-                        <div class="mx-1">
-                            <flag-img v-if="seed.node.country" class="w-[2rem]" :src="flag(seed.node.country.id)"
-                                :alt="seed.node.country.name" />
-                        </div>
-                        <div class="mx-1">
-                            <v-avatar size="small">
-                                <v-img :src="headshot(seed.node.id)" :alt="seed.node.full_name" />
-                            </v-avatar>
-                        </div>
-                        <div class="mx-1">
-                            <router-link class="hover-link" :class="{ 'strikethrough': seed.properties.wd }"
-                                :to="{ name: 'Player', params: { id: seed.node.id, name: encodeName(seed.node.full_name) } }">
-                                {{ seed.node.full_name }}
-                            </router-link>
-                        </div>
-                    </div>
-                </td>
-                <td class="text-center" :class="{ 'strikethrough': seed.properties.wd }">{{ seed.properties.rank ?? ''
-                    }}
-                </td>
-            </tr>
-        </tbody>
-    </v-table>
+    <div id="seeds" class="text-4xl">Seeded Players</div>
+    <v-chart class="!h-[400px] !w-full" :option="option" :autoresize="true" />
 </template>
