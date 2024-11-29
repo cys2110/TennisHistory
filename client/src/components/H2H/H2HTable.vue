@@ -15,9 +15,9 @@ const comparisons = [
 <template>
     <div v-for="comparison in comparisons" :key="comparison.title">
         <a-row>
-            <a-col :span="8" class="text-lg">{{ comparison.p1 }}</a-col>
-            <a-col :span="8" class="text-zinc-400 font-bold text-center text-lg">{{ comparison.title }}</a-col>
-            <a-col :span="8" class="text-lg text-right">{{ comparison.p2 }}</a-col>
+            <a-col :span="8">{{ comparison.p1 }}</a-col>
+            <a-col :span="8" class="text-zinc-400 font-bold text-center">{{ comparison.title }}</a-col>
+            <a-col :span="8" class="text-right">{{ comparison.p2 }}</a-col>
         </a-row>
         <a-row>
             <a-col :span="24">

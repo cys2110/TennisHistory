@@ -22,7 +22,6 @@ const { result, loading, error } = useQuery(query, variables)
 watch(result, (newResult) => {
     if (newResult) {
         h2h.value = newResult
-        console.log(h2h.value)
         pieStats.value = [{
             name: unencodeName(props.p1Name),
             value: h2h.value.p1Wins.count,
@@ -45,7 +44,7 @@ watch(error, (newError) => {
     <Title>
         <template #title>{{ p1.name }} v. {{ p2.name }}</template>
     </Title>
-    <a-row v-if="h2h" :gutter="32">
+    <a-row v-if="h2h" :gutter="32" class="mb-5">
         <a-col :span="6">
             <a-image class="border-2 border-zinc-400 mx-auto rounded-full my-5" :src="headshot(h2h.p1[0].id)"
                 :alt="h2h.p1[0].full_name" :preview="false" />

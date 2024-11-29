@@ -127,3 +127,19 @@ export const GET_H2H = (p1Id, p2Id) => {
   `
   return { query: call, variables: { p1Id, p2Id } }
 }
+
+export const SEARCH_PLAYER = (fullName) => {
+  const call = gql`
+    query SearchPlayers($fullName: String!) {
+      searchPlayers(full_name: $fullName) {
+        id
+        full_name
+        country {
+          id
+          name
+        }
+      }
+    }
+  `
+  return { query: call, variables: { fullName } }
+}

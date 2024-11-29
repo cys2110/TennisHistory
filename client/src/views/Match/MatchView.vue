@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_MATCH } from '@/services/MatchService';
-import { encodeName, flag, headshot, percentage, unencodeName } from '@/utils/functions';
+import { encodeName, flag, headshot, percentage, unencodeName, updateDocumentTitle } from '@/utils/functions';
 import { COLOURS } from '@/utils/variables';
 
 // [TODO: UPDATE DOCUMENT TITLE]
@@ -10,6 +10,8 @@ import { COLOURS } from '@/utils/variables';
 
 // Variables
 const props = defineProps(['name', 'id', 'eid', 'year', 'mid'])
+
+document.title = `${unencodeName(props.name)} ${props.year} | TennisHistory`
 const match = ref(null)
 const stats = ref(null)
 const serviceSpeed = ref(null)
@@ -47,7 +49,7 @@ const { result, loading, error } = useQuery(query, variables)
 watch(result, (newResult) => {
     if (newResult) {
         match.value = newResult.matches[0]
-        console.log(match.value)
+        updateDocumentTitle(`${match.value.p1.player.player.full_name} vs. ${match.value.p2.player.player.full_name} | ${unencodeName(props.name)} ${props.year} | TennisHistory`)
         const serviceStats = [
             {
                 category: 'Aces',

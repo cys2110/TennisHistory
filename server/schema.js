@@ -320,7 +320,7 @@ export const typeDefs = `#graphql
         career_high: Int
         ch_date: Date
         coaches: [Coach!]! @relationship(type: "COACHES", direction: IN)
-        country: Country! @relationship(type: "REPRESENTS", direction: OUT, properties: "RepresentsProperties")
+        country: Country @relationship(type: "REPRESENTS", direction: OUT, properties: "RepresentsProperties")
         dob: Date
         dod: Date
         entries: [Entry!]! @relationship (type: "ENTERED", direction: OUT)

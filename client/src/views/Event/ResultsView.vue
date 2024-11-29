@@ -45,7 +45,7 @@ watch(error, (newError) => {
                 <div class="text-4xl my-5">{{ round.round }}</div>
                 <a-row justify="space-evenly" :gutter="[0, 32]">
                     <a-col :span="11" v-for="match in round.matches" :key="match.match_no">
-                        <ResultCard :match :name :id :year :eid />
+                        <ResultCard v-if="match.winner?.player" :match :name :id :year :eid />
                     </a-col>
                 </a-row>
             </div>

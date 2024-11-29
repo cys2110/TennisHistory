@@ -5,7 +5,7 @@ const props = defineProps(['player', 'entry'])
 </script>
 
 <template>
-    <a-row>
+    <a-row class="flex items-center">
         <a-col :span="3">
             <div class="w-full flex items-center">
                 <a-image :alt="player.country.name" :src="flag(player.country.id)" class="rounded" :preview="false" />

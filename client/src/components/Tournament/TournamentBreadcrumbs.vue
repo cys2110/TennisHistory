@@ -106,9 +106,16 @@ if (route.name !== 'match') {
     </a-breadcrumb>
     <a-drawer v-if="selectedRound" v-model:open="open" :title="selectedRound.round" class="!bg-violet-800">
         <div v-for="roundsMatch in selectedRound.matches" :key="roundsMatch.match_no" class="my-1">
-            <router-link class="hover-link" :to="{ name: 'match', params: { mid: roundsMatch.match_no } }">{{
-                roundsMatch.p1.player.player.full_name }} vs. {{ roundsMatch.p2.player.player.full_name
+            <router-link v-if="!roundsMatch.incomplete" class="hover-link"
+                :to="{ name: 'match', params: { mid: roundsMatch.match_no } }">{{
+                    roundsMatch.p1.player.player.full_name }} vs. {{ roundsMatch.p2.player.player.full_name
                 }}</router-link>
+            <div v-else-if="roundsMatch.incomplete === 'WO'">{{ roundsMatch.p1.player.player.full_name }} vs. {{
+                roundsMatch.p2.player.player.full_name }} (Walkover)</div>
+            <div v-else-if="roundsMatch.p1?.player || roundsMatch.p2?.player">{{
+                roundsMatch.p1?.player?.player.full_name ||
+                roundsMatch.p2.player.player.full_name }} (BYE)
+            </div>
         </div>
     </a-drawer>
 </template>
