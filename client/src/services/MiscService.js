@@ -143,3 +143,188 @@ export const SEARCH_PLAYER = (fullName) => {
   `
   return { query: call, variables: { fullName } }
 }
+
+export const GET_SEARCH = (searchTerm) => {
+  const call = gql`
+    query search($searchTerm: String!) {
+      searchTournaments(name: $searchTerm) {
+        id
+        name
+      }
+      searchPlayers(full_name: $searchTerm) {
+        id
+        full_name
+        country {
+          name
+          id
+        }
+      }
+      searchCoaches(name: $searchTerm) {
+        id
+        full_name
+      }
+      searchCountries(name: $searchTerm) {
+        name
+      }
+      searchSupervisors(name: $searchTerm) {
+        id
+      }
+      searchSurface(name: $searchTerm) {
+        id
+      }
+      searchUmpires(name: $searchTerm) {
+        id
+      }
+      searchVenue(name: $searchTerm) {
+        name
+        city
+        country {
+          name
+        }
+      }
+    }
+  `
+  return { query: call, variables: { searchTerm } }
+}
+
+export const GET_COACH = (id) => {
+  const call = gql`
+    query Coaches($id: String) {
+      coaches(where: { id: $id }) {
+        players {
+          id
+          full_name
+          country {
+            name
+            id
+          }
+        }
+      }
+    }
+  `
+  return { query: call, variables: { id } }
+}
+
+export const GET_SUPERVISOR = (id) => {
+  const call = gql`
+    query Supervisors($id: String) {
+      supervisors(where: { id: $id }) {
+        events(options: { sort: [{ start_date: DESC }] }) {
+          id
+          year {
+            id
+          }
+          tournament {
+            id
+            name
+          }
+        }
+      }
+    }
+  `
+  return { query: call, variables: { id } }
+}
+
+export const GET_SURFACE = (id) => {
+  const call = gql`
+    query Surfaces($id: String) {
+      surfaces(where: { id: $id }) {
+        events(options: { sort: [{ start_date: DESC }] }) {
+          id
+          year {
+            id
+          }
+          tournament {
+            id
+            name
+          }
+        }
+      }
+    }
+  `
+  return { query: call, variables: { id } }
+}
+
+export const GET_VENUE = (name, city) => {
+  const call = gql`
+    query Venues($name: String, $city: String) {
+      venues(where: { name: $name, city: $city }) {
+        events(options: { sort: [{ start_date: DESC }] }) {
+          id
+          year {
+            id
+          }
+          tournament {
+            id
+            name
+          }
+        }
+      }
+    }
+  `
+  return { query: call, variables: { name, city } }
+}
+
+export const GET_UMPIRE = (id) => {
+  const call = gql`
+    query Umpires($id: String) {
+      events(
+        options: { sort: [{ start_date: DESC }] }
+        where: { rounds_SOME: { matches_SOME: { umpire: { id: $id } } } }
+      ) {
+        id
+        year {
+          id
+        }
+        tournament {
+          id
+          name
+        }
+        rounds(
+          options: { sort: [{ number: ASC }] }
+          where: { matches_SOME: { umpire: { id: $id } } }
+        ) {
+          round
+          matches(options: { sort: [{ match_no: ASC }] }, where: { umpire: { id: $id } }) {
+            match_no
+            p1 {
+              player {
+                player {
+                  full_name
+                  id
+                }
+              }
+            }
+            p2 {
+              player {
+                player {
+                  full_name
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `
+  return { query: call, variables: { id } }
+}
+
+export const GET_COUNTRY = (name) => {
+  const call = gql`
+    query Countries($name: String) {
+      countries(where: { name: $name }) {
+        players(options: { sort: [{ last_name: ASC }] }) {
+          id
+          full_name
+        }
+        formerPlayers {
+          id
+          full_name
+        }
+      }
+    }
+  `
+  return { query: call, variables: { name } }
+}

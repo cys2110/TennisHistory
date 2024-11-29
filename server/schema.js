@@ -66,7 +66,8 @@ export const typeDefs = `#graphql
         id: String! @unique
         first_name: String
         last_name: String
-        full_name: String! @customResolver(requires: "first_name last_name")
+        full_name: String @customResolver(requires: "first_name last_name")
+        players: [Player!]! @relationship(type: "COACHES", direction: OUT)
     }
 
     type Country {
@@ -506,7 +507,7 @@ export const typeDefs = `#graphql
 
     type Supervisor {
         id: String! @unique
-        eventS: [Event!]! @relationship(type: "SUPERVISED", direction: OUT)
+        events: [Event!]! @relationship(type: "SUPERVISED", direction: OUT)
     }
 
     type Surface {
@@ -639,16 +640,46 @@ export const typeDefs = `#graphql
     }
 
     type Query {
-        searchPlayers(full_name: String!): [Player] @cypher(statement: """
+        searchPlayers(full_name: String!): [Player!]! @cypher(statement: """
             MATCH (p:Player)
             WHERE p.first_name + ' ' + p.last_name =~ '(?i).*'+ $full_name + '.*'
             RETURN p AS players
         """, columnName: "players")
-        searchTournaments (name: String!): [Tournament] @cypher(statement: """
+        searchTournaments (name: String!): [Tournament!]! @cypher(statement: """
             MATCH (t:Tournament)
             WHERE t.name =~ '(?i).*' + $name + '.*'
             RETURN t as tournaments
         """, columnName: "tournaments")
+        searchUmpires (name: String!): [Umpire!]! @cypher(statement: """
+            MATCH (u:Umpire)
+            WHERE u.id =~ '(?i).*' + $name + '.*'
+            RETURN u as umpires
+        """, columnName: "umpires")
+        searchSupervisors (name: String!): [Supervisor] @cypher(statement: """
+            MATCH (s:Supervisor)
+            WHERE s.id =~ '(?i).*' + $name + '.*'
+            RETURN s as supervisors
+        """, columnName: "supervisors")
+        searchCoaches (name: String!): [Coach] @cypher(statement: """
+            MATCH (c:Coach)
+            WHERE c.id =~ '(?i).*' + $name + '.*' OR c.first_name + ' ' + c.last_name =~ '(?i).*'+ $name + '.*'
+            RETURN c as coaches
+        """, columnName: "coaches")
+        searchCountries (name: String!): [Country] @cypher(statement: """
+            MATCH (c:Country)
+            WHERE c.name =~ '(?i).*' + $name + '.*'
+            RETURN c as countries
+        """, columnName: "countries")
+        searchVenue (name: String!): [Venue] @cypher(statement: """
+            MATCH (v:Venue)
+            WHERE v.name =~ '(?i).*' + $name + '.*'
+            RETURN v as venues
+        """, columnName: "venues")
+        searchSurface (name: String!): [Surface] @cypher(statement: """
+            MATCH (s:Surface)
+            WHERE s.id =~ '(?i).*' + $name + '.*'
+            RETURN s as surfaces
+        """, columnName: "surfaces")
         playerTitlesAndFinals (id: String!): TitlesFinals! @cypher(statement: """
             MATCH (p:Player {id: $id})
             OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(s1:Score)-[:SCORED]->(:Match)-[:PLAYED]->(:Round {round: 'Final'})-[:ROUND_OF]-(e:Event)-[:TOOK_PLACE_IN]-(y:Year)

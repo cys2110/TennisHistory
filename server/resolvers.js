@@ -11,7 +11,12 @@ export const resolvers = {
   },
   Coach: {
     full_name(source) {
-      return `${source.first_name} ${source.last_name}`;
+      const { first_name, last_name } = source;
+      if (first_name && last_name) {
+        return `${first_name} ${last_name}`;
+      } else {
+        return null;
+      }
     },
   },
 };

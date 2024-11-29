@@ -15,7 +15,7 @@ const componentThemes = {
     colorBorder: COLOURS.violet800,
     colorText: COLOURS.zinc300,
   },
-  Anchor: { colorPrimary: COLOURS.violet700 },
+  Anchor: { colorPrimary: COLOURS.violet700 }
 }
 </script>
 
