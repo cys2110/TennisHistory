@@ -3,7 +3,6 @@ import { useRoute } from 'vue-router';
 import { unencodeName } from '@/utils/functions';
 
 // Variables
-const props = defineProps(['name', 'id'])
 const route = useRoute()
 const pages = [{ name: 'player', title: 'Details' }, { name: 'activity', title: 'Activity' }, { name: 'titles', title: 'Titles and Finals' }, { name: 'index', title: 'Win-Loss Index' }, { name: 'stats', title: 'Stats' }]
 </script>
@@ -14,7 +13,7 @@ const pages = [{ name: 'player', title: 'Details' }, { name: 'activity', title: 
             <router-link :to="{ name: 'home' }">Home</router-link>
         </a-breadcrumb-item>
         <a-breadcrumb-item>
-            {{ unencodeName(name) }}
+            {{ unencodeName(route.params.name) }}
             <template #overlay>
                 <a-menu>
                     <template v-for="(page, index) in pages" :key="index">

@@ -17,7 +17,7 @@ export const gladiator = (player) => {
   return new URL(`https://www.atptour.com/-/media/alias/player-gladiator-headshot/${player}`).href
 }
 
-export const category = (category) => {
+export const categorySrc = (category) => {
   return new URL(`../assets/category/${category}.svg`, import.meta.url).href
 }
 
@@ -48,20 +48,17 @@ export const smallDate = (ISOdate) => {
 }
 
 export const formattedDates = (start, end) => {
-  const startDate = DateTime.fromISO(start)
-  const endDate = DateTime.fromISO(end)
+  const startDateISO = DateTime.fromISO(start)
+  const endDateISO = DateTime.fromISO(end)
+  const startDate =
+    startDateISO.year !== endDateISO.year
+      ? startDateISO.setLocale('gb').toFormat('dd MMMM yyyy')
+      : startDateISO.month !== endDateISO.month
+        ? startDateISO.setLocale('gb').toFormat('dd MMMM')
+        : startDateISO.setLocale('gb').toFormat('dd')
+  const endDate = endDateISO.setLocale('gb').toFormat('dd MMMM yyyy')
 
-  if (startDate.year !== endDate.year) {
-    return `${startDate.setLocale('gb').toFormat('dd MMMM yyyy')} - ${endDate
-      .setLocale('gb')
-      .toFormat('dd MMMM yyyy')}`
-  } else if (startDate.month !== endDate.month) {
-    return `${startDate.setLocale('gb').toFormat('dd MMMM')} - ${endDate
-      .setLocale('gb')
-      .toFormat('dd MMMM yyyy')}`
-  } else {
-    return `${startDate.day} - ${endDate.setLocale('gb').toFormat('dd MMMM yyyy')}`
-  }
+  return `${startDate} - ${endDate}`
 }
 
 export const formatTime = (time) => {

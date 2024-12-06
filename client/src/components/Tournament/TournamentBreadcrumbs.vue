@@ -7,6 +7,7 @@ import { GET_MATCH_BREADCRUMBS } from '@/services/MatchService';
 import { unencodeName } from '@/utils/functions';
 
 const route = useRoute()
+const { name, id, eid, year, mid } = route.params
 const tournamentYears = ref(null)
 const rounds = ref(null)
 const match = ref(null)
@@ -19,8 +20,9 @@ const showDrawer = (round) => {
     selectedRound.value = round
 }
 
+// API calls
 if (route.name !== 'match') {
-    const { query, variables } = GET_TOURNAMENT_YEARS(parseInt(route.params.id))
+    const { query, variables } = GET_TOURNAMENT_YEARS(parseInt(id))
     const { result, loading, error } = useQuery(query, variables)
 
     watch(result, (newResult) => {
@@ -31,7 +33,7 @@ if (route.name !== 'match') {
         if (newError) console.error(newError)
     })
 } else {
-    const { query, variables } = GET_MATCH_BREADCRUMBS(parseInt(route.params.id), parseInt(route.params.eid), parseInt(route.params.mid))
+    const { query, variables } = GET_MATCH_BREADCRUMBS(parseInt(id), parseInt(eid), parseInt(mid))
     const { result, loading, error } = useQuery(query, variables)
     watch(result, (newResult) => {
         if (newResult) {
@@ -53,11 +55,14 @@ if (route.name !== 'match') {
             <router-link :to="{ name: 'home' }">Home</router-link>
         </a-breadcrumb-item>
         <a-breadcrumb-item>
-            {{ unencodeName(route.params.name) }}
+            <router-link v-if="route.name !== 'tournament'"
+                :to="{ name: 'tournament', params: { name: name, id: id } }">
+                {{ unencodeName(name) }}</router-link>
+            <span v-else>{{ unencodeName(name) }}</span>
             <template #overlay>
                 <a-menu>
                     <template v-for="event in tournamentYears" :key="event.id">
-                        <a-menu-item v-if="route.name === 'tournament' || parseInt(route.params.eid) !== event.id">
+                        <a-menu-item v-if="route.name === 'tournament' || parseInt(eid) !== event.id">
                             <router-link :to="{ name: 'event', params: { year: event.year.id, eid: event.id } }">{{
                                 event.year.id }}</router-link>
                         </a-menu-item>
@@ -66,7 +71,7 @@ if (route.name !== 'match') {
             </template>
         </a-breadcrumb-item>
         <a-breadcrumb-item v-if="route.name !== 'tournament'">
-            {{ route.params.year }}
+            {{ year }}
             <template #overlay>
                 <a-menu>
                     <template v-for="page in pages" :key="page.name">
@@ -94,7 +99,7 @@ if (route.name !== 'match') {
             <template #overlay>
                 <a-menu>
                     <template v-for="roundMatch in match.round.matches" :key="roundMatch.match_no">
-                        <a-menu-item v-if="route.params.mid !== roundMatch.match_no">
+                        <a-menu-item v-if="mid !== roundMatch.match_no">
                             <router-link :to="{ name: 'match', params: { mid: roundMatch.match_no } }">{{
                                 roundMatch.p1.player.player.full_name }} vs. {{ roundMatch.p2.player.player.full_name
                                 }}</router-link>

@@ -1,28 +1,58 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, markRaw, onMounted, ref, shallowRef, toRefs } from 'vue';
+import Icon from '@ant-design/icons-vue';
 import { DateTime } from 'luxon';
-import { convertToFt, encodeName, flag, formatDate, smallDate } from '@/utils/functions';
+import { convertToFt, encodeName, formatDate, smallDate } from '@/utils/functions';
 
 const props = defineProps(['player'])
+const { countryConnection, prev_countriesConnection, turned_pro, retired, dob, rh, bh1, height_cm, coaches, career_high, ch_date, win, loss, titles, pm_USD } = toRefs(props.player)
+const selectedFlag = shallowRef(null)
+const olderFlags = ref([])
+
+onMounted(async () => {
+    const countryCode = countryConnection.value.edges[0].node.id;
+    try {
+        selectedFlag.value = (
+            await import(`@/components/icons/flags`)
+        )[countryCode] || null;
+    } catch (error) {
+        console.error(`Flag for ${countryCode} not found`, error);
+    }
+    if (prev_countriesConnection.value.edges.length > 0) {
+        for (const country of prev_countriesConnection.value.edges) {
+            const countryCode = country.node.id;
+            try {
+                const flag = markRaw(
+                    (await import(`@/components/icons/flags`))[countryCode] || null
+                );
+                olderFlags.value.push(flag);
+            } catch (error) {
+                console.error(`Flag for ${countryCode} not found`, error);
+                olderFlags.value.push(null);
+            }
+        }
+    }
+});
+
 const statistics = [
-    { title: 'Career High', value: props.player.career_high ?? '—', description: props.player.ch_date ? formatDate(props.player.ch_date) : '—' },
-    { title: 'Win-Loss', value: `${props.player.win}—${props.player.loss}` },
-    { title: 'Titles', value: props.player.titles },
-    { title: 'Prize Money', prefix: '$', value: props.player.pm_USD }
+    { title: 'Career High', value: career_high.value ?? '—', description: ch_date.value ? formatDate(ch_date.value) : '—' },
+    { title: 'Win-Loss', value: `${win.value}—${loss.value}` },
+    { title: 'Titles', value: titles.value },
+    { title: 'Prize Money', prefix: '$', value: pm_USD.value }
 ]
 
 const playerYears = computed(() => {
-    if (props.player.turned_pro && props.player.retired) {
-        return `${props.player.retired.id - props.player.turned_pro.id} years`
+    if (turned_pro.value && retired.value) {
+        return `${retired.value.id - turned_pro.value.id} years`
     } else {
-        return `${parseInt(DateTime.now().year) - props.player.turned_pro.id + 1} years`
+        return `${parseInt(DateTime.now().year) - turned_pro.value.id + 1} years`
     }
 })
 
-const age = computed(() => { return Math.floor(Math.abs(DateTime.fromISO(props.player.dob).diffNow("years").toObject().years)) })
+const age = computed(() => { return Math.floor(Math.abs(DateTime.fromISO(dob.value).diffNow("years").toObject().years)) })
 
 const playingHand = computed(() => {
-    switch (props.player.rh) {
+    switch (rh.value) {
         case true:
             return "Right-handed"
         case false:
@@ -33,7 +63,7 @@ const playingHand = computed(() => {
 })
 
 const backhand = computed(() => {
-    switch (props.player.bh1) {
+    switch (bh1.value) {
         case true:
             return 'One-handed'
         case false:
@@ -45,9 +75,9 @@ const backhand = computed(() => {
 </script>
 
 <template>
-    <a-row justify="space-evenly" :gutter=6>
-        <a-col v-for="stat in statistics" :key="stat.title" :span=6>
-            <a-card class="text-center h-full flex flex-col justify-between">
+    <a-row justify="space-evenly" :gutter="[5, 16]">
+        <a-col v-for="stat in statistics" :key="stat.title" :xs="24" :md="11" :xl="5">
+            <a-card class="text-center full-card">
                 <a-statistic :title="stat.title" :prefix="stat.prefix || ''" :value="stat.value" />
                 <a-card-meta v-if="stat.description" :description="stat.description" />
             </a-card>
@@ -57,39 +87,36 @@ const backhand = computed(() => {
         size="middle">
         <a-descriptions-item class="bg-black" label="Country">
             <div class="flex items-center justify-center">
-                <div class="w-10 mr-2">
-                    <a-image class="rounded" :alt="player.countryConnection.edges[0].node.name"
-                        :src="flag(player.countryConnection.edges[0].node.id)" />
-                </div>
-                <div>{{ player.countryConnection.edges[0].node.name }}</div>
+                <Icon v-if="selectedFlag" class="mr-2 text-2xl" :component="selectedFlag" />
+                <div>{{ countryConnection.edges[0].node.name }}</div>
             </div>
         </a-descriptions-item>
         <a-descriptions-item class="bg-black" label="Active">
-            <div v-if="player.turned_pro && player.retired">
+            <div v-if="turned_pro && retired">
                 <div>{{ playerYears }}</div>
-                <div>{{ player.turned_pro.id }}—{{ player.retired.id }}</div>
+                <div>{{ turned_pro.id }}—{{ retired.id }}</div>
             </div>
             <div v-else-if="player.turned_pro">
                 <div>{{ playerYears }}</div>
-                <div>{{ player.turned_pro.id }}—present</div>
+                <div>{{ turned_pro.id }}—present</div>
             </div>
             <div v-else>—</div>
         </a-descriptions-item>
         <a-descriptions-item class="bg-black" label="Age">
-            <div v-if="player.dob">
+            <div v-if="dob">
                 <div>{{ age }}</div>
-                <div>{{ formatDate(player.dob) }}</div>
+                <div>{{ formatDate(dob) }}</div>
             </div>
             <div v-else>—</div>
         </a-descriptions-item>
         <a-descriptions-item class="bg-black" label="Height">
-            <div>{{ player.height_cm }} cm</div>
-            <div>{{ convertToFt(player.height_cm) }}</div>
+            <div>{{ height_cm }} cm</div>
+            <div>{{ convertToFt(height_cm) }}</div>
         </a-descriptions-item>
         <a-descriptions-item class="bg-black" label="Plays">{{ playingHand }}</a-descriptions-item>
         <a-descriptions-item class="bg-black" label="Backhand">{{ backhand }}</a-descriptions-item>
-        <a-descriptions-item class="bg-black" :label="player.coaches.length === 1 ? 'Coach' : 'Coaches'">
-            <div v-if="player.coaches.length > 0" v-for="coach in player.coaches" :key="coach.id">
+        <a-descriptions-item class="bg-black" :label="coaches.length === 1 ? 'Coach' : 'Coaches'">
+            <div v-if="coaches.length > 0" v-for="coach in coaches" :key="coach.id">
                 <router-link v-if="coach.full_name" class="hover-link"
                     :to="{ name: 'player', params: { name: encodeName(coach.full_name), id: coach.id } }">{{
                         coach.full_name }}</router-link>
@@ -98,18 +125,19 @@ const backhand = computed(() => {
             <div v-else>—</div>
         </a-descriptions-item>
         <a-descriptions-item class="bg-black" label="Previous Representations" :span="2">
-            <div v-if="player.prev_countriesConnection.edges.length > 0"
-                v-for="country in player.prev_countriesConnection.edges" :key="country.node.id"
+            <a-row v-if="prev_countriesConnection.edges.length > 0"
+                v-for="(country, index) in prev_countriesConnection.edges" :key="country.node.id"
                 class="flex items-center justify-center">
-                <div class="w-10 mr-2 my-3">
-                    <a-image :alt="country.node.name" :src="flag(country.node.id)" class="rounded-lg" />
-                </div>
-                <div class="mx-2 w-48">{{ country.node.name }}</div>
-                <div class="mx-2">
+                <a-col :span="2">
+                    <Icon v-if="olderFlags.length > 0 && olderFlags[index]" class="mr-2 text-2xl"
+                        :component="olderFlags[index]" />
+                </a-col>
+                <a-col :span="9">{{ country.node.name }}</a-col>
+                <a-col :span="13">
                     {{ smallDate(country.properties.start_date) }}—
                     {{ smallDate(country.properties.end_date) }}
-                </div>
-            </div>
+                </a-col>
+            </a-row>
             <div v-else>—</div>
         </a-descriptions-item>
     </a-descriptions>

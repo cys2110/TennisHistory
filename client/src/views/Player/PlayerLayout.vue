@@ -14,7 +14,6 @@ const pageNames = {
 </script>
 
 <template>
-    <PlayerBreadcrumbs :name :id />
     <Title>
         <template #title>{{ unencodeName(name) }}</template>
         <template #subtitle>{{ pageNames[route.name] }}</template>

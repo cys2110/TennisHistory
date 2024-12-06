@@ -17,3 +17,9 @@
   background-size: 100% 0.1em;
   color: #d4d4d8;
 }
+
+@layer components {
+  .full-card {
+    @apply h-full flex flex-col justify-between;
+  }
+}

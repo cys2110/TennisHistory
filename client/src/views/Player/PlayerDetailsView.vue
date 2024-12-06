@@ -27,11 +27,11 @@ watch(error, (newError) => {
 
 <template>
     <a-row v-if="player">
-        <a-col :span="4">
+        <a-col :xs="24" :sm="4">
             <a-image :alt="player.full_name" :src="player.gladiator ? gladiator(player.id) : headshot(player.id)"
                 :preview="false" class="rounded-full" />
         </a-col>
-        <a-col :span="20">
+        <a-col :xs="24" :sm="20">
             <PlayerDetails :player />
             <!--[TODO: INSERT MAJOR RESULTS TABLE]-->
         </a-col>

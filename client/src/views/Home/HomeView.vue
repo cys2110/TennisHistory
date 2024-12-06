@@ -8,7 +8,7 @@ import { GET_UPCOMING } from '@/services/EventService';
 document.title = "Upcoming Tournaments | TennisHistory"
 
 // Variables
-const events = ref([])
+const events = ref(null)
 
 // API call to get upcoming tournaments
 const { query, variables } = GET_UPCOMING(DateTime.now().toISODate())
@@ -24,9 +24,11 @@ watch(error, (newError) => {
 </script>
 
 <template>
-    <Title><template #title>Upcoming Tournaments</template></Title>
+    <Title>
+        <template #title>Upcoming Tournaments</template>
+    </Title>
     <a-row v-if="events?.length > 0" justify="space-evenly" align="stretch" :gutter="[0, 32]">
-        <a-col v-for="event in events" :key="event.id" :xs="24" :sm="11" :md="7" :xl="5">
+        <a-col v-for="event in events" :key="event.id" :xs="24" :sm="11" :md="10" :xl="5">
             <EventCard :event />
         </a-col>
     </a-row>

@@ -1,5 +1,6 @@
 <script setup>
-import { ref, provide } from 'vue'
+import { ref, provide, computed } from 'vue'
+import { Grid } from 'ant-design-vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { TreeChart } from 'echarts/charts'
@@ -7,6 +8,8 @@ import VChart, { THEME_KEY } from 'vue-echarts'
 import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
 
 const props = defineProps(['entryInfo'])
+const { useBreakpoint } = Grid
+const screens = useBreakpoint()
 
 const treeData = {
     name: "Entry Information",
@@ -27,6 +30,10 @@ const treeData = {
     })),
 };
 
+const orientation = computed(() => (screens.value.xs ? "TB" : "LR"))
+const rotation = computed(() => (screens.value.xs ? -90 : 0))
+const bottomGrid = computed(() => (screens.value.xs ? "30%" : "1%"))
+
 use([TreeChart, CanvasRenderer]);
 provide(THEME_KEY, 'dark')
 
@@ -38,20 +45,23 @@ const option = ref({
             data: [treeData],
             top: "1%",
             left: "20%",
-            bottom: "1%",
+            bottom: bottomGrid,
             right: "20%",
             symbolSize: 7,
+            orient: orientation,
             label: {
                 position: "top",
                 verticalAlign: "middle",
                 align: "right",
                 fontSize: 12,
             },
+            labelLayout: { rotate: rotation },
             leaves: {
                 label: {
                     position: "right",
                     verticalAlign: "middle",
                     align: "left",
+                    rotate: rotation
                 },
             },
             itemStyle: { color: COLOURS.violet700 },

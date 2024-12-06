@@ -1,19 +1,20 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_TOURNAMENT } from '@/services/TournamentService';
 import { unencodeName, updateDocumentTitle } from '@/utils/functions';
-import { useRoute } from 'vue-router';
 
 // Variables
 const route = useRoute()
+const { id, name } = route.params
 const tournament = ref(null)
 
 // Update document title
-watch(() => route.params.name, () => updateDocumentTitle(`${unencodeName(route.params.name)} | TennisHistory`), { immediate: true })
+watch(() => name, () => updateDocumentTitle(`${unencodeName(name)} | TennisHistory`), { immediate: true })
 
 // API call
-const { query, variables } = GET_TOURNAMENT(parseInt(route.params.id))
+const { query, variables } = GET_TOURNAMENT(parseInt(id))
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
@@ -30,15 +31,14 @@ const years = computed(() => {
 </script>
 
 <template>
-    <TournamentBreadcrumbs />
     <div v-if="route.name === 'tournament'">
         <Title>
-            <template #title>{{ unencodeName(route.params.name) }}</template>
+            <template #title>{{ unencodeName(name) }}</template>
             <template v-if="tournament" #subtitle>{{ years }}</template>
         </Title>
         <a-row v-if="tournament?.events.length > 0" justify="space-evenly" :gutter="[0, 32]">
-            <a-col v-for="event in tournament.events" :key="event.id" :span="5">
-                <TournamentCard :event :id="route.params.id" :name="route.params.name" />
+            <a-col v-for="event in tournament.events" :key="event.id" :xs="24" :md="11" :lg="7" :xl="5">
+                <TournamentCard :event :id :name />
             </a-col>
         </a-row>
         <Loading v-else :loading>

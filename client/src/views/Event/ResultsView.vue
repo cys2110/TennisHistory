@@ -1,12 +1,16 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
+import { Grid } from 'ant-design-vue';
 import { GET_RESULTS } from '@/services/EventService';
 import { unencodeName, updateDocumentTitle } from '@/utils/functions';
+import { COLOURS } from '@/utils/variables';
 
 // [FUTURE: FILTER BY DATE, COURT, UMPIRE, PLAYER]
 
 const props = defineProps(['name', 'id', 'year', 'eid'])
+const { useBreakpoint } = Grid
+const screens = useBreakpoint()
 const matches = ref(null)
 const anchorItems = ref(null)
 
@@ -37,14 +41,18 @@ watch(error, (newError) => {
 
 <template>
     <a-row v-if="matches">
-        <a-col :span="4">
+        <a-col v-if="!screens.xs" :span="4">
             <a-anchor :offset-top="75" :items="anchorItems" />
         </a-col>
-        <a-col :span="20">
+        <a-col :xs="24" :sm="20" class="pl-5">
+            <a-config-provider :theme="{ components: { Anchor: { colorPrimary: COLOURS.violet400 } } }">
+                <a-anchor class="smallAnchor" v-if="screens.xs" :offset-top="75" :items="anchorItems"
+                    direction="horizontal" />
+            </a-config-provider>
             <div v-for="round in matches" :key="round.number" :id="round.round">
                 <div class="text-4xl my-5">{{ round.round }}</div>
                 <a-row justify="space-evenly" :gutter="[0, 32]">
-                    <a-col :span="11" v-for="match in round.matches" :key="match.match_no">
+                    <a-col :xs="24" :lg="11" v-for="match in round.matches" :key="match.match_no">
                         <ResultCard v-if="match.winner?.player" :match :name :id :year :eid />
                     </a-col>
                 </a-row>
@@ -55,3 +63,9 @@ watch(error, (newError) => {
         <template #none>No results available</template>
     </Loading>
 </template>
+
+<style scoped>
+.smallAnchor :deep(.ant-anchor) {
+    background-color: #3f3f46;
+}
+</style>

@@ -1,5 +1,6 @@
 <script setup>
-import { ref, provide } from 'vue'
+import { ref, provide, computed } from 'vue'
+import { Grid } from 'ant-design-vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { ScatterChart } from 'echarts/charts'
@@ -9,19 +10,26 @@ import { formatCurrency } from '@/utils/functions'
 import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
 
 const props = defineProps(['rounds', 'currency'])
+const { useBreakpoint } = Grid
+const screens = useBreakpoint()
 
 use([CanvasRenderer, ScatterChart, DatasetComponent, GridComponent, TooltipComponent])
 provide(THEME_KEY, 'dark')
 
+const leftGrid = computed(() => screens.value.xs ? '30%' : '15%')
+
 const option = ref({
     ...CHART_OPTIONS,
-    dataset: {
-        source: props.rounds,
-        dimensions: ['round', 'points', 'pm']
-    },
+    grid: { left: leftGrid },
+    dataset: { source: props.rounds, dimensions: ['round', 'points', 'pm'] },
     tooltip: {
+        trigger: "axis",
+        axisPointer: { type: "none" },
         formatter: function (params) {
-            return `<span style="font-weight: bold">${params.value.round}</span><br/>Points: ${params.value.points}<br/>Prize Money: ${formatCurrency(props.currency, params.value.pm)}`;
+            return `
+            <div style="font-weight: bold">${params[0].value.round}</div>
+            <div style="display: flex; justify-content: space-between; align-items: center;"><span>Points: </span><span>${params[0].value.points}</span></div>
+            <div style="display: flex; justify-content: space-between; align-items: center;"><span>Prize Money:&nbsp</span><span>${formatCurrency(props.currency, params[0].value.pm)}</span></div>`;
         },
         backgroundColor: "transparent",
         textStyle: { color: COLOURS.zinc400 },

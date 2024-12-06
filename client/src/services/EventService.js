@@ -353,10 +353,10 @@ export const GET_DRAW = (id) => {
   const call = gql`
     query Draw($id: Int!) {
       events(where: { id: $id }) {
-        rounds(where: { number_GT: 0 }) {
+        rounds(where: { number_GT: 0 }, options: { sort: { number: DESC } }) {
           round
           number
-          matches {
+          matches(options: { sort: [{ match_no: ASC }] }) {
             incomplete
             match_no
             p1 {

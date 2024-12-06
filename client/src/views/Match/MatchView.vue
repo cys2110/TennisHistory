@@ -5,9 +5,6 @@ import { GET_MATCH } from '@/services/MatchService';
 import { encodeName, flag, headshot, percentage, unencodeName, updateDocumentTitle } from '@/utils/functions';
 import { COLOURS } from '@/utils/variables';
 
-// [TODO: UPDATE DOCUMENT TITLE]
-// [TODO: SCOREBOX AND PLAYER IMAGES]
-
 // Variables
 const props = defineProps(['name', 'id', 'eid', 'year', 'mid'])
 
@@ -16,21 +13,9 @@ const match = ref(null)
 const stats = ref(null)
 const serviceSpeed = ref(null)
 const anchorItems = ref([
-    {
-        key: 1,
-        href: '#service-stats',
-        title: "Service Stats"
-    },
-    {
-        key: 2,
-        href: '#return-stats',
-        title: 'Return Stats'
-    },
-    {
-        key: 3,
-        href: '#points-stats',
-        title: 'Points Stats'
-    }
+    { key: 1, href: '#service-stats', title: "Service Stats" },
+    { key: 2, href: '#return-stats', title: 'Return Stats' },
+    { key: 3, href: '#points-stats', title: 'Points Stats' }
 ])
 
 // Get player params
@@ -63,28 +48,22 @@ watch(result, (newResult) => {
             },
             {
                 category: 'First serve',
-                p1Value: percentage(match.value.p1.serve1_pts, match.value.p1.serve1_pts + match.value.p1.serve2_pts),
                 p1Actual: match.value.p1.serve1_pts,
                 p1Max: match.value.p1.serve1_pts + match.value.p1.serve2_pts,
-                p2Value: percentage(match.value.p2.serve1_pts, match.value.p2.serve1_pts + match.value.p2.serve2_pts),
                 p2Actual: match.value.p2.serve1_pts,
                 p2Max: match.value.p2.serve1_pts + match.value.p2.serve2_pts
             },
             {
                 category: '1st serve points won',
-                p1Value: percentage(match.value.p1.serve1_pts_w, match.value.p1.serve1_pts),
                 p1Actual: match.value.p1.serve1_pts_w,
                 p1Max: match.value.p1.serve1_pts,
-                p2Value: percentage(match.value.p2.serve1_pts_w, match.value.p2.serve1_pts),
                 p2Actual: match.value.p2.serve1_pts_w,
                 p2Max: match.value.p2.serve1_pts
             },
             {
                 category: '2nd serve points won',
-                p1Value: percentage(match.value.p1.serve2_pts_w, match.value.p1.serve2_pts),
                 p1Actual: match.value.p1.serve2_pts_w,
                 p1Max: match.value.p1.serve2_pts,
-                p2Value: percentage(match.value.p2.serve2_pts_w, match.value.p2.serve1_pts),
                 p2Actual: match.value.p2.serve2_pts_w,
                 p2Max: match.value.p2.serve1_pts
             },
@@ -105,28 +84,22 @@ watch(result, (newResult) => {
         const returnStats = [
             {
                 category: '1st serve return points won',
-                p1Value: percentage(match.value.p1.ret1_w, match.value.p1.ret1),
                 p1Actual: match.value.p1.ret1_w,
                 p1Max: match.value.p1.ret1,
-                p2Value: percentage(match.value.p2.ret1_w, match.value.p2.ret1),
                 p2Actual: match.value.p2.ret1_w,
                 p2Max: match.value.p2.ret1
             },
             {
                 category: '2nd serve return points won',
-                p1Value: percentage(match.value.p1.ret2_w, match.value.p1.ret2),
                 p1Actual: match.value.p1.ret2_w,
                 p1Max: match.value.p1.ret2,
-                p2Value: percentage(match.value.p2.ret2_w, match.value.p2.ret2),
                 p2Actual: match.value.p2.ret2_w,
                 p2Max: match.value.p2.ret2
             },
             {
                 category: 'Break points converted',
-                p1Value: percentage(match.value.p1.bps_converted, match.value.p1.bp_opps),
                 p1Actual: match.value.p1.bps_converted,
                 p1Max: match.value.p1.bp_opps,
-                p2Value: percentage(match.value.p2.bps_converted, match.value.p2.bp_opps),
                 p2Actual: match.value.p2.bps_converted,
                 p2Max: match.value.p2.bp_opps
             }
@@ -150,44 +123,38 @@ watch(result, (newResult) => {
                 p1Max: match.value.p1.ret1 + match.value.p1.ret2,
                 p2Actual: match.value.p2.ret1_w + match.value.p2.ret2_w,
                 p2Max: match.value.p2.ret1 + match.value.p2.ret2
-            }
-        ]
-        if (match.value.p1.net) {
-            pointStats = [{
+            },
+            match.value.p1.net && {
                 category: 'Net points won',
                 p1Actual: match.value.p1.net_w,
                 p1Max: match.value.p1.net,
                 p2Actual: match.value.p2.net_w,
                 p2Max: match.value.p2.net
-            }, ...pointStats]
-        }
-        if (match.value.p1.winners) {
-            pointStats.push({
+            },
+            match.value.p1.winners && {
                 category: 'Winners',
                 p1Value: match.value.p1.winners,
                 p2Value: match.value.p2.winners
-            })
-        }
-        if (match.value.p1.ues) {
-            pointStats.push({
+            },
+            match.value.p1.ues && {
                 category: 'Unforced errors',
                 p1Value: match.value.p1.ues,
                 p2Value: match.value.p2.ues
-            })
-        }
-        pointStats.push({
-            category: 'Total Points Won',
-            p1Actual: match.value.p1.serve1_pts_w +
-                match.value.p1.serve2_pts_w +
-                match.value.p1.ret1_w +
-                match.value.p1.ret2_w,
-            p1Max: match.value.p1.serve1_pts + match.value.p1.serve2_pts + match.value.p1.ret1 + match.value.p1.ret2,
-            p2Actual: match.value.p2.serve1_pts_w +
-                match.value.p2.serve2_pts_w +
-                match.value.p2.ret1_w +
-                match.value.p2.ret2_w,
-            p2Max: match.value.p1.serve1_pts + match.value.p1.serve2_pts + match.value.p1.ret1 + match.value.p1.ret2
-        })
+            },
+            {
+                category: 'Total Points Won',
+                p1Actual: match.value.p1.serve1_pts_w +
+                    match.value.p1.serve2_pts_w +
+                    match.value.p1.ret1_w +
+                    match.value.p1.ret2_w,
+                p1Max: match.value.p1.serve1_pts + match.value.p1.serve2_pts + match.value.p1.ret1 + match.value.p1.ret2,
+                p2Actual: match.value.p2.serve1_pts_w +
+                    match.value.p2.serve2_pts_w +
+                    match.value.p2.ret1_w +
+                    match.value.p2.ret2_w,
+                p2Max: match.value.p1.serve1_pts + match.value.p1.serve2_pts + match.value.p1.ret1 + match.value.p1.ret2
+            }
+        ].filter(Boolean)
         pointStats.map(stat => {
             if (stat.p1Max) {
                 stat.p1Value = percentage(stat.p1Actual, stat.p1Max)
@@ -207,21 +174,9 @@ watch(result, (newResult) => {
                     title: 'Service Speed'
                 })
             serviceSpeed.value = [
-                {
-                    name: 'Max Speed',
-                    p1: match.value.p1.max_speed_kph,
-                    p2: match.value.p2.max_speed_kph
-                },
-                {
-                    name: '1st serve average speed',
-                    p1: match.value.p1.avg_sv1_kph,
-                    p2: match.value.p2.avg_sv1_kph
-                },
-                {
-                    name: '2nd serve average speed',
-                    p1: match.value.p1.avg_sv2_kph,
-                    p2: match.value.p2.avg_sv2_kph
-                }
+                { name: 'Max Speed', p1: match.value.p1.max_speed_kph, p2: match.value.p2.max_speed_kph },
+                { name: '1st serve average speed', p1: match.value.p1.avg_sv1_kph, p2: match.value.p2.avg_sv1_kph },
+                { name: '2nd serve average speed', p1: match.value.p1.avg_sv2_kph, p2: match.value.p2.avg_sv2_kph }
             ]
         }
     }

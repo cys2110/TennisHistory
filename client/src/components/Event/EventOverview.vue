@@ -1,27 +1,43 @@
 <script setup>
+import { onMounted, shallowRef, toRefs } from 'vue';
+import Icon from '@ant-design/icons-vue';
 import { formattedDates } from '@/utils/functions';
 import { CURRENCIES, SURFACES } from '@/utils/variables';
 
 const props = defineProps(['event'])
+const { sponsor_name, category, start_date, end_date, surface, currency, pm, tfc, venue, supervisors } = toRefs(props.event)
+const selectedFlag = shallowRef(null)
 
 const statistics = [
-    { title: 'Prize Money', value: props.event.pm || '—' },
-    { title: 'Total Financial Commitment', value: props.event.tfc || '—' }
+    { title: 'Prize Money', value: pm.value || '—' },
+    { title: 'Total Financial Commitment', value: tfc.value || '—' }
 ]
 
 const descriptionItems = [
-    { label: 'Sponsor name', value: props.event.sponsor_name ?? '—' },
-    { label: 'Category', value: props.event.category ?? '—' },
-    { label: 'Dates', value: formattedDates(props.event.start_date, props.event.end_date) },
-    { label: 'Surface', value: SURFACES[props.event.surface.id] ?? '—' }
+    { label: 'Sponsor name', value: sponsor_name.value ?? '—' },
+    { label: 'Category', value: category.value ?? '—' },
+    { label: 'Dates', value: formattedDates(start_date.value, end_date.value) },
+    { label: 'Surface', value: SURFACES[surface.value.id] ?? '—' }
 ]
+
+// Import flag icons on mount
+onMounted(async () => {
+    const countryCode = venue.value.country.id;
+    try {
+        selectedFlag.value = (
+            await import(`@/components/icons/flags`)
+        )[countryCode] || null;
+    } catch (error) {
+        console.error(`Flag for ${countryCode} not found`, error);
+    }
+});
 </script>
 
 <template>
-    <a-row id="details" justify="space-evenly">
-        <a-col :span="6" v-for="stat in statistics" :key="stat.title">
-            <a-card>
-                <a-statistic :prefix="CURRENCIES[event.currency] || ''" :title="stat.title" :value="stat.value"
+    <a-row id="details" justify="space-evenly" :gutter="[0, 16]">
+        <a-col :xs="24" :sm="11" :md="10" :xl="7" v-for="stat in statistics" :key="stat.title">
+            <a-card class="full-card">
+                <a-statistic :prefix="CURRENCIES[currency] || ''" :title="stat.title" :value="stat.value"
                     class="text-center" />
             </a-card>
         </a-col>
@@ -32,12 +48,15 @@ const descriptionItems = [
         </a-descriptions-item>
         <a-descriptions-item label="Venue" class="bg-black">
             <div class="flex flex-col justify-center">
-                <div>{{ event.venue?.name ?? '—' }}</div>
-                <div v-if="event.venue">{{ event.venue.city }}, {{ event.venue.country.name }}</div>
+                <div>{{ venue?.name ?? '—' }}</div>
+                <div v-if="venue" class="flex items-center">
+                    {{ venue.city }}
+                    <Icon v-if="selectedFlag" :component="selectedFlag" class="ml-2 text-2xl" />
+                </div>
             </div>
         </a-descriptions-item>
-        <a-descriptions-item :label="event.supervisors.length === 1 ? 'Supervisor' : 'Supervisors'" class="bg-black">
-            <div v-if="event.supervisors.length > 0" v-for="supervisor in event.supervisors" :key="supervisor.id">{{
+        <a-descriptions-item :label="supervisors.length === 1 ? 'Supervisor' : 'Supervisors'" class="bg-black">
+            <div v-if="supervisors.length > 0" v-for="supervisor in supervisors" :key="supervisor.id">{{
                 supervisor.id }}</div>
             <div v-else>—</div>
         </a-descriptions-item>

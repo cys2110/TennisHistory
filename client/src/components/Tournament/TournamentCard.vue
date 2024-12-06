@@ -1,6 +1,8 @@
 <script setup>
 const props = defineProps(['event', 'id', 'name'])
 const final = props.event.rounds[0].matches[0]
+
+// router-link params
 const eventParams = {
     name: props.name,
     id: props.id,
@@ -11,10 +13,11 @@ const matchParams = { ...eventParams, mid: final.match_no }
 </script>
 
 <template>
-    <a-card>
+    <a-card class="full-card">
         <template #title>
-            <router-link class="hover-link" :to="{ name: 'event', params: eventParams }">{{
-                event.year.id }}</router-link>
+            <router-link class="hover-link font-bold" :to="{ name: 'event', params: eventParams }">
+                {{ event.year.id }}
+            </router-link>
         </template>
         <a-card-meta class="text-center">
             <template #title>

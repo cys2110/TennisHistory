@@ -59,7 +59,7 @@ export const SHORT_ROUNDS = {
 export const ENTRY_INFO = {
   ldaConnection: 'Last direct acceptance',
   llsConnection: 'Lucky losers',
-  altsConnection: 'Alternates',
+  altConnection: 'Alternates',
   wdConnection: 'Withdrawals',
   retConnection: 'Retirements',
   woConnection: 'Walkovers',
@@ -69,10 +69,10 @@ export const ENTRY_INFO = {
 }
 
 export const STATUS_INFO = {
-  LL: 'Lucky loser',
-  PR: 'Protected ranking',
-  WC: 'Wild card',
-  SE: 'Special exemption',
+  LL: 'Lucky Loser',
+  PR: 'Protected Ranking',
+  WC: 'Wild Card',
+  SE: 'Special Exemption',
   Q: 'Qualifier',
   Alt: 'Alternate',
 }
@@ -83,6 +83,7 @@ export const COLOURS = {
   green600: '#16a34a',
   sky600: '#0284c7',
   fuchsia600: '#c026d3',
+  violet400: '#c084fc',
   violet600: '#7c3aed',
   violet700: '#6d28d9',
   violet800: '#5b21b6',

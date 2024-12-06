@@ -1,5 +1,6 @@
 <script setup>
-import { ref, provide } from 'vue'
+import { ref, provide, computed } from 'vue'
+import { Grid } from 'ant-design-vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart, LineChart } from 'echarts/charts'
@@ -8,6 +9,8 @@ import VChart, { THEME_KEY } from 'vue-echarts'
 import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
 
 const props = defineProps(['seeds'])
+const { useBreakpoint } = Grid
+const screens = useBreakpoint()
 
 const flattenedSeeds = props.seeds.map((seed) => ({
     seed: seed.seed,
@@ -15,20 +18,22 @@ const flattenedSeeds = props.seeds.map((seed) => ({
     name: seed.player.full_name,
 }));
 
+const rotation = computed(() => screens.value.xs ? 90 : 60)
+
 use([DatasetComponent, TooltipComponent, GridComponent, BarChart, LineChart, CanvasRenderer]);
 provide(THEME_KEY, 'dark')
 
 const option = ref({
     ...CHART_OPTIONS,
-    grid: { bottom: "30%" },
+    grid: { bottom: "30%", right: '15%' },
     dataset: { source: flattenedSeeds, dimensions: ["seed", "rank", "name"] },
     tooltip: {
         trigger: "axis",
-        axisPointer: { type: "shadow" },
+        axisPointer: { type: "shadow" }
     },
     xAxis: {
         type: "category",
-        axisLabel: { rotate: 60, interval: 0 },
+        axisLabel: { rotate: rotation, interval: 0 },
     },
     yAxis: [
         { type: "value", name: "Seed" },

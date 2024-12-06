@@ -1,7 +1,8 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, shallowRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable';
+import Icon from '@ant-design/icons-vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import { convertToFt, encodeName, flag, smallDate } from '@/utils/functions';
 import { COLOURS } from '@/utils/variables';
@@ -13,6 +14,7 @@ const props = defineProps(['player', 'number'])
 const cardTheme = { colorBgContainer: props.number === 1 ? COLOURS.violet700 : COLOURS.green800 }
 const searchTerm = ref('Search player');
 const options = ref([]);
+const selectedFlag = shallowRef(null)
 
 const { query, variables } = SEARCH_PLAYER(searchTerm.value);
 const { result, loading, error, refetch } = useQuery(query, variables);
@@ -62,6 +64,17 @@ const handleSelect = (name, id) => {
         router.push({ name: 'h2h', params: { p1Name: route.params.p1Name, p1Id: route.params.p1Id, p2Name: encodeName(name), p2Id: id } })
     }
 }
+
+onMounted(async () => {
+    const countryCode = props.player.country.id;
+    try {
+        selectedFlag.value = (
+            await import(`@/components/icons/flags`)
+        )[countryCode] || null;
+    } catch (error) {
+        console.error(`Flag for ${countryCode} not found`, error);
+    }
+});
 </script>
 
 <template>
@@ -74,10 +87,7 @@ const handleSelect = (name, id) => {
             </template>
             <template #extra>
                 <div class="flex justify-end items-center w-full">
-                    <div class="w-1/3 flex items-center">
-                        <a-image :preview="false" :alt="player.country.name" :src="flag(player.country.id)"
-                            class="rounded" />
-                    </div>
+                    <Icon class="text-2xl" :component="selectedFlag" />
                 </div>
             </template>
             <a-card-meta>

@@ -1,7 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
-import router from '@/router';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
 import { GET_ACTIVITY } from '@/services/PlayerService';
@@ -9,8 +8,10 @@ import { unencodeName, updateDocumentTitle } from '@/utils/functions';
 import { COLOURS } from '@/utils/variables';
 
 // [FUTURE: ADD FILTER BY TOURNAMENT TYPE]
+// [TODO: DEFAULT TO LATEST YEAR]
 
 const route = useRoute()
+const router = useRouter()
 
 // Variables
 const props = defineProps(['name', 'id'])
