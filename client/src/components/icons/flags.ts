@@ -78,6 +78,7 @@ import URU from './URU'
 import USA from './USA'
 import UZB from './UZB'
 import VEN from './VEN'
+import YUG from './YUG'
 
 export {
   ARG,
@@ -160,4 +161,5 @@ export {
   USA,
   UZB,
   VEN,
+  YUG,
 }

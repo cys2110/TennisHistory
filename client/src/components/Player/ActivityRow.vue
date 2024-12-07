@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue';
 import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons-vue";
 import { SHORT_ROUNDS } from '@/utils/variables';
-import { encodeName, flag, headshot } from '@/utils/functions';
+import { encodeName, headshot } from '@/utils/functions';
 
 const props = defineProps(['event', 'match', 'id', 'name'])
 const player = ref(null)

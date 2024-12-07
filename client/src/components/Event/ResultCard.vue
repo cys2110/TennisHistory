@@ -1,11 +1,17 @@
-<script setup>
-import { toRefs } from 'vue';
+<script setup lang="ts">
 import { CheckCircleTwoTone } from '@ant-design/icons-vue';
 import { encodeName, formatDate, formatTime, getEntry } from '@/utils/functions';
 import { COLOURS } from '@/utils/variables';
+import { ResultsMatch } from '@/utils/types';
 
-const props = defineProps(['match', 'name', 'id', 'eid', 'year'])
-const { date, court, duration_mins, umpire, winner, loser, incomplete, match_no } = toRefs(props.match)
+const props = defineProps<{
+    match: ResultsMatch['matches'][0]
+    name: string
+    id: string
+    eid: string
+    year: string
+}>()
+const { date, court, duration_mins, umpire, winner, loser, incomplete, match_no } = props.match
 </script>
 
 <template>

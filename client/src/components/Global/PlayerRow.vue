@@ -1,20 +1,26 @@
-<script setup>
-import { onMounted, shallowRef, toRefs } from 'vue';
+<script setup lang="ts">
+import { onMounted, shallowRef } from 'vue';
 import Icon from '@ant-design/icons-vue';
 import { encodeName, headshot } from '@/utils/functions';
 
-const props = defineProps(['player', 'entry'])
-const { country, full_name, id } = toRefs(props.player)
+const props = defineProps<{
+    player: {
+        country: { id: string },
+        full_name: string,
+        id: string,
+    }
+    entry?: string
+}>()
+const { country, full_name, id } = props.player
 const selectedFlag = shallowRef(null)
 
 
 // import flag icons on mount
 onMounted(async () => {
-    const countryCode = country.value.id;
+    const countryCode = country.id;
     try {
-        selectedFlag.value = (
-            await import(`@/components/icons/flags`)
-        )[countryCode] || null;
+        const flags: { [key: string]: any } = await import(`@/components/icons/flags`)
+        selectedFlag.value = flags[countryCode] || null;
     } catch (error) {
         console.error(`Flag for ${countryCode} not found`, error);
     }
@@ -33,6 +39,7 @@ onMounted(async () => {
             <router-link class="hover-link" :to="{ name: 'player', params: { name: encodeName(full_name), id: id } }">
                 {{ full_name }}
             </router-link> <small v-if="entry">{{ entry }}</small>
+            {{ full_name }}
         </a-col>
     </a-row>
 </template>

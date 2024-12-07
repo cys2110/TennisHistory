@@ -1,15 +1,156 @@
-<script setup>
-import { ref, watch } from 'vue';
+<script setup lang="ts">
+// @ts-nocheck
+import { Ref, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_MATCH } from '@/services/MatchService';
-import { encodeName, flag, headshot, percentage, unencodeName, updateDocumentTitle } from '@/utils/functions';
+import { encodeName, headshot, percentage, unencodeName, updateDocumentTitle } from '@/utils/functions';
 import { COLOURS } from '@/utils/variables';
+import { Incomplete, StatusInfo } from '@/utils/types';
 
 // Variables
-const props = defineProps(['name', 'id', 'eid', 'year', 'mid'])
+const props = defineProps<{
+    name: string,
+    id: string,
+    eid: string,
+    year: string,
+    mid: string
+}>()
+
+interface Match {
+    court: string | null,
+    date: string | null,
+    duration_mins: number,
+    incomplete: Incomplete | null,
+    match_no: number,
+    round: {
+        round: string
+        event: {
+            sponsor_name: string | null,
+            start_date: string,
+            end_date: string,
+            category: string,
+            id: number,
+            surface: {
+                id: string,
+            }
+            venue: {
+                city: string,
+                country: {
+                    id: string,
+                    name: string
+                }
+            },
+            year: {
+                id: number,
+            }
+        }
+    }
+    umpire: {
+        id: string | null
+    }
+    winner: {
+        player: {
+            player: {
+                id: string,
+            }
+        }
+    }
+    p1: {
+        s1: number | null,
+        s2: number | null,
+        s3: number | null,
+        s4: number | null,
+        s5: number | null,
+        serve1_pts: number | null,
+        serve1_pts_w: number | null,
+        serve2_pts: number | null,
+        serve2_pts_w: number | null,
+        t1: number | null,
+        t2: number | null,
+        t3: number | null,
+        t4: number | null,
+        t5: number | null,
+        ues: number | null,
+        winners: number | null,
+        ret2_w: number | null,
+        ret2: number | null,
+        ret1_w: number | null,
+        ret1: number | null,
+        net_w: number | null,
+        net: number | null,
+        max_speed_kph: number | null,
+        incomplete: Incomplete | null,
+        dfs: number | null,
+        bps_saved: number | null,
+        bps_faced: number | null,
+        bps_converted: number | null,
+        bp_opps: number | null,
+        aces: number | null,
+        avg_sv1_kph: number | null,
+        avg_sv2_kph: number | null,
+        player: {
+            seed: number | null,
+            status: StatusInfo | null,
+            player: {
+                full_name: string,
+                id: string,
+                country: {
+                    id: string,
+                    name: string
+                }
+            }
+        }
+    }
+    p2: {
+        s1: number | null,
+        s2: number | null,
+        s3: number | null,
+        s4: number | null,
+        s5: number | null,
+        serve1_pts: number | null,
+        serve1_pts_w: number | null,
+        serve2_pts: number | null,
+        serve2_pts_w: number | null,
+        t1: number | null,
+        t2: number | null,
+        t3: number | null,
+        t4: number | null,
+        t5: number | null,
+        ues: number | null,
+        winners: number | null,
+        ret2_w: number | null,
+        ret2: number | null,
+        ret1_w: number | null,
+        ret1: number | null,
+        net_w: number | null,
+        net: number | null,
+        max_speed_kph: number | null,
+        incomplete: Incomplete | null,
+        dfs: number | null,
+        bps_saved: number | null,
+        bps_faced: number | null,
+        bps_converted: number | null,
+        bp_opps: number | null,
+        aces: number | null,
+        avg_sv1_kph: number | null,
+        avg_sv2_kph: number | null,
+        player: {
+            seed: number | null,
+            status: StatusInfo | null,
+            player: {
+                full_name: string,
+                id: string,
+                country: {
+                    id: string,
+                    name: string
+                }
+            }
+        }
+    }
+}
 
 document.title = `${unencodeName(props.name)} ${props.year} | TennisHistory`
-const match = ref(null)
+const match: Ref<Match | null> = ref(null)
 const stats = ref(null)
 const serviceSpeed = ref(null)
 const anchorItems = ref([
@@ -19,7 +160,7 @@ const anchorItems = ref([
 ])
 
 // Get player params
-const playerParams = (player) => {
+const playerParams = (player: { player: { player: { full_name: string, id: string } } }) => {
     const name = encodeName(player.player.player.full_name)
     return {
         name: name,
@@ -34,24 +175,24 @@ const { result, loading, error } = useQuery(query, variables)
 watch(result, (newResult) => {
     if (newResult) {
         match.value = newResult.matches[0]
-        updateDocumentTitle(`${match.value.p1.player.player.full_name} vs. ${match.value.p2.player.player.full_name} | ${unencodeName(props.name)} ${props.year} | TennisHistory`)
+        updateDocumentTitle(`${match.value?.p1.player.player.full_name} vs. ${match.value?.p2.player.player.full_name} | ${unencodeName(props.name)} ${props.year} | TennisHistory`)
         const serviceStats = [
             {
                 category: 'Aces',
-                p1Value: match.value.p1.aces,
-                p2Value: match.value.p2.aces
+                p1Value: match.value?.p1.aces,
+                p2Value: match.value?.p2.aces
             },
             {
                 category: 'Double faults',
-                p1Value: match.value.p1.dfs,
-                p2Value: match.value.p2.dfs
+                p1Value: match.value?.p1.dfs,
+                p2Value: match.value?.p2.dfs
             },
             {
                 category: 'First serve',
-                p1Actual: match.value.p1.serve1_pts,
-                p1Max: match.value.p1.serve1_pts + match.value.p1.serve2_pts,
-                p2Actual: match.value.p2.serve1_pts,
-                p2Max: match.value.p2.serve1_pts + match.value.p2.serve2_pts
+                p1Actual: match.value?.p1.serve1_pts,
+                p1Max: match.value?.p1.serve1_pts && match.value?.p1.serve2_pts && (match.value?.p1.serve1_pts + match.value.p1.serve2_pts),
+                p2Actual: match.value?.p2.serve1_pts,
+                p2Max: match.value?.p2.serve1_pts && match.value?.p2.serve2_pts && (match.value.p2.serve1_pts + match.value.p2.serve2_pts)
             },
             {
                 category: '1st serve points won',
@@ -76,7 +217,7 @@ watch(result, (newResult) => {
             }
         ]
         serviceStats.map(stat => {
-            if (stat.p1Max) {
+            if (stat.p1Max && stat.p2Max && stat.p1Actual && stat.p2Actual) {
                 stat.p1Value = percentage(stat.p1Actual, stat.p1Max)
                 stat.p2Value = percentage(stat.p2Actual, stat.p2Max)
             }
@@ -209,9 +350,9 @@ watch(error, (newError) => {
                             <template #title>
                                 <a-row class="flex items-center">
                                     <a-col :span="4">
-                                        <a-image :alt="match.p1.player.player.country.name"
+                                        <!-- <a-image :alt="match.p1.player.player.country.name"
                                             :src="flag(match.p1.player.player.country.id)" :preview="false"
-                                            class="rounded" />
+                                            class="rounded" /> -->
                                     </a-col>
                                     <a-col :span="20">
                                         <router-link class="hover-link text-lg"
@@ -238,9 +379,9 @@ watch(error, (newError) => {
                                 <template #title>
                                     <a-row class="flex items-center">
                                         <a-col :span="4">
-                                            <a-image :alt="match.p2.player.player.country.name"
+                                            <!-- <a-image :alt="match.p2.player.player.country.name"
                                                 :src="flag(match.p2.player.player.country.id)" :preview="false"
-                                                class="rounded" />
+                                                class="rounded" /> -->
                                         </a-col>
                                         <a-col :span="20">
                                             <router-link class="hover-link text-lg"

@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client/core'
 
-export const GET_MATCH_BREADCRUMBS = (id, eid, mid) => {
+export const GET_MATCH_BREADCRUMBS = (id: number, eid: number, mid: number) => {
   const call = gql`
     query getYears($id: Int!, $eid: Int!, $mid: Int!) {
       tournaments(where: { id: $id }) {
@@ -76,7 +76,7 @@ export const GET_MATCH_BREADCRUMBS = (id, eid, mid) => {
   return { query: call, variables: { id, eid, mid } }
 }
 
-export const GET_MATCH = (matchNo, eventId) => {
+export const GET_MATCH = (matchNo: number, eventId: number) => {
   const call = gql`
     query MatchStats($matchNo: Int!, $eventId: Int!) {
       matches(where: { match_no: $matchNo, round: { event: { id: $eventId } } }) {

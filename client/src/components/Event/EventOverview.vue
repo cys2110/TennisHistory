@@ -1,10 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, shallowRef, toRefs } from 'vue';
 import Icon from '@ant-design/icons-vue';
 import { formattedDates } from '@/utils/functions';
 import { CURRENCIES, SURFACES } from '@/utils/variables';
+import { EventDetailsType } from '@/utils/types';
 
-const props = defineProps(['event'])
+const props = defineProps<{
+    event: EventDetailsType;
+}>();
 const { sponsor_name, category, start_date, end_date, surface, currency, pm, tfc, venue, supervisors } = toRefs(props.event)
 const selectedFlag = shallowRef(null)
 
@@ -24,9 +27,8 @@ const descriptionItems = [
 onMounted(async () => {
     const countryCode = venue.value.country.id;
     try {
-        selectedFlag.value = (
-            await import(`@/components/icons/flags`)
-        )[countryCode] || null;
+        const flags: { [key: string]: any } = await import(`@/components/icons/flags`)
+        selectedFlag.value = flags[countryCode] || null
     } catch (error) {
         console.error(`Flag for ${countryCode} not found`, error);
     }
@@ -37,7 +39,7 @@ onMounted(async () => {
     <a-row id="details" justify="space-evenly" :gutter="[0, 16]">
         <a-col :xs="24" :sm="11" :md="10" :xl="7" v-for="stat in statistics" :key="stat.title">
             <a-card class="full-card">
-                <a-statistic :prefix="CURRENCIES[currency] || ''" :title="stat.title" :value="stat.value"
+                <a-statistic :prefix="currency ? CURRENCIES[currency] : ''" :title="stat.title" :value="stat.value"
                     class="text-center" />
             </a-card>
         </a-col>

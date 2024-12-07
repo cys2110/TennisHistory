@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Grid } from 'ant-design-vue';
 const links = [{ name: "ATP", url: "https://www.atptour.com/en" }, { name: 'ITF', url: 'https://www.itftennis.com/en/' }, { name: 'Australian Open', url: 'https://ausopen.com/' }, { name: 'Roland Garros', url: 'https://www.rolandgarros.com/en-us' }, { name: 'Wimbledon', url: 'https://www.wimbledon.com/' }, { name: 'US Open', url: 'https://www.usopen.org/' }]
 
@@ -16,7 +16,7 @@ const screens = useBreakpoint();
                 }}</a>
         </div>
         <div class="px-4 pt-2 pb-4 text-center text-zinc-300">Built by <a class="hover-link"
-                href="https://www.claire-sheridan.com" target="_blank">Claire Sheridan</a> using Vue.js, Ant
+                href="https://www.claire-sheridan.com" target="_blank">Claire Sheridan</a> using Vue.js, TypeScript, Ant
             Design and Tailwind</div>
     </div>
 </template>

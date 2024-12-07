@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { Grid } from 'ant-design-vue';
 
@@ -13,8 +13,8 @@ const playerPages = ['player', 'activity', 'titles', 'index', 'stats']
 <template>
     <a-page-header :ghost="true" class="!rounded-xl  mb-10" :class="{ 'is-sm': screens.xs }">
         <template #breadcrumb>
-            <TournamentBreadcrumbs v-if="!screens.xs && tournamentPages.includes(route.name)" />
-            <PlayerBreadcrumbs v-if="!screens.xs && playerPages.includes(route.name)" />
+            <TournamentBreadcrumbs v-if="!screens.xs && tournamentPages.includes(route.name as string)" />
+            <PlayerBreadcrumbs v-if="!screens.xs && playerPages.includes(route.name as string)" />
         </template>
         <template #title>
             <div :class="{ 'text-4xl': screens.xl, 'text-3xl': screens.lg, 'text-base': screens.xs }" class="font-bold">

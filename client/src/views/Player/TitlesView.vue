@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_TITLES } from '@/services/PlayerService';

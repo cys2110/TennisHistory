@@ -1,10 +1,10 @@
-<script setup>
-import { computed, onMounted, ref, shallowRef, watch } from 'vue';
+<script setup lang="ts">
+import { computed, onMounted, Ref, ref, shallowRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable';
 import Icon from '@ant-design/icons-vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
-import { convertToFt, encodeName, flag, smallDate } from '@/utils/functions';
+import { convertToFt, encodeName, smallDate } from '@/utils/functions';
 import { COLOURS } from '@/utils/variables';
 import { SEARCH_PLAYER } from '@/services/MiscService';
 
@@ -12,8 +12,14 @@ const router = useRouter();
 const route = useRoute()
 const props = defineProps(['player', 'number'])
 const cardTheme = { colorBgContainer: props.number === 1 ? COLOURS.violet700 : COLOURS.green800 }
+
+interface SearchPlayer {
+    full_name: string,
+    id: string
+    country: { id: string, name: string }
+}
 const searchTerm = ref('Search player');
-const options = ref([]);
+const options: Ref<SearchPlayer[]> = ref([]);
 const selectedFlag = shallowRef(null)
 
 const { query, variables } = SEARCH_PLAYER(searchTerm.value);
@@ -68,9 +74,8 @@ const handleSelect = (name, id) => {
 onMounted(async () => {
     const countryCode = props.player.country.id;
     try {
-        selectedFlag.value = (
-            await import(`@/components/icons/flags`)
-        )[countryCode] || null;
+        const flags: { [key: string]: any } = await import(`@/components/icons/flags`)
+        selectedFlag.value = flags[countryCode] || null;
     } catch (error) {
         console.error(`Flag for ${countryCode} not found`, error);
     }
@@ -87,7 +92,7 @@ onMounted(async () => {
             </template>
             <template #extra>
                 <div class="flex justify-end items-center w-full">
-                    <Icon class="text-2xl" :component="selectedFlag" />
+                    <Icon v-if="selectedFlag" class="text-2xl" :component="selectedFlag" />
                 </div>
             </template>
             <a-card-meta>

@@ -1,31 +1,31 @@
-<script setup>
-import { computed, markRaw, onMounted, ref, shallowRef, toRefs } from 'vue';
+<script setup lang="ts">
+import { computed, markRaw, onMounted, Ref, ref, shallowRef } from 'vue';
 import Icon from '@ant-design/icons-vue';
 import { DateTime } from 'luxon';
 import { convertToFt, encodeName, formatDate, smallDate } from '@/utils/functions';
+import { PlayerDetailsType } from '@/utils/types';
 
-const props = defineProps(['player'])
-const { countryConnection, prev_countriesConnection, turned_pro, retired, dob, rh, bh1, height_cm, coaches, career_high, ch_date, win, loss, titles, pm_USD } = toRefs(props.player)
+const props = defineProps<{
+    player: PlayerDetailsType
+}>()
+const { countryConnection, prev_countriesConnection, turned_pro, retired, dob, rh, bh1, height_cm, coaches, career_high, ch_date, win, loss, titles, pm_USD } = props.player
 const selectedFlag = shallowRef(null)
-const olderFlags = ref([])
+const olderFlags: Ref<(any | null)[]> = ref([])
 
 onMounted(async () => {
-    const countryCode = countryConnection.value.edges[0].node.id;
+    const countryCode = countryConnection.edges[0].node.id;
     try {
-        selectedFlag.value = (
-            await import(`@/components/icons/flags`)
-        )[countryCode] || null;
+        const flags: { [key: string]: any } = await import(`@/components/icons/flags`)
+        selectedFlag.value = flags[countryCode] || null;
     } catch (error) {
         console.error(`Flag for ${countryCode} not found`, error);
     }
-    if (prev_countriesConnection.value.edges.length > 0) {
-        for (const country of prev_countriesConnection.value.edges) {
-            const countryCode = country.node.id;
+    if (prev_countriesConnection.edges.length > 0) {
+        for (const country of prev_countriesConnection.edges) {
+            const countryCode = String(country.node.id);
             try {
-                const flag = markRaw(
-                    (await import(`@/components/icons/flags`))[countryCode] || null
-                );
-                olderFlags.value.push(flag);
+                const flag: { [key: string]: any } = await import(`@/components/icons/flags`);
+                olderFlags.value.push(markRaw(flag[countryCode] || null));
             } catch (error) {
                 console.error(`Flag for ${countryCode} not found`, error);
                 olderFlags.value.push(null);
@@ -35,24 +35,29 @@ onMounted(async () => {
 });
 
 const statistics = [
-    { title: 'Career High', value: career_high.value ?? '—', description: ch_date.value ? formatDate(ch_date.value) : '—' },
-    { title: 'Win-Loss', value: `${win.value}—${loss.value}` },
-    { title: 'Titles', value: titles.value },
-    { title: 'Prize Money', prefix: '$', value: pm_USD.value }
+    { title: 'Career High', value: career_high ?? '—', description: ch_date ? formatDate(ch_date) : '—' },
+    { title: 'Win-Loss', value: `${win}—${loss}` },
+    { title: 'Titles', value: titles },
+    { title: 'Prize Money', prefix: '$', value: pm_USD }
 ]
 
 const playerYears = computed(() => {
-    if (turned_pro.value && retired.value) {
-        return `${retired.value.id - turned_pro.value.id} years`
+    if (turned_pro && retired) {
+        return `${retired.id - turned_pro.id} years`
     } else {
-        return `${parseInt(DateTime.now().year) - turned_pro.value.id + 1} years`
+        return `${DateTime.now().year - turned_pro.id + 1} years`
     }
 })
 
-const age = computed(() => { return Math.floor(Math.abs(DateTime.fromISO(dob.value).diffNow("years").toObject().years)) })
+const age = computed(() => {
+    if (dob) {
+        return Math.floor(Math.abs(DateTime.fromISO(dob).diffNow("years").toObject().years || 0))
+    }
+    return '—'
+})
 
 const playingHand = computed(() => {
-    switch (rh.value) {
+    switch (rh) {
         case true:
             return "Right-handed"
         case false:
@@ -63,7 +68,7 @@ const playingHand = computed(() => {
 })
 
 const backhand = computed(() => {
-    switch (bh1.value) {
+    switch (bh1) {
         case true:
             return 'One-handed'
         case false:
@@ -72,6 +77,32 @@ const backhand = computed(() => {
             return '—'
     }
 })
+
+const descriptionItems = [
+    {
+        label: 'Active',
+        value: turned_pro ? playerYears : '—',
+        description: turned_pro ? `${turned_pro.id}—${retired?.id || 'present'}` : null
+    },
+    {
+        label: 'Age',
+        value: age,
+        description: dob ? formatDate(dob) : null
+    },
+    {
+        label: 'Height',
+        value: height_cm ? `${height_cm} cm` : '—',
+        description: height_cm ? convertToFt(height_cm) : null
+    },
+    {
+        label: 'Plays',
+        value: playingHand
+    },
+    {
+        label: 'Backhand',
+        value: backhand
+    }
+]
 </script>
 
 <template>
@@ -91,35 +122,16 @@ const backhand = computed(() => {
                 <div>{{ countryConnection.edges[0].node.name }}</div>
             </div>
         </a-descriptions-item>
-        <a-descriptions-item class="bg-black" label="Active">
-            <div v-if="turned_pro && retired">
-                <div>{{ playerYears }}</div>
-                <div>{{ turned_pro.id }}—{{ retired.id }}</div>
-            </div>
-            <div v-else-if="player.turned_pro">
-                <div>{{ playerYears }}</div>
-                <div>{{ turned_pro.id }}—present</div>
-            </div>
-            <div v-else>—</div>
+        <a-descriptions-item v-for="item in descriptionItems" :key="item.label" class="bg-black" :label="item.label">
+            <div>{{ item.value }}</div>
+            <div v-if="item.description">{{ item.description }}</div>
         </a-descriptions-item>
-        <a-descriptions-item class="bg-black" label="Age">
-            <div v-if="dob">
-                <div>{{ age }}</div>
-                <div>{{ formatDate(dob) }}</div>
-            </div>
-            <div v-else>—</div>
-        </a-descriptions-item>
-        <a-descriptions-item class="bg-black" label="Height">
-            <div>{{ height_cm }} cm</div>
-            <div>{{ convertToFt(height_cm) }}</div>
-        </a-descriptions-item>
-        <a-descriptions-item class="bg-black" label="Plays">{{ playingHand }}</a-descriptions-item>
-        <a-descriptions-item class="bg-black" label="Backhand">{{ backhand }}</a-descriptions-item>
         <a-descriptions-item class="bg-black" :label="coaches.length === 1 ? 'Coach' : 'Coaches'">
             <div v-if="coaches.length > 0" v-for="coach in coaches" :key="coach.id">
                 <router-link v-if="coach.full_name" class="hover-link"
-                    :to="{ name: 'player', params: { name: encodeName(coach.full_name), id: coach.id } }">{{
-                        coach.full_name }}</router-link>
+                    :to="{ name: 'player', params: { name: encodeName(coach.full_name), id: coach.id } }">
+                    {{ coach.full_name }}
+                </router-link>
                 <div v-else>{{ coach.id }}</div>
             </div>
             <div v-else>—</div>

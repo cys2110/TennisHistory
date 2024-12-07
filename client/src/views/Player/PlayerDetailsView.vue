@@ -1,14 +1,18 @@
-<script setup>
-import { ref, watch } from 'vue';
+<script setup lang="ts">
+import { Ref, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_PLAYER } from '@/services/PlayerService';
 import { gladiator, headshot, unencodeName, updateDocumentTitle } from '@/utils/functions';
+import { PlayerDetailsType } from '@/utils/types';
 
 // [TODO: FIGURE OUT MAJOR RESULTS APICALL]
 
 // Variables
-const props = defineProps(['name', 'id'])
-const player = ref(null)
+const props = defineProps<{
+    name: string,
+    id: string
+}>()
+const player: Ref<PlayerDetailsType | null> = ref(null)
 
 // Update document title
 watch(() => props.name, () => updateDocumentTitle(`${unencodeName(props.name)} | TennisHistory`), { immediate: true })

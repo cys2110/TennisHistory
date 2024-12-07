@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client/core'
 
-export const GET_H2H = (p1Id, p2Id) => {
+export const GET_H2H = (p1Id: string, p2Id: string) => {
   const call = gql`
     query H2H($p1Id: String!, $p2Id: String!) {
       p1: players(where: { id: $p1Id }) {
@@ -128,7 +128,7 @@ export const GET_H2H = (p1Id, p2Id) => {
   return { query: call, variables: { p1Id, p2Id } }
 }
 
-export const SEARCH_PLAYER = (fullName) => {
+export const SEARCH_PLAYER = (fullName: string) => {
   const call = gql`
     query SearchPlayers($fullName: String!) {
       searchPlayers(full_name: $fullName) {
@@ -144,7 +144,7 @@ export const SEARCH_PLAYER = (fullName) => {
   return { query: call, variables: { fullName } }
 }
 
-export const GET_SEARCH = (searchTerm) => {
+export const GET_SEARCH = (searchTerm: string) => {
   const call = gql`
     query search($searchTerm: String!) {
       searchTournaments(name: $searchTerm) {
@@ -165,6 +165,7 @@ export const GET_SEARCH = (searchTerm) => {
       }
       searchCountries(name: $searchTerm) {
         name
+        id
       }
       searchSupervisors(name: $searchTerm) {
         id
@@ -179,7 +180,7 @@ export const GET_SEARCH = (searchTerm) => {
         name
         city
         country {
-          name
+          id
         }
       }
     }
@@ -187,7 +188,7 @@ export const GET_SEARCH = (searchTerm) => {
   return { query: call, variables: { searchTerm } }
 }
 
-export const GET_COACH = (id) => {
+export const GET_COACH = (id: string) => {
   const call = gql`
     query Coaches($id: String) {
       coaches(where: { id: $id }) {
@@ -205,7 +206,7 @@ export const GET_COACH = (id) => {
   return { query: call, variables: { id } }
 }
 
-export const GET_SUPERVISOR = (id) => {
+export const GET_SUPERVISOR = (id: string) => {
   const call = gql`
     query Supervisors($id: String) {
       supervisors(where: { id: $id }) {
@@ -218,6 +219,12 @@ export const GET_SUPERVISOR = (id) => {
             id
             name
           }
+          venue {
+            country {
+              id
+              name
+            }
+          }
         }
       }
     }
@@ -225,7 +232,7 @@ export const GET_SUPERVISOR = (id) => {
   return { query: call, variables: { id } }
 }
 
-export const GET_SURFACE = (id) => {
+export const GET_SURFACE = (id: string) => {
   const call = gql`
     query Surfaces($id: String) {
       surfaces(where: { id: $id }) {
@@ -238,6 +245,11 @@ export const GET_SURFACE = (id) => {
             id
             name
           }
+          venue {
+            country {
+              id
+            }
+          }
         }
       }
     }
@@ -245,7 +257,7 @@ export const GET_SURFACE = (id) => {
   return { query: call, variables: { id } }
 }
 
-export const GET_VENUE = (name, city) => {
+export const GET_VENUE = (name: string, city: string) => {
   const call = gql`
     query Venues($name: String, $city: String) {
       venues(where: { name: $name, city: $city }) {
@@ -265,7 +277,7 @@ export const GET_VENUE = (name, city) => {
   return { query: call, variables: { name, city } }
 }
 
-export const GET_UMPIRE = (id) => {
+export const GET_UMPIRE = (id: string) => {
   const call = gql`
     query Umpires($id: String) {
       events(
@@ -279,6 +291,11 @@ export const GET_UMPIRE = (id) => {
         tournament {
           id
           name
+        }
+        venue {
+          country {
+            id
+          }
         }
         rounds(
           options: { sort: [{ number: ASC }] }
@@ -311,7 +328,7 @@ export const GET_UMPIRE = (id) => {
   return { query: call, variables: { id } }
 }
 
-export const GET_COUNTRY = (name) => {
+export const GET_COUNTRY = (name: string) => {
   const call = gql`
     query Countries($name: String) {
       countries(where: { name: $name }) {

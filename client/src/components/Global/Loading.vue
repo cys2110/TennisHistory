@@ -1,5 +1,5 @@
-<script setup>
-const props = defineProps(['loading'])
+<script setup lang="ts">
+const props = defineProps<{ loading: Boolean }>()
 </script>
 
 <template>

@@ -1,15 +1,31 @@
-<script setup>
-import { ref, watch } from 'vue';
+<script setup lang="ts">
+import { Ref, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_COUNTRY } from '@/services/MiscService';
 import { encodeName, headshot } from '@/utils/functions';
 
-const props = defineProps(['countries'])
-const open = ref(false)
-const selection = ref(null)
-const players = ref(null)
+const props = defineProps<{
+    countries: {
+        id: string
+        name: string
+    }[]
+}>()
 
-const { query, variables } = GET_COUNTRY(selection.value)
+interface Players {
+    players: {
+        id: string
+        full_name: string
+    }[]
+    formerPlayers: {
+        id: string
+        full_name: string
+    }[]
+}
+const open = ref(false)
+const selection: Ref<string | null> = ref(null)
+const players: Ref<Players | null> = ref(null)
+
+const { query, variables } = GET_COUNTRY("Search")
 const { result, loading, error, refetch } = useQuery(query, variables)
 
 watch(result, newResult => {
@@ -20,7 +36,7 @@ watch(error, newError => {
     if (newError) console.error(newError)
 })
 
-const handleClick = (country) => {
+const handleClick = (country: string) => {
     selection.value = country
     open.value = true
     refetch({ name: country })
@@ -31,7 +47,7 @@ const handleClose = () => {
     selection.value = null
 }
 
-const getParams = (item) => {
+const getParams = (item: { id: string, full_name: string }) => {
     return {
         name: encodeName(item.full_name),
         id: item.id
@@ -42,7 +58,9 @@ const getParams = (item) => {
 <template>
     <a-list :data-source="countries" header="Countries">
         <template #renderItem="{ item }">
-            <a-list-item class="cursor-pointer" @click="handleClick(item.name)">{{ item.name }}</a-list-item>
+            <a-list-item class="cursor-pointer" @click="handleClick(item.name)">
+                <SearchCountryRow :country="item" />
+            </a-list-item>
         </template>
     </a-list>
     <a-drawer v-if="players" v-model:open="open" @close="handleClose" size="large" class="!bg-violet-800">

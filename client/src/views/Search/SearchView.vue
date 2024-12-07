@@ -1,20 +1,59 @@
-<script setup>
-import { ref, watch } from 'vue';
+<script setup lang="ts">
+import { Ref, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import { GET_SEARCH } from '@/services/MiscService';
-import { encodeName, headshot } from '@/utils/functions';
+import { encodeName } from '@/utils/functions';
+import { Surface } from '@/utils/types';
 
 document.title = 'Search | TennisHistory'
 
+interface Results {
+    searchTournaments: {
+        id: number
+        name: string
+    }[]
+    searchPlayers: {
+        id: string
+        full_name: string
+        country: {
+            name: string
+            id: string
+        }
+    }[]
+    searchCoaches: {
+        id: string
+        full_name: string | null
+    }[]
+    searchCountries: {
+        name: string
+        id: string
+    }[]
+    searchSupervisors: {
+        id: string
+    }[]
+    searchSurface: {
+        id: Surface
+    }[]
+    searchUmpires: {
+        id: string
+    }[]
+    searchVenue: {
+        name: string
+        city: string
+        country: {
+            id: string
+        }
+    }[]
+}
 const searchTerm = ref(null)
 const noMatch = ref(true)
-const results = ref(null)
+const results: Ref<Results | null> = ref(null)
 
-const { query, variables } = GET_SEARCH(searchTerm.value)
+const { query, variables } = GET_SEARCH("Search")
 const { result, loading, error, refetch } = useQuery(query, variables)
 
-watch(result, newResult => {
+watch(result, (newResult: Results) => {
     if (newResult) {
         if (Object.values(newResult).every(val => val.length === 0)) {
             noMatch.value = true
@@ -29,7 +68,7 @@ watch(error, newError => {
     if (newError) console.error(newError)
 })
 
-const handleSearch = (e) => {
+const handleSearch = (e: { target: { value: string } }) => {
     refetch({ searchTerm: e.target.value })
 }
 </script>
@@ -38,7 +77,7 @@ const handleSearch = (e) => {
     <Title>
         <template #title>Search</template>
     </Title>
-    <div>
+    <div class="mb-3">
         <a-input v-model:value="searchTerm" @pressEnter="handleSearch"
             placeholder="Search for players, tournaments, umpires, coaches, supervisors, countries, venues and surfaces"
             allowClear>
@@ -50,25 +89,18 @@ const handleSearch = (e) => {
 
     <div v-if="noMatch" class="my-10 text-3xl text-zinc-400">No results matching search</div>
 
-    <a-list v-if="results?.searchPlayers.length > 0" :data-source="results.searchPlayers" header="Players">
+    <a-list v-if="results && results.searchPlayers.length > 0" :data-source="results.searchPlayers" header="Players">
         <template #renderItem="{ item }">
             <a-list-item>
-                <a-list-item-meta>
-                    <template #avatar>
-                        <a-avatar :alt="item.full_name" :src="headshot(item.id)" class="border-zinc-300 mx-2" />
-                    </template>
-                    <template #title>
-                        <router-link class="hover-link hover:!text-zinc-300 text-left"
-                            :to="{ name: 'player', params: { name: encodeName(item.full_name), id: item.id } }">{{
-                                item.full_name }}</router-link>
-                    </template>
-                    <template #description>{{ item.country.name }}</template>
-                </a-list-item-meta>
+                <a-skeleton :loading active avatar>
+                    <SearchPlayerRow :player="item" />
+                </a-skeleton>
             </a-list-item>
         </template>
     </a-list>
 
-    <a-list v-if="results?.searchTournaments.length > 0" :data-source="results.searchTournaments" header="Tournaments">
+    <a-list v-if="results && results.searchTournaments.length > 0" :data-source="results.searchTournaments"
+        header="Tournaments">
         <template #renderItem="{ item }">
             <a-list-item>
                 <a-list-item-meta>
@@ -82,17 +114,18 @@ const handleSearch = (e) => {
         </template>
     </a-list>
 
-    <CountryResults v-if="results?.searchCountries.length > 0" :countries="results.searchCountries" />
+    <CountryResults v-if="results && results?.searchCountries.length > 0" :countries="results.searchCountries" />
 
-    <CoachResults v-if="results?.searchCoaches.length > 0" :coaches="results.searchCoaches" />
+    <CoachResults v-if="results && results?.searchCoaches.length > 0" :coaches="results.searchCoaches" />
 
-    <UmpireResults v-if="results?.searchUmpires.length > 0" :umpires="results.searchUmpires" />
+    <UmpireResults v-if="results && results?.searchUmpires.length > 0" :umpires="results.searchUmpires" />
 
-    <SurfaceResults v-if="results?.searchSurface.length > 0" :surfaces="results.searchSurface" />
+    <SurfaceResults v-if="results && results?.searchSurface.length > 0" :surfaces="results.searchSurface" />
 
-    <VenueResults v-if="results?.searchVenue.length > 0" :venues="results.searchVenue" />
+    <VenueResults v-if="results && results?.searchVenue.length > 0" :venues="results.searchVenue" />
 
-    <SupervisorResults v-if="results?.searchSupervisors.length > 0" :supervisors="results.searchSupervisors" />
+    <SupervisorResults v-if="results && results?.searchSupervisors.length > 0"
+        :supervisors="results.searchSupervisors" />
 
     <Loading v-if="loading" :loading />
 

@@ -1,5 +1,11 @@
-<script setup>
-const props = defineProps(['event', 'id', 'name'])
+<script setup lang="ts">
+import type { TournamentEvent } from '@/utils/types';
+
+const props = defineProps<{
+    event: TournamentEvent,
+    id: number,
+    name: string
+}>()
 const final = props.event.rounds[0].matches[0]
 
 // router-link params

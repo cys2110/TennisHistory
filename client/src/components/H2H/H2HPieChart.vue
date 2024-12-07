@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, provide } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
@@ -7,7 +7,9 @@ import VChart, { THEME_KEY } from 'vue-echarts'
 import { percentage } from '@/utils/functions'
 import { CHART_OPTIONS } from '@/utils/variables'
 
-const props = defineProps(['stats'])
+const props = defineProps<{
+    stats: { name: string, value: number, itemStyle: { color: string } }[]
+}>()
 
 use([PieChart, CanvasRenderer])
 provide(THEME_KEY, 'dark')

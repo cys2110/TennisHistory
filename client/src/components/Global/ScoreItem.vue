@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const props = defineProps(['score'])
 const scoreArray = Array.from({ length: 5 }, (_, i) => i + 1)
 </script>

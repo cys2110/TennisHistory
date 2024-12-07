@@ -1,36 +1,42 @@
-<script setup>
-import { ref, watch } from 'vue';
+<script setup lang="ts">
+import { Ref, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { Grid } from 'ant-design-vue';
 import { GET_RESULTS } from '@/services/EventService';
 import { unencodeName, updateDocumentTitle } from '@/utils/functions';
 import { COLOURS } from '@/utils/variables';
+import { ResultsMatch } from '@/utils/types';
 
 // [FUTURE: FILTER BY DATE, COURT, UMPIRE, PLAYER]
 
-const props = defineProps(['name', 'id', 'year', 'eid'])
+const props = defineProps<{ name: string, year: string, eid: string, id: string }>()
+const { name, year, eid, id } = props
 const { useBreakpoint } = Grid
 const screens = useBreakpoint()
-const matches = ref(null)
-const anchorItems = ref(null)
+
+
+const matches: Ref<ResultsMatch[] | null> = ref(null)
+const anchorItems: Ref<{ key: number, href: string, title: string }[] | null> = ref(null)
 
 // Update document title
-watch(() => props.name, () => updateDocumentTitle(`Results | ${unencodeName(props.name)} ${props.year} | TennisHistory`), { immediate: true })
+watch(() => name, () => updateDocumentTitle(`Results | ${unencodeName(name)} ${year} | TennisHistory`), { immediate: true })
 
 // API CALL
-const { query, variables } = GET_RESULTS(parseInt(props.eid))
+const { query, variables } = GET_RESULTS(parseInt(eid))
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
     if (newResult) {
         matches.value = newResult.events[0].rounds
-        anchorItems.value = matches.value.map(round => (
-            {
-                key: round.number,
-                href: `#${round.round}`,
-                title: round.round
-            }
-        ))
+        if (matches.value) {
+            anchorItems.value = matches.value.map(round => (
+                {
+                    key: round.number,
+                    href: `#${round.round}`,
+                    title: round.round
+                }
+            ))
+        }
     }
 })
 

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, provide, computed } from 'vue'
 import { Grid } from 'ant-design-vue'
 import { use } from 'echarts/core'
@@ -8,8 +8,9 @@ import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/compo
 import VChart, { THEME_KEY } from 'vue-echarts'
 import { formatCurrency } from '@/utils/functions'
 import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
+import { Currency, EventRound } from '@/utils/types'
 
-const props = defineProps(['rounds', 'currency'])
+const props = defineProps<{ rounds: EventRound[], currency: Currency }>()
 const { useBreakpoint } = Grid
 const screens = useBreakpoint()
 
@@ -25,7 +26,7 @@ const option = ref({
     tooltip: {
         trigger: "axis",
         axisPointer: { type: "none" },
-        formatter: function (params) {
+        formatter: function (params: { value: { round: string, points: number, pm: number } }[]) {
             return `
             <div style="font-weight: bold">${params[0].value.round}</div>
             <div style="display: flex; justify-content: space-between; align-items: center;"><span>Points: </span><span>${params[0].value.points}</span></div>
@@ -42,7 +43,7 @@ const option = ref({
     yAxis: {
         type: "value",
         name: "Prize Money",
-        axisLabel: { formatter: (value) => `${formatCurrency(props.currency, value)}`, },
+        axisLabel: { formatter: (value: number) => `${formatCurrency(props.currency, value)}`, },
         splitLine: { show: false },
     },
     series: [

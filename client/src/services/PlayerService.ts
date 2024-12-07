@@ -1,12 +1,10 @@
 import { gql } from '@apollo/client/core'
 
-export const GET_PLAYER = (id) => {
+export const GET_PLAYER = (id: string) => {
   const call = gql`
     query Player($id: String!) {
       players(where: { id: $id }) {
         id
-        first_name
-        last_name
         full_name
         career_high
         ch_date
@@ -60,7 +58,7 @@ export const GET_PLAYER = (id) => {
   return { query: call, variables: { id } }
 }
 
-export const GET_ACTIVITY = (id, year) => {
+export const GET_ACTIVITY = (id: string, year: number) => {
   const call = gql`
     query Activity($id: String!, $year: Int!) {
       yearStats(id: $id, year: $year) {
@@ -179,7 +177,7 @@ export const GET_ACTIVITY = (id, year) => {
   return { query: call, variables: { id, year } }
 }
 
-export const GET_TITLES = (id) => {
+export const GET_TITLES = (id: string) => {
   const call = gql`
     query PlayerTitlesAndFinals($id: String!) {
       playerTitlesAndFinals(id: $id) {
@@ -209,7 +207,7 @@ export const GET_TITLES = (id) => {
   return { query: call, variables: { id } }
 }
 
-export const GET_INDEX = (id) => {
+export const GET_INDEX = (id: string) => {
   const call = gql`
     query Index($id: String!) {
       players(where: { id: $id }) {
@@ -266,7 +264,7 @@ export const GET_INDEX = (id) => {
   return { query: call, variables: { id } }
 }
 
-export const GET_PLAYER_STATS = (id, year, surface) => {
+export const GET_PLAYER_STATS = (id: string, year?: number, surface?: string) => {
   const call = gql`
     query GetStats($id: String!, $year: Int, $surface: String) {
       players(where: { id: $id }) {

@@ -1,5 +1,9 @@
-<script setup>
-const props = defineProps(['entries'])
+<script setup lang="ts">
+import { EventEntries } from '@/utils/types';
+
+const props = defineProps < {
+    entries: EventEntries[]
+} > ()
 </script>
 
 <template>

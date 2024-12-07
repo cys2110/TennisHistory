@@ -1,19 +1,24 @@
-<script setup>
-import { ref, watch } from 'vue';
+<script setup lang="ts">
+import { Ref, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_H2H } from '@/services/MiscService';
 import { headshot, unencodeName, updateDocumentTitle } from '@/utils/functions';
 import { COLOURS } from '@/utils/variables';
+import { H2H } from '@/utils/types';
 
-// [TODO: SEARCH FUNCTION]
-const props = defineProps(['p1Name', 'p1Id', 'p2Name', 'p2Id'])
+const props = defineProps<{
+    p1Name: string,
+    p1Id: string,
+    p2Name: string,
+    p2Id: string
+}>()
 const p1 = ref({ name: props.p1Name ? unencodeName(props.p1Name) : 'Jannik Sinner', id: props.p1Id || 's0ag' })
 const p2 = ref({ name: props.p2Name ? unencodeName(props.p2Name) : 'Alexander Zverev', id: props.p2Id || 'z355' })
-const h2h = ref(null)
-const pieStats = ref(null)
+const h2h: Ref<H2H | null> = ref(null)
+const pieStats: Ref<{ name: string, value: number, itemStyle: { color: string } }[] | null> = ref(null)
 
 // Update document title
-watch(() => [props.p1, props.p2], () => updateDocumentTitle(`${p1.value.name} v. ${p2.value.name} | TennisHistory`), { immediate: true })
+watch(() => [props.p1Name, props.p2Name], () => updateDocumentTitle(`${p1.value.name} v. ${p2.value.name} | TennisHistory`), { immediate: true })
 
 // API call
 const { query, variables } = GET_H2H(p1.value.id, p2.value.id)
@@ -24,12 +29,12 @@ watch(result, (newResult) => {
         h2h.value = newResult
         pieStats.value = [{
             name: unencodeName(props.p1Name),
-            value: h2h.value.p1Wins.count,
+            value: newResult.p1Wins.count,
             itemStyle: { color: COLOURS.violet700 }
         },
         {
             name: unencodeName(props.p2Name),
-            value: h2h.value.p2Wins.count,
+            value: newResult.p2Wins.count,
             itemStyle: { color: COLOURS.green800 }
         }]
     }

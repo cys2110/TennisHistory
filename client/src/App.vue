@@ -1,10 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { RouterView } from 'vue-router'
 import { theme } from 'ant-design-vue'
 import { COLOURS } from './utils/variables';
-
-// [GLOBAL: ADD RESPONSIVE DESIGN]
-// [FUTURE: CONVERT TO TYPESCRIPT?]
 
 const tokenColours = { colorPrimary: COLOURS.violet800 }
 const componentThemes = {
@@ -28,7 +25,7 @@ const componentThemes = {
     }">
       <a-layout class="flex flex-col min-h-screen">
         <a-layout-header class="!bg-violet-800 sticky top-0 z-50 w-full flex items-center">
-          <Header class="" />
+          <Header />
         </a-layout-header>
         <a-layout-content class="flex-1 py-16 w-3/4 mx-auto font">
           <RouterView :key="$route.fullPath" />

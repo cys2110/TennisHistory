@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client/core'
 
-export const GET_UPCOMING = (date) => {
+export const GET_UPCOMING = (date: string) => {
   const call = gql`
     query Upcoming($date: Date!) {
       events(where: { end_date_GT: $date }, options: { sort: [{ start_date: ASC }] }) {
@@ -32,7 +32,7 @@ export const GET_UPCOMING = (date) => {
   return { query: call, variables: { date } }
 }
 
-export const GET_ARCHIVE = (year) => {
+export const GET_ARCHIVE = (year: number) => {
   const call = gql`
     query GetArchive($year: Int!) {
       events(where: { year: { id: $year } }, options: { sort: [{ start_date: ASC }] }) {
@@ -64,7 +64,7 @@ export const GET_ARCHIVE = (year) => {
   return { query: call, variables: { year } }
 }
 
-export const GET_EVENT = (id, idString) => {
+export const GET_EVENT = (id: number, idString: string) => {
   const call = gql`
     query Event($id: Int!, $idString: String!) {
       events(where: { id: $id }) {
@@ -276,7 +276,7 @@ export const GET_EVENT = (id, idString) => {
   return { query: call, variables: { id, idString } }
 }
 
-export const GET_RESULTS = (id) => {
+export const GET_RESULTS = (id: number) => {
   const call = gql`
     query Results($id: Int!) {
       events(where: { id: $id }) {
@@ -349,7 +349,7 @@ export const GET_RESULTS = (id) => {
   return { query: call, variables: { id } }
 }
 
-export const GET_DRAW = (id) => {
+export const GET_DRAW = (id: number) => {
   const call = gql`
     query Draw($id: Int!) {
       events(where: { id: $id }) {

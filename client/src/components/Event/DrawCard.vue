@@ -1,9 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { CheckCircleTwoTone } from '@ant-design/icons-vue';
 import { encodeName, getEntry } from '@/utils/functions';
 import { COLOURS } from '@/utils/variables';
+import { DrawMatch } from '@/utils/types';
 
-const props = defineProps(['match', 'name', 'id', 'eid', 'year'])
+const props = defineProps < {
+    name: string
+    id: string
+    eid: string
+    year: string
+    match: DrawMatch['matches'][0]
+} > ()
 </script>
 
 <template>

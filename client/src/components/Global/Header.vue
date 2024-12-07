@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import { Grid } from 'ant-design-vue';
 import { CalendarOutlined, HomeOutlined, SearchOutlined, TeamOutlined, MenuOutlined } from '@ant-design/icons-vue';

@@ -1,9 +1,10 @@
-<script setup>
-import { ref, watch } from 'vue';
+<script setup lang="ts">
+import { Ref, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
 import { GET_ARCHIVE } from '@/services/EventService';
+import type { EventCard } from '@/utils/types';
 
 // [FUTURE: ADD FILTERS BY MONTH AND CATEGORY]
 
@@ -14,9 +15,9 @@ const route = useRoute()
 document.title = 'Results Archive | TennisHistory'
 
 // Variables
+const events: Ref<EventCard[] | null> = ref(null)
 const years = Array.from({ length: DateTime.now().year - 1968 + 1 }, (_, index) => ({ label: 1968 + index, value: 1968 + index }))
-const searchYear = ref(route.query.year ? parseInt(route.query.year) : DateTime.now().year)
-const events = ref(null)
+const searchYear = ref(route.query.year ? parseInt(route.query.year as string) : DateTime.now().year)
 
 // API call
 const { query, variables } = GET_ARCHIVE(searchYear.value)

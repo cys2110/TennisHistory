@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, provide, computed } from 'vue'
 import { Grid } from 'ant-design-vue'
 import { use } from 'echarts/core'
@@ -6,8 +6,11 @@ import { CanvasRenderer } from 'echarts/renderers'
 import { TreeChart } from 'echarts/charts'
 import VChart, { THEME_KEY } from 'vue-echarts'
 import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
+import { EntryConnectionNode } from '@/utils/types'
 
-const props = defineProps(['entryInfo'])
+const props = defineProps<{
+    entryInfo: { array: EntryConnectionNode['edges'][], title: string }[]
+}>()
 const { useBreakpoint } = Grid
 const screens = useBreakpoint()
 
@@ -23,7 +26,7 @@ const treeData = {
                 childNodes.push({ name: player.properties.reason });
 
             return {
-                name: player.node?.player.full_name || player.player.full_name,
+                name: player.node?.player.full_name || player.node?.player.full_name,
                 children: childNodes.length > 0 ? childNodes : undefined,
             };
         }),

@@ -1,15 +1,55 @@
-<script setup>
-import { ref, watch } from 'vue';
+<script setup lang="ts">
+import { Ref, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_UMPIRE } from '@/services/MiscService';
-import { encodeName } from '@/utils/functions';
 
-const props = defineProps(['umpires'])
+const props = defineProps<{
+    umpires: string[]
+}>()
+
+interface Event {
+    id: number
+    tournament: {
+        id: number
+        name: string
+    }
+    year: {
+        id: number
+    }
+    venue: {
+        country: {
+            id: string
+        }
+    }
+    rounds: {
+        round: string
+        matches: {
+            match_no: number
+            p1: {
+                player: {
+                    player: {
+                        full_name: string
+                        id: string
+                    }
+                }
+            }
+            p2: {
+                player: {
+                    player: {
+                        full_name: string
+                        id: string
+                    }
+                }
+            }
+        }[]
+    }
+}
+
 const open = ref(false)
-const selection = ref(null)
-const events = ref([])
+const selection: Ref<string | null> = ref(null)
+const events: Ref<Event[]> = ref([])
 
-const { query, variables } = GET_UMPIRE(selection.value)
+const { query, variables } = GET_UMPIRE("")
 const { result, loading, error, refetch } = useQuery(query, variables)
 
 watch(result, newResult => {
@@ -20,7 +60,7 @@ watch(error, newError => {
     if (newError) console.error(newError)
 })
 
-const handleClick = (umpire) => {
+const handleClick = (umpire: string) => {
     selection.value = umpire
     open.value = true
     refetch({ id: umpire })
@@ -29,15 +69,6 @@ const handleClick = (umpire) => {
 const handleClose = () => {
     open.value = false
     selection.value = null
-}
-
-const getParams = (event) => {
-    return {
-        name: encodeName(event.tournament.name),
-        id: event.tournament.id,
-        year: event.year.id,
-        eid: event.id
-    }
 }
 </script>
 
@@ -49,26 +80,6 @@ const getParams = (event) => {
     </a-list>
     <a-drawer v-if="selection" v-model:open="open" @close="handleClose" size="large" class="!bg-violet-800">
         <template #title>Matches umpired by {{ selection }}</template>
-        <a-list v-if="events.length > 0" v-for="event in events" :key="event.id" :data-source="event.rounds">
-            <template #header>
-                <router-link class="hover-link" :to="{ name: 'event', params: getParams(event) }">
-                    {{ event.tournament.name }} {{ event.year.id }}</router-link>
-            </template>
-            <template #renderItem="{ item }">
-                <a-list-item>
-                    <a-list-item-meta>
-                        <template #title>{{ item.round }}</template>
-                        <template #description>
-                            <div v-for="match in item.matches" :key="match.match_no" class="ml-5 text-sm my-1">
-                                <router-link class="hover-link"
-                                    :to="{ name: 'match', params: { ...getParams(event), mid: match.match_no } }">
-                                    {{ match.p1.player.player.full_name }} vs. {{ match.p2.player.player.full_name
-                                    }}</router-link>
-                            </div>
-                        </template>
-                    </a-list-item-meta>
-                </a-list-item>
-            </template>
-        </a-list>
+        <SearchUmpireRow v-for="event in events" :key="event.id" :event="event" />
     </a-drawer>
 </template>

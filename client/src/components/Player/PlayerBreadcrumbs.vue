@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { unencodeName } from '@/utils/functions';
 
@@ -13,7 +13,7 @@ const pages = [{ name: 'player', title: 'Details' }, { name: 'activity', title: 
             <router-link :to="{ name: 'home' }">Home</router-link>
         </a-breadcrumb-item>
         <a-breadcrumb-item>
-            {{ unencodeName(route.params.name) }}
+            {{ unencodeName(route.params.name as string) }}
             <template #overlay>
                 <a-menu>
                     <template v-for="(page, index) in pages" :key="index">

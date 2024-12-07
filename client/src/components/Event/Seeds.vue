@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, provide, computed } from 'vue'
 import { Grid } from 'ant-design-vue'
 import { use } from 'echarts/core'
@@ -7,8 +7,11 @@ import { BarChart, LineChart } from 'echarts/charts'
 import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/components'
 import VChart, { THEME_KEY } from 'vue-echarts'
 import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
+import { EventSeeds } from '@/utils/types'
 
-const props = defineProps(['seeds'])
+const props = defineProps < {
+    seeds: EventSeeds[]
+} > ()
 const { useBreakpoint } = Grid
 const screens = useBreakpoint()
 

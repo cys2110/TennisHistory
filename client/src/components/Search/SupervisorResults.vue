@@ -1,26 +1,44 @@
-<script setup>
-import { ref, watch } from 'vue';
+<script setup lang="ts">
+import { Ref, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_SUPERVISOR } from '@/services/MiscService';
 import { encodeName } from '@/utils/functions';
 
-const props = defineProps(['supervisors'])
-const open = ref(false)
-const selection = ref(null)
-const events = ref([])
+const props = defineProps<{
+    supervisors: { id: string }[]
+}>()
 
-const { query, variables } = GET_SUPERVISOR(selection.value)
+interface Event {
+    id: number
+    tournament: {
+        id: number
+        name: string
+    }
+    year: {
+        id: number
+    }
+    venue: {
+        country: {
+            id: string
+        }
+    }
+}
+const open = ref(false)
+const selection: Ref<string | null> = ref(null)
+const events: Ref<Event[]> = ref([])
+
+const { query, variables } = GET_SUPERVISOR("Search")
 const { result, loading, error, refetch } = useQuery(query, variables)
 
 watch(result, newResult => {
-    if (newResult) events.value = newResult.supervisors[0].events
+    if (newResult?.supervisors[0]?.events) events.value = newResult.supervisors[0].events
 })
 
 watch(error, newError => {
     if (newError) console.error(newError)
 })
 
-const handleClick = (supervisor) => {
+const handleClick = (supervisor: string) => {
     selection.value = supervisor
     open.value = true
     refetch({ id: supervisor })
@@ -43,14 +61,7 @@ const handleClose = () => {
         <a-list v-if="events.length > 0" :data-source="events">
             <template #renderItem="{ item }">
                 <a-list-item>
-                    <a-list-item-meta>
-                        <template #title>
-                            <router-link class="hover-link hover:!text-zinc-300"
-                                :to="{ name: 'event', params: { name: encodeName(item.tournament.name), id: item.tournament.id, year: item.year.id, eid: item.id } }">
-                                {{ item.tournament.name }} {{ item.year.id }}
-                            </router-link>
-                        </template>
-                    </a-list-item-meta>
+                    <SearchEventRow :event="item" />
                 </a-list-item>
             </template>
         </a-list>

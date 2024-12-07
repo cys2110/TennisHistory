@@ -1,32 +1,34 @@
-<script setup>
-import { onMounted, shallowRef, toRefs } from 'vue';
+<script setup lang="ts">
+import { onMounted, shallowRef } from 'vue';
 import Icon from '@ant-design/icons-vue';
 import { DateTime } from 'luxon';
 import { categorySrc, encodeName, formattedDates } from '@/utils/functions';
 import { SURFACES } from '@/utils/variables';
+import type { EventCard } from '@/utils/types';
 
 // Variables
-const props = defineProps(['event'])
-const { start_date, tournament, year, id, venue, sponsor_name, category, surface, end_date } = toRefs(props.event)
+const props = defineProps<{
+    event: EventCard
+}>()
+const { start_date, tournament, year, id, venue, sponsor_name, category, surface, end_date } = props.event
 const selectedFlag = shallowRef(null)
 const eventPages = [
     { title: 'Details', name: 'event' },
     { title: 'Results', name: 'results' },
     { title: 'Draw', name: 'draw' }
 ]
-const isDisabled = DateTime.now() < DateTime.fromISO(start_date.value)
+const isDisabled = DateTime.now() < DateTime.fromISO(start_date)
 
 // Router link params
-const tournamentParams = { name: encodeName(tournament.value.name), id: tournament.value.id }
-const eventParams = { ...tournamentParams, year: year.value.id, eid: id.value }
+const tournamentParams = { name: encodeName(tournament.name), id: tournament.id }
+const eventParams = { ...tournamentParams, year: year.id, eid: id }
 
 // Import flag icons on mount
 onMounted(async () => {
-    const countryCode = venue.value.country.id;
+    const countryCode = venue.country.id;
     try {
-        selectedFlag.value = (
-            await import(`@/components/icons/flags`)
-        )[countryCode] || null;
+        const flags: { [key: string]: any } = await import(`@/components/icons/flags`)
+        selectedFlag.value = flags[countryCode] || null;
     } catch (error) {
         console.error(`Flag for ${countryCode} not found`, error);
     }
