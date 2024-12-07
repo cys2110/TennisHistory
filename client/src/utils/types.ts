@@ -74,6 +74,8 @@ export interface PlayerBase {
   }
 }
 
+// Home/Archive View
+
 export interface EventCard {
   id: number
   category: string | null
@@ -124,7 +126,7 @@ export interface Tournament {
   }
   end_year: {
     id: number
-  }
+  } | null
   events: TournamentEvent[]
 }
 

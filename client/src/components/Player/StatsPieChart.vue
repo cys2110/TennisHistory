@@ -12,18 +12,18 @@ use([PieChart, CanvasRenderer])
 provide(THEME_KEY, 'dark')
 
 const option = ref({
-    ...CHART_OPTIONS,
-    series: [
-        {
-            type: 'pie',
-            radius: ['40%', '70%'],
-            data: props.stats,
-            label: { formatter: "{b}: {c}", position: 'inside' }
-        }
-    ]
+  ...CHART_OPTIONS,
+  series: [
+    {
+      type: 'pie',
+      radius: ['40%', '70%'],
+      data: props.stats,
+      label: { formatter: '{b}: {c}', position: 'inside' },
+    },
+  ],
 })
 </script>
 
 <template>
-    <v-chart class="!h-[600px] !w-full" :option="option" :autoresize="true" />
+  <v-chart class="!h-[600px] !w-full" :option="option" :autoresize="true" />
 </template>

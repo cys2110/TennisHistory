@@ -1,28 +1,18 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  createHttpLink,
-  DefaultOptions,
-  FetchPolicy,
-} from '@apollo/client/core'
-import { provideApolloClient } from '@vue/apollo-composable'
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client/core'
+import type { DefaultOptions, FetchPolicy } from '@apollo/client/core'
 
-// Typing for environment variables
 const API_URL: string = import.meta.env.VITE_API_URL as string
 
-// Typing for HTTP Link
 const httpLink = createHttpLink({
   uri: API_URL,
 })
 
-// Typing for the cache
 const cache = new InMemoryCache()
 
-// Typing for default options
 const defaultOptions: DefaultOptions = {
   query: {
     fetchPolicy: 'cache-and-network' as FetchPolicy, // Use cache but always refetch in the background
-    errorPolicy: 'all', // Handle partial errors gracefully
+    errorPolicy: 'all',
   },
   watchQuery: {
     fetchPolicy: 'cache-and-network',
@@ -33,7 +23,6 @@ const defaultOptions: DefaultOptions = {
   },
 }
 
-// Typing for Apollo Client
 const apolloClient: ApolloClient<object> = new ApolloClient({
   link: httpLink,
   cache,
