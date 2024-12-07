@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useRouter } from 'vue-router';
 
 const router = useRouter()
@@ -18,7 +17,7 @@ const menuItems = [
 
 <template>
   <div class="flex justify-between items-center w-full h-16">
-    <div class="heading text-3xl">TennisHistory</div>
+    <div class="heading text-3xl ml-5">TennisHistory</div>
     <Menubar :model="menuItems" />
   </div>
 </template>

@@ -22,4 +22,12 @@
   .full-card {
     @apply h-full flex flex-col justify-between;
   }
+
+  .full-card .p-card-body {
+    @apply flex-1; /* Ensure body grows to fill space */
+  }
+
+  .full-card .p-card-footer {
+    @apply mt-auto; /* Push footer to the bottom */
+  }
 }

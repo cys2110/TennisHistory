@@ -29,11 +29,9 @@ watch(error, (newError) => {
   <Title>
     <template #title>Upcoming Tournaments</template>
   </Title>
-  <a-row v-if="events" justify="space-evenly" align="stretch" :gutter="[0, 32]">
-    <a-col v-for="event in events" :key="event.id" :xs="24" :sm="11" :md="10" :xl="5">
-      <EventCard :event />
-    </a-col>
-  </a-row>
+  <div v-if="events" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-10 w-3/4 mx-auto">
+    <EventCard v-for="event in events" :key="event.id" :event="event" />
+  </div>
   <Loading v-else :loading>
     <template #none>No upcoming tournaments</template>
   </Loading>

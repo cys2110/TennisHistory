@@ -10,8 +10,7 @@ import type { EventCard } from '@/utils/types'
 const props = defineProps<{
   event: EventCard
 }>()
-const { start_date, tournament, year, id, venue, sponsor_name, category, surface, end_date } =
-  props.event
+const { start_date, tournament, year, id, venue, sponsor_name, category, surface, end_date } = props.event
 
 // Button pages
 const eventPages = [
@@ -20,6 +19,7 @@ const eventPages = [
   { title: 'Draw', name: 'draw' },
 ]
 const isDisabled = DateTime.now() < DateTime.fromISO(start_date)
+const tooltipText = "Event has not started yet"
 
 // Router link params
 const tournamentParams = { name: encodeName(tournament.name), id: tournament.id }
@@ -39,7 +39,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <a-card class="full-card">
+  <Card class="full-card">
 
     <template #title>
       <router-link class="hover-link font-bold text-wrap" :to="{ name: 'tournament', params: tournamentParams }">
@@ -47,40 +47,33 @@ onMounted(async () => {
       </router-link>
     </template>
 
-    <template #extra>
-      <div class="flex items-center">
-        <a-image v-if="category" class="!w-[50px]" :alt="category" :src="categorySrc(category)" :preview="false" />
-      </div>
+    <template #subtitle>
+      <template v-if="sponsor_name">{{ sponsor_name }}</template>
     </template>
 
-    <template #actions>
-      <a-button v-for="page in eventPages" :key="page.name" type="dashed" :ghost="true" shape="round" size="small"
-        :disabled="isDisabled" class="!border-zinc-300 hover:!border-zinc-400">
-        <template v-if="isDisabled">
-          <a-tooltip title="Event has not started yet">{{ page.title }}</a-tooltip>
-        </template>
-        <template v-else>
-          <router-link class="!text-zinc-300 hover:!text-zinc-400" :to="{ name: page.name, params: eventParams }">
-            {{ page.title }}
-          </router-link>
-        </template>
-      </a-button>
-    </template>
-
-    <a-card-meta>
-      <template #title v-if="sponsor_name">
-        <div class="text-wrap text-sm">{{ sponsor_name }}</div>
-      </template>
-
-      <template #description>
-        <div v-if="venue" class="flex items-center">
+    <template #content>
+      <div class="grid grid-cols-4">
+        <div v-if="venue" class="flex items-center col-span-3">
           {{ venue.city }}
           <Icon v-if="selectedFlag" class="mx-2 text-2xl" :component="selectedFlag" />
         </div>
-        <div>{{ formattedDates(start_date, end_date) }}</div>
-        <div v-if="surface">{{ SURFACES[surface.id] }}</div>
-      </template>
-    </a-card-meta>
+        <div class="row-span-3">
+          <Image v-if="category" :src="categorySrc(category)" :alt="category" />
+        </div>
+        <div class="col-span-3">{{ formattedDates(start_date, end_date) }}</div>
+        <div v-if="surface" class="col-span-3">{{ SURFACES[surface.id] }}</div>
+      </div>
+    </template>
 
-  </a-card>
+    <template #footer>
+      <div class="flex justify-evenly">
+        <Button v-for="page in eventPages" :key="page.name" as="router-link" :label="page.title" size="small"
+          class="!border-zinc-400 !text-zinc-400 hover:!border-zinc-300 hover:!text-zinc-300"
+          :class="{ '!cursor-not-allowed': isDisabled }" variant="outlined" rounded raised
+          :to="{ name: page.name, params: eventParams }" v-tooltip="isDisabled ? tooltipText : null"
+          :disabled="isDisabled" />
+      </div>
+    </template>
+
+  </Card>
 </template>

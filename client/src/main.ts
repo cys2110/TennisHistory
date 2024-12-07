@@ -39,6 +39,18 @@ const MyPreset = definePreset(Aura, {
       itemGap: '1rem',
       itemIconColor: '{zinc.400}',
       itemFocusBackground: 'transparent',
+      mobileButtonHoverBackground: 'transparent',
+      submenuBackground: '{violet.800}',
+    },
+    card: {
+      background: '{violet.800}',
+      color: '{zinc.300}',
+    },
+    button: {
+      smPaddingY: '.1rem',
+    },
+    select: {
+      borderColor: '{violet.800}',
     },
   },
 })

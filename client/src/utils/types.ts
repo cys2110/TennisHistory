@@ -65,6 +65,39 @@ export enum EntryInfo {
   qualifiersConnection = 'qualifiersConnection',
 }
 
+export enum Months {
+  Jan = 'January',
+  Feb = 'February',
+  Mar = 'March',
+  Apr = 'April',
+  May = 'May',
+  Jun = 'June',
+  Jul = 'July',
+  Aug = 'August',
+  Sep = 'September',
+  Oct = 'October',
+  Nov = 'November',
+  Dec = 'December',
+}
+
+export enum Category {
+  ATP250 = 'ATP 250',
+  ATP500 = 'ATP 500',
+  ATP1000 = 'ATP Masters 1000',
+  GS = 'Grand Slam',
+  Finals = 'ATP Finals',
+  ATPCup = 'ATP Cup',
+  ILTF = 'ILTF',
+  ITF = 'ITF',
+  Laver = 'Laver Cup',
+  NextGen = 'Next Gen Finals',
+  NTL = 'NTL',
+  Olympics = 'Olympics',
+  United = 'United',
+  Davis = 'Davis Cup',
+  GP = 'Grand Prix',
+}
+
 export interface PlayerBase {
   id: string
   full_name: string

@@ -1,4 +1,4 @@
-import { Currency, EntryInfo, Incomplete, StatusInfo, Surface } from './types'
+import { Category, Currency, EntryInfo, Incomplete, Months, StatusInfo, Surface } from './types'
 
 export const SURFACES = {
   [Surface.IndoorCarpet]: 'Indoor Carpet',
@@ -31,6 +31,39 @@ export const SURFACES = {
   [Surface.OutdoorHardSolflex]: 'Outdoor Hard (Solflex)',
   [Surface.OutdoorHardSportMaster]: 'Outdoor Hard (Sport Master)',
   [Surface.Various]: 'Various',
+}
+
+export const CATEGORIES = {
+  [Category.GS]: 'Grand Slam',
+  [Category.ATP1000]: 'ATP Masters 1000',
+  [Category.ATP500]: 'ATP 500',
+  [Category.ATP250]: 'ATP 250',
+  [Category.ATPCup]: 'ATP Cup',
+  [Category.Davis]: 'Davis Cup',
+  [Category.Finals]: 'ATP Finals',
+  [Category.Olympics]: 'Olympics',
+  [Category.ILTF]: 'ILTF',
+  [Category.NTL]: 'NTL',
+  [Category.Laver]: 'Laver Cup',
+  [Category.ITF]: 'ITF',
+  [Category.United]: 'United',
+  [Category.NextGen]: 'Next Gen Finals',
+  [Category.GP]: 'Grand Prix',
+}
+
+export const MONTHS = {
+  [Months.Jan]: 'January',
+  [Months.Feb]: 'February',
+  [Months.Mar]: 'March',
+  [Months.Apr]: 'April',
+  [Months.May]: 'May',
+  [Months.Jun]: 'June',
+  [Months.Jul]: 'July',
+  [Months.Aug]: 'August',
+  [Months.Sep]: 'September',
+  [Months.Oct]: 'October',
+  [Months.Nov]: 'November',
+  [Months.Dec]: 'December',
 }
 
 export const INCOMPLETES = {
