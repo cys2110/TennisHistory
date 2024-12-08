@@ -1,78 +1,67 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import type { Ref } from 'vue'
+import { type Ref, ref, watch } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
-import { Grid } from 'ant-design-vue'
+import AccordionPanel from 'primevue/accordionpanel'
+import AccordionHeader from 'primevue/accordionheader'
+import AccordionContent from 'primevue/accordioncontent'
 import { GET_RESULTS } from '@/services/EventService'
 import { unencodeName, updateDocumentTitle } from '@/utils/functions'
-import type { ResultsMatch } from '@/utils/types'
-import { COLOURS } from '@/utils/variables'
+import type { Round, Match } from '@/utils/types'
 
 // [FUTURE: FILTER BY DATE, COURT, UMPIRE, PLAYER]
 
 const props = defineProps<{ name: string; year: string; eid: string; id: string }>()
 const { name, year, eid, id } = props
-const { useBreakpoint } = Grid
-const screens = useBreakpoint()
 
-const matches: Ref<ResultsMatch[] | null> = ref(null)
-const anchorItems: Ref<{ key: number; href: string; title: string }[] | null> = ref(null)
+const matches: Ref<(
+  Pick<Round, 'round' | 'number'> & {
+    matches: Pick<Match, 'court' | 'date' | 'duration_mins' | 'incomplete' | 'match_no' | 'umpire' | 'winner' | 'loser'>[];
+  }
+)[] | null> = ref(null);
 
 // Update document title
-watch(
-  () => name,
-  () => updateDocumentTitle(`Results | ${unencodeName(name)} ${year} | TennisHistory`),
-  { immediate: true },
-)
+watch(() => name, () => updateDocumentTitle(`Results | ${unencodeName(name)} ${year} | TennisHistory`), { immediate: true })
 
 // API CALL
 const { query, variables } = GET_RESULTS(parseInt(eid))
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
-  if (newResult) {
-    matches.value = newResult.events[0].rounds
-    if (matches.value) {
-      anchorItems.value = matches.value.map((round) => ({
-        key: round.number,
-        href: `#${round.round}`,
-        title: round.round,
-      }))
-    }
-  }
+  if (newResult) matches.value = newResult.events[0].rounds
 })
 
 watch(error, (newError) => {
   if (newError) console.error(newError)
 })
+
+const pages = [
+  { title: 'Details', name: 'event' },
+  { title: 'Draw', name: 'draw' },
+]
 </script>
 
 <template>
-  <a-row v-if="matches">
-    <a-col v-if="!screens.xs" :span="4">
-      <a-anchor :offset-top="75" :items="anchorItems" />
-    </a-col>
-    <a-col :xs="24" :sm="20" class="pl-5">
-      <a-config-provider :theme="{ components: { Anchor: { colorPrimary: COLOURS.violet400 } } }">
-        <a-anchor class="smallAnchor" v-if="screens.xs" :offset-top="75" :items="anchorItems" direction="horizontal" />
-      </a-config-provider>
-      <div v-for="round in matches" :key="round.number" :id="round.round">
-        <div class="text-4xl my-5">{{ round.round }}</div>
-        <a-row justify="space-evenly" :gutter="[0, 32]">
-          <a-col :xs="24" :lg="11" v-for="match in round.matches" :key="match.match_no">
-            <ResultCard v-if="match.winner?.player" :match :name :id :year :eid />
-          </a-col>
-        </a-row>
+  <Toolbar class="mb-5">
+    <template #end>
+      <div class="flex items-center">
+        <Button v-for="page in pages" :key="page.title" as="router-link" :label="page.title" size="small" rounded
+          class="mx-2" raised :to="{ name: page.name }" />
       </div>
-    </a-col>
-  </a-row>
+    </template>
+  </Toolbar>
+  <Accordion v-if="matches" :value="['0']" multiple>
+    <AccordionPanel v-for="(round, index) in matches" :key="round.number" :value="index">
+      <AccordionHeader>{{ round.round }}</AccordionHeader>
+      <AccordionContent>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 xl:gap-10">
+          <template v-for="match in round.matches" :key="match.match_no">
+            <ResultCard v-if="match.winner?.player" :match :name :id :year :eid />
+          </template>
+        </div>
+      </AccordionContent>
+    </AccordionPanel>
+  </Accordion>
   <Loading v-else :loading>
     <template #none>No results available</template>
   </Loading>
 </template>
-
-<style scoped>
-.smallAnchor :deep(.ant-anchor) {
-  background-color: #3f3f46;
-}
-</style>

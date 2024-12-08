@@ -157,15 +157,22 @@ export interface Event {
 }
 
 export interface Match {
+  court: string | null
+  date: string | null
+  duration_mins: number | null
+  incomplete: Incomplete | null
+  loser: Pick<
+    Score,
+    'player' | 's1' | 's2' | 's3' | 's4' | 's5' | 't1' | 't2' | 't3' | 't4' | 't5' | 'incomplete'
+  >
   match_no: number
   winner: Pick<
     Score,
     'player' | 's1' | 's2' | 's3' | 's4' | 's5' | 't1' | 't2' | 't3' | 't4' | 't5'
   >
-  loser: Pick<
-    Score,
-    'player' | 's1' | 's2' | 's3' | 's4' | 's5' | 't1' | 't2' | 't3' | 't4' | 't5' | 'incomplete'
-  >
+  umpire: {
+    id: string
+  } | null
 }
 
 export interface Player {
@@ -227,56 +234,6 @@ export type EventCard = Pick<
   Event,
   'id' | 'category' | 'start_date' | 'end_date' | 'tournament' | 'year' | 'sponsor_name' | 'surface'
 > & { venue: Pick<Venue, 'city' | 'country'> }
-
-export interface ResultsMatch {
-  round: string
-  number: number
-  matches: {
-    court: string
-    date: string
-    duration_mins: number
-    incomplete: Incomplete | null
-    match_no: number
-    umpire: {
-      id: string
-    }
-    winner: {
-      s1: number | null
-      s2: number | null
-      s3: number | null
-      s4: number | null
-      s5: number | null
-      t1: number | null
-      t2: number | null
-      t3: number | null
-      t4: number | null
-      t5: number | null
-      player: {
-        seed: number | null
-        status: StatusInfo | null
-        player: Player
-      }
-    }
-    loser: {
-      s1: number | null
-      s2: number | null
-      s3: number | null
-      s4: number | null
-      s5: number | null
-      t1: number | null
-      t2: number | null
-      t3: number | null
-      t4: number | null
-      t5: number | null
-      incomplete: Incomplete | null
-      player: {
-        seed: number | null
-        status: StatusInfo | null
-        player: Player
-      }
-    }
-  }[]
-}
 
 export interface DrawMatch {
   round: string

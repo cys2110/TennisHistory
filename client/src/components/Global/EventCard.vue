@@ -54,11 +54,12 @@ const eventParams = { ...tournamentParams, year: year.id, eid: id }
     <template #footer>
       <Divider />
       <div class="flex justify-evenly">
-        <Button v-for="page in eventPages" :key="page.name" as="router-link" :label="page.title" size="small"
-          class="!border-zinc-400 !text-zinc-400 hover:!border-zinc-300 hover:!text-zinc-300"
-          :class="{ '!cursor-not-allowed': isDisabled }" variant="outlined" rounded raised
-          :to="{ name: page.name, params: eventParams }" v-tooltip="isDisabled ? tooltipText : null"
-          :disabled="isDisabled" />
+        <Button v-if="isDisabled" v-for="page in eventPages" :key="page.name" :label="page.title" size="small"
+          class="!border-zinc-400 !text-zinc-400 !cursor-not-allowed" variant="outlined" rounded raised
+          v-tooltip="tooltipText" disabled />
+        <Button v-else v-for="(page, index) in eventPages" :key="index" as="router-link" :label="page.title"
+          size="small" class="!border-zinc-400 !text-zinc-400 hover:!border-zinc-300 hover:!text-zinc-300"
+          variant="outlined" rounded raised :to="{ name: page.name, params: eventParams }" />
       </div>
     </template>
 

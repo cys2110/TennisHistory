@@ -113,6 +113,7 @@ declare module 'vue' {
     Tag: typeof import('primevue/tag')['default']
     Title: typeof import('./src/components/Global/Title.vue')['default']
     ToggleButton: typeof import('primevue/togglebutton')['default']
+    Toolbar: typeof import('primevue/toolbar')['default']
     TournamentBreadcrumbs: typeof import('./src/components/Tournament/TournamentBreadcrumbs.vue')['default']
     TournamentBreadcrumbsPopover: typeof import('./src/components/Tournament/TournamentBreadcrumbsPopover.vue')['default']
     TournamentCard: typeof import('./src/components/Tournament/TournamentCard.vue')['default']
