@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { TournamentEvent } from '@/utils/types'
+import type { Event, Match } from '@/utils/types'
 
 const props = defineProps<{
-  event: TournamentEvent
+  event: Pick<Event, 'id' | 'year'> & { rounds: { matches: Pick<Match, 'match_no' | 'winner' | 'loser'>[] }[] }
   id: number
   name: string
 }>()
@@ -14,23 +14,24 @@ const matchParams = { ...eventParams, mid: final.match_no }
 </script>
 
 <template>
-  <a-card class="full-card">
+  <Card class="full-card">
     <template #title>
       <router-link class="hover-link font-bold" :to="{ name: 'event', params: eventParams }">
         {{ event.year.id }}
       </router-link>
+      <Divider />
     </template>
-    <a-card-meta class="text-center">
-      <template #title>
-        <PlayerRow :player="final.winner.player.player" class="items-center mb-2" />
-        <a-row class="justify-center">d.</a-row>
-        <PlayerRow :player="final.loser.player.player" class="items-center mt-2" />
-      </template>
-      <template #description>
+    <template #content>
+      <PlayerRow :player="final.winner.player.player" class="items-center mb-2" />
+      <div class="flex justify-center">d.</div>
+      <PlayerRow :player="final.loser.player.player" class="items-center mt-2" />
+    </template>
+    <template #footer>
+      <div class="text-center">
         <router-link :to="{ name: 'match', params: matchParams }">
           <WinnerScore :winner="final.winner" :loser="final.loser" />
         </router-link>
-      </template>
-    </a-card-meta>
-  </a-card>
+      </div>
+    </template>
+  </Card>
 </template>

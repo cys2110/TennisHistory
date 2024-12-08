@@ -52,6 +52,15 @@ const MyPreset = definePreset(Aura, {
     select: {
       borderColor: '{violet.800}',
     },
+    breadcrumb: {
+      itemColor: '{cyan.700}',
+      itemIconColor: '{cyan.700}',
+      separatorColor: '{zinc.300}',
+    },
+    divider: {
+      borderColor: '{zinc.500}',
+      contentBackground: '{violet.800}',
+    },
   },
 })
 

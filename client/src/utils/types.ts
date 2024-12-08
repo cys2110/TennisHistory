@@ -98,7 +98,45 @@ export enum Category {
   GP = 'Grand Prix',
 }
 
-export interface PlayerBase {
+interface Country {
+  id: string
+  name: string
+}
+
+interface Entry {
+  player: Pick<Player, 'id' | 'full_name' | 'country'>
+}
+
+export interface Event {
+  id: number
+  category: Category | null
+  end_date: string
+  rounds: Round[]
+  sponsor_name: string | null
+  start_date: string
+  surface: {
+    id: Surface
+  }
+  tournament: Pick<Tournament, 'id' | 'name'>
+  venue: Venue
+  year: {
+    id: number
+  }
+}
+
+export interface Match {
+  match_no: number
+  winner: Pick<
+    Score,
+    'player' | 's1' | 's2' | 's3' | 's4' | 's5' | 't1' | 't2' | 't3' | 't4' | 't5'
+  >
+  loser: Pick<
+    Score,
+    'player' | 's1' | 's2' | 's3' | 's4' | 's5' | 't1' | 't2' | 't3' | 't4' | 't5' | 'incomplete'
+  >
+}
+
+export interface Player {
   id: string
   full_name: string
   country: {
@@ -107,47 +145,23 @@ export interface PlayerBase {
   }
 }
 
-// Home/Archive View
-
-export interface EventCard {
-  id: number
-  category: string | null
-  end_date: string
-  sponsor_name: string | null
-  start_date: string
-  surface: {
-    id: Surface
-  }
-  tournament: {
-    id: number
-    name: string
-  }
-  venue: {
-    city: string
-    country: {
-      id: string
-      name: string
-    }
-  }
-  year: {
-    id: number
-  }
+interface Round {
+  matches: Match[]
 }
 
-export interface TournamentEvent {
-  id: number
-  year: {
-    id: number
-  }
-  start_date: string
-  end_date: string
-  rounds: {
-    matches: {
-      match_no: number
-      winner: WinnerScore
-      loser: WinnerScore
-    }[]
-  }[]
+interface Score {
+  incomplete: Incomplete | null
+  player: Entry
+  s1: number | null
+  s2: number | null
+  s3: number | null
+  s4: number | null
+  s5: number | null
+  t1: number | null
+  t2: number | null
+  t3: number | null
+  t4: number | null
+  t5: number | null
 }
 
 export interface Tournament {
@@ -160,13 +174,26 @@ export interface Tournament {
   end_year: {
     id: number
   } | null
-  events: TournamentEvent[]
+  events: Pick<Event, 'id' | 'year' | 'start_date' | 'end_date' | 'rounds'>[]
 }
+
+interface Venue {
+  name: string
+  city: string
+  country: Country
+}
+
+// Home/Archive View
+
+export type EventCard = Pick<
+  Event,
+  'id' | 'category' | 'start_date' | 'end_date' | 'tournament' | 'year'
+> & { venue: Pick<Venue, 'city' | 'country'> }
 
 export interface EntryConnectionNode {
   edges: {
     node: {
-      player: PlayerBase
+      player: Player
     }
     properties?: {
       rank?: number | null
@@ -185,11 +212,11 @@ export interface EventRound {
 export interface EventSeeds {
   seed: number
   rank: number
-  player: PlayerBase
+  player: Player
 }
 
 export interface EventEntries {
-  player: PlayerBase
+  player: Player
   seed: number | null
   rank: number | null
   status: StatusInfo | null
@@ -266,7 +293,7 @@ export interface ResultsMatch {
       player: {
         seed: number | null
         status: StatusInfo | null
-        player: PlayerBase
+        player: Player
       }
     }
     loser: {
@@ -284,7 +311,7 @@ export interface ResultsMatch {
       player: {
         seed: number | null
         status: StatusInfo | null
-        player: PlayerBase
+        player: Player
       }
     }
   }[]
@@ -310,7 +337,7 @@ export interface DrawMatch {
       player: {
         seed: number | null
         status: StatusInfo | null
-        player: PlayerBase
+        player: Player
       }
       incomplete: Incomplete | null
     }
@@ -329,7 +356,7 @@ export interface DrawMatch {
       player: {
         seed: number | null
         status: StatusInfo | null
-        player: PlayerBase
+        player: Player
       }
     }
     winner: {
@@ -340,23 +367,6 @@ export interface DrawMatch {
       }
     }
   }[]
-}
-
-export interface WinnerScore {
-  player: {
-    player: PlayerBase
-  }
-  s1: number | null
-  s2: number | null
-  s3: number | null
-  s4: number | null
-  s5: number | null
-  t1: number | null
-  t2: number | null
-  t3: number | null
-  t4: number | null
-  t5: number | null
-  incomplete?: Incomplete | null
 }
 
 export interface PlayerDetailsType {

@@ -1,60 +1,12 @@
 import { gql } from '@apollo/client/core'
 
-export const GET_MATCH_BREADCRUMBS = (id: number, eid: number, mid: number) => {
+export const GET_MATCH_BREADCRUMBS = (eid: number, mid: number) => {
   const call = gql`
-    query getYears($id: Int!, $eid: Int!, $mid: Int!) {
-      tournaments(where: { id: $id }) {
-        events {
-          id
-          year(options: { sort: [{ id: ASC }] }) {
-            id
-          }
-        }
-      }
-      events(where: { id: $eid }) {
-        rounds(where: { number_GT: 0 }, options: { sort: [{ number: ASC }] }) {
-          round
-          matches {
-            match_no
-            incomplete
-            p1 {
-              player {
-                player {
-                  full_name
-                }
-              }
-            }
-            p2 {
-              player {
-                player {
-                  full_name
-                }
-              }
-            }
-          }
-        }
-      }
+    query getYears($eid: Int!, $mid: Int!) {
       matches(where: { match_no: $mid, round: { event: { id: $eid } } }) {
         match_no
         round {
           round
-          matches {
-            match_no
-            p1 {
-              player {
-                player {
-                  full_name
-                }
-              }
-            }
-            p2 {
-              player {
-                player {
-                  full_name
-                }
-              }
-            }
-          }
         }
         p1 {
           player {
@@ -73,7 +25,7 @@ export const GET_MATCH_BREADCRUMBS = (id: number, eid: number, mid: number) => {
       }
     }
   `
-  return { query: call, variables: { id, eid, mid } }
+  return { query: call, variables: { eid, mid } }
 }
 
 export const GET_MATCH = (matchNo: number, eventId: number) => {

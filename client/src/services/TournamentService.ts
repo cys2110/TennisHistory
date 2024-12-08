@@ -1,21 +1,5 @@
 import { gql } from '@apollo/client/core'
 
-export const GET_TOURNAMENT_YEARS = (id: number) => {
-  const call = gql`
-    query getYears($id: Int!) {
-      tournaments(where: { id: $id }) {
-        events {
-          id
-          year(options: { sort: [{ id: ASC }] }) {
-            id
-          }
-        }
-      }
-    }
-  `
-  return { query: call, variables: { id } }
-}
-
 export const GET_TOURNAMENT = (id: number) => {
   const call = gql`
     query getTournament($id: Int!) {

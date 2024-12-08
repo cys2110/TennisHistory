@@ -45,10 +45,9 @@ onMounted(async () => {
       <router-link class="hover-link font-bold text-wrap" :to="{ name: 'tournament', params: tournamentParams }">
         {{ tournament.name }}
       </router-link>
-    </template>
-
-    <template #subtitle>
-      <template v-if="sponsor_name">{{ sponsor_name }}</template>
+      <Divider align="center">
+        <div v-if="sponsor_name" class="text-sm text-zinc-400 text-center">{{ sponsor_name }}</div>
+      </Divider>
     </template>
 
     <template #content>
@@ -66,6 +65,7 @@ onMounted(async () => {
     </template>
 
     <template #footer>
+      <Divider />
       <div class="flex justify-evenly">
         <Button v-for="page in eventPages" :key="page.name" as="router-link" :label="page.title" size="small"
           class="!border-zinc-400 !text-zinc-400 hover:!border-zinc-300 hover:!text-zinc-300"
@@ -77,3 +77,9 @@ onMounted(async () => {
 
   </Card>
 </template>
+
+<style scoped>
+:deep(.p-card-content) {
+  @apply !h-full !flex !items-center !justify-center
+}
+</style>

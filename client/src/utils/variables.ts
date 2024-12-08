@@ -69,6 +69,7 @@ export const MONTHS = {
 export const INCOMPLETES = {
   [Incomplete.R]: 'Ret.',
   [Incomplete.WO]: 'Walkover',
+  [Incomplete.B]: 'Bye',
 }
 
 export const CURRENCIES = {
