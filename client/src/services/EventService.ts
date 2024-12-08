@@ -109,6 +109,7 @@ export const GET_EVENT = (id: number, idString: string) => {
           rank
           player {
             full_name
+            last_name
             id
             country {
               id
@@ -262,6 +263,7 @@ export const GET_EVENT = (id: number, idString: string) => {
         player {
           id
           full_name
+          last_name
           country {
             id
             name

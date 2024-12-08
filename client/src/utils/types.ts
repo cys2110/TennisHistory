@@ -103,22 +103,54 @@ interface Country {
   name: string
 }
 
-interface Entry {
-  player: Pick<Player, 'id' | 'full_name' | 'country'>
+export interface Entry {
+  player: Pick<Player, 'id' | 'full_name' | 'country' | 'last_name'>
+  seed: number | null
+  rank: number | null
+  status: StatusInfo | null
+}
+
+export interface EntryConnection {
+  edges: {
+    node: {
+      player: Player
+    }
+    properties?: {
+      rank?: number | null
+      reason?: string | null
+    }
+  }
 }
 
 export interface Event {
+  altConnection: Pick<EntryConnection, 'edges'>[]
   id: number
   category: Category | null
+  currency: Currency | null
+  defaultedConnection: Pick<EntryConnection, 'edges'> & { properties: { reason: string | null } }[]
+  draw_type: string
   end_date: string
+  ldaConnection: Pick<EntryConnection, 'edges'> & { properties: { rank: number | null } }[]
+  llsConnection: Pick<EntryConnection, 'edges'>[]
+  pm: number
+  retConnection: Pick<EntryConnection, 'edges'> & { properties: { reason: string | null } }[]
   rounds: Round[]
+  qualifiersConnection: Pick<EntryConnection, 'edges'>[]
+  seeds: Pick<Entry, 'player' | 'seed' | 'rank'>[]
   sponsor_name: string | null
   start_date: string
+  supervisors: {
+    id: string
+  }[]
   surface: {
     id: Surface
   }
+  tfc: number
   tournament: Pick<Tournament, 'id' | 'name'>
   venue: Venue
+  wcConnection: Pick<EntryConnection, 'edges'>[]
+  wdConnection: Pick<EntryConnection, 'edges'> & { properties: { reason: string | null } }[]
+  woConnection: Pick<EntryConnection, 'edges'> & { properties: { reason: string | null } }[]
   year: {
     id: number
   }
@@ -137,19 +169,25 @@ export interface Match {
 }
 
 export interface Player {
-  id: string
-  full_name: string
   country: {
     id: string
     name: string
   }
+  full_name: string
+  id: string
+  last_name: string
 }
 
-interface Round {
+export interface Round {
   matches: Match[]
+  number: number
+  pm: number | null
+  points: number | null
+  round: string
+  event: Event
 }
 
-interface Score {
+export interface Score {
   incomplete: Incomplete | null
   player: Entry
   s1: number | null
@@ -187,85 +225,8 @@ interface Venue {
 
 export type EventCard = Pick<
   Event,
-  'id' | 'category' | 'start_date' | 'end_date' | 'tournament' | 'year'
+  'id' | 'category' | 'start_date' | 'end_date' | 'tournament' | 'year' | 'sponsor_name' | 'surface'
 > & { venue: Pick<Venue, 'city' | 'country'> }
-
-export interface EntryConnectionNode {
-  edges: {
-    node: {
-      player: Player
-    }
-    properties?: {
-      rank?: number | null
-      reason?: string | null
-    }
-  }
-}
-
-export interface EventRound {
-  round: string
-  number: number
-  pm: number | null
-  points: number | null
-}
-
-export interface EventSeeds {
-  seed: number
-  rank: number
-  player: Player
-}
-
-export interface EventEntries {
-  player: Player
-  seed: number | null
-  rank: number | null
-  status: StatusInfo | null
-}
-
-export interface EventDetailsType {
-  category: string | null
-  draw_type: string
-  sponsor_name: string | null
-  start_date: string
-  end_date: string
-  id: number
-  pm: number
-  tfc: number
-  currency: Currency | null
-  surface: {
-    id: Surface
-  }
-  tournament: {
-    id: number
-    name: string
-  }
-  venue: {
-    name: string
-    city: string
-    country: {
-      id: string
-      name: string
-    }
-  }
-  year: {
-    id: number
-  }
-  supervisors: {
-    id: string
-  }[]
-  rounds: EventRound[]
-  seeds: EventSeeds[]
-  ldaConnection: EntryConnectionNode[]
-  wdConnection: EntryConnectionNode[]
-  retConnection: EntryConnectionNode[]
-  woConnection: EntryConnectionNode[]
-  defaultedConnection: EntryConnectionNode[]
-  llsConnection: EntryConnectionNode[]
-  altConnection: EntryConnectionNode[]
-  wcConnection: EntryConnectionNode[]
-  qualifiersConnection: EntryConnectionNode[]
-  entries: EventEntries[]
-}
 
 export interface ResultsMatch {
   round: string

@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { onMounted, shallowRef } from 'vue'
-import Icon from '@ant-design/icons-vue'
 import { DateTime } from 'luxon'
 import { categorySrc, encodeName, formattedDates } from '@/utils/functions'
 import { SURFACES } from '@/utils/variables'
 import type { EventCard } from '@/utils/types'
+import GetFlag from './GetFlag.vue'
 
 // Variables
 const props = defineProps<{
@@ -24,18 +23,6 @@ const tooltipText = "Event has not started yet"
 // Router link params
 const tournamentParams = { name: encodeName(tournament.name), id: tournament.id }
 const eventParams = { ...tournamentParams, year: year.id, eid: id }
-
-// Import flag icons on mount
-const selectedFlag = shallowRef(null)
-onMounted(async () => {
-  const countryCode = venue.country.id
-  try {
-    const flags: { [key: string]: any } = await import(`@/components/icons/flags`)
-    selectedFlag.value = flags[countryCode] || null
-  } catch (error) {
-    console.error(`Flag for ${countryCode} not found`, error)
-  }
-})
 </script>
 
 <template>
@@ -54,7 +41,7 @@ onMounted(async () => {
       <div class="grid grid-cols-4">
         <div v-if="venue" class="flex items-center col-span-3">
           {{ venue.city }}
-          <Icon v-if="selectedFlag" class="mx-2 text-2xl" :component="selectedFlag" />
+          <GetFlag :country="venue.country.id" />
         </div>
         <div class="row-span-3">
           <Image v-if="category" :src="categorySrc(category)" :alt="category" />

@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { getLowerTb } from '@/utils/functions'
-import type { WinnerScore } from '@/utils/types'
+import type { Score } from '@/utils/types'
 import { COLOURS, INCOMPLETES } from '@/utils/variables'
 
 const props = defineProps<{
-  winner: WinnerScore
-  loser: WinnerScore
+  winner: Pick<
+    Score,
+    'player' | 's1' | 's2' | 's3' | 's4' | 's5' | 't1' | 't2' | 't3' | 't4' | 't5'
+  >
+  loser: Pick<
+    Score,
+    'player' | 's1' | 's2' | 's3' | 's4' | 's5' | 't1' | 't2' | 't3' | 't4' | 't5' | 'incomplete'
+  >
 }>()
 </script>
 
@@ -23,6 +29,6 @@ const props = defineProps<{
     }}<sup v-if="winner.t5 && loser.t5">{{ getLowerTb(winner.t5, loser.t5) }}</sup>
     <a-tag v-if="loser.incomplete" :color="COLOURS.red600">{{
       INCOMPLETES[loser.incomplete]
-      }}</a-tag>
+    }}</a-tag>
   </div>
 </template>

@@ -123,6 +123,16 @@ const router = createRouter({
       component: AboutView,
     },
   ],
+  scrollBehavior(to, from, savedPosition) {
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth',
+        top: 75,
+      }
+    }
+    return { top: 0 }
+  },
 })
 
 export default router

@@ -131,3 +131,10 @@ export const CHART_OPTIONS = {
   backgroundColor: 'transparent',
   textStyle: { color: COLOURS.zinc400, fontSize: 14 },
 }
+
+export const breakpoints = {
+  sm: '(max-width: 640px)',
+  md: '(max-width: 768px)',
+  lg: '(max-width: 1024px)',
+  xl: '(min-width: 1025px)',
+}

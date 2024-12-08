@@ -1,46 +1,28 @@
 <script setup lang="ts">
-import { onMounted, shallowRef } from 'vue'
-import Icon from '@ant-design/icons-vue'
 import { encodeName, headshot } from '@/utils/functions'
+import type { Player } from '@/utils/types';
+import GetFlag from './GetFlag.vue';
 
 const props = defineProps<{
-  player: {
-    country: { id: string }
-    full_name: string
-    id: string
-  }
+  player: Pick<Player, 'country' | 'full_name' | 'id' | 'last_name'>
   entry?: string
 }>()
 const { country, full_name, id } = props.player
-
-// import flag icons on mount
-const selectedFlag = shallowRef(null)
-onMounted(async () => {
-  const countryCode = country.id
-  try {
-    const flags: { [key: string]: any } = await import(`@/components/icons/flags`)
-    selectedFlag.value = flags[countryCode] || null
-  } catch (error) {
-    console.error(`Flag for ${countryCode} not found`, error)
-  }
-})
 </script>
 
 <template>
-  <a-row class="flex items-center">
-    <a-col :span="3">
-      <Icon v-if="selectedFlag" class="text-2xl" :component="selectedFlag" />
-    </a-col>
-
-    <a-col :span="3">
-      <a-avatar :alt="full_name" :src="headshot(id)" class="border-zinc-300 mx-2" />
-    </a-col>
-
-    <a-col :span="18" class="text-left px-5">
+  <div class="grid grid-flow-col auto-cols-max gap-x-3 items-center">
+    <div>
+      <GetFlag :country="country.id" />
+    </div>
+    <div>
+      <Avatar style="border: 1px solid #d4d4d8" shape="circle" :image="headshot(id)" />
+    </div>
+    <div>
       <router-link class="hover-link" :to="{ name: 'player', params: { name: encodeName(full_name), id: id } }">
         {{ full_name }}
       </router-link>
       <small v-if="entry">{{ entry }}</small>
-    </a-col>
-  </a-row>
+    </div>
+  </div>
 </template>

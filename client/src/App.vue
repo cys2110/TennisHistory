@@ -8,6 +8,7 @@ import { RouterView } from 'vue-router'
     <div class="flex-1 py-16 w-3/4 mx-auto">
       <RouterView :key="$route.fullPath" />
     </div>
+    <ScrollTop />
     <Footer class="bg-violet-800 pt-5" />
   </div>
 </template>

@@ -61,6 +61,12 @@ const MyPreset = definePreset(Aura, {
       borderColor: '{zinc.500}',
       contentBackground: '{violet.800}',
     },
+    fieldset: {
+      borderColor: '{violet.700}',
+    },
+    datatable: {
+      rowBackground: '{zinc.700}',
+    },
   },
 })
 
