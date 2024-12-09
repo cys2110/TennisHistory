@@ -263,6 +263,14 @@ export interface Score {
   t5: number | null
 }
 
+export interface TitlesAndFinals {
+  tid: number
+  surface: number
+  year: number
+  id: number
+  tname: string
+}
+
 export interface Tournament {
   id: number
   name: string

@@ -4,6 +4,7 @@ import { useQuery } from '@vue/apollo-composable'
 import { GET_PLAYER } from '@/services/PlayerService'
 import { gladiator, headshot, unencodeName, updateDocumentTitle } from '@/utils/functions'
 import type { Player } from '@/utils/types'
+import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints'
 
 // [TODO: FIGURE OUT MAJOR RESULTS APICALL]
 
@@ -13,6 +14,8 @@ const props = defineProps<{
   id: string
 }>()
 const player: Ref<Player | null> = ref(null)
+
+const { isBreakpointOrUp, isBreakpoint } = useGlobalBreakpoints()
 
 // Menubar
 const menuItems: Ref<{ route: string; label: string }[]> = ref([])
@@ -40,20 +43,16 @@ watch(error, (newError) => {
 </script>
 
 <template>
-  <Menubar :model="menuItems" class="mb-5" :dt="menuOptions">
-    <template #end>
-      <div class="flex items-center">
-        <Button v-for="page in pages" :key="page.title" as="router-link" :label="page.title" size="small" rounded
-          class="mx-2" raised :to="{ name: page.name }" />
-      </div>
-    </template>
-  </Menubar>
+  <PageToolbar :pages />
+  <div v-if="player && isBreakpoint('sm')" class="flex justify-center mb-10">
+    <Avatar style="border: 1px solid #d4d4d8" shape="circle" :image="headshot(player.id)" size="xlarge" />
+  </div>
   <div v-if="player" class="grid grid-cols-5 grid-flow-col">
-    <div>
+    <div v-if="isBreakpointOrUp('md')">
       <Image :alt="player.full_name" :src="player.gladiator ? gladiator(player.id) : headshot(player.id)"
         class="rounded-full" />
     </div>
-    <div class="col-span-4">
+    <div class="col-span-5 md:col-span-4">
       <PlayerDetails :player />
     </div>
   </div>

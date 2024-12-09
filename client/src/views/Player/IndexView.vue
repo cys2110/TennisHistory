@@ -4,6 +4,9 @@ import { useQuery } from '@vue/apollo-composable'
 import { GET_INDEX } from '@/services/PlayerService'
 import { unencodeName, updateDocumentTitle } from '@/utils/functions'
 import type { Index } from '@/utils/types';
+import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints';
+
+const { isBreakpointOrUp } = useGlobalBreakpoints()
 
 // Variables
 const props = defineProps<{
@@ -178,26 +181,20 @@ watch(error, (newError) => {
 </script>
 
 <template>
-  <div v-if="index">
-    <Toolbar class="mb-5">
-      <template #start>
+  <div v-if="index" class="lg:w-3/4 lg:mx-auto">
+    <PageToolbar :pages>
+      <template #start v-if="isBreakpointOrUp('md')">
         <ToggleButton v-model="checked" offIcon="pi pi-chart-bar" onIcon="pi pi-table" offLabel="" onLabel="" unstyled
           class="mb-5" pt:icon="text-cyan-600 text-3xl" pt:root="border-cyan-600 border-[1px] rounded px-2" />
       </template>
-      <template #end>
-        <div class="flex items-center">
-          <Button v-for="page in pages" :key="page.title" as="router-link" :label="page.title" size="small" rounded
-            class="mx-2" raised :to="{ name: page.name }" />
-        </div>
-      </template>
-    </Toolbar>
+    </PageToolbar>
     <DataTable v-if="!checked" :value="index" rowGroupMode="subheader" groupRowsBy="category" stripedRows size="small">
       <Column field="category" header="Category" />
-      <Column field="stat" header="" />
-      <Column field="win" header="Wins" class="!text-center" />
-      <Column field="loss" header="Losses" class="!text-center" />
-      <Column field="titles" header="Titles" class="!text-center" />
-      <Column field="value" header="Index" class="!text-center" />
+      <Column field="stat" class="!text-xs md:!text-base" />
+      <Column field="win" header="Wins" class="!text-center !text-xs md:!text-base" />
+      <Column field="loss" header="Losses" class="!text-center !text-xs md:!text-base" />
+      <Column field="titles" header="Titles" class="!text-center !text-xs md:!text-base" />
+      <Column field="value" header="Index" class="!text-center !text-xs md:!text-base" />
       <template #groupheader="{ data }">
         <div class="font-bold">{{ data.category }}</div>
       </template>

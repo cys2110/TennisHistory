@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, provide } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
@@ -7,7 +7,9 @@ import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/compo
 import VChart, { THEME_KEY } from 'vue-echarts'
 import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
 
-const props = defineProps(['stats'])
+const props = defineProps<{
+  stats: { category: string, value: number, suffix?: boolean }[]
+}>()
 
 use([DatasetComponent, TooltipComponent, GridComponent, BarChart, CanvasRenderer])
 provide(THEME_KEY, 'dark')
@@ -20,8 +22,9 @@ const option = ref({
     dimensions: ['category', 'value', 'actualValue', 'max'],
   },
   tooltip: {
+    // @ts-ignore
     formatter: function (params) {
-      return `${params.value.actualValue} / ${params.value.max} (${params.value.value})%`
+      return `${params.value.value}${params.data.suffix === false ? '' : '%'}`
     },
   },
   xAxis: { type: 'value', max: 100 },
@@ -30,7 +33,7 @@ const option = ref({
     {
       type: 'bar',
       encode: { x: 'value', y: 'category' },
-      itemStyle: { color: COLOURS.violet700 },
+      itemStyle: { color: COLOURS.green800 },
     },
   ],
 })

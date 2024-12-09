@@ -41,14 +41,7 @@ const pages = [
 </script>
 
 <template>
-  <Toolbar class="mb-5">
-    <template #end>
-      <div class="flex items-center">
-        <Button v-for="page in pages" :key="page.title" as="router-link" :label="page.title" size="small" rounded
-          class="mx-2" raised :to="{ name: page.name }" />
-      </div>
-    </template>
-  </Toolbar>
+  <PageToolbar :pages />
   <Accordion v-if="matches" :value="['0']" multiple class="md:w-3/4 lg:w-full xl:w-3/4 mx-auto">
     <AccordionPanel v-for="(round, index) in matches" :key="round.number" :value="index">
       <AccordionHeader>{{ round.round }}</AccordionHeader>

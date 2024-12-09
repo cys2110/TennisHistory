@@ -59,7 +59,7 @@ const option = ref({
   <div class="flex justify-center">
     <div v-for="(entry, index) in Object.entries(categoryColours)" :key="index" class="mx-5 flex">
       <div class="rounded-lg !w-9 mx-2" :style="{ backgroundColor: entry[1] }"></div>
-      <div class="text-zinc-400">{{ entry[0] }}</div>
+      <div class="text-zinc-400 self-center">{{ entry[0] }}</div>
     </div>
   </div>
   <v-chart class="!h-[600px] !w-full" :option="option" :autoresize="true" />

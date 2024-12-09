@@ -112,7 +112,7 @@ const Descriptions = defineComponent(() => {
   return () => (
     <>
       {descriptionItems.map(item => (
-        <Fieldset legend={item.label} class={`col-span-${item.colSpan} flex justify-center items-center`}>{item.value}</Fieldset>
+        <Fieldset legend={item.label} class={`sm:col-span-1 md:col-span-${item.colSpan} lg:col-span-${item.colSpan} xl:col-span-${item.colSpan} flex justify-center items-center`}>{item.value}</Fieldset>
       ))}
     </>
   );
@@ -120,18 +120,18 @@ const Descriptions = defineComponent(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-4 gap-5 justify-center">
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 justify-center">
     <Card v-for="stat in statistics" :key="stat.title" class="p-5 w-11/12 mx-auto text-center">
       <template #subtitle>{{ stat.title }}</template>
       <template #footer v-if="stat.description">
         <div class="text-zinc-400">{{ stat.description }}</div>
       </template>
       <template #content>
-        <div class="font-bold text-2xl">{{ stat.prefix || '' }} {{ stat.value }}</div>
+        <div class="font-bold text-xl md:text-lg lg:text-2xl">{{ stat.prefix || '' }} {{ stat.value }}</div>
       </template>
     </Card>
   </div>
-  <div id="details" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 mt-5">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 mt-5">
     <Descriptions />
   </div>
 </template>

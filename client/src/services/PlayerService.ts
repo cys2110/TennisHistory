@@ -180,27 +180,19 @@ export const GET_ACTIVITY = (id: string, year: number) => {
 export const GET_TITLES = (id: string) => {
   const call = gql`
     query PlayerTitlesAndFinals($id: String!) {
-      playerTitlesAndFinals(id: $id) {
-        finals {
-          count
-          events {
-            tid
-            surface
-            id
-            tname
-          }
-          year
-        }
-        titles {
-          year
-          count
-          events {
-            id
-            surface
-            tid
-            tname
-          }
-        }
+      playerfinals(id: $id) {
+        id
+        surface
+        tid
+        tname
+        year
+      }
+      playertitles(id: $id) {
+        id
+        surface
+        tid
+        tname
+        year
       }
     }
   `
