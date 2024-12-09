@@ -49,7 +49,7 @@ const pages = [
       </div>
     </template>
   </Toolbar>
-  <Accordion v-if="matches" :value="['0']" multiple>
+  <Accordion v-if="matches" :value="['0']" multiple class="md:w-3/4 lg:w-full xl:w-3/4 mx-auto">
     <AccordionPanel v-for="(round, index) in matches" :key="round.number" :value="index">
       <AccordionHeader>{{ round.round }}</AccordionHeader>
       <AccordionContent>

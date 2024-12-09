@@ -14,7 +14,7 @@ const { date, court, duration_mins, umpire, winner, loser, incomplete, match_no 
 </script>
 
 <template>
-  <Card class="full-card pt-3 px-5">
+  <Card class="full-card pt-3 px-5 text-xs xl:text-sm">
     <template #header>
       <div class="flex justify-between">
         <div class="flex flex-col">

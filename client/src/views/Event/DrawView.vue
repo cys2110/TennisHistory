@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { computed, Ref, ref, watch } from 'vue'
+import { type Ref, ref, watch } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
-import { Grid } from 'ant-design-vue'
 import { GET_DRAW } from '@/services/EventService'
 import { encodeName, unencodeName, updateDocumentTitle } from '@/utils/functions'
-import { DrawMatch } from '@/utils/types'
+import type { Round, Match } from '@/utils/types'
 // import { html2pdf } from 'html2pdf.js';
 
 // [FUTURE: FILTER BY PLAYER]
@@ -16,46 +15,28 @@ const props = defineProps<{
   eid: string
   year: string
 }>()
-const { useBreakpoint } = Grid
-const screens = useBreakpoint()
-const matches: Ref<DrawMatch[] | null> = ref(null)
-const anchorItems: Ref<{ number: number; round: string }[] | null> = ref(null)
-const selectedRound: Ref<number | null> = ref(null)
+const matches: Ref<(
+  Pick<Round, 'round' | 'number'> & {
+    matches: (Pick<Match, 'incomplete' | 'match_no' | 'p1' | 'p2'> & { winner: { player: { player: { id: string } } } })[];
+  }
+)[] | null> = ref(null);
+const selectedRound = ref(1)
+const buttonOptions = { primaryBackground: '{cyan.500}', primaryBorderColor: '{cyan.500}' }
 
 // Update document title
-watch(
-  () => props.name,
-  () => updateDocumentTitle(`Draw | ${unencodeName(props.name)} ${props.year} | TennisHistory`),
-  { immediate: true },
-)
+watch(() => props.name, () => updateDocumentTitle(`Draw | ${unencodeName(props.name)} ${props.year} | TennisHistory`), { immediate: true })
 
 // API call
 const { query, variables } = GET_DRAW(parseInt(props.eid))
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
-  if (newResult) {
-    matches.value = newResult.events[0].rounds
-    if (matches.value) {
-      anchorItems.value = matches.value.map((round) => ({
-        number: round.number,
-        round: round.round,
-      }))
-      selectedRound.value = anchorItems.value[0].number
-    }
-  }
-})
+  if (newResult) matches.value = newResult.events[0].rounds
+}, { immediate: true })
+
 watch(error, (newError) => {
   if (newError) console.error(newError)
-})
-
-const handleChange = (e: number) => (selectedRound.value = e)
-
-const cardWidth = computed(() => {
-  if (screens.value.xl) return 'w-[30%]'
-  if (screens.value.lg) return 'w-5/12'
-  return 'w-full'
-})
+}, { immediate: true })
 
 // const generatePdf = () => {
 //     const chartElement = document.querySelector('#details');
@@ -78,91 +59,56 @@ const cardWidth = computed(() => {
 //             window.open(pdfUrl, '_blank');
 //         });
 // };
+
+const pages = [
+  { title: 'Details', name: 'event' },
+  { title: 'Results', name: 'results' },
+]
 </script>
 
 <template>
-  <a-row v-if="matches">
-    <a-col v-if="!screens.xs" :span="4">
-      <div class="flex flex-col">
-        <a-checkable-tag
-          v-for="item in anchorItems"
-          :key="item.number"
-          :checked="selectedRound === item.number"
-          :value="item.number"
-          class="my-2"
-          @change="handleChange(item.number)"
-        >
-          {{ item.round }}</a-checkable-tag
-        >
+
+  <Toolbar>
+    <template #start>
+      <ButtonGroup>
+        <Button v-for="round in matches" :key="round.number" @click="selectedRound = round.number" class="mx-2"
+          size="small" rounded raised :dt="buttonOptions">{{
+            round.round
+          }}</Button>
+      </ButtonGroup>
+    </template>
+    <template #end>
+      <div class="flex items-center">
+        <Button v-for="page in pages" :key="page.title" as="router-link" :label="page.title" size="small" rounded
+          class="mx-2" raised :to="{ name: page.name }" />
       </div>
-    </a-col>
-    <a-col :xs="24" :sm="20">
-      <div v-if="screens.xs" class="flex overflow-x-auto scroll-smooth">
-        <a-checkable-tag
-          v-for="item in anchorItems"
-          :key="item.number"
-          :checked="selectedRound === item.number"
-          :value="item.number"
-          class="my-2"
-          @change="handleChange(item.number)"
-        >
-          {{ item.round }}</a-checkable-tag
-        >
+    </template>
+  </Toolbar>
+
+  <div v-if="matches" class="hide-scrollbar flex flex-nowrap w-3/4 overflow-x-hidden mx-auto overflow-y-auto">
+    <template v-for="round in matches" :key="round.number">
+      <div v-if="selectedRound > round.number - 1 && selectedRound < round.number + 3" :id="encodeName(round.round)"
+        class="shrink-0 w-[400px] mx-2">
+        <div class="text-center font-bold">{{ round.round }}</div>
+        <div class="flex flex-col justify-around h-full">
+          <DrawCard v-for="match in round.matches" :key="match.match_no" :match :name :id :eid :year />
+        </div>
       </div>
-      <a-row class="flex overflow-x-auto scroll-smooth" id="draw-container">
-        <template v-for="round in matches" :key="round.round">
-          <a-col
-            :xs="24"
-            v-if="
-              selectedRound &&
-              ((screens.sm && selectedRound === round.number) ||
-                (screens.lg &&
-                  selectedRound > round.number - 1 &&
-                  selectedRound < round.number + 2) ||
-                (screens.xl &&
-                  selectedRound > round.number - 1 &&
-                  selectedRound < round.number + 3))
-            "
-            class="flex-[0_0_auto] mx-4 flex flex-col justify-around items-center mb-2 font-bold"
-            :class="cardWidth"
-          >
-            {{ round.round }}
-          </a-col>
-        </template>
-      </a-row>
-      <a-row class="flex overflow-x-auto scroll-smooth" id="draw-container">
-        <template v-for="round in matches" :key="round.round">
-          <a-col
-            :xs="24"
-            v-if="
-              selectedRound &&
-              ((screens.sm && selectedRound === round.number) ||
-                (screens.lg &&
-                  selectedRound > round.number - 1 &&
-                  selectedRound < round.number + 2) ||
-                (screens.xl &&
-                  selectedRound > round.number - 1 &&
-                  selectedRound < round.number + 3))
-            "
-            class="flex-[0_0_auto] mx-4 flex flex-col justify-around"
-            :id="encodeName(round.round)"
-            :class="cardWidth"
-          >
-            <DrawCard
-              v-for="match in round.matches"
-              :key="match.match_no"
-              :match
-              :name
-              :id
-              :eid
-              :year
-            />
-          </a-col>
-        </template>
-      </a-row>
-    </a-col>
-  </a-row>
+    </template>
+  </div>
+
   <Loading v-else :loading>
     <template #none>No draw available</template>
   </Loading>
 </template>
+
+<style scoped>
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+</style>

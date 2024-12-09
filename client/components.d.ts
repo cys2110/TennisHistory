@@ -105,6 +105,8 @@ declare module 'vue' {
     SeedsChart: typeof import('./src/components/Event/SeedsChart.vue')['default']
     ServiceSpeed: typeof import('./src/components/Match/ServiceSpeed.vue')['default']
     SpeedGauge: typeof import('./src/components/Match/SpeedGauge.vue')['default']
+    Splitter: typeof import('primevue/splitter')['default']
+    SplitterPanel: typeof import('primevue/splitterpanel')['default']
     StatsBarChart: typeof import('./src/components/Player/StatsBarChart.vue')['default']
     StatsChart: typeof import('./src/components/Match/StatsChart.vue')['default']
     StatsPieChart: typeof import('./src/components/Player/StatsPieChart.vue')['default']
