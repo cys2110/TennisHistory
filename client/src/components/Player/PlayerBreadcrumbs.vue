@@ -1,34 +1,49 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { unencodeName } from '@/utils/functions'
+import { ref } from 'vue';
+
+type Page = 'player' | 'activity' | 'titles' | 'index' | 'stats'
+
+const route = useRoute()
+const router = useRouter()
 
 // Variables
-const route = useRoute()
-const pages = [
-  { name: 'player', title: 'Details' },
-  { name: 'activity', title: 'Activity' },
-  { name: 'titles', title: 'Titles and Finals' },
-  { name: 'index', title: 'Win-Loss Index' },
-  { name: 'stats', title: 'Stats' },
-]
+const { name, id } = route.params
+const home = {
+  icon: 'pi pi-home',
+  class: 'text-lg',
+  command: () => router.push({ name: 'home' })
+}
+
+const pages = {
+  player: 'Details',
+  activity: 'Activity',
+  titles: 'Titles and Finals',
+  index: 'Win-Loss Index',
+  stats: 'Stats'
+}
+
+const breadcrumbs = ref([
+  {
+    label: unencodeName(name as string),
+    class: 'text-lg'
+  },
+  {
+    label: pages[route.name as Page],
+    class: 'text-lg'
+  }
+])
 </script>
 
 <template>
-  <a-breadcrumb>
-    <a-breadcrumb-item>
-      <router-link :to="{ name: 'home' }">Home</router-link>
-    </a-breadcrumb-item>
-    <a-breadcrumb-item>
-      {{ unencodeName(route.params.name as string) }}
-      <template #overlay>
-        <a-menu>
-          <template v-for="(page, index) in pages" :key="index">
-            <a-menu-item v-if="route.name !== page.name">
-              <router-link :to="{ name: page.name }">{{ page.title }}</router-link>
-            </a-menu-item>
-          </template>
-        </a-menu>
-      </template>
-    </a-breadcrumb-item>
-  </a-breadcrumb>
+  <Breadcrumb :home="home" :model="breadcrumbs">
+    <template #separator>/</template>
+  </Breadcrumb>
 </template>
+
+<style scoped>
+:deep(.p-breadcrumb-item:last-child .p-breadcrumb-item-label) {
+  font-weight: bold !important;
+}
+</style>

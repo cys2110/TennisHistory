@@ -18,7 +18,7 @@ const { p1, p2, incomplete, match_no, winner } = props.match
 <template>
   <Card class="pt-3 px-5 text-xs my-1">
     <template #content>
-      <div class="grid grid-cols-9">
+      <div class="grid grid-cols-9 gap-y-2">
         <div>
           <GetFlag v-if="p1.player" :country="p1.player.player.country.id" />
         </div>
@@ -41,8 +41,6 @@ const { p1, p2, incomplete, match_no, winner } = props.match
         <div class="col-span-2 flex items-center justify-center">
           <ScoreItem v-if="incomplete !== 'B'" :score="p1" />
         </div>
-      </div>
-      <div class="grid grid-cols-9">
         <div>
           <GetFlag v-if="p2?.player" :country="p2.player.player.country.id" />
         </div>

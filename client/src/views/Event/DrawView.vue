@@ -68,7 +68,7 @@ const pages = [
 
 <template>
 
-  <Toolbar>
+  <Toolbar class="mb-10">
     <template #start>
       <ButtonGroup>
         <Button v-for="round in matches" :key="round.number" @click="selectedRound = round.number" class="mx-2"

@@ -103,6 +103,19 @@ interface Country {
   name: string
 }
 
+interface CountryConnection {
+  edges: {
+    node: {
+      id: string
+      name: string
+    }
+    properties: {
+      end_date: string
+      start_date: string
+    }
+  }[]
+}
+
 export interface Entry {
   player: Pick<Player, 'id' | 'full_name' | 'country' | 'last_name'>
   seed: number | null
@@ -184,13 +197,37 @@ export interface Match {
 }
 
 export interface Player {
+  bh1: boolean | null
+  career_high: number | null
+  ch_date: string | null
+  coaches: {
+    id: string
+    full_name: string
+    first_name: string | null
+  }[]
   country: {
     id: string
     name: string
   }
+  countryConnection: CountryConnection
+  dob: string | null
   full_name: string
+  gladiator: boolean
+  height_cm: number | null
   id: string
   last_name: string
+  loss: number
+  pm_USD: number
+  prev_countriesConnection: CountryConnection | null
+  retired: {
+    id: number
+  } | null
+  rh: boolean | null
+  titles: number
+  turned_pro: {
+    id: number
+  } | null
+  win: number
 }
 
 export interface Round {
@@ -242,57 +279,6 @@ export type EventCard = Pick<
   Event,
   'id' | 'category' | 'start_date' | 'end_date' | 'tournament' | 'year' | 'sponsor_name' | 'surface'
 > & { venue: Pick<Venue, 'city' | 'country'> }
-
-export interface PlayerDetailsType {
-  id: string
-  full_name: string
-  career_high: number | null
-  ch_date: string | null
-  loss: number
-  win: number
-  titles: number
-  pm_USD: number
-  gladiator: boolean
-  dob: string | null
-  height_cm: number | null
-  rh: boolean | null
-  bh1: boolean | null
-  turned_pro: {
-    id: number
-  }
-  retired: {
-    id: number
-  }
-  coaches: {
-    id: string
-    full_name: string | null
-    first_name: string | null
-  }[]
-  countryConnection: {
-    edges: {
-      node: {
-        id: string
-        name: string
-      }
-      properties: {
-        start_date: string | null
-        end_date: string | null
-      }
-    }[]
-  }
-  prev_countriesConnection: {
-    edges: {
-      node: {
-        id: string
-        name: string
-      }
-      properties: {
-        start_date: string
-        end_date: string
-      }
-    }[]
-  }
-}
 
 export interface H2HPlayerDetails {
   bh1: boolean | null
