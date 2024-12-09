@@ -169,6 +169,15 @@ export interface Event {
   }
 }
 
+export interface Index {
+  category: string
+  stat: string
+  win: number
+  loss: number
+  titles?: number
+  value: number | string
+}
+
 export interface Match {
   court: string | null
   date: string | null
