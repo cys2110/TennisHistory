@@ -118,8 +118,11 @@ interface CountryConnection {
 
 export interface Entry {
   player: Pick<Player, 'id' | 'full_name' | 'country' | 'last_name'>
-  seed: number | null
+  pm: number
+  points: number
   rank: number | null
+  scores: Score[]
+  seed: number | null
   status: StatusInfo | null
 }
 
@@ -196,6 +199,7 @@ export interface Match {
     Score,
     'player' | 's1' | 's2' | 's3' | 's4' | 's5' | 't1' | 't2' | 't3' | 't4' | 't5' | 'incomplete'
   >
+  round: Round
   winner: Pick<
     Score,
     'player' | 's1' | 's2' | 's3' | 's4' | 's5' | 't1' | 't2' | 't3' | 't4' | 't5'
@@ -250,6 +254,7 @@ export interface Round {
 
 export interface Score {
   incomplete: Incomplete | null
+  match: Match
   player: Entry
   s1: number | null
   s2: number | null

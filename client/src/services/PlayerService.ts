@@ -79,6 +79,58 @@ export const GET_ACTIVITY = (id: string, year: number) => {
           status
           scores {
             match {
+              p2 {
+                s1
+                s2
+                s3
+                s4
+                s5
+                t1
+                t2
+                t3
+                t4
+                t5
+                incomplete
+                player {
+                  rank
+                  seed
+                  status
+                  player {
+                    full_name
+                    id
+                    country {
+                      name
+                      id
+                    }
+                  }
+                }
+              }
+              p1 {
+                s1
+                s2
+                s3
+                s4
+                s5
+                t1
+                t2
+                t3
+                t4
+                t5
+                incomplete
+                player {
+                  rank
+                  seed
+                  status
+                  player {
+                    full_name
+                    id
+                    country {
+                      id
+                      name
+                    }
+                  }
+                }
+              }
               round {
                 event {
                   id
@@ -113,58 +165,6 @@ export const GET_ACTIVITY = (id: string, year: number) => {
                 player {
                   player {
                     id
-                  }
-                }
-              }
-              p2 {
-                s1
-                s2
-                s3
-                s4
-                s5
-                t1
-                t2
-                t3
-                t4
-                t5
-                incomplete
-                player(where: { NOT: { player: { id: $id } } }) {
-                  rank
-                  seed
-                  status
-                  player {
-                    full_name
-                    id
-                    country {
-                      name
-                      id
-                    }
-                  }
-                }
-              }
-              p1 {
-                s1
-                s2
-                s3
-                s4
-                s5
-                t1
-                t2
-                t3
-                t4
-                t5
-                incomplete
-                player(where: { NOT: { player: { id: $id } } }) {
-                  rank
-                  seed
-                  status
-                  player {
-                    full_name
-                    id
-                    country {
-                      id
-                      name
-                    }
                   }
                 }
               }

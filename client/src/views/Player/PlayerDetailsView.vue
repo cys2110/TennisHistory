@@ -16,10 +16,6 @@ const props = defineProps<{
 const player: Ref<Player | null> = ref(null)
 
 const { isBreakpointOrUp, isBreakpoint } = useGlobalBreakpoints()
-
-// Menubar
-const menuItems: Ref<{ route: string; label: string }[]> = ref([])
-const menuOptions = { itemColor: '{cyan.500}', gap: '1rem' }
 const pages = [
   { title: 'Activity', name: 'activity' },
   { title: 'Titles and Finals', name: 'titles' },
