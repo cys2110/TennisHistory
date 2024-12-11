@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, provide, computed } from 'vue'
-import { Grid } from 'ant-design-vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart, LineChart } from 'echarts/charts'
@@ -12,16 +11,12 @@ import type { Entry } from '@/utils/types'
 const props = defineProps<{
   seeds: Pick<Entry, 'seed' | 'rank' | 'player'>[]
 }>()
-const { useBreakpoint } = Grid
-const screens = useBreakpoint()
 
 const flattenedSeeds = props.seeds.map((seed) => ({
   seed: seed.seed,
   rank: seed.rank,
   name: seed.player.full_name,
 }))
-
-const rotation = computed(() => (screens.value.xs ? 90 : 60))
 
 use([DatasetComponent, TooltipComponent, GridComponent, BarChart, LineChart, CanvasRenderer])
 provide(THEME_KEY, 'dark')
@@ -36,7 +31,7 @@ const option = ref({
   },
   xAxis: {
     type: 'category',
-    axisLabel: { rotate: rotation, interval: 0 },
+    axisLabel: { interval: 0 },
   },
   yAxis: [
     { type: 'value', name: 'Seed' },
