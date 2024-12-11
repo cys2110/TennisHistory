@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { CheckCircleTwoTone } from '@ant-design/icons-vue'
 import { encodeName, getEntry, headshot } from '@/utils/functions'
-import { COLOURS } from '@/utils/variables'
 import type { Match } from '@/utils/types'
 
 const props = defineProps<{

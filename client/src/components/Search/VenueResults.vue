@@ -10,7 +10,7 @@ const props = defineProps<{
   venues: Venue[]
 }>()
 const open = ref(false)
-const selection: Ref<{ name: string; city: string }> = ref({})
+const selection: Ref<{ name: string; city: string }> = ref({ name: '', city: '' })
 const events: Ref<Pick<Event, 'id' | 'tournament' | 'year'>[]> = ref([])
 
 const { query, variables } = GET_VENUE('', '')

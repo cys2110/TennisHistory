@@ -27,8 +27,6 @@ const props = defineProps<{
     }}<sup v-if="winner.t4 && loser.t4">{{ getLowerTb(winner.t4, loser.t4) }}</sup>
     {{ winner.s5 && loser.s5 ? `${winner.s5}${loser.s5}` : ''
     }}<sup v-if="winner.t5 && loser.t5">{{ getLowerTb(winner.t5, loser.t5) }}</sup>
-    <a-tag v-if="loser.incomplete" :color="COLOURS.red600">{{
-      INCOMPLETES[loser.incomplete]
-    }}</a-tag>
+    <Tag v-if="loser.incomplete" class="!bg-red-800" :value="INCOMPLETES[loser.incomplete]" />
   </div>
 </template>
