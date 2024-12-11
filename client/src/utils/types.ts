@@ -237,6 +237,45 @@ export interface Player {
   win: number
 }
 
+export interface SearchResults {
+  searchTournaments: {
+    id: number
+    name: string
+  }[]
+  searchPlayers: {
+    id: string
+    full_name: string
+    country: {
+      name: string
+      id: string
+    }
+  }[]
+  searchCoaches: {
+    id: string
+    full_name: string | null
+  }[]
+  searchCountries: {
+    name: string
+    id: string
+  }[]
+  searchSupervisors: {
+    id: string
+  }[]
+  searchSurface: {
+    id: Surface
+  }[]
+  searchUmpires: {
+    id: string
+  }[]
+  searchVenue: {
+    name: string
+    city: string
+    country: {
+      id: string
+    }
+  }[]
+}
+
 export interface Round {
   matches: Match[]
   number: number
@@ -304,7 +343,7 @@ export interface Tournament {
   events: Pick<Event, 'id' | 'year' | 'start_date' | 'end_date' | 'rounds'>[]
 }
 
-interface Venue {
+export interface Venue {
   name: string
   city: string
   country: Country

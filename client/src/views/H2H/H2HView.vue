@@ -5,6 +5,11 @@ import { GET_H2H } from '@/services/MiscService'
 import { headshot, unencodeName, updateDocumentTitle } from '@/utils/functions'
 import type { Match, Player } from '@/utils/types'
 
+const buttonOptions = {
+  outlinedPrimaryColor: '{cyan.600}',
+  outlinedPrimaryBorderColor: '{cyan.600}'
+}
+
 const props = defineProps<{
   p1Name: string
   p1Id: string
@@ -66,6 +71,16 @@ watch(error, (newError) => {
     <template #title>{{ p1.name }} v. {{ p2.name }}</template>
   </Title>
   <div v-if="matches" class="w-3/4 mx-auto">
+    <Toolbar class="mb-5 flex justify-evenly">
+      <template #end>
+        <div class="flex flex-col md:flex-row md:items-center md:justify-center items-start">
+          <Button as="router-link" :label="`${p1Details?.full_name} Profile`" size="small" variant="outlined" rounded
+            class="m-2" raised :to="{ name: 'player', params: { name: p1.name, id: p1.id } }" :dt="buttonOptions" />
+          <Button as="router-link" :label="`${p2Details?.full_name} Profile`" size="small" variant="outlined" rounded
+            class="m-2" raised :to="{ name: 'player', params: { name: p2.name, id: p2.id } }" :dt="buttonOptions" />
+        </div>
+      </template>
+    </Toolbar>
     <div class="flex justify-evenly items-center">
       <div>
         <PlayerTable :player="p1Details" :number="1" />

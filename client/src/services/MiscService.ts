@@ -340,6 +340,10 @@ export const GET_COUNTRY = (name: string) => {
         formerPlayers {
           id
           full_name
+          country {
+            id
+            name
+          }
         }
       }
     }

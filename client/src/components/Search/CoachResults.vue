@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Ref, ref, watch } from 'vue'
+import { type Ref, ref, watch } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import { GET_COACH } from '@/services/MiscService'
-import { encodeName } from '@/utils/functions'
+import { encodeName, headshot } from '@/utils/functions'
+import type { Player } from '@/utils/types';
 
 const props = defineProps<{
   coaches: {
@@ -10,18 +11,9 @@ const props = defineProps<{
     full_name: string | null
   }[]
 }>()
-
-interface Player {
-  id: string
-  full_name: string
-  country: {
-    name: string
-    id: string
-  }
-}
 const open = ref(false)
-const selection: Ref<{ id: string; full_name: string | null } | null> = ref(null)
-const players: Ref<Player[]> = ref([])
+const selection: Ref<string | null> = ref(null)
+const players: Ref<Pick<Player, 'id' | 'full_name' | 'country'>[]> = ref([])
 
 const { query, variables } = GET_COACH('')
 const { result, loading, error, refetch } = useQuery(query, variables)
@@ -34,56 +26,41 @@ watch(error, (newError) => {
   if (newError) console.error(newError)
 })
 
-const handleClick = (coach: { id: string; full_name: string | null }) => {
+const handleClick = (coach: string) => {
   selection.value = coach
   open.value = true
-  refetch({ id: coach.id })
-}
-
-const handleClose = () => {
-  open.value = false
-  selection.value = null
-}
-
-const getParams = (item: { id: string; full_name: string | null }) => {
-  return {
-    name: encodeName(item.full_name || 'Unknown'),
-    id: item.id,
-  }
+  refetch({ id: coach })
 }
 </script>
 
 <template>
-  <a-list :data-source="coaches" header="Coaches">
-    <template #renderItem="{ item }">
-      <a-list-item class="cursor-pointer" @click="handleClick(item)">{{
-        item.full_name || item.id
-      }}</a-list-item>
-    </template>
-  </a-list>
-  <a-drawer
-    v-if="selection"
-    v-model:open="open"
-    @close="handleClose"
-    size="large"
-    class="!bg-violet-800"
-  >
-    <template #title
-      >Players coached by
-      <router-link
-        v-if="selection.full_name"
-        class="hover-link font-bold"
-        :to="{ name: 'player', params: getParams(selection) }"
-        >{{ selection.full_name }}</router-link
-      >
-      <span v-else class="font-bold">{{ selection.id }}</span>
-    </template>
-    <a-list v-if="players.length > 0" :data-source="players">
-      <template #renderItem="{ item }">
-        <a-list-item>
-          <SearchPlayerRow :player="item" />
-        </a-list-item>
-      </template>
-    </a-list>
-  </a-drawer>
+  <TabPanel value="3">
+    <div class="grid grid-cols-3 gap-3">
+      <div v-for="coach in coaches" :key="coach.id"
+        class="flex justify-center items-center !text-sm border-[1px] border-zinc-700 p-3 rounded-lg cursor-pointer"
+        @click="handleClick(coach.id)">
+        <div class="ml-2">{{ coach.full_name || coach.id }}</div>
+      </div>
+    </div>
+    <Dialog v-model:visible="open" maximizable modal :header="`Players coached by ${selection}`">
+      <div v-if="players && players.length > 0" class="grid grid-cols-2 gap-3">
+        <div v-for="player in players" :key="player.id"
+          class="flex items-center !text-sm border-[1px] border-zinc-700 p-3 rounded-lg">
+          <div>
+            <GetFlag :country="player.country.id" />
+          </div>
+          <Avatar style="border: 1px solid #d4d4d8" shape="circle" :image="headshot(player.id)" class="mx-2" />
+          <div class="ml-2">
+            <router-link class="hover-link"
+              :to="{ name: 'player', params: { name: encodeName(player.full_name), id: player.id } }">
+              {{ player.full_name }}
+            </router-link>
+          </div>
+        </div>
+      </div>
+      <Loading v-else :loading>
+        <template #none>No results available</template>
+      </Loading>
+    </Dialog>
+  </TabPanel>
 </template>
