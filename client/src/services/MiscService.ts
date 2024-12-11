@@ -96,6 +96,7 @@ export const GET_H2H = (p1Id: string, p2Id: string) => {
             player {
               id
               full_name
+              last_name
             }
           }
           s1

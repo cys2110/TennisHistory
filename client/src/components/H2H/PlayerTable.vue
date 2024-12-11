@@ -1,26 +1,50 @@
 <script setup lang="ts">
-import { computed, onMounted, Ref, ref, shallowRef, watch } from 'vue'
+import { computed, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@vue/apollo-composable'
-import Icon from '@ant-design/icons-vue'
-import { SearchOutlined } from '@ant-design/icons-vue'
-import { convertToFt, encodeName, smallDate } from '@/utils/functions'
-import { COLOURS } from '@/utils/variables'
+import Select from 'primevue/select'
 import { SEARCH_PLAYER } from '@/services/MiscService'
+import { convertToFt, encodeName, headshot, smallDate } from '@/utils/functions'
+import type { Player } from '@/utils/types'
 
 const router = useRouter()
 const route = useRoute()
-const props = defineProps(['player', 'number'])
-const cardTheme = { colorBgContainer: props.number === 1 ? COLOURS.violet700 : COLOURS.green800 }
+
+const props = defineProps<{
+  player: Pick<Player, 'bh1' | 'career_high' | 'ch_date' | 'country' | 'dob' | 'full_name' | 'height_cm' | 'id' | 'loss' | 'pm_USD' | 'rh' | 'titles' | 'turned_pro' | 'win'>
+  number: number
+}>()
+
+const cardOptions = {
+  background: props.number === 1 ? '{cyan.700}' : '{violet.800}'
+}
+
+const dividerOptions = {
+  borderColor: '{zinc.400}',
+}
+
+const selectOptions = {
+  borderColor: '{zinc-400}',
+  background: 'transparent',
+  color: '{zinc.300}',
+  focusBorderColor: '{zinc.300}',
+}
+
+const floatLabelOptions = {
+  onActiveBackground: props.number === 1 ? '{cyan.700}' : '{violet.800}',
+  color: '{zinc.300}',
+  focusColor: '{zinc.300}',
+}
+
+const imageUrl = headshot(props.player.id)
 
 interface SearchPlayer {
   full_name: string
   id: string
   country: { id: string; name: string }
 }
-const searchTerm = ref('Search player')
+const searchTerm = ref('')
 const options: Ref<SearchPlayer[]> = ref([])
-const selectedFlag = shallowRef(null)
 
 const { query, variables } = SEARCH_PLAYER(searchTerm.value)
 const { result, loading, error, refetch } = useQuery(query, variables)
@@ -66,15 +90,17 @@ const descriptionItems = [
   { title: 'Turned pro', value: props.player.turned_pro?.id ?? 'Unknown' },
 ]
 
-const handleSearch = (e) => refetch({ fullName: e })
+const handleSearch = () => {
+  refetch({ fullName: searchTerm.value })
+}
 
-const handleSelect = (name, id) => {
+const handleSelect = (e: { value: { full_name: string, id: string } }) => {
   if (props.number === 1) {
     router.push({
       name: 'h2h',
       params: {
-        p1Name: encodeName(name),
-        p1Id: id,
+        p1Name: encodeName(e.value.full_name),
+        p1Id: e.value.id,
         p2Name: route.params.p2Name,
         p2Id: route.params.p2Id,
       },
@@ -85,81 +111,43 @@ const handleSelect = (name, id) => {
       params: {
         p1Name: route.params.p1Name,
         p1Id: route.params.p1Id,
-        p2Name: encodeName(name),
-        p2Id: id,
+        p2Name: encodeName(e.value.full_name),
+        p2Id: e.value.id,
       },
     })
   }
 }
-
-onMounted(async () => {
-  const countryCode = props.player.country.id
-  try {
-    const flags: { [key: string]: any } = await import(`@/components/icons/flags`)
-    selectedFlag.value = flags[countryCode] || null
-  } catch (error) {
-    console.error(`Flag for ${countryCode} not found`, error)
-  }
-})
 </script>
 
 <template>
-  <a-config-provider :theme="{ components: { Card: cardTheme } }">
-    <a-card>
-      <template #title>
-        <router-link
-          class="hover-link"
-          :to="{ name: 'player', params: { name: encodeName(player.full_name), id: player.id } }"
-        >
-          {{ player.full_name }}</router-link
-        >
-      </template>
-      <template #extra>
-        <div class="flex justify-end items-center w-full">
-          <Icon v-if="selectedFlag" class="text-2xl" :component="selectedFlag" />
+  <Card class="p-3" :dt="cardOptions">
+    <template #header>
+      <div class="!rounded-full flex justify-center items-center w-[125px] mx-auto h-[125px] border-[1px]"
+        :style="`background-image: url(${imageUrl}); background-size: contain`" />
+    </template>
+    <template #title>
+      <div class="flex justify-between items-center">
+        <div class="font-bold">{{ player.full_name }}</div>
+        <div>
+          <GetFlag :country="player.country.id" />
         </div>
-      </template>
-      <a-card-meta>
-        <template #description>
-          <div v-for="item in descriptionItems" :key="item.title" class="flex justify-between my-1">
-            <span>{{ item.title }}</span>
-            <span class="font-bold">{{ item.value }}</span>
-          </div>
-        </template>
-      </a-card-meta>
-      <template #actions>
-        <a-config-provider
-          :theme="{
-            components: {
-              Select: {
-                colorBgContainer: 'transparent',
-                activeBorderColor: COLOURS.zinc300,
-                hoverBorderColor: COLOURS.zinc300,
-                colorBorder: COLOURS.zinc400,
-                color: COLOURS.zinc400,
-              },
-            },
-          }"
-        >
-          <a-select
-            :value="searchTerm"
-            show-search
-            class="w-4/5"
-            placeholder="Search player"
-            @search="handleSearch"
-          >
-            <template #suffixIcon><search-outlined /></template>
-            <a-select-option
-              v-for="option in options"
-              :key="option.id"
-              :value="option.full_name"
-              @click="handleSelect(option.full_name, option.id)"
-            >
-              {{ option.full_name }}</a-select-option
-            >
-          </a-select>
-        </a-config-provider>
-      </template>
-    </a-card>
-  </a-config-provider>
+      </div>
+      <Divider :dt="dividerOptions" />
+    </template>
+    <template #content>
+      <div v-for="item in descriptionItems" :key="item.title" class="flex justify-between my-1">
+        <span>{{ item.title }}</span>
+        <span class="font-bold">{{ item.value }}</span>
+      </div>
+    </template>
+    <template #footer>
+      <Divider :dt="dividerOptions" />
+      <FloatLabel variant="on" :dt="floatLabelOptions">
+        <Select v-model="searchTerm" placeholder="Search player" inputId="search_player" :options editable
+          optionLabel="full_name" class="w-full" @update:model-value="handleSearch" @change="handleSelect"
+          :dt="selectOptions" />
+        <label for="search_player">Search player</label>
+      </FloatLabel>
+    </template>
+  </Card>
 </template>

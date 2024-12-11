@@ -70,6 +70,11 @@ const MyPreset = definePreset(Aura, {
     toolbar: {
       borderColor: 'transparent',
     },
+    progressbar: {
+      height: '0.5rem',
+      background: '{violet.800}',
+      valueBackground: '{cyan.700}',
+    },
   },
 })
 

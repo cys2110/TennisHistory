@@ -46,7 +46,8 @@ const fieldsetItems = [
             <Avatar style="border: 1px solid #d4d4d8" shape="circle" :image="headshot(p1.player.player.id)" />
           </div>
           <div class="col-span-2 flex items-center">{{ p1.player.player.full_name }}</div>
-          <div v-if="p1.player.seed || p1.player.status" class="text-xs flex items-center">{{ getEntry(p1.player) }}
+          <div class="text-xs flex items-center"><span v-if="p1.player.seed || p1.player.status">{{ getEntry(p1.player)
+              }}</span>
           </div>
           <div class="flex items-center">
             <i v-if="winner.player.player.id === p1.player.player.id" class="pi pi-check-circle text-green-500" />
@@ -62,7 +63,8 @@ const fieldsetItems = [
             <Avatar style="border: 1px solid #d4d4d8" shape="circle" :image="headshot(p2.player.player.id)" />
           </div>
           <div class="col-span-2 flex items-center">{{ p2.player.player.full_name }}</div>
-          <div v-if="p2.player.seed || p2.player.status" class="text-xs flex items-center">{{ getEntry(p2.player) }}
+          <div class="text-xs flex items-center"><span v-if="p2.player.seed || p2.player.status">{{ getEntry(p2.player)
+              }}</span>
           </div>
           <div class="flex items-center">
             <i v-if="winner.player.player.id === p2.player.player.id" class="pi pi-check-circle text-green-500" />

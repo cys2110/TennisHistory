@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { formatCurrency, percentage } from '@/utils/functions'
-import { H2HPlayerDetails } from '@/utils/types'
-import { COLOURS } from '@/utils/variables'
+import type { Player } from '@/utils/types'
 
 const props = defineProps<{
-  p1: H2HPlayerDetails
-  p2: H2HPlayerDetails
+  p1: Pick<Player, 'bh1' | 'career_high' | 'ch_date' | 'country' | 'dob' | 'full_name' | 'height_cm' | 'id' | 'loss' | 'pm_USD' | 'rh' | 'titles' | 'turned_pro' | 'win'>
+  p2: Pick<Player, 'bh1' | 'career_high' | 'ch_date' | 'country' | 'dob' | 'full_name' | 'height_cm' | 'id' | 'loss' | 'pm_USD' | 'rh' | 'titles' | 'turned_pro' | 'win'>
 }>()
 
 type Comparison = {
@@ -23,7 +22,7 @@ const comparisons: Comparison[] = [
     percent: percentage(
       percentage(props.p1.win, props.p1.win + props.p1.loss),
       percentage(props.p1.win, props.p1.win + props.p1.loss) +
-        percentage(props.p2.win, props.p2.win + props.p2.loss),
+      percentage(props.p2.win, props.p2.win + props.p2.loss),
     ),
   },
   {
@@ -40,34 +39,27 @@ const comparisons: Comparison[] = [
   },
   ...(props.p1.career_high && props.p2.career_high
     ? [
-        {
-          title: 'Career High',
-          p1: props.p1.career_high,
-          p2: props.p2.career_high,
-          percent: percentage(props.p1.career_high, props.p1.career_high + props.p2.career_high),
-        },
-      ]
+      {
+        title: 'Career High',
+        p1: props.p1.career_high,
+        p2: props.p2.career_high,
+        percent: percentage(props.p1.career_high, props.p1.career_high + props.p2.career_high),
+      },
+    ]
     : []),
 ]
 </script>
 
 <template>
-  <div v-for="comparison in comparisons" :key="comparison.title">
-    <a-row>
-      <a-col :span="8">{{ comparison.p1 }}</a-col>
-      <a-col :span="8" class="text-zinc-400 font-bold text-center">{{ comparison.title }}</a-col>
-      <a-col :span="8" class="text-right">{{ comparison.p2 }}</a-col>
-    </a-row>
-    <a-row>
-      <a-col :span="24">
-        <a-progress
-          size="small"
-          :percent="comparison.percent"
-          :showInfo="false"
-          :strokeColor="COLOURS.violet700"
-          :trailColor="COLOURS.green800"
-        />
-      </a-col>
-    </a-row>
+  <div v-for="comparison in comparisons" :key="comparison.title" class="my-1">
+    <div class="flex justify-between items-center">
+      <div>{{ comparison.p1 }}</div>
+      <div class="font-bold">{{ comparison.title }}</div>
+      <div>{{ comparison.p2 }}</div>
+    </div>
+    <div class="w-full mt-1">
+      <ProgressBar v-if="isNaN(comparison.percent)" mode="indeterminate" />
+      <ProgressBar v-else :value="comparison.percent" :showValue="false" />
+    </div>
   </div>
 </template>

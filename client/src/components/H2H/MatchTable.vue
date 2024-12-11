@@ -1,82 +1,69 @@
 <script setup lang="ts">
-import { encodeName } from '@/utils/functions'
+import { encodeName, headshot } from '@/utils/functions'
 import { COLOURS, SURFACES } from '@/utils/variables'
 import WinnerScore from '../Global/WinnerScore.vue'
-import { H2HMatches, Surface } from '@/utils/types'
+import { type Match, Surface } from '@/utils/types'
 
 const props = defineProps<{
-  matches: H2HMatches[]
+  matches: Pick<Match, 'match_no' | 'round' | 'winner' | 'loser'>[]
 }>()
-
-const customHeaderCell = () => {
-  return { style: { backgroundColor: COLOURS.violet700, textAlign: 'center' } }
-}
-
-const columns = [
-  { title: 'Year', dataIndex: ['round', 'event'], key: 'year', customHeaderCell },
-  { title: 'Winner', dataIndex: ['winner', 'player', 'player'], key: 'winner', customHeaderCell },
-  { title: 'Event', dataIndex: ['round', 'event', 'tournament'], key: 'event', customHeaderCell },
-  { title: 'Round', dataIndex: ['round', 'round'], key: 'round', customHeaderCell },
-  {
-    title: 'Surface',
-    dataIndex: ['round', 'event', 'surface', 'id'],
-    key: 'surface',
-    customHeaderCell,
-  },
-  { title: 'Score', key: 'score', customHeaderCell },
-]
 </script>
 
 <template>
-  <a-table :columns :data-source="matches" :pagination="false">
-    <template #bodyCell="{ column, record, text }">
-      <template v-if="column.title === 'Year'">
-        <router-link
-          class="hover-link"
-          :to="{
-            name: 'event',
-            params: {
-              name: encodeName(text.tournament.name),
-              id: text.tournament.id,
-              year: text.year.id,
-              eid: text.id,
-            },
-          }"
-          >{{ text.year.id }}</router-link
-        >
+  <DataTable :value="matches" size="small" stripedRows class="my-5">
+    <Column field="round.event.year.id" header="Year" :sortable="true" class="!text-center">
+      <template #sorticon>
+        <i class="pi pi-sort !text-zinc-400" />
       </template>
-      <template v-if="column.title === 'Winner'">
-        <router-link
-          class="hover-link"
-          :to="{ name: 'player', params: { name: encodeName(text.full_name), id: text.id } }"
-          >{{ text.full_name }}</router-link
-        >
+      <template #body="{ data }">
+        <router-link class="hover-link"
+          :to="{ name: 'event', params: { name: encodeName(data.round.event.tournament.name), id: data.round.event.tournament.id, year: data.round.event.year.id, eid: data.round.event.id } }">{{
+            data.round.event.year.id }}</router-link>
       </template>
-      <template v-if="column.title === 'Event'">
-        <router-link
-          class="hover-link"
-          :to="{ name: 'tournament', params: { name: encodeName(text.name), id: text.id } }"
-          >{{ text.name }}</router-link
-        >
+    </Column>
+    <Column field="winner.player.player.last_name" header="Winner" :sortable="true" class="!text-center">
+      <template #sorticon>
+        <i class="pi pi-sort !text-zinc-400" />
       </template>
-      <template v-if="column.title === 'Surface'">{{ SURFACES[text as Surface] }}</template>
-      <template v-if="column.title === 'Score'">
-        <router-link
-          class="hover-link"
-          :to="{
-            name: 'match',
-            params: {
-              name: encodeName(text.tournament.name),
-              id: text.tournament.id,
-              year: text.year.id,
-              eid: text.id,
-              mid: record.match_no,
-            },
-          }"
-        >
-          <WinnerScore :winner="record.winner" :loser="record.loser" />
+      <template #body="{ data }">
+        <Avatar style="border: 1px solid #d4d4d8" shape="circle" :image="headshot(data.winner.player.player.id)" />
+      </template>
+    </Column>
+    <Column field="round.event.tournament" header="Event" :sortable="true" class="!text-center">
+      <template #sorticon>
+        <i class="pi pi-sort !text-zinc-400" />
+      </template>
+      <template #body="{ data }">
+        <router-link class="hover-link"
+          :to="{ name: 'tournament', params: { name: encodeName(data.round.event.tournament.name), id: data.round.event.tournament.id } }">{{
+            data.round.event.tournament.name }}</router-link>
+      </template>
+    </Column>
+    <Column field="round.round" header="Round" :sortable="true" class="!text-center">
+      <template #sorticon>
+        <i class="pi pi-sort !text-zinc-400" />
+      </template>
+    </Column>
+    <Column field="round.event.surface.id" header="Surface" :sortable="true" class="!text-center">
+      <template #sorticon>
+        <i class="pi pi-sort !text-zinc-400" />
+      </template>
+      <template #body="{ data }">{{ SURFACES[data.round.event.surface.id as Surface] }}</template>
+    </Column>
+    <Column header="Score">
+      <template #body="{ data }">
+        <router-link class="hover-link"
+          :to="{ name: 'match', params: { name: encodeName(data.round.event.tournament.name), id: data.round.event.tournament.id, year: data.round.event.year.id, eid: data.round.event.id, mid: data.match_no } }">
+          <WinnerScore :winner="data.winner" :loser="data.loser" />
         </router-link>
       </template>
-    </template>
-  </a-table>
+    </Column>
+  </DataTable>
 </template>
+
+<style scoped>
+:deep(.p-datatable-column-header-content) {
+  display: flex;
+  justify-content: center;
+}
+</style>
