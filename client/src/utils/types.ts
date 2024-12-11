@@ -191,14 +191,8 @@ export interface Match {
     'player' | 's1' | 's2' | 's3' | 's4' | 's5' | 't1' | 't2' | 't3' | 't4' | 't5' | 'incomplete'
   >
   match_no: number
-  p1: Pick<
-    Score,
-    'player' | 's1' | 's2' | 's3' | 's4' | 's5' | 't1' | 't2' | 't3' | 't4' | 't5' | 'incomplete'
-  >
-  p2: Pick<
-    Score,
-    'player' | 's1' | 's2' | 's3' | 's4' | 's5' | 't1' | 't2' | 't3' | 't4' | 't5' | 'incomplete'
-  >
+  p1: Score
+  p2: Score
   round: Round
   winner: Pick<
     Score,
@@ -253,19 +247,40 @@ export interface Round {
 }
 
 export interface Score {
+  aces: number | null
+  avg_sv1_kph: number | null
+  avg_sv2_kph: number | null
+  bp_opps: number | null
+  bps_converted: number | null
+  bps_faced: number | null
+  bps_saved: number | null
+  dfs: number | null
   incomplete: Incomplete | null
   match: Match
+  max_speed_kph: number | null
+  net: number | null
+  net_w: number | null
   player: Entry
+  ret2_w: number | null
+  ret2: number | null
+  ret1_w: number | null
+  ret1: number | null
   s1: number | null
   s2: number | null
   s3: number | null
   s4: number | null
   s5: number | null
+  serve1_pts: number | null
+  serve1_pts_w: number | null
+  serve2_pts: number | null
+  serve2_pts_w: number | null
   t1: number | null
   t2: number | null
   t3: number | null
   t4: number | null
   t5: number | null
+  ues: number | null
+  winners: number | null
 }
 
 export interface TitlesAndFinals {

@@ -6,7 +6,6 @@ import Select from 'primevue/select'
 import { DateTime } from 'luxon'
 import { GET_ACTIVITY } from '@/services/PlayerService'
 import { unencodeName, updateDocumentTitle } from '@/utils/functions'
-import { COLOURS } from '@/utils/variables'
 import type { Entry } from '@/utils/types'
 
 // [FUTURE: ADD FILTER BY TOURNAMENT TYPE AND TOURNAMENT]
