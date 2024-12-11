@@ -1,58 +1,63 @@
-<script setup>
-import { ref, watch } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
-import { GET_SUPERVISOR } from '@/services/MiscService';
-import { encodeName } from '@/utils/functions';
+<script setup lang="ts">
+import { type Ref, ref, watch } from 'vue'
+import { useQuery } from '@vue/apollo-composable'
+import { GET_SUPERVISOR } from '@/services/MiscService'
+import { encodeName } from '@/utils/functions'
+import type { Event } from '@/utils/types';
 
-const props = defineProps(['supervisors'])
+const props = defineProps<{
+  supervisors: { id: string }[]
+}>()
+
 const open = ref(false)
-const selection = ref(null)
-const events = ref([])
+const selection: Ref<string | null> = ref(null)
+const events: Ref<Pick<Event, 'id' | 'tournament' | 'year' | 'venue'>[]> = ref([])
 
-const { query, variables } = GET_SUPERVISOR(selection.value)
+const { query, variables } = GET_SUPERVISOR('Search')
 const { result, loading, error, refetch } = useQuery(query, variables)
 
-watch(result, newResult => {
-    if (newResult) events.value = newResult.supervisors[0].events
+watch(result, (newResult) => {
+  if (newResult?.supervisors[0]?.events) events.value = newResult.supervisors[0].events
 })
 
-watch(error, newError => {
-    if (newError) console.error(newError)
+watch(error, (newError) => {
+  if (newError) console.error(newError)
 })
 
-const handleClick = (supervisor) => {
-    selection.value = supervisor
-    open.value = true
-    refetch({ id: supervisor })
-}
-
-const handleClose = () => {
-    open.value = false
-    selection.value = null
+const handleClick = (supervisor: string) => {
+  selection.value = supervisor
+  open.value = true
+  refetch({ id: supervisor })
 }
 </script>
 
 <template>
-    <a-list :data-source="supervisors" header="Supervisors">
-        <template #renderItem="{ item }">
-            <a-list-item class="cursor-pointer" @click="handleClick(item.id)">{{ item.id }}</a-list-item>
-        </template>
-    </a-list>
-    <a-drawer v-if="selection" v-model:open="open" @close="handleClose" size="large" class="!bg-violet-800">
-        <template #title>Events supervised by {{ selection }}</template>
-        <a-list v-if="events.length > 0" :data-source="events">
-            <template #renderItem="{ item }">
-                <a-list-item>
-                    <a-list-item-meta>
-                        <template #title>
-                            <router-link class="hover-link hover:!text-zinc-300"
-                                :to="{ name: 'event', params: { name: encodeName(item.tournament.name), id: item.tournament.id, year: item.year.id, eid: item.id } }">
-                                {{ item.tournament.name }} {{ item.year.id }}
-                            </router-link>
-                        </template>
-                    </a-list-item-meta>
-                </a-list-item>
-            </template>
-        </a-list>
-    </a-drawer>
+  <TabPanel value="7">
+    <div class="grid grid-cols-3 gap-3">
+      <div v-for="supervisor in supervisors" :key="supervisor.id"
+        class="flex justify-center items-center !text-sm border-[1px] border-zinc-700 p-3 rounded-lg cursor-pointer"
+        @click="handleClick(supervisor.id)">
+        <div class="ml-2">{{ supervisor.id }}</div>
+      </div>
+    </div>
+    <Dialog v-model:visible="open" maximizable modal :header="`Events which took place on ${selection}`">
+      <div v-if="events && events.length > 0" class="grid grid-cols-2 gap-3">
+        <div v-for="event in events" :key="event.id"
+          class="flex items-center !text-sm border-[1px] border-zinc-700 p-3 rounded-lg">
+          <div>
+            <GetFlag :country="event.venue.country.id" />
+          </div>
+          <div class="ml-2">
+            <router-link class="hover-link"
+              :to="{ name: 'event', params: { name: encodeName(event.tournament.name), id: event.tournament.id, year: event.year.id, eid: event.id } }">
+              {{ event.tournament.name }} {{ event.year.id }}
+            </router-link>
+          </div>
+        </div>
+      </div>
+      <Loading v-else :loading>
+        <template #none>No results available</template>
+      </Loading>
+    </Dialog>
+  </TabPanel>
 </template>

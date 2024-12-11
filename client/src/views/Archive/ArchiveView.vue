@@ -1,58 +1,100 @@
-<script setup>
-import { ref, watch, watchEffect } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
-import { DateTime } from 'luxon';
-import { GET_ARCHIVE } from '@/services/EventService';
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import type { Ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useQuery } from '@vue/apollo-composable'
+import Select from 'primevue/select'
+import { DateTime } from 'luxon'
+import { GET_ARCHIVE } from '@/services/EventService'
+import type { EventCard } from '@/utils/types'
+import { CATEGORIES, MONTHS } from '@/utils/variables'
+
+// [TODO: ADD FILTERS BY MONTH AND CATEGORY]
+
+const router = useRouter()
+const route = useRoute()
 
 // Update document title
 document.title = 'Results Archive | TennisHistory'
 
 // Variables
-const years = [{ label: 2018, value: 2018 }, { label: 2024, value: 2024 }]
-const searchYear = ref(DateTime.now().year)
-const events = ref([])
-const load = ref(false)
+const events: Ref<EventCard[] | null> = ref(null)
+
+// Filter by year
+const years = Array.from({ length: DateTime.now().year - 1968 + 1 }, (_, index) => ({
+  label: 1968 + index,
+  value: 1968 + index,
+}))
+const searchYear = ref(
+  route.query.year ? parseInt(route.query.year as string) : DateTime.now().year,
+)
+
+// Filter by category
+const selectedCategory: Ref<string | null> = ref("All")
+const categories = Object.entries(CATEGORIES).map(([key, value]) => ({
+  label: key,
+  value: value,
+}))
+
+// Filter by month
+const selectedMonth: Ref<string | null> = ref("All")
+const months = Object.entries(MONTHS).map(([key, value]) => ({
+  label: key,
+  value: value,
+}))
+
+const selectOptions = [
+  {
+    inputId: 'year_label',
+    vModel: searchYear,
+    options: years,
+    label: 'Year',
+  },
+  {
+    inputId: 'category_label',
+    vModel: selectedCategory,
+    options: categories,
+    label: 'Category',
+  },
+  {
+    inputId: 'month_label',
+    vModel: selectedMonth,
+    options: months,
+    label: 'Month',
+  },
+]
 
 // API call
-const updateResults = () => {
-    load.value = true
-    const { query, variables } = GET_ARCHIVE(searchYear.value)
-    const { result, loading, error } = useQuery(query, variables)
+const { query, variables } = GET_ARCHIVE(searchYear.value)
+const { result, loading, error } = useQuery(query, variables)
 
-    watch(result, (newResult) => {
-        if (newResult) {
-            events.value = newResult.events
-            load.value = false
-        }
-    }, { immediate: true })
+watch(result, (newResult) => {
+  if (newResult) events.value = newResult.events
+}, { immediate: true })
 
-    watch(loading, (newLoad) => load.value = newLoad, { immediate: true })
+watch(error, (newError) => {
+  if (newError) console.error(newError)
+}, { immediate: true })
 
-    watch(error, (newError) => {
-        if (newError) console.error(newError)
-    }, { immediate: true })
-}
-
-watchEffect(() => updateResults())
+// Handle year selection
+const handleSelection = () => router.push({ query: { year: searchYear.value } })
 </script>
 
 <template>
-    <a-row align="middle" justify="space-between" class="mb-5">
-        <a-col :xs=24 :sm=20 :xl=22>
-            <Title>
-                <template #title>Results Archive</template>
-            </Title>
-        </a-col>
-        <a-col :xs=24 :sm=4 :xl=2>
-            <a-select show-search :options="years" v-model:value="searchYear" size="large" class="w-full text-center" />
-        </a-col>
-    </a-row>
-    <a-row v-if="events.length > 0" justify="space-evenly" align="stretch" :gutter="[0, 32]">
-        <a-col v-for="event in events" :key="event.id" :xs="24" :sm="11" :md="7" :xl="5">
-            <EventCard :event />
-        </a-col>
-    </a-row>
-    <Loading v-else :loading="load">
-        <template #none>No tournaments played</template>
-    </Loading>
+  <Title>
+    <template #title>Results Archive</template>
+  </Title>
+  <div class="flex justify-evenly w-1/3">
+    <FloatLabel v-for="select in selectOptions" :key="select.inputId" variant="on">
+      <Select :inputId="select.inputId" v-model="select.vModel" :options="select.options" optionLabel="label"
+        optionValue="value" variant="filled" size="small" filter checkmark class="mb-10" @change="handleSelection" />
+      <label :for="select.inputId">{{ select.label }}</label>
+    </FloatLabel>
+  </div>
+  <div v-if="events" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-10 w-3/4 mx-auto">
+    <EventCard v-for="event in events" :key="event.id" :event="event" />
+  </div>
+  <Loading v-else :loading>
+    <template #none>No tournaments played</template>
+  </Loading>
 </template>

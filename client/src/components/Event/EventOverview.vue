@@ -1,45 +1,50 @@
-<script setup>
+<script setup lang="tsx">
+import { defineComponent } from 'vue';
+import Fieldset from 'primevue/fieldset'
+import GetFlag from '../Global/GetFlag.vue';
 import { formattedDates } from '@/utils/functions';
-import { CURRENCIES, SURFACES } from '@/utils/variables';
+import type { Event } from '@/utils/types'
+import { CURRENCIES, SURFACES } from '@/utils/variables'
 
-const props = defineProps(['event'])
-
-const statistics = [
-    { title: 'Prize Money', value: props.event.pm || '—' },
-    { title: 'Total Financial Commitment', value: props.event.tfc || '—' }
-]
+const props = defineProps<{
+  event: Pick<Event, 'currency' | 'pm' | 'tfc' | 'sponsor_name' | 'category' | 'start_date' | 'end_date' | 'surface' | 'venue' | 'supervisors' | 'draw_type'>
+}>()
+const { currency, pm, tfc, sponsor_name, category, start_date, end_date, surface, venue, supervisors, draw_type } = props.event
 
 const descriptionItems = [
-    { label: 'Sponsor name', value: props.event.sponsor_name ?? '—' },
-    { label: 'Category', value: props.event.category ?? '—' },
-    { label: 'Dates', value: formattedDates(props.event.start_date, props.event.end_date) },
-    { label: 'Surface', value: SURFACES[props.event.surface.id] ?? '—' }
+  { label: 'Sponsor name', value: sponsor_name ?? '—' },
+  { label: 'Category', value: category ?? '—' },
+  { label: 'Dates', value: formattedDates(start_date, end_date) },
+  { label: 'Surface', value: SURFACES[surface.id] ?? '—' },
+  {
+    label: 'Venue', value: <div class="flex flex-col xl:flex-row xl:items-center">
+      <span>{venue?.name ? `${venue.name},` : '—'}&nbsp;</span>
+      {venue && <span class="flex items-center mr-2">{venue.city} <GetFlag country={venue.country.id} />
+      </span>}
+    </div>
+  },
+  { label: 'Draw type', value: draw_type },
+  {
+    label: supervisors.length === 1 ? 'Supervisor' : 'Supervisors',
+    value: supervisors.length > 0 ? supervisors.map(supervisor => supervisor.id) : '—'
+  },
+  { label: 'Prize money', value: currency && pm ? `${CURRENCIES[currency]} ${pm.toLocaleString('en-GB')}` : '—' },
+  { label: 'Total financial commitment', value: currency && tfc ? `${CURRENCIES[currency]} ${tfc.toLocaleString('en-GB')}` : '—' },
 ]
+
+const Descriptions = defineComponent(() => {
+  return () => (
+    <>
+      {descriptionItems.map(item => (
+        <Fieldset legend={item.label}>{item.value}</Fieldset>
+      ))}
+    </>
+  )
+})
 </script>
 
 <template>
-    <a-row id="details" justify="space-evenly">
-        <a-col :span="6" v-for="stat in statistics" :key="stat.title">
-            <a-card>
-                <a-statistic :prefix="CURRENCIES[event.currency] || ''" :title="stat.title" :value="stat.value"
-                    class="text-center" />
-            </a-card>
-        </a-col>
-    </a-row>
-    <a-descriptions :colon="false" class="my-10 bg-violet-800 rounded" bordered layout="vertical" size="middle">
-        <a-descriptions-item v-for="item in descriptionItems" :key="item.label" :label="item.label" class="bg-black">
-            {{ item.value }}
-        </a-descriptions-item>
-        <a-descriptions-item label="Venue" class="bg-black">
-            <div class="flex flex-col justify-center">
-                <div>{{ event.venue?.name ?? '—' }}</div>
-                <div v-if="event.venue">{{ event.venue.city }}, {{ event.venue.country.name }}</div>
-            </div>
-        </a-descriptions-item>
-        <a-descriptions-item :label="event.supervisors.length === 1 ? 'Supervisor' : 'Supervisors'" class="bg-black">
-            <div v-if="event.supervisors.length > 0" v-for="supervisor in event.supervisors" :key="supervisor.id">{{
-                supervisor.id }}</div>
-            <div v-else>—</div>
-        </a-descriptions-item>
-    </a-descriptions>
+  <div id="details" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 mt-5">
+    <Descriptions />
+  </div>
 </template>

@@ -1,65 +1,71 @@
-<script setup>
-import { computed } from 'vue';
-import { encodeName } from '@/utils/functions';
-import { COLOURS, SURFACES } from '@/utils/variables';
+<script setup lang="ts">
+import { ref } from 'vue'
+import { encodeName } from '@/utils/functions'
+import { SURFACES } from '@/utils/variables'
+import type { Surface, TitlesAndFinals } from '@/utils/types';
 
-// Variables
-const props = defineProps(['events'])
-const flattenedEvents = computed(() =>
-    props.events.flatMap(({ year, count, events }) =>
-        events.map((event, index) => ({
-            year: index === 0 ? year : "",
-            count: index === 0 ? count : 0,
-            event
-        }))
-    )
-);
+const props = defineProps<{
+  events: TitlesAndFinals[]
+}>()
+const expandedRowGroups = ref()
 
-// Table styling
-const customHeaderStyle = { style: { backgroundColor: COLOURS.violet700, textAlign: 'center' } }
-const customHeaderCell = () => customHeaderStyle;
-const customCell = record => ({ rowSpan: record.count, align: 'center' });
+const getEventParams = (id: number, name: string, eid: number, year: number) => {
+  return {
+    name: encodeName(name),
+    id,
+    eid,
+    year
+  }
+}
 
-const columns = [
-    {
-        title: "Year",
-        dataIndex: "year",
-        key: "year",
-        customCell,
-        customHeaderCell
-    },
-    {
-        title: "Total",
-        dataIndex: "count",
-        key: "count",
-        customCell,
-        customHeaderCell
-    },
-    {
-        title: "Event",
-        dataIndex: "event",
-        key: "eventName",
-        customHeaderCell
-    },
-    {
-        title: "Surface",
-        dataIndex: ["event", "surface"],
-        key: "surface",
-        customHeaderCell
-    },
-];
-
+const calculateYearTotal = (year: number) => {
+  const filteredEvents = props.events.filter((event) => event.year === year)
+  return filteredEvents.length
+}
 </script>
 
 <template>
-    <a-table :columns :data-source="flattenedEvents">
-        <template #bodyCell="{ column, text }">
-            <template v-if="column.title === 'Event'">
-                <router-link class="hover-link"
-                    :to="{ name: 'tournament', params: { name: encodeName(text.tname), id: text.tid } }">{{
-                        text.tname }}</router-link>
-            </template>
-            <template v-if="column.title === 'Surface'">{{ SURFACES[text] }}</template>
-        </template>
-    </a-table>
+  <DataTable v-model:expandedRowGroups="expandedRowGroups" :value="events" expandableRowGroups rowGroupMode="subheader"
+    groupRowsBy="year" sortMode="single" sortField="year" :sortOrder="1" size="small" stripedRows>
+    <Column field="year" header="Year" />
+    <Column field="tname" header="Event" class="!text-xs md:!text-base">
+      <template #body="{ data }">
+        <router-link class="hover-link md:ml-3"
+          :to="{ name: 'tournament', params: { name: encodeName(data.tname), id: data.tid } }">{{ data.tname
+          }}</router-link>
+      </template>
+    </Column>
+    <Column field="surface" header="Surface" class="!text-xs md:!text-base">
+      <template #body="{ data }">
+        <span>{{ SURFACES[data.surface as Surface] }}</span>
+      </template>
+    </Column>
+    <Column class="!text-xs xl:!text-base">
+      <template #body="{ data }">
+        <div class="flex flex-col lg:flex-row justify-evenly">
+          <Button label="Overview" size="small" variant="outlined" rounded raised as="router-link" class="my-1"
+            :to="{ name: 'event', params: getEventParams(data.tid, data.tname, data.id, data.year) }" />
+          <Button label="Results" size="small" variant="outlined" rounded raised as="router-link" class="my-1"
+            :to="{ name: 'results', params: getEventParams(data.tid, data.tname, data.id, data.year) }" />
+          <Button label="Draw" size="small" variant="outlined" rounded raised as="router-link" class="my-1"
+            :to="{ name: 'draw', params: getEventParams(data.tid, data.tname, data.id, data.year) }" />
+        </div>
+      </template>
+    </Column>
+    <template #groupheader="{ data }">
+      <span class="font-bold">{{ data.year }}</span>
+    </template>
+    <template #groupfooter="{ data }">
+      <div class="flex justify-end w-full font-bold">Total in {{ data.year }}: {{ calculateYearTotal(data.year) }}</div>
+    </template>
+    <template #footer>
+      <div class="font-extrabold">Total: {{ events.length }}</div>
+    </template>
+  </DataTable>
 </template>
+
+<style scoped>
+:deep(.p-datatable-row-group-header) {
+  background-color: var(--p-violet-800);
+}
+</style>

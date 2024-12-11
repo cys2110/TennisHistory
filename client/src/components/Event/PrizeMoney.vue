@@ -1,54 +1,44 @@
-<script setup>
-import { ref, provide } from 'vue'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { ScatterChart } from 'echarts/charts'
-import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/components'
-import VChart, { THEME_KEY } from 'vue-echarts'
-import { formatCurrency } from '@/utils/functions'
-import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints';
+import { formatCurrency } from '@/utils/functions';
+import { Currency, type Round } from '@/utils/types'
 
-const props = defineProps(['rounds', 'currency'])
+const { isBreakpointOrUp } = useGlobalBreakpoints()
 
-use([CanvasRenderer, ScatterChart, DatasetComponent, GridComponent, TooltipComponent])
-provide(THEME_KEY, 'dark')
+const props = defineProps<{ rounds: Omit<Round, 'matches' | 'event'>[]; currency: Currency }>()
+const visible = ref(false)
 
-const option = ref({
-    ...CHART_OPTIONS,
-    dataset: {
-        source: props.rounds,
-        dimensions: ['round', 'points', 'pm']
-    },
-    tooltip: {
-        formatter: function (params) {
-            return `<span style="font-weight: bold">${params.value.round}</span><br/>Points: ${params.value.points}<br/>Prize Money: ${formatCurrency(props.currency, params.value.pm)}`;
-        },
-        backgroundColor: "transparent",
-        textStyle: { color: COLOURS.zinc400 },
-    },
-    xAxis: {
-        type: "value",
-        name: "Points",
-        splitLine: { show: false },
-    },
-    yAxis: {
-        type: "value",
-        name: "Prize Money",
-        axisLabel: { formatter: (value) => `${formatCurrency(props.currency, value)}`, },
-        splitLine: { show: false },
-    },
-    series: [
-        {
-            symbolSize: 20,
-            type: "scatter",
-            encode: { x: "points", y: "pm" },
-            itemStyle: { color: COLOURS.violet700 },
-        },
-    ],
-})
+const buttonOptions = {
+    outlinedPrimaryColor: '{cyan.600}',
+    outlinedPrimaryBorderColor: '{cyan.600}'
+}
 </script>
 
 <template>
-    <div class="text-4xl" id="awards">Awards</div>
-    <v-chart class="!h-[400px] !w-full" :option="option" :autoresize="true" />
+    <Fieldset id="awards" legend="Awards" class="my-10">
+        <div v-if="isBreakpointOrUp('md')" class="w-full flex justify-end">
+            <Button icon="pi pi-chart-scatter" @click="visible = true" size="small" variant="outlined"
+                :dt="buttonOptions" />
+            <Dialog v-model:visible="visible" modal header="Awards" class="w-3/4">
+                <PrizeMoneyChart :rounds :currency />
+            </Dialog>
+        </div>
+        <DataTable :value="rounds" size="small" stripedRows>
+            <Column field="round" header="Round" class="!text-center text-xs md:text-sm xl:text-base" />
+            <Column field="points" header="Points" class="!text-center text-xs md:text-sm xl:text-base" />
+            <Column field="pm" header="Prize Money" class="!text-center text-xs md:text-sm xl:text-base">
+                <template #body="{ data }">
+                    {{ currency ? formatCurrency(currency, data.pm) : '—' }}
+                </template>
+            </Column>
+        </DataTable>
+    </Fieldset>
 </template>
+
+<style scoped>
+:deep(.p-datatable-column-header-content) {
+    display: flex;
+    justify-content: center;
+}
+</style>

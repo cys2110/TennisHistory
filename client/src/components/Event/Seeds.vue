@@ -1,58 +1,56 @@
-<script setup>
-import { ref, provide } from 'vue'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { BarChart, LineChart } from 'echarts/charts'
-import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/components'
-import VChart, { THEME_KEY } from 'vue-echarts'
-import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
+<script setup lang="ts">
+import { ref } from 'vue';
+import type { Entry } from '@/utils/types'
+import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints';
 
-const props = defineProps(['seeds'])
+const { isBreakpointOrUp } = useGlobalBreakpoints()
+const visible = ref(false)
 
-const flattenedSeeds = props.seeds.map((seed) => ({
-    seed: seed.seed,
-    rank: seed.rank,
-    name: seed.player.full_name,
-}));
+const props = defineProps<{
+    seeds: Pick<Entry, 'seed' | 'rank' | 'player'>[]
+}>()
 
-use([DatasetComponent, TooltipComponent, GridComponent, BarChart, LineChart, CanvasRenderer]);
-provide(THEME_KEY, 'dark')
-
-const option = ref({
-    ...CHART_OPTIONS,
-    grid: { bottom: "30%" },
-    dataset: { source: flattenedSeeds, dimensions: ["seed", "rank", "name"] },
-    tooltip: {
-        trigger: "axis",
-        axisPointer: { type: "shadow" },
-    },
-    xAxis: {
-        type: "category",
-        axisLabel: { rotate: 60, interval: 0 },
-    },
-    yAxis: [
-        { type: "value", name: "Seed" },
-        { type: "value", name: "Rank" },
-    ],
-    series: [
-        {
-            name: "Seed",
-            type: "line",
-            encode: { x: "name", y: "seed" },
-            itemStyle: { color: COLOURS.green600 },
-        },
-        {
-            name: "Rank",
-            type: "bar",
-            encode: { x: "name", y: "rank" },
-            yAxisIndex: 1,
-            itemStyle: { color: COLOURS.violet700 },
-        },
-    ]
-})
+const buttonOptions = {
+    outlinedPrimaryColor: '{cyan.600}',
+    outlinedPrimaryBorderColor: '{cyan.600}'
+}
 </script>
 
 <template>
-    <div id="seeds" class="text-4xl">Seeded Players</div>
-    <v-chart class="!h-[400px] !w-full" :option="option" :autoresize="true" />
+    <Fieldset id="seeds" legend="Seeded Players">
+        <div v-if="isBreakpointOrUp('md')" class="w-full flex justify-end">
+            <Button icon="pi pi-chart-scatter" @click="visible = true" size="small" variant="outlined"
+                :dt="buttonOptions" />
+            <Dialog v-model:visible="visible" modal header="Seeded Players" class="w-3/4">
+                <SeedsChart :seeds />
+            </Dialog>
+        </div>
+        <DataTable :value="seeds" size="small" stripedRows>
+            <Column field="seed" header="Seed" sortable class="!text-center">
+                <template #sorticon>
+                    <i class="pi pi-sort !text-zinc-400" />
+                </template>
+            </Column>
+            <Column field="player.last_name" header="Player" sortable class="!text-center">
+                <template #sorticon>
+                    <i class="pi pi-sort !text-zinc-400" />
+                </template>
+                <template #body="{ data }">
+                    <PlayerRow :player="data.player" />
+                </template>
+            </Column>
+            <Column field="rank" header="Rank" sortable class="!text-center">
+                <template #sorticon>
+                    <i class="pi pi-sort !text-zinc-400" />
+                </template>
+            </Column>
+        </DataTable>
+    </Fieldset>
 </template>
+
+<style scoped>
+:deep(.p-datatable-column-header-content) {
+    display: flex;
+    justify-content: center;
+}
+</style>

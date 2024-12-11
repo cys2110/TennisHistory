@@ -3,7 +3,7 @@
 .hover-link {
   color: #d4d4d8;
   text-decoration: none;
-  background-image: linear-gradient(#d4d4d8, #d4d4d8);
+  background-image: linear-gradient(#a1a1aa, #a1a1aa);
   background-size: 0% 0.1em;
   background-position-y: 105%;
   background-position-x: 50%;
@@ -15,5 +15,19 @@
 .hover-link:focus,
 .hover-link:active {
   background-size: 100% 0.1em;
-  color: #d4d4d8;
+  color: #a1a1aa;
+}
+
+@layer components {
+  .full-card {
+    @apply h-full flex flex-col justify-between;
+  }
+
+  .full-card .p-card-body {
+    @apply flex-1; /* Ensure body grows to fill space */
+  }
+
+  .full-card .p-card-footer {
+    @apply mt-auto; /* Push footer to the bottom */
+  }
 }

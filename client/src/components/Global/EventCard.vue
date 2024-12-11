@@ -1,65 +1,73 @@
-<script setup>
-import { computed } from 'vue';
-import { DateTime } from 'luxon';
-import { category, encodeName, flag, formattedDates } from '@/utils/functions';
-import { SURFACES } from '@/utils/variables';
+<script setup lang="ts">
+import { DateTime } from 'luxon'
+import { categorySrc, encodeName, formattedDates } from '@/utils/functions'
+import { SURFACES } from '@/utils/variables'
+import type { EventCard } from '@/utils/types'
+import GetFlag from './GetFlag.vue'
 
 // Variables
-const props = defineProps(['event'])
+const props = defineProps<{
+  event: EventCard
+}>()
+const { start_date, tournament, year, id, venue, sponsor_name, category, surface, end_date } = props.event
+
+// Button pages
 const eventPages = [
-    { title: 'Details', name: 'event' },
-    { title: 'Results', name: 'results' },
-    { title: 'Draw', name: 'draw' }
+  { title: 'Details', name: 'event' },
+  { title: 'Results', name: 'results' },
+  { title: 'Draw', name: 'draw' },
 ]
-const isDisabled = DateTime.now() < DateTime.fromISO(props.event.start_date)
-const tournamentParams = { name: encodeName(props.event.tournament.name), id: props.event.tournament.id }
-const eventParams = { ...tournamentParams, year: props.event.year.id, eid: props.event.id }
+const isDisabled = DateTime.now() < DateTime.fromISO(start_date)
+const tooltipText = "Event has not started yet"
 
-const coverImage = computed(() => {
-    return {
-        alt: props.event.venue?.country.name || props.event.category,
-        src: props.event.venue ? flag(props.event.venue.country.id) : category(props.event.category)
-    }
-})
-
+// Router link params
+const tournamentParams = { name: encodeName(tournament.name), id: tournament.id }
+const eventParams = { ...tournamentParams, year: year.id, eid: id }
 </script>
 
 <template>
-    <a-card class="h-full flex flex-col justify-between">
-        <template #cover>
-            <a-image :alt="coverImage.alt" :src="coverImage.src" :preview="false" />
-        </template>
-        <template #actions>
-            <a-button v-for="page in eventPages" :key="page.name" type="dashed" :ghost="true" shape="round" size="small"
-                :disabled="isDisabled" class=" !border-zinc-300 hover:!border-zinc-400">
-                <template v-if="isDisabled">
-                    <a-tooltip title="Event has not started yet">{{ page.title }}</a-tooltip>
-                </template>
-                <template v-else>
-                    <router-link class="!text-zinc-300 hover:!text-zinc-400"
-                        :to="{ name: page.name, params: eventParams }">
-                        {{ page.title }}</router-link>
-                </template>
-            </a-button>
-        </template>
-        <a-card-meta :description="event.sponsor_name ?? ''">
-            <template #title><router-link class="hover-link" :to="{ name: 'tournament', params: tournamentParams }">{{
-                event.tournament.name }}</router-link></template>
-        </a-card-meta>
-        <a-row>
-            <a-col :span="18">
-                <div class="mt-3 flex flex-col justify-center">
-                    <div v-if="event.venue">{{ event.venue.city }}, {{ event.venue.country.name }}</div>
-                    <div>{{ formattedDates(event.start_date, event.end_date) }}</div>
-                    <div v-if="event.surface">{{ SURFACES[event.surface.id] }}</div>
-                </div>
-            </a-col>
-            <a-col :span="6" class="self-center">
-                <div class="w-full">
-                    <a-image v-if="event.category && event.venue" :alt="event.category" :src="category(event.category)"
-                        class="object-cover" />
-                </div>
-            </a-col>
-        </a-row>
-    </a-card>
+  <Card class="full-card">
+
+    <template #title>
+      <router-link class="hover-link font-bold text-wrap" :to="{ name: 'tournament', params: tournamentParams }">
+        {{ tournament.name }}
+      </router-link>
+      <Divider align="center">
+        <div v-if="sponsor_name" class="text-sm text-zinc-400 text-center">{{ sponsor_name }}</div>
+      </Divider>
+    </template>
+
+    <template #content>
+      <div class="grid grid-cols-4">
+        <div v-if="venue" class="flex items-center col-span-3">
+          {{ venue.city }}
+          <GetFlag :country="venue.country.id" />
+        </div>
+        <div class="row-span-3">
+          <Image v-if="category" :src="categorySrc(category)" :alt="category" />
+        </div>
+        <div class="col-span-3">{{ formattedDates(start_date, end_date) }}</div>
+        <div v-if="surface" class="col-span-3">{{ SURFACES[surface.id] }}</div>
+      </div>
+    </template>
+
+    <template #footer>
+      <Divider />
+      <div class="flex justify-evenly">
+        <Button v-if="isDisabled" v-for="page in eventPages" :key="page.name" :label="page.title" size="small"
+          class="!border-zinc-400 !text-zinc-400 !cursor-not-allowed" variant="outlined" rounded raised
+          v-tooltip="tooltipText" disabled />
+        <Button v-else v-for="(page, index) in eventPages" :key="index" as="router-link" :label="page.title"
+          size="small" class="!border-zinc-400 !text-zinc-400 hover:!border-zinc-300 hover:!text-zinc-300"
+          variant="outlined" rounded raised :to="{ name: page.name, params: eventParams }" />
+      </div>
+    </template>
+
+  </Card>
 </template>
+
+<style scoped>
+:deep(.p-card-content) {
+  @apply !h-full !flex !items-center !justify-center
+}
+</style>

@@ -1,40 +1,67 @@
-<script setup>
-import { flag, headshot } from '@/utils/functions';
-import { STATUS_INFO } from '@/utils/variables';
+<script setup lang="ts">
+import { ref } from 'vue';
+import type { Entry } from '@/utils/types'
+import { encodeName, headshot } from '@/utils/functions';
 
-const props = defineProps(['entries'])
+const props = defineProps<{
+  entries: Pick<Entry, 'player' | 'rank' | 'seed' | 'status'>[]
+}>()
+
+const checked = ref(false)
 </script>
 
 <template>
-    <div id="entries" class="text-4xl my-5">Entries</div>
-    <a-row justify="space-evenly" :gutter="[0, 32]">
-        <a-col :span="5" v-for="entry in entries" :key="entry.player.id">
-            <a-card class="h-full flex flex-col justify-between pt-5 items-center" :bodyStyle="{ width: '100%' }">
-                <template #cover>
-                    <a-image :alt="entry.player.full_name" :src="headshot(entry.player.id)"
-                        class="!rounded-full !border-zinc-300 border-[1.5px] !w-28" :preview="false" />
-                </template>
-                <a-card-meta class="text-center">
-                    <template #title>
-                        <a-row>
-                            <a-col :span="4">
-                                <a-image :alt="entry.player.country.name" :src="flag(entry.player.country.id)"
-                                    :preview="false" class="rounded" />
-                            </a-col>
-                            <a-col :span="20" class="px-1">
-                                <router-link class="hover-link"
-                                    :to="{ name: 'player', params: { name: entry.player.full_name, id: entry.player.id } }">{{
-                                        entry.player.full_name }}</router-link>
-                            </a-col>
-                        </a-row>
-                    </template>
-                    <template #description>
-                        <div v-if="entry.seed">Seed: {{ entry.seed }}</div>
-                        <div v-if="entry.status">Status: {{ STATUS_INFO[entry.status] }}</div>
-                        <div v-if="entry.rank">Rank: {{ entry.rank }}</div>
-                    </template>
-                </a-card-meta>
-            </a-card>
-        </a-col>
-    </a-row>
+  <Fieldset id="entries" legend="Entries">
+    <div class="w-full flex justify-end my-2">
+      <ToggleButton v-model="checked" offIcon="pi pi-th-large" onIcon="pi pi-bars" offLabel="" onLabel="" unstyled
+        class="mb-5" pt:icon="text-cyan-600 text-3xl" pt:root="border-cyan-600 border-[1px] rounded px-2" />
+    </div>
+    <DataTable v-if="!checked" :value="entries" size="small" stripedRows>
+      <Column field="player.country" header="Country" class="!text-center">
+        <template #body="{ data }">
+          <GetFlag :country="data.player.country.id" />
+        </template>
+      </Column>
+      <Column field="player.id">
+        <template #body="{ data }">
+          <Avatar style="border: 1px solid #d4d4d8" shape="circle" :image="headshot(data.player.id)" />
+        </template>
+      </Column>
+      <Column field="player.last_name" header="Player" sortable>
+        <template #sorticon>
+          <i class="pi pi-sort !text-zinc-400" />
+        </template>
+        <template #body="{ data }">
+          <router-link class="hover-link"
+            :to="{ name: 'player', params: { name: encodeName(data.player.full_name), id: data.player.id } }">{{
+              data.player.full_name }}</router-link>
+        </template>
+      </Column>
+      <Column field="seed" header="Seed" sortable class="!text-center">
+        <template #sorticon>
+          <i class="pi pi-sort !text-zinc-400" />
+        </template>
+      </Column>
+      <Column field="status" header="Entry Info" sortable class="!text-center">
+        <template #sorticon>
+          <i class="pi pi-sort !text-zinc-400" />
+        </template>
+      </Column>
+      <Column field="rank" header="Rank" sortable class="!text-center">
+        <template #sorticon>
+          <i class="pi pi-sort !text-zinc-400" />
+        </template>
+      </Column>
+    </DataTable>
+    <div v-if="checked" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+      <EntryCard v-for="entry in entries" :entry="entry" :key="entry.player.id" />
+    </div>
+  </Fieldset>
 </template>
+
+<style scoped>
+:deep(.p-datatable-column-header-content) {
+  display: flex;
+  justify-content: center;
+}
+</style>

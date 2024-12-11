@@ -1,116 +1,137 @@
-<script setup>
-import { computed } from 'vue';
-import { DateTime } from 'luxon';
-import { convertToFt, encodeName, flag, formatDate, smallDate } from '@/utils/functions';
+<script setup lang="tsx">
+import { defineComponent } from 'vue'
+import Fieldset from 'primevue/fieldset'
+import { DateTime } from 'luxon'
+import GetFlag from '../Global/GetFlag.vue'
+import { convertToFt, encodeName, formatDate, smallDate } from '@/utils/functions'
+import type { Player } from '@/utils/types'
 
-const props = defineProps(['player'])
+const props = defineProps<{
+  player: Player
+}>()
+const {
+  countryConnection,
+  prev_countriesConnection,
+  turned_pro,
+  retired,
+  dob,
+  rh,
+  bh1,
+  height_cm,
+  coaches,
+  career_high,
+  ch_date,
+  win,
+  loss,
+  titles,
+  pm_USD,
+} = props.player
+
 const statistics = [
-    { title: 'Career High', value: props.player.career_high ?? '—', description: props.player.ch_date ? formatDate(props.player.ch_date) : '—' },
-    { title: 'Win-Loss', value: `${props.player.win}—${props.player.loss}` },
-    { title: 'Titles', value: props.player.titles },
-    { title: 'Prize Money', prefix: '$', value: props.player.pm_USD }
+  {
+    title: 'Career High',
+    value: career_high ?? '—',
+    description: ch_date ? formatDate(ch_date) : '—',
+  },
+  { title: 'Win-Loss', value: `${win}—${loss}` },
+  { title: 'Titles', value: titles },
+  { title: 'Prize Money', prefix: '$', value: pm_USD.toLocaleString('en-GB') },
 ]
 
-const playerYears = computed(() => {
-    if (props.player.turned_pro && props.player.retired) {
-        return `${props.player.retired.id - props.player.turned_pro.id} years`
-    } else {
-        return `${parseInt(DateTime.now().year) - props.player.turned_pro.id + 1} years`
-    }
-})
+const descriptionItems = [
+  {
+    label: 'Country',
+    value: <div class="flex items-center">
+      <GetFlag country={countryConnection.edges[0].node.id} />
+      <div class="ml-2">{countryConnection.edges[0].node.name}</div>
+    </div>,
+    colSpan: 1
+  },
+  {
+    label: 'Active',
+    value: turned_pro ?
+      <div>
+        {<div>{retired ? retired.id - turned_pro.id : DateTime.now().year - turned_pro.id + 1} years</div>}
+        <div>{turned_pro.id} - {retired?.id || 'present'}</div>
+      </div>
+      : '—',
+    colSpan: 1
+  },
+  {
+    label: 'Age',
+    value: dob ? <div>
+      <div>{Math.floor(Math.abs(DateTime.fromISO(dob).diffNow('years').toObject().years || 0))}</div>
+      <div>{formatDate(dob)}</div>
+    </div> : '—',
+    colSpan: 1
+  },
+  {
+    label: 'Height',
+    value: height_cm ? <div>
+      <div>{height_cm} cm</div>
+      <div>{convertToFt(height_cm)}</div>
+    </div> : '—',
+    colSpan: 1
+  },
+  {
+    label: 'Plays',
+    value: rh === true ? 'Right-handed' : rh === false ? 'Left-handed' : '—',
+    colSpan: 1
 
-const age = computed(() => { return Math.floor(Math.abs(DateTime.fromISO(props.player.dob).diffNow("years").toObject().years)) })
+  },
+  {
+    label: 'Backhand',
+    value: bh1 === true ? 'One-handed' : bh1 === false ? 'Two-handed' : '—',
+    colSpan: 1
+  },
+  {
+    label: coaches.length === 1 ? 'Coach' : 'Coaches',
+    value: <div class="flex flex-col">
+      {coaches.length > 0 ? coaches.map(coach => {
+        return coach.first_name ? <router-link class="hover-link" to={{ name: 'player', params: { name: encodeName(coach.full_name), id: coach.id } }}>{coach.full_name}</router-link> : coach.id
+      }) : '—'}
+    </div>,
+    colSpan: 1
+  },
+  {
+    label: 'Previous Representations',
+    value: prev_countriesConnection && prev_countriesConnection.edges.length > 0 ? <div>
+      {prev_countriesConnection.edges.map((country) => {
+        return <div class="grid grid-cols-6 gap-2">
+          <div><GetFlag country={country.node.id} /></div>
+          <div class="col-span-2">{country.node.name}</div>
+          <div class="col-span-3">{smallDate(country.properties.start_date)}—{smallDate(country.properties.end_date)}</div>
+        </div>
+      })}
+    </div> : '—',
+    colSpan: 2
+  }
+]
 
-const playingHand = computed(() => {
-    switch (props.player.rh) {
-        case true:
-            return "Right-handed"
-        case false:
-            return "Left-handed"
-        default:
-            return '—'
-    }
-})
-
-const backhand = computed(() => {
-    switch (props.player.bh1) {
-        case true:
-            return 'One-handed'
-        case false:
-            return 'Two-handed'
-        default:
-            return '—'
-    }
+const Descriptions = defineComponent(() => {
+  return () => (
+    <>
+      {descriptionItems.map(item => (
+        <Fieldset legend={item.label} class={`sm:col-span-1 md:col-span-${item.colSpan} lg:col-span-${item.colSpan} xl:col-span-${item.colSpan} flex justify-center items-center`}>{item.value}</Fieldset>
+      ))}
+    </>
+  );
 })
 </script>
 
 <template>
-    <a-row justify="space-evenly" :gutter=6>
-        <a-col v-for="stat in statistics" :key="stat.title" :span=6>
-            <a-card class="text-center h-full flex flex-col justify-between">
-                <a-statistic :title="stat.title" :prefix="stat.prefix || ''" :value="stat.value" />
-                <a-card-meta v-if="stat.description" :description="stat.description" />
-            </a-card>
-        </a-col>
-    </a-row>
-    <a-descriptions :colon="false" class="my-10 text-center bg-violet-800 rounded-lg" bordered layout="vertical"
-        size="middle">
-        <a-descriptions-item class="bg-black" label="Country">
-            <div class="flex items-center justify-center">
-                <div class="w-10 mr-2">
-                    <a-image class="rounded" :alt="player.countryConnection.edges[0].node.name"
-                        :src="flag(player.countryConnection.edges[0].node.id)" />
-                </div>
-                <div>{{ player.countryConnection.edges[0].node.name }}</div>
-            </div>
-        </a-descriptions-item>
-        <a-descriptions-item class="bg-black" label="Active">
-            <div v-if="player.turned_pro && player.retired">
-                <div>{{ playerYears }}</div>
-                <div>{{ player.turned_pro.id }}—{{ player.retired.id }}</div>
-            </div>
-            <div v-else-if="player.turned_pro">
-                <div>{{ playerYears }}</div>
-                <div>{{ player.turned_pro.id }}—present</div>
-            </div>
-            <div v-else>—</div>
-        </a-descriptions-item>
-        <a-descriptions-item class="bg-black" label="Age">
-            <div v-if="player.dob">
-                <div>{{ age }}</div>
-                <div>{{ formatDate(player.dob) }}</div>
-            </div>
-            <div v-else>—</div>
-        </a-descriptions-item>
-        <a-descriptions-item class="bg-black" label="Height">
-            <div>{{ player.height_cm }} cm</div>
-            <div>{{ convertToFt(player.height_cm) }}</div>
-        </a-descriptions-item>
-        <a-descriptions-item class="bg-black" label="Plays">{{ playingHand }}</a-descriptions-item>
-        <a-descriptions-item class="bg-black" label="Backhand">{{ backhand }}</a-descriptions-item>
-        <a-descriptions-item class="bg-black" :label="player.coaches.length === 1 ? 'Coach' : 'Coaches'">
-            <div v-if="player.coaches.length > 0" v-for="coach in player.coaches" :key="coach.id">
-                <router-link v-if="coach.full_name" class="hover-link"
-                    :to="{ name: 'player', params: { name: encodeName(coach.full_name), id: coach.id } }">{{
-                        coach.full_name }}</router-link>
-                <div v-else>{{ coach.id }}</div>
-            </div>
-            <div v-else>—</div>
-        </a-descriptions-item>
-        <a-descriptions-item class="bg-black" label="Previous Representations" :span="2">
-            <div v-if="player.prev_countriesConnection.edges.length > 0"
-                v-for="country in player.prev_countriesConnection.edges" :key="country.node.id"
-                class="flex items-center justify-center">
-                <div class="w-10 mr-2 my-3">
-                    <a-image :alt="country.node.name" :src="flag(country.node.id)" class="rounded-lg" />
-                </div>
-                <div class="mx-2 w-48">{{ country.node.name }}</div>
-                <div class="mx-2">
-                    {{ smallDate(country.properties.start_date) }}—
-                    {{ smallDate(country.properties.end_date) }}
-                </div>
-            </div>
-            <div v-else>—</div>
-        </a-descriptions-item>
-    </a-descriptions>
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 justify-center">
+    <Card v-for="stat in statistics" :key="stat.title" class="p-5 w-11/12 mx-auto text-center">
+      <template #subtitle>{{ stat.title }}</template>
+      <template #footer v-if="stat.description">
+        <div class="text-zinc-400">{{ stat.description }}</div>
+      </template>
+      <template #content>
+        <div class="font-bold text-xl md:text-lg lg:text-2xl">{{ stat.prefix || '' }} {{ stat.value }}</div>
+      </template>
+    </Card>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 mt-5">
+    <Descriptions />
+  </div>
 </template>

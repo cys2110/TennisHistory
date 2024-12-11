@@ -1,58 +1,69 @@
-<script setup>
-import { ref, provide } from 'vue'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { BarChart } from 'echarts/charts'
-import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/components'
-import VChart, { THEME_KEY } from 'vue-echarts'
-import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
+<script setup lang="ts">
+import { headshot } from '@/utils/functions';
+import { ref } from 'vue';
 
-const props = defineProps(['stats', 'p1', 'p2'])
+const props = defineProps<{
+  stats: { category: string, p1Value: number, p2Value: number, p1Max?: number, p2Max?: number, p1Actual?: number, p2Actual?: number }[]
+  p1: { full_name: string, id: string }
+  p2: { full_name: string, id: string }
+  tabValue: string
+}>()
 
-use([DatasetComponent, TooltipComponent, GridComponent, BarChart, CanvasRenderer])
-provide(THEME_KEY, 'dark')
-
-const option = ref({
-    ...CHART_OPTIONS,
-    grid: { left: '20%' },
-    dataset: {
-        source: props.stats,
-        dimensions: ['category', 'p1Value', 'p1Actual', 'p1Max', 'p2Value', 'p2actual', 'p2Max']
-    },
-    xAxis: { type: 'value' },
-    yAxis: { type: 'category', inverse: true },
-    tooltip: {
-        trigger: 'axis',
-        formatter: function (params) {
-            let tooltipText = `<div>${params[0].axisValueLabel}</div>`
-            if (params[0].data.p1Actual) {
-                tooltipText += `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="margin-right: 10px;">${params[0].marker} ${params[0].seriesName} </span><span style="font-weight: bold; text-align: right;">${params[0].data.p1Actual}/${params[0].data.p1Max} (${params[0].data.p1Value}%)</span></div>
-                <div style="display: flex; justify-content: space-between; align-items: center;"><span style="margin-right: 10px;">${params[1].marker} ${params[1].seriesName}</span> <span style="font-weight: bold; text-align: right;">${params[1].data.p2Actual}/${params[1].data.p2Max} (${params[1].data.p2Value}%)</span></div >`
-            } else {
-                tooltipText += `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="margin-right: 10px;">${params[0].marker} ${params[0].seriesName} </span><span style="font-weight: bold; text-align: right;">${params[0].data.p1Value}</span></div>
-                <div style="display: flex; justify-content: space-between; align-items: center;"><span style="margin-right: 10px;">${params[1].marker} ${params[1].seriesName}</span> <span style="font-weight: bold; text-align: right;">${params[1].data.p2Value}</span></div >`
-            }
-            return tooltipText
-        }
-    },
-    series: [
-        {
-            name: props.p1,
-            type: 'bar',
-            encode: { x: 'p1Value', y: 'category' },
-            itemStyle: { color: COLOURS.violet700 },
-        },
-        {
-            name: props.p2,
-            type: 'bar',
-            encode: { x: 'p2Value', y: 'category' },
-            itemStyle: { color: COLOURS.green800 },
-        }
-    ]
-})
+const checked = ref(false)
 </script>
 
 <template>
-    <v-chart class="!w-full" :class="{ '!h-[400px]': stats.length > 3, '!h-[275px]': stats.length < 4 }"
-        :option="option" :autoresize="true" />
+  <TabPanel :value="tabValue">
+    <div class="w-full flex justify-end">
+      <ToggleButton v-model="checked" offIcon="pi pi-chart-bar" onIcon="pi pi-bars" offLabel="" onLabel="" unstyled
+        class="mb-5" pt:icon="text-cyan-600 text-3xl" pt:root="border-cyan-600 border-[1px] rounded px-2" />
+    </div>
+    <DataTable :value="stats" size="small" stripedRows v-if="!checked">
+      <Column>
+        <template #header>
+          <div class="flex flex-col justify-center items-center">
+            <Avatar style="border: 1px solid #d4d4d8" shape="circle" :image="headshot(p1.id)" />
+            <div class="font-bold">{{ p1.full_name }}</div>
+          </div>
+        </template>
+        <template #body="{ data }">
+          <div class="flex flex-col items-center">
+            <div v-if="data.p1Actual && data.p1Max" :class="{ '!font-bold': data.p1Value > data.p2Value }">{{
+              data.p1Actual }}/{{ data.p1Max }}</div>
+            <div :class="{ '!font-bold': data.p1Value > data.p2Value }">{{ data.p1Value }}<span
+                v-if="data.p1Actual">%</span></div>
+          </div>
+        </template>
+      </Column>
+      <Column field="category" header="Category" class="!text-center" />
+      <Column>
+        <template #header>
+          <div class="flex justify-center items-center flex-col">
+            <Avatar style="border: 1px solid #d4d4d8" shape="circle" :image="headshot(p2.id)" />
+            <div class="font-bold">{{ p2.full_name }}</div>
+          </div>
+        </template>
+        <template #body="{ data }">
+          <div class="flex flex-col items-center">
+            <div v-if="data.p2Actual && data.p2Max" :class="{ '!font-bold': data.p2Value > data.p1Value }">{{
+              data.p2Actual }}/{{ data.p2Max }}</div>
+            <div :class="{ '!font-bold': data.p2Value > data.p1Value }">{{ data.p2Value }}<span
+                v-if="data.p2Actual">%</span></div>
+          </div>
+        </template>
+      </Column>
+    </DataTable>
+    <StatsBarChart v-if="checked" :stats="stats" :p1="p1.full_name" :p2="p2.full_name" />
+  </TabPanel>
 </template>
+
+<style scoped>
+:deep(.p-datatable-column-header-content) {
+  display: flex;
+  justify-content: center;
+}
+
+:deep(.p-datatable-thead tr th) {
+  background-color: var(--p-violet-800);
+}
+</style>

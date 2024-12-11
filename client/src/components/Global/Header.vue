@@ -1,47 +1,29 @@
-<script setup>
-import { CalendarOutlined, HomeOutlined, SearchOutlined, TeamOutlined } from '@ant-design/icons-vue';
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
 
-// [TODO: FIX H2H ROUTE]
-const links = [
-    {
-        route: 'home',
-        icon: HomeOutlined,
-        tooltip: 'Home'
-    },
-    {
-        route: 'archive',
-        icon: CalendarOutlined,
-        tooltip: 'Results Archive'
-    },
-    {
-        route: 'h2h',
-        icon: TeamOutlined,
-        tooltip: 'Head to Head'
-    },
-    {
-        route: 'search',
-        icon: SearchOutlined,
-        tooltip: 'Search'
-    }
+const router = useRouter()
+
+const navigate = (route: string) => {
+  router.push({ name: route })
+}
+
+const menuItems = [
+  { icon: 'pi pi-home', label: 'Home', command: () => navigate('home') },
+  { icon: 'pi pi-calendar', label: 'Results Archive', command: () => navigate('archive') },
+  { icon: 'pi pi-trophy', label: 'Head to Head', command: () => navigate('h2h') },
+  { icon: 'pi pi-search', label: 'Search', command: () => navigate('search') },
 ]
 </script>
 
 <template>
-    <div class="flex justify-between items-center w-full">
-        <div class="heading text-3xl">TennisHistory</div>
-        <div>
-            <a-tooltip v-for="link in links" :key="link.route">
-                <template #title>{{ link.tooltip }}</template>
-                <router-link :to="{ name: link.route }">
-                    <component :is="link.icon" class="text-2xl mx-2 text-zinc-400" />
-                </router-link>
-            </a-tooltip>
-        </div>
-    </div>
+  <div class="flex justify-between items-center w-full h-16">
+    <div class="heading text-3xl ml-5">TennisHistory</div>
+    <Menubar :model="menuItems" />
+  </div>
 </template>
 
 <style scoped>
 .heading {
-    font-family: 'Petit Formal Script', cursive
+  font-family: 'Petit Formal Script', cursive;
 }
 </style>

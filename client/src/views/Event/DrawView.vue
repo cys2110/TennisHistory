@@ -1,16 +1,27 @@
-<script setup>
-import { ref, watch } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
-import { GET_DRAW } from '@/services/EventService';
-import { encodeName, unencodeName, updateDocumentTitle } from '@/utils/functions';
+<script setup lang="ts">
+import { type Ref, ref, watch } from 'vue'
+import { useQuery } from '@vue/apollo-composable'
+import { GET_DRAW } from '@/services/EventService'
+import { encodeName, unencodeName, updateDocumentTitle } from '@/utils/functions'
+import type { Round, Match } from '@/utils/types'
+// import { html2pdf } from 'html2pdf.js';
 
 // [FUTURE: FILTER BY PLAYER]
 // [FUTURE: PDF OF DRAW]
 
-const props = defineProps(['name', 'id', 'year', 'eid'])
-const matches = ref(null)
-const anchorItems = ref(null)
-const selectedRound = ref(null)
+const props = defineProps<{
+  name: string
+  id: string
+  eid: string
+  year: string
+}>()
+const matches: Ref<(
+  Pick<Round, 'round' | 'number'> & {
+    matches: (Pick<Match, 'incomplete' | 'match_no' | 'p1' | 'p2'> & { winner: { player: { player: { id: string } } } })[];
+  }
+)[] | null> = ref(null);
+const selectedRound = ref(1)
+const buttonOptions = { primaryBackground: '{cyan.500}', primaryBorderColor: '{cyan.500}' }
 
 // Update document title
 watch(() => props.name, () => updateDocumentTitle(`Draw | ${unencodeName(props.name)} ${props.year} | TennisHistory`), { immediate: true })
@@ -20,48 +31,84 @@ const { query, variables } = GET_DRAW(parseInt(props.eid))
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
-    if (newResult) {
-        matches.value = newResult.events[0].rounds
-        anchorItems.value = matches.value.map(round => ({ number: round.number, round: round.round }))
-        selectedRound.value = anchorItems.value[0].number
-    }
-})
-watch(error, (newError) => {
-    if (newError) console.error(newError)
-})
+  if (newResult) matches.value = newResult.events[0].rounds
+}, { immediate: true })
 
-const handleChange = (e) => selectedRound.value = e
+watch(error, (newError) => {
+  if (newError) console.error(newError)
+}, { immediate: true })
+
+// const generatePdf = () => {
+//     const chartElement = document.querySelector('#details');
+//     const options = {
+//         margin: 1,
+//         filename: 'chart.pdf',
+//         image: { type: 'jpeg', quality: 0.98 },
+//         html2canvas: { scale: 1 },
+//         jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
+//     };
+
+//     html2pdf()
+//         .from(chartElement)
+//         .set(options)
+//         .outputPdf('blob') // Generates the PDF as a Blob
+//         .then((pdfBlob) => {
+//             // Create a URL for the Blob
+//             const pdfUrl = URL.createObjectURL(pdfBlob);
+//             // Open the URL in a new window or tab
+//             window.open(pdfUrl, '_blank');
+//         });
+// };
+
+const pages = [
+  { title: 'Details', name: 'event' },
+  { title: 'Results', name: 'results' },
+]
 </script>
 
 <template>
-    <a-row>
-        <a-col :span="4">
-            <div class="flex flex-col" v-if="matches">
-                <a-checkable-tag v-for="item in anchorItems" :key="item.number" :checked="selectedRound === item.number"
-                    :value="item.number" class="my-2" @change="handleChange(item.number)">
-                    {{ item.round }}</a-checkable-tag>
-            </div>
-        </a-col>
-        <a-col :span="20">
-            <a-row v-if="matches" class="flex overflow-x-auto scroll-smooth" id="draw-container">
-                <template v-for="round in matches" :key="round.round">
-                    <a-col :span="7" v-if="selectedRound > round.number - 1 && selectedRound < round.number + 3"
-                        class="flex-[0_0_auto] w-1/3 mx-4 flex flex-col justify-around items-center mb-2 font-bold">
-                        {{ round.round }}
-                    </a-col>
-                </template>
-            </a-row>
-            <a-row v-if="matches" class="flex overflow-x-auto scroll-smooth" id="draw-container">
-                <template v-for="round in matches" :key="round.round">
-                    <a-col :span="7" v-if="selectedRound > round.number - 1 && selectedRound < round.number + 3"
-                        class="flex-[0_0_auto] w-1/3 mx-4 flex flex-col justify-around" :id="encodeName(round.round)">
-                        <DrawCard v-for="match in round.matches" :key="match.match_no" :match :name :id :eid :year />
-                    </a-col>
-                </template>
-            </a-row>
-        </a-col>
-    </a-row>
-    <Loading v-if="!matches" :loading>
-        <template #none>No draw available</template>
-    </Loading>
+
+  <Toolbar class="mb-10">
+    <template #start>
+      <ButtonGroup>
+        <Button v-for="round in matches" :key="round.number" @click="selectedRound = round.number" class="mx-2"
+          size="small" rounded raised :dt="buttonOptions">{{
+            round.round
+          }}</Button>
+      </ButtonGroup>
+    </template>
+    <template #end>
+      <div class="flex items-center">
+        <Button v-for="page in pages" :key="page.title" as="router-link" :label="page.title" size="small" rounded
+          class="mx-2" raised :to="{ name: page.name }" />
+      </div>
+    </template>
+  </Toolbar>
+
+  <div v-if="matches" class="hide-scrollbar flex flex-nowrap w-3/4 overflow-x-hidden mx-auto overflow-y-auto">
+    <template v-for="round in matches" :key="round.number">
+      <div v-if="selectedRound > round.number - 1 && selectedRound < round.number + 3" :id="encodeName(round.round)"
+        class="shrink-0 w-[400px] mx-2">
+        <div class="text-center font-bold">{{ round.round }}</div>
+        <div class="flex flex-col justify-around h-full">
+          <DrawCard v-for="match in round.matches" :key="match.match_no" :match :name :id :eid :year />
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <Loading v-else :loading>
+    <template #none>No draw available</template>
+  </Loading>
 </template>
+
+<style scoped>
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+</style>

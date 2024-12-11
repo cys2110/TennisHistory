@@ -526,23 +526,13 @@ export const typeDefs = `#graphql
         tieOfRounds: [Round!]! @relationship(type: "TIE_OF", direction: OUT)
     }
 
-    type TitleFinalArray {
+    type TitlesFinals {
         id: Int
         tid: Int
         tname: String
         surface: String
-    }
-
-    type TitleFinalObject {
         year: Int
-        count: Int
-        events: [TitleFinalArray!]!
-    }
-
-    type TitlesFinals {
-        titles: [TitleFinalObject!]!
-        finals: [TitleFinalObject!]!
-    }
+}
 
     type Tournament {
         start_year: Year! @relationship(type: "ESTABLISHED", direction: OUT)
@@ -680,25 +670,17 @@ export const typeDefs = `#graphql
             WHERE s.id =~ '(?i).*' + $name + '.*'
             RETURN s as surfaces
         """, columnName: "surfaces")
-        playerTitlesAndFinals (id: String!): TitlesFinals! @cypher(statement: """
-            MATCH (p:Player {id: $id})
-            OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(s1:Score)-[:SCORED]->(:Match)-[:PLAYED]->(:Round {round: 'Final'})-[:ROUND_OF]-(e:Event)-[:TOOK_PLACE_IN]-(y:Year)
-            OPTIONAL MATCH (s:Surface)-[]-(e)-[]-(t:Tournament)
-            WITH y,
-                COLLECT(CASE WHEN s1:Winner THEN {id: e.id, tname: t.name, tid: t.id, surface: s.id} ELSE null END) AS title_events,
-                COLLECT(CASE WHEN s1:Loser THEN {id: e.id, tname: t.name, tid: t.id, surface: s.id} ELSE null END) AS final_events
-            WITH y,
-                SIZE([x IN title_events WHERE x IS NOT NULL]) AS title_count,
-                [x IN title_events WHERE x IS NOT NULL] AS title_events,
-                SIZE([x IN final_events WHERE x IS NOT NULL]) AS final_count,
-                [x IN final_events WHERE x IS NOT NULL] AS final_events
-            WITH
-            COLLECT(CASE WHEN title_count > 0 THEN {year: y.id, count: title_count, events: title_events} ELSE null END) AS filtered_titles,
-            COLLECT(CASE WHEN final_count > 0 THEN {year: y.id, count: final_count, events: final_events} ELSE null END) AS filtered_finals
-            RETURN {
-            titles: [x IN filtered_titles WHERE x IS NOT NULL],
-            finals: [x IN filtered_finals WHERE x IS NOT NULL]
-            } AS result
+        playertitles (id: String!): [TitlesFinals!]! @cypher(statement: """
+            MATCH (t:Tournament)-[]-(e:Event)-[]-(:Round {round: 'Final'})-[]-(:Match)-[]-(:Winner)-[]-(:Entry)-[]-(:Player {id: $id})
+            MATCH (y:Year)-[]-(e)-[]-(s:Surface)
+            RETURN {tid: t.id, id: e.id, tname: t.name, year: y.id, surface: s.id} as result
+            ORDER BY e.start_date
+        """, columnName: "result")
+        playerfinals (id: String!): [TitlesFinals!]! @cypher(statement: """
+            MATCH (t:Tournament)-[]-(e:Event)-[]-(:Round {round: 'Final'})-[]-(:Match)-[]-(:Loser)-[]-(:Entry)-[]-(:Player {id: $id})
+            MATCH (y:Year)-[]-(e)-[]-(s:Surface)
+            RETURN {tid: t.id, id: e.id, tname: t.name, year: y.id, surface: s.id} as result
+            ORDER BY e.start_date
         """, columnName: "result")
         majorResults (id: String!, tournament: Int!): MajorResults @cypher(statement: """
             MATCH (p:Player {id: $id})

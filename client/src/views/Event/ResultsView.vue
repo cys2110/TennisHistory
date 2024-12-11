@@ -1,57 +1,60 @@
-<script setup>
-import { ref, watch } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
-import { GET_RESULTS } from '@/services/EventService';
-import { unencodeName, updateDocumentTitle } from '@/utils/functions';
+<script setup lang="ts">
+import { type Ref, ref, watch } from 'vue'
+import { useQuery } from '@vue/apollo-composable'
+import AccordionPanel from 'primevue/accordionpanel'
+import AccordionHeader from 'primevue/accordionheader'
+import AccordionContent from 'primevue/accordioncontent'
+import { GET_RESULTS } from '@/services/EventService'
+import { unencodeName, updateDocumentTitle } from '@/utils/functions'
+import type { Round, Match } from '@/utils/types'
 
 // [FUTURE: FILTER BY DATE, COURT, UMPIRE, PLAYER]
 
-const props = defineProps(['name', 'id', 'year', 'eid'])
-const matches = ref(null)
-const anchorItems = ref(null)
+const props = defineProps<{ name: string; year: string; eid: string; id: string }>()
+const { name, year, eid, id } = props
+
+const matches: Ref<(
+  Pick<Round, 'round' | 'number'> & {
+    matches: Pick<Match, 'court' | 'date' | 'duration_mins' | 'incomplete' | 'match_no' | 'umpire' | 'winner' | 'loser'>[];
+  }
+)[] | null> = ref(null);
 
 // Update document title
-watch(() => props.name, () => updateDocumentTitle(`Results | ${unencodeName(props.name)} ${props.year} | TennisHistory`), { immediate: true })
+watch(() => name, () => updateDocumentTitle(`Results | ${unencodeName(name)} ${year} | TennisHistory`), { immediate: true })
 
 // API CALL
-const { query, variables } = GET_RESULTS(parseInt(props.eid))
+const { query, variables } = GET_RESULTS(parseInt(eid))
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
-    if (newResult) {
-        matches.value = newResult.events[0].rounds
-        anchorItems.value = matches.value.map(round => (
-            {
-                key: round.number,
-                href: `#${round.round}`,
-                title: round.round
-            }
-        ))
-    }
+  if (newResult) matches.value = newResult.events[0].rounds
 })
 
 watch(error, (newError) => {
-    if (newError) console.error(newError)
+  if (newError) console.error(newError)
 })
+
+const pages = [
+  { title: 'Details', name: 'event' },
+  { title: 'Draw', name: 'draw' },
+]
 </script>
 
 <template>
-    <a-row v-if="matches">
-        <a-col :span="4">
-            <a-anchor :offset-top="75" :items="anchorItems" />
-        </a-col>
-        <a-col :span="20">
-            <div v-for="round in matches" :key="round.number" :id="round.round">
-                <div class="text-4xl my-5">{{ round.round }}</div>
-                <a-row justify="space-evenly" :gutter="[0, 32]">
-                    <a-col :span="11" v-for="match in round.matches" :key="match.match_no">
-                        <ResultCard v-if="match.winner?.player" :match :name :id :year :eid />
-                    </a-col>
-                </a-row>
-            </div>
-        </a-col>
-    </a-row>
-    <Loading v-else :loading>
-        <template #none>No results available</template>
-    </Loading>
+  <PageToolbar :pages />
+  <Accordion v-if="matches" :value="['0']" multiple class="md:w-3/4 lg:w-full xl:w-3/4 mx-auto">
+    <AccordionPanel v-for="(round, index) in matches" :key="round.number" :value="index">
+      <AccordionHeader>{{ round.round }}</AccordionHeader>
+      <AccordionContent>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 xl:gap-10">
+          <template v-for="match in round.matches" :key="match.match_no">
+            <ResultCard v-if="match.winner?.player" :match :name :id :year :eid />
+          </template>
+        </div>
+      </AccordionContent>
+    </AccordionPanel>
+  </Accordion>
+  <Loading v-else :loading>
+    <template #none>No results available</template>
+  </Loading>
 </template>

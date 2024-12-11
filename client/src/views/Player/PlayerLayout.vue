@@ -1,23 +1,25 @@
-<script setup>
-import { useRoute } from 'vue-router';
-import { unencodeName } from '@/utils/functions';
+<script setup lang="ts">
+import { useRoute } from 'vue-router'
+import { unencodeName } from '@/utils/functions'
 
-const props = defineProps(['name', 'id'])
+const props = defineProps<{
+  name: string
+  id: string
+}>()
 const route = useRoute()
 const pageNames = {
-    player: 'Overview',
-    activity: 'Activity',
-    titles: 'Titles and Finals',
-    index: 'Win-Loss Index',
-    stats: 'Stats'
+  player: 'Overview',
+  activity: 'Activity',
+  titles: 'Titles and Finals',
+  index: 'Win-Loss Index',
+  stats: 'Stats',
 }
 </script>
 
 <template>
-    <PlayerBreadcrumbs :name :id />
-    <Title>
-        <template #title>{{ unencodeName(name) }}</template>
-        <template #subtitle>{{ pageNames[route.name] }}</template>
-    </Title>
-    <router-view />
+  <Title>
+    <template #title>{{ unencodeName(name) }}</template>
+    <template #subtitle>{{ pageNames[route.name as keyof typeof pageNames] }}</template>
+  </Title>
+  <router-view />
 </template>
