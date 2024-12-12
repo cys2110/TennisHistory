@@ -1,9 +1,13 @@
 import { gql } from '@apollo/client/core'
 
-export const GET_UPCOMING = (date: string) => {
+export const GET_UPCOMING = (
+  surface: string | null,
+  month: number | null,
+  category: string | null,
+) => {
   const call = gql`
-    query Upcoming($date: Date!) {
-      events(where: { end_date_GT: $date }, options: { sort: [{ start_date: ASC }] }) {
+    query Upcoming($surface: String, $month: Int, $category: String) {
+      upcomingEvents(surface: $surface, month: $month, category: $category) {
         id
         category
         end_date
@@ -29,13 +33,18 @@ export const GET_UPCOMING = (date: string) => {
       }
     }
   `
-  return { query: call, variables: { date } }
+  return { query: call, variables: { surface, month, category } }
 }
 
-export const GET_ARCHIVE = (year: number) => {
+export const GET_ARCHIVE = (
+  year: number,
+  category: string | null,
+  month: number | null,
+  surface: string | null,
+) => {
   const call = gql`
-    query GetArchive($year: Int!) {
-      events(where: { year: { id: $year } }, options: { sort: [{ start_date: ASC }] }) {
+    query GetArchive($year: Int, $category: String, $month: Int, $surface: String) {
+      archiveEvents(year: $year, category: $category, month: $month, surface: $surface) {
         id
         category
         end_date
@@ -61,7 +70,7 @@ export const GET_ARCHIVE = (year: number) => {
       }
     }
   `
-  return { query: call, variables: { year } }
+  return { query: call, variables: { year, category, month, surface } }
 }
 
 export const GET_EVENT = (id: number, idString: string) => {

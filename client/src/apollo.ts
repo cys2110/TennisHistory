@@ -2,6 +2,7 @@ import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client/core
 import type { DefaultOptions, FetchPolicy } from '@apollo/client/core'
 
 const API_URL: string = import.meta.env.VITE_API_URL as string
+// const API_URL = 'http://localhost:4000'
 
 const httpLink = createHttpLink({
   uri: API_URL,
