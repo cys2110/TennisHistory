@@ -29,7 +29,6 @@ declare module 'vue' {
     EventOverview: typeof import('./src/components/Event/EventOverview.vue')['default']
     EventTimeline: typeof import('./src/components/Player/EventTimeline.vue')['default']
     Fieldset: typeof import('primevue/fieldset')['default']
-    FinalsTable: typeof import('./src/components/Player/FinalsTable.vue')['default']
     FloatLabel: typeof import('primevue/floatlabel')['default']
     Footer: typeof import('./src/components/Global/Footer.vue')['default']
     GetFlag: typeof import('./src/components/Global/GetFlag.vue')['default']

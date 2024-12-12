@@ -5,6 +5,7 @@ import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints';
 import { useImages } from '@/utils/useImages';
 import { useUrlNames } from '@/utils/useUrlNames';
 import { SURFACES } from '@/utils/variables';
+import { computed } from 'vue';
 
 const { isBreakpointOrUp } = useGlobalBreakpoints()
 const { encodeName } = useUrlNames()
@@ -21,13 +22,13 @@ const eventPages = [
     { title: 'Draw', name: 'draw' },
 ]
 
-const totalEventsObject = props.events.reduce((acc: { [key: number]: number }, obj) => {
-    acc[obj.year] = (acc[obj.year] || 0) + 1
-    return acc
-}, {} as { [key: number]: number })
-
-const totalEvents = Object.entries(totalEventsObject).map(([year, count]) => ({ year: +year, count }))
-console.log(totalEvents)
+const totalEvents = computed(() => {
+    const totalEventsObject = props.events.reduce((acc: { [key: number]: number }, obj) => {
+        acc[obj.year] = (acc[obj.year] || 0) + 1
+        return acc
+    }, {} as { [key: number]: number })
+    return Object.entries(totalEventsObject).map(([year, count]) => ({ year: +year, count }))
+})
 </script>
 
 <template>
@@ -45,17 +46,15 @@ console.log(totalEvents)
                             <Avatar :image="categorySrc(item.category)" size="large" />
                         </div>
                         <div>
-                            <router-link class="hover-link"
+                            <router-link class="hover-link font-bold"
                                 :to="{ name: 'tournament', params: { name: encodeName(item.tname), id: item.tid } }">
                                 {{ item.tname }}
                             </router-link>
                         </div>
                     </div>
-
                 </template>
                 <div class="flex flex-col gap-1">
                     <Divider />
-                    <div class="text-zinc-400 text-center md:text-left"></div>
                     <div class="text-zinc-400 text-center md:text-left">{{ SURFACES[item.surface as Surface] }}</div>
                 </div>
                 <template #footer>
