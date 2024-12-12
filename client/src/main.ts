@@ -32,6 +32,7 @@ const MyPreset = definePreset(Aura, {
     },
   },
   components: {
+    // used in header
     menubar: {
       background: 'transparent',
       borderColor: 'none',
@@ -48,18 +49,20 @@ const MyPreset = definePreset(Aura, {
     },
     button: {
       smPaddingY: '.1rem',
-      outlinedPrimaryBorderColor: '{violet.800}',
     },
     select: {
       borderColor: '{violet.800}',
       smPaddingY: '.1rem',
       smPaddingX: '.2rem',
     },
+    // Used in tournament & player breadcrumbs
     breadcrumb: {
-      itemColor: '{cyan.700}',
-      itemIconColor: '{cyan.700}',
+      itemColor: '{emerald.600}',
+      itemIconColor: '{emerald.500}',
       separatorColor: '{zinc.300}',
     },
+    // Used in event & loading cards
+    // dt: tournament card
     divider: {
       borderColor: '{zinc.500}',
       contentBackground: '{violet.800}',
@@ -79,6 +82,7 @@ const MyPreset = definePreset(Aura, {
       background: '{violet.800}',
       valueBackground: '{cyan.700}',
     },
+    // Used in event, tournament, & loading cards
     panel: {
       borderColor: '{violet.800}',
     },

@@ -317,6 +317,7 @@ export const typeDefs = `#graphql
     }
 
     type Player {
+        backhand: String @customResolver(requires: "bh1")
         bh1: Boolean
         career_high: Int
         ch_date: Date
@@ -329,6 +330,7 @@ export const typeDefs = `#graphql
         full_name: String! @customResolver(requires: "first_name last_name")
         gladiator: Boolean
         height_cm: Int
+        height_ft: String @customResolver(requires: "height_cm")
         hof: Int
         id: String! @unique
         index: Index @cypher(statement: """
@@ -384,6 +386,7 @@ export const typeDefs = `#graphql
         """, columnName: "index")
         last_name: String
         loss: Int
+        plays: String @customResolver(requires: "rh")
         pm_USD: Int
         prev_countries: [Country!]! @relationship(type: "REPRESENTED", direction: OUT, properties: "RepresentsProperties")
         retired: Year @relationship(type: "RETIRED", direction: OUT, properties: "RetiredProperties")

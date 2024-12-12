@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { encodeName, headshot } from '@/utils/functions'
 import type { Player } from '@/utils/types';
-import GetFlag from './GetFlag.vue';
+import { getParams } from '@/utils/getParams';
+import { useImages } from '@/utils/useImages';
+
+const { headshot } = useImages()
+const { getPlayerParams } = getParams()
 
 const props = defineProps<{
-  player: Pick<Player, 'country' | 'full_name' | 'id' | 'last_name'>
-  entry?: string
+  player: Pick<Player, 'country' | 'full_name' | 'id'>
 }>()
 const { country, full_name, id } = props.player
 </script>
@@ -16,13 +18,12 @@ const { country, full_name, id } = props.player
       <GetFlag :country="country.id" />
     </div>
     <div>
-      <Avatar style="border: 1px solid #d4d4d8" shape="circle" :image="headshot(id)" />
+      <Avatar style="border: 1px solid var(--p-zinc-400)" shape="circle" :image="headshot(id)" />
     </div>
     <div>
-      <router-link class="hover-link" :to="{ name: 'player', params: { name: encodeName(full_name), id: id } }">
+      <router-link class="hover-link" :to="{ name: 'player', params: getPlayerParams(player as Player) }">
         {{ full_name }}
       </router-link>
-      <small v-if="entry">{{ entry }}</small>
     </div>
   </div>
 </template>

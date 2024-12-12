@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { useRoute, useRouter } from 'vue-router'
-import { unencodeName } from '@/utils/functions'
 import { ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router'
+import { useUrlNames } from '@/utils/useUrlNames';
 
 type Page = 'player' | 'activity' | 'titles' | 'index' | 'stats'
 
 const route = useRoute()
 const router = useRouter()
+const { unencodeName } = useUrlNames()
 
 // Variables
 const { name, id } = route.params
 const home = {
-  icon: 'pi pi-home',
-  class: 'text-lg',
+  icon: 'fa-duotone fa-solid fa-home',
+  class: 'text-xs md:text-lg',
   command: () => router.push({ name: 'home' })
 }
 
@@ -25,14 +26,8 @@ const pages = {
 }
 
 const breadcrumbs = ref([
-  {
-    label: unencodeName(name as string),
-    class: 'text-lg'
-  },
-  {
-    label: pages[route.name as Page],
-    class: 'text-lg'
-  }
+  { label: unencodeName(name as string), class: 'text-xs md:text-lg' },
+  { label: pages[route.name as Page], class: 'text-xs md:text-lg' }
 ])
 </script>
 

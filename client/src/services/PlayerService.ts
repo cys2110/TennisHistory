@@ -15,8 +15,9 @@ export const GET_PLAYER = (id: string) => {
         gladiator
         dob
         height_cm
-        rh
-        bh1
+        height_ft
+        backhand
+        plays
         turned_pro {
           id
         }

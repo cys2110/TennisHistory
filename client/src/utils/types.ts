@@ -204,7 +204,7 @@ export interface Match {
 }
 
 export interface Player {
-  bh1: boolean | null
+  backhand: string | null
   career_high: number | null
   ch_date: string | null
   coaches: {
@@ -221,20 +221,23 @@ export interface Player {
   full_name: string
   gladiator: boolean
   height_cm: number | null
+  height_ft: string | null
   id: string
   last_name: string
   loss: number
+  plays: string | null
   pm_USD: number
   prev_countriesConnection: CountryConnection | null
   retired: {
     id: number
   } | null
-  rh: boolean | null
   titles: number
   turned_pro: {
     id: number
   } | null
   win: number
+  bh1: boolean | null
+  rh: boolean | null
 }
 
 export interface SearchResults {

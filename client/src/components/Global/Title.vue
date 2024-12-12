@@ -10,7 +10,7 @@ const playerPages = ['player', 'activity', 'titles', 'index', 'stats']
 <template>
   <TournamentBreadcrumbs v-if="tournamentPages.includes(route.name as string)" />
   <PlayerBreadcrumbs v-if="playerPages.includes(route.name as string)" />
-  <div class="flex flex-col md:flex-row mb-20 md:items-center">
+  <div class="flex flex-col md:flex-row mb-12 md:justify-between md:items-center">
     <div class="text-zinc-300 text-3xl md:text-4xl xl:text-5xl">
       <slot name="title" />
     </div>
