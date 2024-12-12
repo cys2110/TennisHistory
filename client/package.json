@@ -23,7 +23,6 @@
     "@ant-design/icons-vue": "^7.0.1",
     "@apollo/client": "^3.12.2",
     "@apollo/server": "^4.11.2",
-    "@awesome.me/kit-a0ec0792e4": "^1.0.7",
     "@fortawesome/duotone-light-svg-icons": "^6.7.1",
     "@fortawesome/duotone-regular-svg-icons": "^6.7.1",
     "@fortawesome/duotone-thin-svg-icons": "^6.7.1",
