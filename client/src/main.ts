@@ -48,9 +48,12 @@ const MyPreset = definePreset(Aura, {
     },
     button: {
       smPaddingY: '.1rem',
+      outlinedPrimaryBorderColor: '{violet.800}',
     },
     select: {
       borderColor: '{violet.800}',
+      smPaddingY: '.1rem',
+      smPaddingX: '.2rem',
     },
     breadcrumb: {
       itemColor: '{cyan.700}',
@@ -60,6 +63,7 @@ const MyPreset = definePreset(Aura, {
     divider: {
       borderColor: '{zinc.500}',
       contentBackground: '{violet.800}',
+      horizontalMargin: '0.5rem',
     },
     fieldset: {
       borderColor: '{violet.700}',
@@ -74,6 +78,9 @@ const MyPreset = definePreset(Aura, {
       height: '0.5rem',
       background: '{violet.800}',
       valueBackground: '{cyan.700}',
+    },
+    panel: {
+      borderColor: '{violet.800}',
     },
   },
 })

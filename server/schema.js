@@ -630,6 +630,12 @@ export const typeDefs = `#graphql
     }
 
     type Query {
+        archiveEvents (year: Int, month: Int, surface: String, category: String): [Event!]! @cypher(statement: """
+            MATCH (y:Year)-[:TOOK_PLACE_IN]-(e:Event)-[:ON_SURFACE]-(s:Surface)
+            WHERE ($year IS NULL OR y.id = $year) AND ($surface IS NULL OR s.surface = $surface) AND ($category IS NULL OR e.category = $category) AND ($month IS NULL OR e.start_date.month = $month)
+            RETURN distinct(e) as events
+            ORDER BY e.start_date
+        """, columnName: "events")
         searchPlayers(full_name: String!): [Player!]! @cypher(statement: """
             MATCH (p:Player)
             WHERE p.first_name + ' ' + p.last_name =~ '(?i).*'+ $full_name + '.*'
@@ -698,6 +704,12 @@ export const typeDefs = `#graphql
             ELSE {events: lowestRounds}
             END AS results
         """, columnName: "results")
+        upcomingEvents (surface: String, month: Int, category: String): [Event!]! @cypher(statement: """
+            MATCH (e:Event)-[:ON_SURFACE]-(s:Surface)
+            WHERE e.start_date > date() AND ($surface IS NULL OR s.surface = $surface) AND ($month IS NULL OR e.start_date.month = $month) AND ($category IS NULL OR e.category = $category)
+            RETURN distinct(e) as events
+            ORDER BY e.start_date
+        """, columnName: "events")
         yearStats (id: String!, year: Int!): YearStats @cypher(statement: """
             OPTIONAL MATCH (p:Player {id: $id})-[:ENTERED]-(:Entry)-[:SCORED]-(w:Winner)-[:SCORED]-(:Match)-[:PLAYED]-(:Round)-[:ROUND_OF]-(:Event)-[:TOOK_PLACE_IN]-(y:Year {id: $year})
             WITH p, y, count(w) as wins

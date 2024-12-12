@@ -8,10 +8,10 @@ const navigate = (route: string) => {
 }
 
 const menuItems = [
-  { icon: 'pi pi-home', label: 'Home', command: () => navigate('home') },
-  { icon: 'pi pi-calendar', label: 'Results Archive', command: () => navigate('archive') },
-  { icon: 'pi pi-trophy', label: 'Head to Head', command: () => navigate('h2h') },
-  { icon: 'pi pi-search', label: 'Search', command: () => navigate('search') },
+  { icon: 'fa-duotone fa-solid fa-house', label: 'Home', command: () => navigate('home') },
+  { icon: 'fa-duotone fa-solid fa-calendar', label: 'Results Archive', command: () => navigate('archive') },
+  { icon: 'fa-duotone fa-solid fa-swords', label: 'Head to Head', command: () => navigate('h2h') },
+  { icon: 'fa-duotone fa-solid fa-magnifying-glass', label: 'Search', command: () => navigate('search') },
 ]
 </script>
 

@@ -52,18 +52,18 @@ export const CATEGORIES = {
 }
 
 export const MONTHS = {
-  [Months.Jan]: 'January',
-  [Months.Feb]: 'February',
-  [Months.Mar]: 'March',
-  [Months.Apr]: 'April',
-  [Months.May]: 'May',
-  [Months.Jun]: 'June',
-  [Months.Jul]: 'July',
-  [Months.Aug]: 'August',
-  [Months.Sep]: 'September',
-  [Months.Oct]: 'October',
-  [Months.Nov]: 'November',
-  [Months.Dec]: 'December',
+  [Months.Jan]: 1,
+  [Months.Feb]: 2,
+  [Months.Mar]: 3,
+  [Months.Apr]: 4,
+  [Months.May]: 5,
+  [Months.Jun]: 6,
+  [Months.Jul]: 7,
+  [Months.Aug]: 8,
+  [Months.Sep]: 9,
+  [Months.Oct]: 10,
+  [Months.Nov]: 11,
+  [Months.Dec]: 12,
 }
 
 export const INCOMPLETES = {
