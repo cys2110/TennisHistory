@@ -68,7 +68,7 @@ const handleSelection = (label: string) => {
   const queryCategory = label === 'Category' ? selectedCategory.value : route.query.category
   const queryMonth = label === 'Month' ? selectedMonth.value : route.query.month
   const querySurface = label === 'Surface' ? selectedSurface.value : route.query.surface
-  router.push({ query: { year: queryYear, category: queryCategory, month: queryMonth, surface: querySurface } })
+  router.replace({ query: { year: queryYear, category: queryCategory, month: queryMonth, surface: querySurface } })
 }
 
 // API call
@@ -85,27 +85,29 @@ watch(error, (newError) => {
 </script>
 
 <template>
-  <Title>
-    <template #title>Results Archive</template>
-  </Title>
-  <Toolbar>
-    <template #start>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-        <Select v-for="select in selectOptions" :key="select.label" v-model="select.vModel" :options="select.options"
-          optionLabel="label" optionValue="value" variant="filled" size="small" filter checkmark class="text-center"
-          :placeholder="select.label" @change="handleSelection(select.label)" />
-      </div>
-    </template>
-  </Toolbar>
-  <div v-if="events" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-5">
-    <EventCard v-for="event in events" :key="event.id" :event="event" />
+  <div class="lg:w-3/4 mx-auto">
+    <Title>
+      <template #title>Results Archive</template>
+    </Title>
+    <Toolbar>
+      <template #center>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+          <Select v-for="select in selectOptions" :key="select.label" v-model="select.vModel" :options="select.options"
+            optionLabel="label" optionValue="value" variant="filled" size="small" filter checkmark class="text-center"
+            :placeholder="select.label" @change="handleSelection(select.label)" />
+        </div>
+      </template>
+    </Toolbar>
+    <div v-if="events" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-5">
+      <EventCard v-for="event in events" :key="event.id" :event="event" />
+    </div>
+    <Loading v-else :loading>
+      <template #loading>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+          <LoadingCard />
+        </div>
+      </template>
+      <template #none>No tournaments played</template>
+    </Loading>
   </div>
-  <Loading v-else :loading>
-    <template #loading>
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 w-3/4 gap-10">
-        <LoadingCard />
-      </div>
-    </template>
-    <template #none>No tournaments played</template>
-  </Loading>
 </template>

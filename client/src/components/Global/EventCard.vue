@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { DateTime } from 'luxon'
-import { categorySrc, encodeName, formattedDates } from '@/utils/functions'
 import type { EventCard } from '@/utils/types'
 import { SURFACES } from '@/utils/variables'
+import { useUrlNames } from '@/utils/useUrlNames';
+import { useConversion } from '@/utils/useConversion';
+import { useImages } from '@/utils/useImages';
+
+const { encodeName } = useUrlNames()
+const { categorySrc } = useImages()
+const { formattedDates } = useConversion()
 
 // Variables
 const props = defineProps<{
@@ -38,7 +44,7 @@ const eventParams = { ...tournamentParams, year: year.id, eid: id }
             </router-link>
           </div>
         </div>
-        <div v-if="sponsor_name" class="text-sm text-zinc-400 text-center">{{ sponsor_name }}</div>
+        <div v-if="sponsor_name" class="text-sm text-zinc-400 mt-2">{{ sponsor_name }}</div>
       </div>
     </template>
     <div class="flex flex-col gap-1">
@@ -63,9 +69,3 @@ const eventParams = { ...tournamentParams, year: year.id, eid: id }
     </template>
   </Panel>
 </template>
-
-<style scoped>
-:deep(.p-card-content) {
-  @apply !h-full !flex !items-center !justify-center
-}
-</style>

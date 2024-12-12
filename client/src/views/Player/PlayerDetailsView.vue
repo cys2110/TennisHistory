@@ -1,30 +1,26 @@
 <script setup lang="ts">
 import { type Ref, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useQuery } from '@vue/apollo-composable'
 import { GET_PLAYER } from '@/services/PlayerService'
-import { gladiator, headshot, unencodeName, updateDocumentTitle } from '@/utils/functions'
 import type { Player } from '@/utils/types'
 import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints'
+import { useImages } from '@/utils/useImages'
 
 // [TODO: FIGURE OUT MAJOR RESULTS APICALL]
+
+const route = useRoute()
+const { isBreakpointOrUp, isBreakpoint } = useGlobalBreakpoints()
+const { gladiator, headshot } = useImages()
 
 // Variables
 const props = defineProps<{
   name: string
   id: string
+  pageNames: { title: string; name: string }[]
 }>()
 const player: Ref<Player | null> = ref(null)
-
-const { isBreakpointOrUp, isBreakpoint } = useGlobalBreakpoints()
-const pages = [
-  { title: 'Activity', name: 'activity' },
-  { title: 'Titles and Finals', name: 'titles' },
-  { title: 'Win-Loss Index', name: 'index' },
-  { title: 'Stats', name: 'stats' }
-]
-
-// Update document title
-watch(() => props.name, () => updateDocumentTitle(`${unencodeName(props.name)} | TennisHistory`), { immediate: true })
+const pages = props.pageNames.filter(page => page.name !== route.name)
 
 // API call
 const { query, variables } = GET_PLAYER(props.id)
@@ -41,7 +37,7 @@ watch(error, (newError) => {
 <template>
   <PageToolbar :pages />
   <div v-if="player && isBreakpoint('sm')" class="flex justify-center mb-10">
-    <Avatar style="border: 1px solid #d4d4d8" shape="circle" :image="headshot(player.id)" size="xlarge" />
+    <Avatar style="border: 1px solid var(--p-zinc-400)" shape="circle" :image="headshot(player.id)" size="xlarge" />
   </div>
   <div v-if="player" class="grid grid-cols-5 grid-flow-col">
     <div v-if="isBreakpointOrUp('md')">

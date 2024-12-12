@@ -83,5 +83,5 @@ export const getEntry = (entry: { seed: number | null; status: StatusInfo | null
 }
 
 export const updateDocumentTitle = (title: string) => {
-  document.title = title
+  document.title = `${title} | TennisHistory`
 }

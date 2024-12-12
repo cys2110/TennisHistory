@@ -3,8 +3,12 @@ import { defineComponent } from 'vue'
 import Fieldset from 'primevue/fieldset'
 import { DateTime } from 'luxon'
 import GetFlag from '../Global/GetFlag.vue'
-import { convertToFt, encodeName, formatDate, smallDate } from '@/utils/functions'
 import type { Player } from '@/utils/types'
+import { useConversion } from '@/utils/useConversion'
+import { useUrlNames } from '@/utils/useUrlNames'
+
+const { formatDate, shorterDate, smallDate } = useConversion()
+const { encodeName } = useUrlNames()
 
 const props = defineProps<{
   player: Player
@@ -15,9 +19,10 @@ const {
   turned_pro,
   retired,
   dob,
-  rh,
-  bh1,
+  plays,
+  backhand,
   height_cm,
+  height_ft,
   coaches,
   career_high,
   ch_date,
@@ -28,11 +33,7 @@ const {
 } = props.player
 
 const statistics = [
-  {
-    title: 'Career High',
-    value: career_high ?? '—',
-    description: ch_date ? formatDate(ch_date) : '—',
-  },
+  { title: 'Career High', value: career_high ?? '—', description: ch_date ? shorterDate(ch_date) : '—' },
   { title: 'Win-Loss', value: `${win}—${loss}` },
   { title: 'Titles', value: titles },
   { title: 'Prize Money', prefix: '$', value: pm_USD.toLocaleString('en-GB') },
@@ -50,7 +51,7 @@ const descriptionItems = [
   {
     label: 'Active',
     value: turned_pro ?
-      <div>
+      <div class="text-center">
         {<div>{retired ? retired.id - turned_pro.id : DateTime.now().year - turned_pro.id + 1} years</div>}
         <div>{turned_pro.id} - {retired?.id || 'present'}</div>
       </div>
@@ -59,29 +60,29 @@ const descriptionItems = [
   },
   {
     label: 'Age',
-    value: dob ? <div>
-      <div>{Math.floor(Math.abs(DateTime.fromISO(dob).diffNow('years').toObject().years || 0))}</div>
+    value: dob ? <div class="text-center">
+      <div>{Math.floor(Math.abs(DateTime.fromISO(dob).diffNow('years').toObject().years || 0))} years old</div>
       <div>{formatDate(dob)}</div>
     </div> : '—',
     colSpan: 1
   },
   {
     label: 'Height',
-    value: height_cm ? <div>
+    value: height_cm ? <div class="text-center">
       <div>{height_cm} cm</div>
-      <div>{convertToFt(height_cm)}</div>
+      <div>{height_ft}</div>
     </div> : '—',
     colSpan: 1
   },
   {
     label: 'Plays',
-    value: rh === true ? 'Right-handed' : rh === false ? 'Left-handed' : '—',
+    value: plays || '—',
     colSpan: 1
 
   },
   {
     label: 'Backhand',
-    value: bh1 === true ? 'One-handed' : bh1 === false ? 'Two-handed' : '—',
+    value: backhand || '—',
     colSpan: 1
   },
   {
@@ -120,14 +121,14 @@ const Descriptions = defineComponent(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 justify-center">
-    <Card v-for="stat in statistics" :key="stat.title" class="p-5 w-11/12 mx-auto text-center">
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 justify-center">
+    <Card v-for="stat in statistics" :key="stat.title" class="p-5 w-full mx-auto text-center full-card">
       <template #subtitle>{{ stat.title }}</template>
-      <template #footer v-if="stat.description">
-        <div class="text-zinc-400">{{ stat.description }}</div>
+      <template #footer>
+        <div v-if="stat.description" class="text-zinc-400 text-sm">{{ stat.description }}</div>
       </template>
       <template #content>
-        <div class="font-bold text-xl md:text-lg lg:text-2xl">{{ stat.prefix || '' }} {{ stat.value }}</div>
+        <div class="font-bold text-xl md:text-lg">{{ stat.prefix || '' }} {{ stat.value }}</div>
       </template>
     </Card>
   </div>
