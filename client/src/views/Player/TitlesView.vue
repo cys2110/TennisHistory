@@ -4,7 +4,6 @@ import { useQuery } from '@vue/apollo-composable'
 import ToggleSwitch from 'primevue/toggleswitch'
 import { GET_TITLES } from '@/services/PlayerService'
 import type { TitlesAndFinals } from '@/utils/types'
-import EventTimeline from '@/components/Player/EventTimeline.vue'
 
 // Variables
 const props = defineProps<{

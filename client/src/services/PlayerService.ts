@@ -263,7 +263,7 @@ export const GET_INDEX = (id: string) => {
   return { query: call, variables: { id } }
 }
 
-export const GET_PLAYER_STATS = (id: string, year?: number, surface?: string) => {
+export const GET_PLAYER_STATS = (id: string, year: number | null, surface: string | null) => {
   const call = gql`
     query GetStats($id: String!, $year: Int, $surface: String) {
       players(where: { id: $id }) {

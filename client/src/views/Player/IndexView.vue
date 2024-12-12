@@ -83,11 +83,11 @@ const columns = [
 </script>
 
 <template>
-  <div v-if="index" class="lg:w-3/4 lg:mx-auto">
+  <div v-if="index">
     <PageToolbar :pages>
       <template #start v-if="isBreakpointOrUp('md')">
-        <ToggleButtonComponent :checked="checked" onIcon="fa-duotone fa-light fa-table"
-          offIcon="fa-duotone fa-light fa-chart-bar" @toggle="handleToggle" />
+        <ToggleButtonComponent :checked onIcon="fa-duotone fa-light fa-table" offIcon="fa-duotone fa-light fa-chart-bar"
+          @toggle="handleToggle" />
       </template>
     </PageToolbar>
     <IndexTable v-if="!checked" :index :columns />

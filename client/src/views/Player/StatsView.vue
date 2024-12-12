@@ -3,8 +3,9 @@ import { ref, watch, type Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@vue/apollo-composable'
 import Select from 'primevue/select'
+import PlayerStatsTable from '@/components/Player/PlayerStatsTable.vue'
 import { GET_PLAYER_STATS } from '@/services/PlayerService'
-import { percentage, unencodeName, updateDocumentTitle } from '@/utils/functions'
+import { percentage } from '@/utils/functions'
 import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints'
 
 const route = useRoute()
@@ -15,16 +16,19 @@ const { isBreakpointOrUp } = useGlobalBreakpoints()
 const props = defineProps<{
   name: string
   id: string
+  pageNames: { title: string, name: string }[]
 }>()
+const pages = props.pageNames.filter(page => page.name !== 'stats')
 const stats: Ref<{ category: string, value: number, suffix?: boolean }[] | null> = ref(null)
 const checked = ref(false)
-const selectOptions = {
-  borderColor: '{cyan.600}',
-  focusBorderColor: '{cyan.400}',
-}
+const selectTheme = { borderColor: '{violet.400}' }
+const columns = [
+  { field: 'category', header: 'Category' },
+  { field: 'value', header: '' },
+]
 
 const selectedYear = ref(route.query.year ? parseInt(route.query.year as string) : null)
-const selectedSurface = ref(route.query.surface || null)
+const selectedSurface = ref(route.query.surface as string || null)
 const years = ref([{ name: 'Career', value: null }])
 const surfaces = [
   { name: 'All', value: null },
@@ -33,15 +37,6 @@ const surfaces = [
   { name: 'Hard', value: 'Hard' },
   { name: 'Carpet', value: 'Carpet' },
 ]
-const pages = [
-  { title: 'Overview', name: 'player' },
-  { title: 'Activity', name: 'activity' },
-  { title: 'Titles and Finals', name: 'titles' },
-  { title: 'Win-Loss Index', name: 'index' }
-]
-
-// Update document title
-watch(() => props.name, () => updateDocumentTitle(`Stats | ${unencodeName(props.name)} | TennisHistory`), { immediate: true })
 
 // Handle selection
 const handleSelection = () => {
@@ -49,7 +44,6 @@ const handleSelection = () => {
 }
 
 // API call
-// @ts-ignore
 const { query, variables } = GET_PLAYER_STATS(props.id, selectedYear.value, selectedSurface.value)
 const { result, loading, error } = useQuery(query, variables)
 
@@ -89,35 +83,32 @@ watch(error, (newError) => {
 </script>
 
 <template>
-  <div v-if="stats" class="lg:w-3/4 mx-auto">
-    <PageToolbar :pages>
+  <div v-if="stats">
+    <PageToolbar :pages />
+    <Toolbar>
       <template #start>
         <FloatLabel variant="on">
-          <Select inputId="year_select" v-model="selectedYear" :options="years" optionLabel="name" placeholder="Year"
-            optionValue="value" @change="handleSelection" size="small" :dt="selectOptions" />
+          <Select :dt="selectTheme" inputId="year_select" v-model="selectedYear" :options="years" optionLabel="name"
+            optionValue="value" @change="handleSelection" size="small" class="w-[140%] text-center" />
           <label for="year_select">Year</label>
         </FloatLabel>
       </template>
+      <template #end v-if="isBreakpointOrUp('md')">
+        <ToggleButtonComponent :checked onIcon="fa-duotone fa-light fa-table" offIcon="fa-duotone fa-light fa-chart-bar"
+          @toggle="checked = !checked" />
+      </template>
       <template #center>
         <SelectButton v-model="selectedSurface" :options="surfaces" optionLabel="name" optionValue="value"
-          @change="handleSelection" size="small" style="border: 1px solid var(--p-cyan-400);" />
+          @change="handleSelection" size="small" style="border: 1px solid var(--p-violet-400);" />
       </template>
-    </PageToolbar>
-    <div v-if="isBreakpointOrUp('md')" class="w-full flex justify-end">
-      <ToggleButton v-model="checked" offIcon="pi pi-chart-bar" onIcon="pi pi-table" offLabel="" onLabel="" unstyled
-        class="mb-5" pt:icon="text-cyan-600 text-3xl" pt:root="border-cyan-600 border-[1px] rounded px-2" />
-    </div>
-    <DataTable v-if="!checked" :value="stats" size="small" stripedRows class="w-1/2 mx-auto">
-      <Column field="category" class="" />
-      <Column field="value" class="!text-center">
-        <template #body="{ data }">
-          <div>{{ data.value }}{{ data.suffix === false ? null : '%' }}</div>
-        </template>
-      </Column>
-    </DataTable>
-    <StatsBarChart v-if="checked" :stats />
+    </Toolbar>
+    <PlayerStatsTable :columns="columns" :stats="stats" :checked="checked" />
+    <PlayerStatsBarChart v-if="checked" :stats />
   </div>
   <Loading v-else :loading>
+    <template #loading>
+      <LoadingTable :columns />
+    </template>
     <template #none>No stats available</template>
   </Loading>
 </template>

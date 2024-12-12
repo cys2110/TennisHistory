@@ -53,6 +53,8 @@ declare module 'vue' {
     PlayerBreadcrumbs: typeof import('./src/components/Player/PlayerBreadcrumbs.vue')['default']
     PlayerDetails: typeof import('./src/components/Player/PlayerDetails.vue')['default']
     PlayerRow: typeof import('./src/components/Global/PlayerRow.vue')['default']
+    PlayerStatsBarChart: typeof import('./src/components/Player/PlayerStatsBarChart.vue')['default']
+    PlayerStatsTable: typeof import('./src/components/Player/PlayerStatsTable.vue')['default']
     PlayerTable: typeof import('./src/components/H2H/PlayerTable.vue')['default']
     PrizeMoney: typeof import('./src/components/Event/PrizeMoney.vue')['default']
     PrizeMoneyChart: typeof import('./src/components/Event/PrizeMoneyChart.vue')['default']

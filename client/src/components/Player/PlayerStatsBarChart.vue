@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { ref, provide } from 'vue'
+import { $dt } from '@primevue/themes'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart } from 'echarts/charts'
 import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/components'
 import VChart, { THEME_KEY } from 'vue-echarts'
-import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
+import { CHART_OPTIONS } from '@/utils/variables'
+import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints'
+
+const { isBreakpointOrUp } = useGlobalBreakpoints()
 
 const props = defineProps<{
   stats: { category: string, value: number, suffix?: boolean }[]
@@ -16,15 +20,14 @@ provide(THEME_KEY, 'dark')
 
 const option = ref({
   ...CHART_OPTIONS,
-  grid: { left: '20%' },
+  grid: { left: isBreakpointOrUp('lg') ? '20%' : '30%' },
   dataset: {
     source: props.stats,
     dimensions: ['category', 'value', 'actualValue', 'max'],
   },
   tooltip: {
-    // @ts-ignore
-    formatter: function (params) {
-      return `${params.value.value}${params.data.suffix === false ? '' : '%'}`
+    formatter: function (params: any) {
+      return `<span style="font-weight: bold">${params.data.category}</span><br/>${params.value.value}${params.data.suffix === false ? '' : '%'}`
     },
   },
   xAxis: { type: 'value', max: 100 },
@@ -33,7 +36,7 @@ const option = ref({
     {
       type: 'bar',
       encode: { x: 'value', y: 'category' },
-      itemStyle: { color: COLOURS.green800 },
+      itemStyle: { color: $dt('emerald.600').value },
     },
   ],
 })
