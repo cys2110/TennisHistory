@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { type Ref, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import { useQuery } from '@vue/apollo-composable'
 import { GET_PLAYER } from '@/services/PlayerService'
 import type { Player } from '@/utils/types'
@@ -10,7 +9,6 @@ import { useImages } from '@/utils/useImages'
 // TODO: Skeleton loader
 // TODO: FIGURE OUT MAJOR RESULTS APICALL
 
-const route = useRoute()
 const { isBreakpointOrUp, isBreakpoint } = useGlobalBreakpoints()
 const { gladiator, headshot } = useImages()
 
@@ -21,7 +19,7 @@ const props = defineProps<{
   pageNames: { title: string; name: string }[]
 }>()
 const player: Ref<Player | null> = ref(null)
-const pages = props.pageNames.filter(page => page.name !== route.name)
+const pages = props.pageNames.filter(page => page.name !== 'player')
 
 // API call
 const { query, variables } = GET_PLAYER(props.id)

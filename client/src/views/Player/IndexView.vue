@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { ref, watch, type Ref } from 'vue'
-import { useRoute } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable'
 import { GET_INDEX } from '@/services/PlayerService'
 import type { Index } from '@/utils/types';
 import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints';
 
-const route = useRoute()
 const { isBreakpointOrUp } = useGlobalBreakpoints()
 
 // Variables
@@ -17,7 +15,7 @@ const props = defineProps<{
 }>()
 const index: Ref<Index[] | null> = ref(null)
 const checked = ref(false)
-const pages = props.pageNames.filter(page => page.name !== route.name)
+const pages = props.pageNames.filter(page => page.name !== 'index')
 
 // Index skeleton
 const getIndexValue = (win: number, loss: number) => {

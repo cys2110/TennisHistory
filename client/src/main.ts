@@ -43,6 +43,7 @@ const MyPreset = definePreset(Aura, {
       mobileButtonHoverBackground: 'transparent',
       submenuBackground: '{violet.800}',
     },
+    // used in player details
     card: {
       background: '{violet.800}',
       color: '{zinc.300}',

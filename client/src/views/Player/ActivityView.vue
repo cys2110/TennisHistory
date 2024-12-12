@@ -8,8 +8,8 @@ import { GET_ACTIVITY } from '@/services/PlayerService'
 import { unencodeName, updateDocumentTitle } from '@/utils/functions'
 import type { Entry } from '@/utils/types'
 
-// [FUTURE: ADD FILTER BY TOURNAMENT TYPE AND TOURNAMENT]
-// [TODO: DEFAULT TO LATEST YEAR]
+// TODO ADD FILTER BY TOURNAMENT TYPE AND TOURNAMENT
+// TODO DEFAULT TO LATEST YEAR
 
 const route = useRoute()
 const router = useRouter()

@@ -535,6 +535,9 @@ export const typeDefs = `#graphql
         tname: String
         surface: String
         year: Int
+        start: Date
+        end: Date
+        category: String
 }
 
     type Tournament {
@@ -682,13 +685,13 @@ export const typeDefs = `#graphql
         playertitles (id: String!): [TitlesFinals!]! @cypher(statement: """
             MATCH (t:Tournament)-[]-(e:Event)-[]-(:Round {round: 'Final'})-[]-(:Match)-[]-(:Winner)-[]-(:Entry)-[]-(:Player {id: $id})
             MATCH (y:Year)-[]-(e)-[]-(s:Surface)
-            RETURN {tid: t.id, id: e.id, tname: t.name, year: y.id, surface: s.id} as result
+            RETURN {tid: t.id, id: e.id, tname: t.name, year: y.id, surface: s.id, start: e.start_date, end: e.end_date, category: e.category} as result
             ORDER BY e.start_date
         """, columnName: "result")
         playerfinals (id: String!): [TitlesFinals!]! @cypher(statement: """
             MATCH (t:Tournament)-[]-(e:Event)-[]-(:Round {round: 'Final'})-[]-(:Match)-[]-(:Loser)-[]-(:Entry)-[]-(:Player {id: $id})
             MATCH (y:Year)-[]-(e)-[]-(s:Surface)
-            RETURN {tid: t.id, id: e.id, tname: t.name, year: y.id, surface: s.id} as result
+            RETURN {tid: t.id, id: e.id, tname: t.name, year: y.id, surface: s.id, start: e.start_date, end: e.end_date, category: e.category} as result
             ORDER BY e.start_date
         """, columnName: "result")
         majorResults (id: String!, tournament: Int!): MajorResults @cypher(statement: """

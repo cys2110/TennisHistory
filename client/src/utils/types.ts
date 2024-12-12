@@ -333,6 +333,9 @@ export interface TitlesAndFinals {
   year: number
   id: number
   tname: string
+  category: string
+  start: string
+  end: string
 }
 
 export interface Tournament {
