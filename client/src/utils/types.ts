@@ -203,6 +203,8 @@ export interface Match {
   } | null
 }
 
+// FIXME: Delete bh1, rh
+
 export interface Player {
   backhand: string | null
   career_high: number | null

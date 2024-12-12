@@ -11,6 +11,7 @@ export function getParams() {
     }
   }
 
+  // TODO: Add tournament, event, match, h2h params
   return {
     getPlayerParams,
   }

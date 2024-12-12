@@ -7,7 +7,8 @@ import type { Player } from '@/utils/types'
 import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints'
 import { useImages } from '@/utils/useImages'
 
-// [TODO: FIGURE OUT MAJOR RESULTS APICALL]
+// TODO: Skeleton loader
+// TODO: FIGURE OUT MAJOR RESULTS APICALL
 
 const route = useRoute()
 const { isBreakpointOrUp, isBreakpoint } = useGlobalBreakpoints()
