@@ -1,28 +1,21 @@
 <script setup lang="ts">
-import { computed, ref, watch, type Ref } from 'vue'
+import { ref, watch, type Ref } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import ToggleSwitch from 'primevue/toggleswitch'
 import { GET_TITLES } from '@/services/PlayerService'
-import { unencodeName, updateDocumentTitle } from '@/utils/functions'
 import type { TitlesAndFinals } from '@/utils/types'
+import EventTimeline from '@/components/Player/EventTimeline.vue'
 
 // Variables
 const props = defineProps<{
   name: string
   id: string
+  pageNames: { title: string, name: string }[]
 }>()
 const checked = ref(false)
-const titles: Ref<TitlesAndFinals[] | null> = ref(null)
-const finals: Ref<TitlesAndFinals[] | null> = ref(null)
-const pages = [
-  { title: 'Overview', name: 'player' },
-  { title: 'Activity', name: 'activity' },
-  { title: 'Win-Loss Index', name: 'index' },
-  { title: 'Stats', name: 'stats' }
-]
-
-// Update document title
-watch(() => props.name, () => updateDocumentTitle(`Titles and Finals | ${unencodeName(props.name)} | TennisHistory`), { immediate: true })
+const titles: Ref<TitlesAndFinals[]> = ref([])
+const finals: Ref<TitlesAndFinals[]> = ref([])
+const pages = props.pageNames.filter(page => page.name !== 'titles')
 
 // API call
 const { query, variables } = GET_TITLES(props.id)
@@ -41,7 +34,7 @@ watch(error, (newError) => {
 </script>
 
 <template>
-  <div v-if="titles || finals">
+  <div v-if="titles.length > 0 || finals.length > 0">
     <PageToolbar :pages>
       <template #start>
         <div class="flex items-center">
@@ -50,9 +43,12 @@ watch(error, (newError) => {
         </div>
       </template>
     </PageToolbar>
-    <FinalsTable :events="checked ? finals : titles" />
+    <EventTimeline :events="checked ? finals : titles" />
   </div>
   <Loading v-else :loading>
+    <template #loading>
+      <LoadingTimeline />
+    </template>
     <template #none>No titles or finals played</template>
   </Loading>
 </template>

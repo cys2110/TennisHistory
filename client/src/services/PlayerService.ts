@@ -187,6 +187,9 @@ export const GET_TITLES = (id: string) => {
         tid
         tname
         year
+        start
+        end
+        category
       }
       playertitles(id: $id) {
         id
@@ -194,6 +197,9 @@ export const GET_TITLES = (id: string) => {
         tid
         tname
         year
+        start
+        end
+        category
       }
     }
   `

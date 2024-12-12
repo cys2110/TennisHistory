@@ -5,16 +5,21 @@ import { CanvasRenderer } from 'echarts/renderers'
 import { BarChart } from 'echarts/charts'
 import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/components'
 import VChart, { THEME_KEY } from 'vue-echarts'
-import { CHART_OPTIONS, COLOURS } from '@/utils/variables'
+import { $dt } from '@primevue/themes'
+import { CHART_OPTIONS } from '@/utils/variables'
 import type { Index } from '@/utils/types'
+import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints'
+
+const { isBreakpointOrUp } = useGlobalBreakpoints()
+type Category = 'Match Record' | 'Pressure Points' | 'Environment' | 'Other'
 
 // Variables
 const props = defineProps<{ index: Index }>()
 const categoryColours = {
-  'Match Record': COLOURS.sky600,
-  'Pressure Points': COLOURS.fuchsia600,
-  Environment: COLOURS.violet600,
-  Other: COLOURS.green600,
+  'Match Record': $dt('sky.600').value,
+  'Pressure Points': $dt('fuchsia.600').value,
+  Environment: $dt('violet.600').value,
+  Other: $dt('emerald.600').value,
 }
 
 use([DatasetComponent, TooltipComponent, GridComponent, BarChart, CanvasRenderer])
@@ -22,7 +27,7 @@ provide(THEME_KEY, 'dark')
 
 const option = ref({
   ...CHART_OPTIONS,
-  grid: { left: '20%' },
+  grid: { left: isBreakpointOrUp('xl') ? '10%' : '30%' },
   tooltip: {
     formatter: function (params: any) {
       const stat = params.value.stat
@@ -30,7 +35,7 @@ const option = ref({
       const wins = params.value.win
       const losses = params.value.loss
       const titles = params.value.titles
-      return `${stat}<br/ >W-L: ${wins}-${losses} (${index})${titles >= 0 ? `<br />Titles.value: ${titles}` : ''
+      return `<span style="font-weight: bold">${stat}</span><br/ >${wins}-${losses} (${index})${titles >= 0 ? `<br />${titles} ${titles === 1 ? 'title' : 'titles'}` : ''
         }`
     },
   },
@@ -39,15 +44,14 @@ const option = ref({
     dimensions: ['category', 'stat', 'win', 'loss', 'titles', 'value'],
   },
   xAxis: { type: 'value' },
-  yAxis: { type: 'category' },
+  yAxis: { type: 'category', inverse: true },
   series: [
     {
       type: 'bar',
       encode: { x: 'value', y: 'stat' },
       itemStyle: {
         color: function (param: any) {
-          // @ts-ignore
-          return categoryColours[param.data.category]
+          return categoryColours[param.data.category as Category]
         },
       },
     },

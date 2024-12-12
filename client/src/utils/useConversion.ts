@@ -1,6 +1,8 @@
 import convert from 'convert'
 import { DateTime, Duration } from 'luxon'
 
+// TODO: Remove extraneous functions
+
 export function useConversion() {
   const percentage = (value1: number, total: number) => {
     return parseInt(((value1 / total) * 100).toFixed(0))
