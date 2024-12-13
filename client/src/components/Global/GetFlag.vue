@@ -8,8 +8,8 @@ const selectedFlag = shallowRef(null)
 onMounted(async () => {
     const countryCode = props.country
     try {
-        const flags: { [key: string]: any } = await import(`@/components/icons/flags`)
-        selectedFlag.value = flags[countryCode] || null
+        const flagModule: { [key: string]: any } = await import(`@/components/icons/${countryCode}.ts`)
+        selectedFlag.value = flagModule.default || null
     } catch (error) {
         console.error(`Flag for ${countryCode} not found`, error)
     }

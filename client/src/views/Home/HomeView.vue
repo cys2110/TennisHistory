@@ -55,17 +55,11 @@ const selectOptions = [
   { vModel: selectedSurface, options: surfaces, label: 'Surface' }
 ]
 
-const handleSelection = (label: string) => {
-  const queryCategory = label === 'Category' ? selectedCategory.value : route.query.category
-  const queryMonth = label === 'Month' ? selectedMonth.value : route.query.month
-  const querySurface = label === 'Surface' ? selectedSurface.value : route.query.surface
-  router.replace({ query: { category: queryCategory, month: queryMonth, surface: querySurface } })
-}
+const handleSelection = (label: string) => router.replace({ query: { category: selectedCategory.value, month: selectedMonth.value, surface: selectedSurface.value } })
 
 // API call to get upcoming tournaments
 const { query, variables } = GET_UPCOMING(selectedSurface.value, selectedMonth.value, selectedCategory.value,)
 const { result, loading, error } = useQuery(query, variables)
-console.log(variables)
 
 watch(result, (newResult) => {
   if (newResult) events.value = newResult.upcomingEvents

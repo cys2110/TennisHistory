@@ -89,7 +89,9 @@ const descriptionItems = [
     label: coaches.length === 1 ? 'Coach' : 'Coaches',
     value: <div class="flex flex-col">
       {coaches.length > 0 ? coaches.map(coach => {
-        return coach.first_name ? <router-link class="hover-link" to={{ name: 'player', params: { name: encodeName(coach.full_name), id: coach.id } }}>{coach.full_name}</router-link> : coach.id
+        return coach.first_name ? <div class="text-center">
+          <router-link class="hover-link" to={{ name: 'player', params: { name: encodeName(coach.full_name), id: coach.id } }}>{coach.full_name}</router-link>
+        </div> : coach.id
       }) : '—'}
     </div>,
     colSpan: 1

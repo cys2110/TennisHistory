@@ -40,7 +40,7 @@ const surfaces = [
 
 // Handle selection
 const handleSelection = () => {
-  router.push({ query: { year: selectedYear.value, surface: selectedSurface.value } })
+  router.replace({ query: { year: selectedYear.value, surface: selectedSurface.value } })
 }
 
 // API call

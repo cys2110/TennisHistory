@@ -63,13 +63,7 @@ const selectOptions = [
   { vModel: selectedSurface, options: surfaces, label: 'Surface' }
 ]
 
-const handleSelection = (label: string) => {
-  const queryYear = label === 'Year' ? searchYear.value : route.query.year
-  const queryCategory = label === 'Category' ? selectedCategory.value : route.query.category
-  const queryMonth = label === 'Month' ? selectedMonth.value : route.query.month
-  const querySurface = label === 'Surface' ? selectedSurface.value : route.query.surface
-  router.replace({ query: { year: queryYear, category: queryCategory, month: queryMonth, surface: querySurface } })
-}
+const handleSelection = (label: string) => router.replace({ query: { year: searchYear.value, category: selectedCategory.value, month: selectedMonth.value, surface: selectedSurface.value } })
 
 // API call
 const { query, variables } = GET_ARCHIVE(searchYear.value, selectedCategory.value, selectedMonth.value, selectedSurface.value)

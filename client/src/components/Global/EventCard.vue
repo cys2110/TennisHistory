@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { DateTime } from 'luxon'
 import type { EventCard } from '@/utils/types'
-import { SURFACES } from '@/utils/variables'
+import { SURFACES, EVENT_PAGES } from '@/utils/variables'
 import { useUrlNames } from '@/utils/useUrlNames';
 import { useConversion } from '@/utils/useConversion';
 import { useImages } from '@/utils/useImages';
@@ -17,11 +17,6 @@ const props = defineProps<{
 const { start_date, tournament, year, id, venue, sponsor_name, category, surface, end_date } = props.event
 
 // Buttons
-const eventPages = [
-  { title: 'Details', name: 'event' },
-  { title: 'Results', name: 'results' },
-  { title: 'Draw', name: 'draw' },
-]
 const isDisabled = DateTime.now() < DateTime.fromISO(start_date)
 const tooltipText = "Event has not started yet"
 
@@ -59,10 +54,10 @@ const eventParams = { ...tournamentParams, year: year.id, eid: id }
     <template #footer>
       <Divider />
       <div class="flex justify-between md:justify-evenly mt-5">
-        <Button v-if="isDisabled" v-for="page in eventPages" :key="page.name" :label="page.title" size="small"
+        <Button v-if="isDisabled" v-for="page in EVENT_PAGES" :key="page.name" :label="page.title" size="small"
           class="!border-violet-800 !text-zinc-400 !cursor-not-allowed" variant="outlined" rounded raised
           v-tooltip="tooltipText" disabled />
-        <Button v-else v-for="(page, index) in eventPages" :key="index" as="router-link" :label="page.title"
+        <Button v-else v-for="(page, index) in EVENT_PAGES" :key="index" as="router-link" :label="page.title"
           size="small" class="!text-zinc-400 hover:!text-zinc-300" variant="outlined" rounded raised
           :to="{ name: page.name, params: eventParams }" />
       </div>

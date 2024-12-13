@@ -4,7 +4,7 @@ import { useConversion } from '@/utils/useConversion';
 import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints';
 import { useImages } from '@/utils/useImages';
 import { useUrlNames } from '@/utils/useUrlNames';
-import { SURFACES } from '@/utils/variables';
+import { EVENT_PAGES, SURFACES } from '@/utils/variables';
 import { computed } from 'vue';
 
 const { isBreakpointOrUp } = useGlobalBreakpoints()
@@ -15,12 +15,6 @@ const { categorySrc } = useImages()
 const props = defineProps<{
     events: TitlesAndFinals[]
 }>()
-
-const eventPages = [
-    { title: 'Details', name: 'event' },
-    { title: 'Results', name: 'results' },
-    { title: 'Draw', name: 'draw' },
-]
 
 const totalEvents = computed(() => {
     const totalEventsObject = props.events.reduce((acc: { [key: number]: number }, obj) => {
@@ -59,7 +53,7 @@ const totalEvents = computed(() => {
                 </div>
                 <template #footer>
                     <div class="flex justify-between md:justify-evenly mt-5">
-                        <Button v-for="(page, index) in eventPages" :key="index" as="router-link" :label="page.title"
+                        <Button v-for="(page, index) in EVENT_PAGES" :key="index" as="router-link" :label="page.title"
                             size="small" class="!text-zinc-400 hover:!text-zinc-300" variant="outlined" rounded raised
                             :to="{ name: page.name, params: { name: encodeName(item.tname), id: item.tid, year: item.year, eid: item.id } }" />
                     </div>

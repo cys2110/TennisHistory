@@ -1,4 +1,14 @@
-import { Category, Currency, EntryInfo, Incomplete, Months, StatusInfo, Surface } from './types'
+import { $dt } from '@primevue/themes'
+import {
+  Category,
+  Currency,
+  EntryInfo,
+  Incomplete,
+  Months,
+  ShortRound,
+  StatusInfo,
+  Surface,
+} from './types'
 
 export const SURFACES = {
   [Surface.IndoorCarpet]: 'Indoor Carpet',
@@ -79,16 +89,23 @@ export const CURRENCIES = {
   [Currency.GBP]: '£',
 }
 
+export const EVENT_PAGES = [
+  { title: 'Details', name: 'event' },
+  { title: 'Results', name: 'results' },
+  { title: 'Draw', name: 'draw' },
+]
+
 export const NORMAL_DRAW = ['Round of 128', 'Round of 64', 'Round of 32']
 
 export const SHORT_ROUNDS = {
-  Final: 'F',
-  Semifinals: 'SF',
-  Quarterfinals: 'QF',
-  'Round of 16': 'R16',
-  'Round of 32': 'R32',
-  'Round of 64': 'R64',
-  'Round of 128': 'R128',
+  [ShortRound.F]: 'F',
+  [ShortRound.SF]: 'SF',
+  [ShortRound.QF]: 'QF',
+  [ShortRound.R16]: 'R16',
+  [ShortRound.R32]: 'R32',
+  [ShortRound.R64]: 'R64',
+  [ShortRound.R128]: 'R128',
+  [ShortRound.RR]: 'RR',
 }
 
 export const ENTRY_INFO = {
@@ -113,28 +130,22 @@ export const STATUS_INFO = {
 }
 
 export const COLOURS = {
-  red600: '#dc2626',
   green800: '#166534',
   green600: '#16a34a',
-  sky600: '#0284c7',
-  fuchsia600: '#c026d3',
-  violet400: '#c084fc',
-  violet600: '#7c3aed',
   violet700: '#6d28d9',
-  violet800: '#5b21b6',
-  zinc300: '#d4d4d8',
   zinc400: '#a1a1aa',
 }
 
 export const CHART_OPTIONS = {
   darkMode: true,
   backgroundColor: 'transparent',
-  textStyle: { color: COLOURS.zinc400, fontSize: 14 },
+  textStyle: { color: $dt('zinc.400').value, fontSize: 14 },
 }
 
 export const breakpoints = {
-  sm: '(max-width: 640px)',
-  md: '(max-width: 768px)',
-  lg: '(max-width: 1024px)',
-  xl: '(min-width: 1025px)',
+  sm: '(min-width: 640px)',
+  md: '(min-width: 768px)',
+  lg: '(min-width: 1024px)',
+  xl: '(min-width: 1280px)',
+  '2xl': '(min-width: 1536px)',
 }

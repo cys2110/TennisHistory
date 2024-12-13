@@ -5,38 +5,29 @@ import { useQuery } from '@vue/apollo-composable'
 import Select from 'primevue/select'
 import { DateTime } from 'luxon'
 import { GET_ACTIVITY } from '@/services/PlayerService'
-import { unencodeName, updateDocumentTitle } from '@/utils/functions'
 import type { Entry } from '@/utils/types'
 
 // TODO ADD FILTER BY TOURNAMENT TYPE AND TOURNAMENT
-// TODO DEFAULT TO LATEST YEAR
+// FIXME: Fix responsive styling
 
 const route = useRoute()
 const router = useRouter()
 
 // Variables
-const props = defineProps(['name', 'id'])
+const props = defineProps<{
+  id: string
+  name: string
+  pageNames: { title: string, name: string }[]
+}>()
 const selectedYear = ref(route.query.year ? parseInt(route.query.year as string) : DateTime.now().year)
 const years: Ref<{ name: string, value: string }[]> = ref([])
 const stats: Ref<{ category: string, value: number }[]> = ref([])
 const events: Ref<Entry[] | null> = ref(null)
+const pages = props.pageNames.filter(page => page.name !== 'activity')
 
-const pages = [
-  { title: 'Overview', name: 'player' },
-  { title: 'Titles and Finals', name: 'titles' },
-  { title: 'Win-Loss Index', name: 'index' },
-  { title: 'Stats', name: 'stats' }
-]
+const selectOptions = { borderColor: '{violet.400}' }
 
-const selectOptions = {
-  borderColor: '{cyan.600}',
-  focusBorderColor: '{cyan.400}',
-}
-
-// Update document title
-watch(() => props.name, () => updateDocumentTitle(`Activity | ${unencodeName(props.name)} | TennisHistory`), { immediate: true })
-
-const handleSelection = () => router.push({ query: { year: selectedYear.value } })
+const handleSelection = () => router.replace({ query: { year: selectedYear.value } })
 
 // API call
 const { query, variables } = GET_ACTIVITY(props.id, selectedYear.value)
@@ -51,7 +42,7 @@ watch(result, (newResult) => {
       name: earliest + index,
       value: earliest + index,
     }))
-    selectedYear.value = latest
+    selectedYear.value = route.query.year ? parseInt(route.query.year as string) : latest
 
     // Set stats
     stats.value = [{ category: 'Wins', value: newResult.yearStats.wins }, { category: 'Losses', value: newResult.yearStats.losses }, { category: 'Titles', value: newResult.yearStats.titles }]
@@ -75,6 +66,16 @@ watch(result, (newResult) => {
 watch(error, (newError) => {
   if (newError) console.error(newError)
 }, { immediate: true })
+
+const columns = [
+  { field: 'round', header: 'ROUND' },
+  { field: '', header: '' },
+  { field: '', header: '' },
+  { field: 'opponent', header: 'OPPONENT' },
+  { field: 'opponent.rank', header: 'RANK' },
+  { field: '', header: 'SEED' },
+  { field: '', header: '' }
+]
 </script>
 
 <template>
@@ -93,9 +94,14 @@ watch(error, (newError) => {
         <div class="font-bold text-3xl text-center">{{ stat.value }}</div>
       </Fieldset>
     </div>
-    <ActivityCard v-for="(event, index) in events" :key="index" :event :name :id />
+    <div class="flex flex-col gap-5 mt-10">
+      <ActivityCard v-for="(event, index) in events" :key="index" :event :name :id />
+    </div>
   </div>
   <Loading v-else :loading>
+    <template #loading>
+      <LoadingTable :columns />
+    </template>
     <template #none>No events played</template>
   </Loading>
 </template>

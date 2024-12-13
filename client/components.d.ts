@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     Accordion: typeof import('primevue/accordion')['default']
     ActivityCard: typeof import('./src/components/Player/ActivityCard.vue')['default']
+    ActivityTable: typeof import('./src/components/Player/ActivityTable.vue')['default']
     Avatar: typeof import('primevue/avatar')['default']
     Badge: typeof import('primevue/badge')['default']
     Breadcrumb: typeof import('primevue/breadcrumb')['default']
@@ -68,6 +69,7 @@ declare module 'vue' {
     SearchTournaments: typeof import('./src/components/Search/SearchTournaments.vue')['default']
     Seeds: typeof import('./src/components/Event/Seeds.vue')['default']
     SeedsChart: typeof import('./src/components/Event/SeedsChart.vue')['default']
+    Select: typeof import('primevue/select')['default']
     SelectButton: typeof import('primevue/selectbutton')['default']
     ServiceSpeed: typeof import('./src/components/Match/ServiceSpeed.vue')['default']
     Skeleton: typeof import('primevue/skeleton')['default']
@@ -82,6 +84,7 @@ declare module 'vue' {
     Title: typeof import('./src/components/Global/Title.vue')['default']
     ToggleButton: typeof import('primevue/togglebutton')['default']
     ToggleButtonComponent: typeof import('./src/components/Global/ToggleButtonComponent.vue')['default']
+    ToggleSwitch: typeof import('primevue/toggleswitch')['default']
     Toolbar: typeof import('primevue/toolbar')['default']
     TournamentBreadcrumbs: typeof import('./src/components/Tournament/TournamentBreadcrumbs.vue')['default']
     TournamentCard: typeof import('./src/components/Tournament/TournamentCard.vue')['default']

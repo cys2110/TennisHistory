@@ -98,6 +98,17 @@ export enum Category {
   GP = 'Grand Prix',
 }
 
+export enum ShortRound {
+  R128 = 'Round of 128',
+  R64 = 'Round of 64',
+  R32 = 'Round of 32',
+  R16 = 'Round of 16',
+  QF = 'Quarterfinals',
+  SF = 'Semifinals',
+  F = 'Final',
+  RR = 'Round Robin',
+}
+
 interface Country {
   id: string
   name: string
