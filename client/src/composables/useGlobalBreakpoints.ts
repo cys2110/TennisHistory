@@ -1,5 +1,4 @@
-import { ref, onMounted, onUnmounted } from 'vue'
-import { breakpoints } from './variables'
+import { breakpoints } from '../utils/variables'
 
 export function useGlobalBreakpoints() {
   const currentBreakpoint = ref<string | null>(null)

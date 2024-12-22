@@ -3,14 +3,14 @@ import { type Ref, ref, watch } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import { GET_PLAYER } from '@/services/PlayerService'
 import type { Player } from '@/utils/types'
-import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints'
-import { useImages } from '@/utils/useImages'
+import { useGlobalBreakpoints } from '@/composables/useGlobalBreakpoints'
+import { use2Images2 } from '@/utils/use2Images2'
 
 // TODO: Skeleton loader
 // TODO: FIGURE OUT MAJOR RESULTS APICALL
 
 const { isBreakpointOrUp, isBreakpoint } = useGlobalBreakpoints()
-const { gladiator, headshot } = useImages()
+const { gladiator, headshot } = use2Images2()
 
 // Variables
 const props = defineProps<{

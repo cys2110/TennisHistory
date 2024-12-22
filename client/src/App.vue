@@ -5,9 +5,9 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen">
-    <Header class="bg-violet-800 sticky top-0 z-50 w-full flex items-center" />
-    <div class="flex-1 py-16 w-3/4 mx-auto">
+  <div class="flex flex-col min-h-screen bg-gray-100 dark:bg-zinc-900">
+    <Header />
+    <div class="flex-1 py-16 w-11/12 md:w-3/4 2xl:w-2/3 mx-auto ">
       <RouterView :key="$route.fullPath" />
     </div>
     <ScrollTop />

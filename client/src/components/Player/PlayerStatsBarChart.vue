@@ -7,7 +7,7 @@ import { BarChart } from 'echarts/charts'
 import { DatasetComponent, GridComponent, TooltipComponent } from 'echarts/components'
 import VChart, { THEME_KEY } from 'vue-echarts'
 import { CHART_OPTIONS } from '@/utils/variables'
-import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints'
+import { useGlobalBreakpoints } from '@/composables/useGlobalBreakpoints'
 
 const { isBreakpointOrUp } = useGlobalBreakpoints()
 

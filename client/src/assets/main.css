@@ -1,23 +1,5 @@
 @import './base.css';
 
-.hover-link {
-  color: #d4d4d8;
-  text-decoration: none;
-  background-image: linear-gradient(#a1a1aa, #a1a1aa);
-  background-size: 0% 0.1em;
-  background-position-y: 105%;
-  background-position-x: 50%;
-  background-repeat: no-repeat;
-  transition: background-size 0.4s ease-in-out;
-}
-
-.hover-link:hover,
-.hover-link:focus,
-.hover-link:active {
-  background-size: 100% 0.1em;
-  color: #a1a1aa;
-}
-
 @layer components {
   .full-card {
     @apply h-full flex flex-col justify-between;
@@ -29,5 +11,9 @@
 
   .full-card .p-card-footer {
     @apply mt-auto; /* Push footer to the bottom */
+  }
+
+  .hover-link {
+    @apply relative text-xl w-fit block after:block after:content-[''] after:absolute after:h-[1px] after:bg-zinc-600 dark:after:bg-zinc-400 after:left-0 after:right-0 after:bottom-0 after:scale-x-0 hover:after:scale-x-100 after:transition after:duration-300 after:origin-center hover:text-zinc-600 dark:hover:text-zinc-400;
   }
 }

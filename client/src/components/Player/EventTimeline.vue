@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Surface, TitlesAndFinals } from '@/utils/types';
 import { useConversion } from '@/utils/useConversion';
-import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints';
-import { useImages } from '@/utils/useImages';
+import { useGlobalBreakpoints } from '@/composables/useGlobalBreakpoints';
+import { use2Images2 } from '@/utils/use2Images2';
 import { useUrlNames } from '@/utils/useUrlNames';
 import { EVENT_PAGES, SURFACES } from '@/utils/variables';
 import { computed } from 'vue';
@@ -10,7 +10,7 @@ import { computed } from 'vue';
 const { isBreakpointOrUp } = useGlobalBreakpoints()
 const { encodeName } = useUrlNames()
 const { formattedDates } = useConversion()
-const { categorySrc } = useImages()
+const { categorySrc } = use2Images2()
 
 const props = defineProps<{
     events: TitlesAndFinals[]

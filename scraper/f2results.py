@@ -9,7 +9,7 @@ import os
 import re
 from unidecode import unidecode
 
-tid = 605
+tid = 7696
 year = 2024
 
 driver = webdriver.Chrome()
@@ -67,18 +67,27 @@ def writeToDb(db):
             MERGE (u:Umpire {id: $umpire})
             MERGE (u)-[:UMPIRED]->(m)
             SET m.date = date($date), m.court = $court, p1:Winner, p2:Loser
-            WITH p, f, m, e
-            WHERE m.match_no > 1
-            MATCH (m2:Match {match_no: floor(m.match_no / 2)})-[]-(:Round)-[]-(e)
-            MERGE (s:Score {id: m2.id + ' ' + p.id})
-            MERGE (f)-[:SCORED]->(s)
-            MERGE (s)-[:SCORED]->(m2)
-            WITH s, m
-            FOREACH (ignoreMe IN CASE WHEN m.match_no % 2 = 1 THEN [1] ELSE [] END |
-            SET s:P2)
-            FOREACH (ignoreMe IN CASE WHEN m.match_no % 2 = 0 THEN [1] ELSE [] END |
-            SET s:P1)
             """, p1id=m['p1'], eid=f"{tid}{year}", p2id=m['p2'], umpire=m['umpire'], date=m['date'], court=m['court'])
+    # for m in matches_list:
+    #     result = db.run("""
+    #         MATCH (p:Player {id: $p1id})-[]-(f:Entry)-[]-(p1:Score)-[]-(m:Match)-[]-(p2:Score)-[]-(:Entry)-[]-(:Player {id: $p2id})
+    #         WHERE m.id CONTAINS $eid
+    #         MATCH (m)-[]-(r:Round)-[]-(e:Event)
+    #         MERGE (u:Umpire {id: $umpire})
+    #         MERGE (u)-[:UMPIRED]->(m)
+    #         SET m.date = date($date), m.court = $court, p1:Winner, p2:Loser
+    #         WITH p, f, m, e
+    #         WHERE m.match_no > 1
+    #         MATCH (m2:Match {match_no: floor(m.match_no / 2)})-[]-(:Round)-[]-(e)
+    #         MERGE (s:Score {id: m2.id + ' ' + p.id})
+    #         MERGE (f)-[:SCORED]->(s)
+    #         MERGE (s)-[:SCORED]->(m2)
+    #         WITH s, m
+    #         FOREACH (ignoreMe IN CASE WHEN m.match_no % 2 = 1 THEN [1] ELSE [] END |
+    #         SET s:P2)
+    #         FOREACH (ignoreMe IN CASE WHEN m.match_no % 2 = 0 THEN [1] ELSE [] END |
+    #         SET s:P1)
+    #         """, p1id=m['p1'], eid=f"{tid}{year}", p2id=m['p2'], umpire=m['umpire'], date=m['date'], court=m['court'])
 
 with GraphDatabase.driver(URI, auth=AUTH) as ndriver:
     with ndriver.session(database="neo4j") as session:

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { getEntry, getLowerTb } from '@/utils/functions';
 import type { Match, ShortRound } from '@/utils/types';
-import { useImages } from '@/utils/useImages';
+import { use2Images2 } from '@/utils/use2Images2';
 import { useUrlNames } from '@/utils/useUrlNames';
 import { SHORT_ROUNDS } from '@/utils/variables';
 
 const { encodeName } = useUrlNames()
-const { headshot } = useImages()
+const { headshot } = use2Images2()
 
 interface Player { s1: number | null, s2: number | null, s3: number | null, s4: number | null, s5: number | null, t1: number | null, t2: number | null, t3: number | null, t4: number | null, t5: number | null, incomplete?: string | null, id?: string, name?: string, country?: { id: string, name: string }, seed?: number | null, rank?: number | null, status?: string | null }
 

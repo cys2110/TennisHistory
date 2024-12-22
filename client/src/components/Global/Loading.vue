@@ -3,7 +3,7 @@ const props = defineProps<{ loading: Boolean }>()
 </script>
 
 <template>
-  <div v-if="loading">
+  <div v-if="loading" class="mt-5">
     <slot name="loading" />
   </div>
   <div v-else class="text-zinc-400 text-2xl">

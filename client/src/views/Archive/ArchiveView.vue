@@ -1,53 +1,33 @@
 <script setup lang="ts">
-import { type Ref, ref, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useQuery } from '@vue/apollo-composable'
 import Select from 'primevue/select'
-import { DateTime } from 'luxon'
 import { GET_ARCHIVE } from '@/services/EventService'
-import type { EventCard } from '@/utils/types'
-import { CATEGORIES, MONTHS } from '@/utils/variables'
 
-const router = useRouter()
-const route = useRoute()
+// Url params
+const title = useTitle('Results Archive | TennisHistory')
+const searchParams = useUrlSearchParams('history')
 
-// Update document title
-document.title = 'Results Archive | TennisHistory'
-
-// Variables
+// Variables/interfaces
 const events: Ref<EventCard[] | null> = ref(null)
-
-interface Options {
-  label: string
-  value: string | number | null
-}
+const baseOption = { label: 'All', value: null }
 
 // Year filters
-const years = Array.from({ length: DateTime.now().year - 1968 + 1 }, (_, index) => ({ label: 1968 + index, value: 1968 + index }))
-const searchYear = ref(
-  route.query.year ? parseInt(route.query.year as string) : DateTime.now().year,
-)
+// Years array starts from 1968 (Open Era)
+const year = useToNumber(searchParams.year as string).value || DateTime.now().year
+const years = Array.from({ length: useToNumber(useDateFormat(useNow(), 'YYYY').value).value - 1968 + 1 }, (_, index) => ({ label: 1968 + index, value: 1968 + index }))
 
 // Category filters
-const selectedCategory: Ref<string | null> = ref(route.query.category ? route.query.category as string : null)
-let categories: Options[] = Object.entries(CATEGORIES).map(([key, value]) => ({ label: key, value: value }))
-categories = [
-  { label: 'All', value: null },
-  ...categories
-]
+const category = searchParams.category as string || null
+const baseCategories = CATEGORIES.map((category) => ({ label: category, value: category }))
+const categories = [baseOption, ...baseCategories]
 
 // Month filters
-const selectedMonth: Ref<number | null> = ref(route.query.month ? parseInt(route.query.month as string) : null)
-let months: Options[] = Object.entries(MONTHS).map(([key, value]) => (
-  { label: key, value: value }))
-months = [
-  { label: 'All', value: null },
-  ...months
-]
+const month = useToNumber(searchParams.month as string).value || null
+const baseMonths = MONTHS.map((month, index) => ({ label: month, value: index + 1 }))
+const months = [baseOption, ...baseMonths]
 
 // Surface filters
-const selectedSurface: Ref<string | null> = ref(route.query.surface ? route.query.surface as string : null)
-const surfaces: Options[] = [
+const surface = searchParams.surface as string || null
+const surfaces = [
   { label: 'All', value: null },
   { label: 'Clay', value: 'Clay' },
   { label: 'Grass', value: 'Grass' },
@@ -57,16 +37,14 @@ const surfaces: Options[] = [
 
 // Filters
 const selectOptions = [
-  { vModel: searchYear, options: years, label: 'Year' },
-  { vModel: selectedCategory, options: categories, label: 'Category' },
-  { vModel: selectedMonth, options: months, label: 'Month' },
-  { vModel: selectedSurface, options: surfaces, label: 'Surface' }
+  { vModel: year, options: years, label: 'Year' },
+  { vModel: category, options: categories, label: 'Category' },
+  { vModel: month, options: months, label: 'Month' },
+  { vModel: surface, options: surfaces, label: 'Surface' }
 ]
 
-const handleSelection = (label: string) => router.replace({ query: { year: searchYear.value, category: selectedCategory.value, month: selectedMonth.value, surface: selectedSurface.value } })
-
 // API call
-const { query, variables } = GET_ARCHIVE(searchYear.value, selectedCategory.value, selectedMonth.value, selectedSurface.value)
+const { query, variables } = GET_ARCHIVE(year, category, month, surface)
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
@@ -79,29 +57,31 @@ watch(error, (newError) => {
 </script>
 
 <template>
-  <div class="lg:w-3/4 mx-auto">
-    <Title>
-      <template #title>Results Archive</template>
-    </Title>
-    <Toolbar>
-      <template #center>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-          <Select v-for="select in selectOptions" :key="select.label" v-model="select.vModel" :options="select.options"
-            optionLabel="label" optionValue="value" variant="filled" size="small" filter checkmark class="text-center"
-            :placeholder="select.label" @change="handleSelection(select.label)" />
-        </div>
-      </template>
-    </Toolbar>
-    <div v-if="events" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-5">
-      <EventCard v-for="event in events" :key="event.id" :event="event" />
-    </div>
-    <Loading v-else :loading>
-      <template #loading>
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
-          <LoadingCard />
-        </div>
-      </template>
-      <template #none>No tournaments played</template>
-    </Loading>
+  <Title>
+    <template #title>Results Archive</template>
+  </Title>
+  <toolbar>
+    <template #center>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <Select v-for="select in selectOptions" :key="select.label" v-model="select.vModel" :options="select.options"
+          optionLabel="label" optionValue="value" size="small" class="text-center" :placeholder="select.label"
+          @change="(value) => searchParams[select.label.toLowerCase()] = value.value">
+          <template #dropdownicon>
+            <i class="fa-solid fa-caret-down text-zinc-400" />
+          </template>
+        </Select>
+      </div>
+    </template>
+  </toolbar>
+  <div v-if="events" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 mt-5">
+    <EventCard v-for="event in events" :key="event.id" :event="event" />
   </div>
+  <div v-else-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 mt-5">
+    <LoadingCard v-for="i in new Array(4)" :key="i" />
+  </div>
+  <ErrorMessage v-else message="No data available yet.">
+    <template #icon>
+      <i class="fa-duotone fa-solid fa-triangle-exclamation"></i>
+    </template>
+  </ErrorMessage>
 </template>

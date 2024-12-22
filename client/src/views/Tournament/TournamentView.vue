@@ -1,27 +1,28 @@
 <script setup lang="ts">
-import { type Ref, computed, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { useQuery } from '@vue/apollo-composable'
 import { GET_TOURNAMENT } from '@/services/TournamentService'
-import { updateDocumentTitle } from '@/utils/functions'
-import type { Tournament } from '@/utils/types'
-import { useUrlNames } from '@/utils/useUrlNames'
-
 const route = useRoute()
-const { unencodeName } = useUrlNames()
 
 // Variables
-const { id, name } = route.params
+const id = useRouteParams('id').value
+const name = useRouteParams('name').value
+const title = useTitle(`${useChangeCase(name as string, 'capitalCase').value} | TennisHistory`)
 const tournament: Ref<Tournament | null> = ref(null)
 
-// Update document title
-watch(() => name, () => updateDocumentTitle(unencodeName(name as string)), { immediate: true })
+// Check if single year tournament or active tournament
 const years = computed(() => {
-  return tournament.value?.start_year === tournament.value?.end_year ? tournament.value?.start_year.id : `${tournament.value?.start_year.id}—${tournament.value?.end_year?.id || 'present'}`
+  if (tournament.value?.end_year) {
+    if (tournament.value?.start_year.id === tournament.value.end_year.id) {
+      return
+    } else {
+      return `—${tournament.value.end_year.id}`
+    }
+  } else {
+    return ' - present'
+  }
 })
 
 // API call
-const { query, variables } = GET_TOURNAMENT(parseInt(id as string))
+const { query, variables } = GET_TOURNAMENT(useToNumber(id as string).value)
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
@@ -34,23 +35,23 @@ watch(error, (newError) => {
 </script>
 
 <template>
-  <div v-if="route.name === 'tournament'" class="lg:w-3/4 mx-auto">
+  <div v-if="route.name === 'tournament'">
     <Title>
-      <template #title>{{ unencodeName(name as string) }}</template>
-      <template v-if="tournament" #subtitle>{{ years }}</template>
+      <template #title>{{ useChangeCase(name as string, 'capitalCase') }}</template>
+      <template v-if="tournament" #subtitle>{{ tournament.start_year.id }}{{ years }}</template>
     </Title>
     <div v-if="tournament && tournament.events.length > 0"
-      class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-10">
-      <TournamentCard v-for="event in tournament.events" :key="event.id" :event :id="parseInt(id as string)" :name />
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 mt-5">
+      <TournamentCard v-for="event in tournament.events" :key="event.id" :event :id="useToNumber(id as string)" :name />
     </div>
-    <Loading v-else :loading>
-      <template #loading>
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-          <LoadingCard />
-        </div>
+    <div v-else-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 mt-5">
+      <TournamentLoadingCard v-for="i in new Array(4)" :key="i" />
+    </div>
+    <ErrorMessage v-else message="No events played.">
+      <template #icon>
+        <i class="fa-duotone fa-solid fa-triangle-exclamation"></i>
       </template>
-      <template #none>No events played</template>
-    </Loading>
+    </ErrorMessage>
   </div>
   <router-view />
 </template>

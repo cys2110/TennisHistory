@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { type Ref, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useQuery } from '@vue/apollo-composable'
 import { GET_MATCH_BREADCRUMBS } from '@/services/MatchService'
-import { useUrlNames } from '@/utils/useUrlNames'
-import type { Match } from '@/utils/types'
 
 const route = useRoute()
 const router = useRouter()
-const { unencodeName } = useUrlNames()
-const { name, id, eid, year, mid } = route.params
+const name = useRouteParams('name').value
+const eventId = useRouteParams('eid').value
+const year = useRouteParams('year').value
+const matchId = useRouteParams('mid').value
 
 // Variables
 const match: Ref<Pick<Match, 'match_no' | 'round' | 'p1' | 'p2'> | null> = ref(null)
@@ -24,7 +21,7 @@ const home = {
 // Tournament breadcrumb
 const breadcrumbs: Ref<{ label: string, class: string, command?: () => void }[]> = ref([
   {
-    label: unencodeName(name as string),
+    label: useChangeCase(name as string, 'capitalCase'),
     class: 'text-lg',
     command: () => {
       if (route.name !== 'tournament') router.push({ name: 'tournament' })
@@ -36,7 +33,7 @@ const breadcrumbs: Ref<{ label: string, class: string, command?: () => void }[]>
 if (route.name !== 'tournament') {
   const breadcrumbYear = Array.isArray(year) ? year.join('') : year
   breadcrumbs.value.push({
-    label: breadcrumbYear,
+    label: breadcrumbYear || '',
     class: 'text-lg',
     command: () => {
       if (route.name !== 'event' && route.name !== 'results' && route.name !== 'draw') router.push({ name: 'event' })
@@ -47,8 +44,8 @@ if (route.name !== 'tournament') {
 // API call / match breadcrumbs
 if (route.name === 'match') {
   const { query, variables } = GET_MATCH_BREADCRUMBS(
-    parseInt(eid as string),
-    parseInt(mid as string),
+    parseInt(eventId as string),
+    parseInt(matchId as string),
   )
   const { result, loading, error } = useQuery(query, variables)
   watch(result, (newResult) => {

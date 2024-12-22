@@ -43,38 +43,38 @@ export const SURFACES = {
   [Surface.Various]: 'Various',
 }
 
-export const CATEGORIES = {
-  [Category.GS]: 'Grand Slam',
-  [Category.ATP1000]: 'ATP Masters 1000',
-  [Category.ATP500]: 'ATP 500',
-  [Category.ATP250]: 'ATP 250',
-  [Category.ATPCup]: 'ATP Cup',
-  [Category.Davis]: 'Davis Cup',
-  [Category.Finals]: 'ATP Finals',
-  [Category.Olympics]: 'Olympics',
-  [Category.ILTF]: 'ILTF',
-  [Category.NTL]: 'NTL',
-  [Category.Laver]: 'Laver Cup',
-  [Category.ITF]: 'ITF',
-  [Category.United]: 'United',
-  [Category.NextGen]: 'Next Gen Finals',
-  [Category.GP]: 'Grand Prix',
-}
+export const CATEGORIES = [
+  Category.GS,
+  Category.ATP1000,
+  Category.ATP500,
+  Category.ATP250,
+  Category.ATPCup,
+  Category.Davis,
+  Category.Finals,
+  Category.Olympics,
+  Category.ILTF,
+  Category.NTL,
+  Category.Laver,
+  Category.ITF,
+  Category.United,
+  Category.NextGen,
+  Category.GP,
+]
 
-export const MONTHS = {
-  [Months.Jan]: 1,
-  [Months.Feb]: 2,
-  [Months.Mar]: 3,
-  [Months.Apr]: 4,
-  [Months.May]: 5,
-  [Months.Jun]: 6,
-  [Months.Jul]: 7,
-  [Months.Aug]: 8,
-  [Months.Sep]: 9,
-  [Months.Oct]: 10,
-  [Months.Nov]: 11,
-  [Months.Dec]: 12,
-}
+export const MONTHS = [
+  Months.Jan,
+  Months.Feb,
+  Months.Mar,
+  Months.Apr,
+  Months.May,
+  Months.Jun,
+  Months.Jul,
+  Months.Aug,
+  Months.Sep,
+  Months.Oct,
+  Months.Nov,
+  Months.Dec,
+]
 
 export const INCOMPLETES = {
   [Incomplete.R]: 'Ret.',

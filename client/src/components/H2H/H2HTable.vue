@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { formatCurrency, percentage } from '@/utils/functions'
 import type { Player } from '@/utils/types'
+import { useConversion } from '@/utils/useConversion';
+
+const { formatCurrency, percentage } = useConversion()
 
 const props = defineProps<{
   p1: Pick<Player, 'bh1' | 'career_high' | 'ch_date' | 'country' | 'dob' | 'full_name' | 'height_cm' | 'id' | 'loss' | 'pm_USD' | 'rh' | 'titles' | 'turned_pro' | 'win'>

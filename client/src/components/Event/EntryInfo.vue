@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints';
+import { useGlobalBreakpoints } from '@/composables/useGlobalBreakpoints';
 import type { EntryConnection } from '@/utils/types'
 
 const { isBreakpointOrUp } = useGlobalBreakpoints()

@@ -1,23 +1,26 @@
 <template>
-    <div class="rounded-lg p-6 border-violet-800 border-[1px] flex flex-col gap-5">
-        <div>
-            <Skeleton height="1.5rem" width="100%" border-radius="16px" />
+    <card class="full-card">
+        <template #title>
+            <div class="flex gap-2">
+                <Skeleton shape="circle" size="2rem" />
+                <Skeleton height="2rem" width="80%" border-radius="16px" />
+            </div>
+            <Skeleton height="1rem" width="100%" border-radius="16px" class="mt-3" />
             <Divider />
-        </div>
-        <div class="flex justify-between">
-            <div class="flex flex-col gap-2">
+        </template>
+        <template #content>
+            <div class="flex flex-col gap-3">
                 <Skeleton width="10rem" border-radius="16px" />
                 <Skeleton width="10rem" border-radius="16px" />
                 <Skeleton width="10rem" border-radius="16px" />
             </div>
-            <div>
-                <Skeleton size="3rem" />
+        </template>
+        <template #footer>
+            <div class="flex gap-3 mt-5">
+                <Skeleton width="5rem" border-radius="16px" />
+                <Skeleton width="5rem" border-radius="16px" />
+                <Skeleton width="5rem" border-radius="16px" />
             </div>
-        </div>
-        <Divider />
-        <div class="flex justify-evenly">
-            <Skeleton width="5rem" border-radius="16px" />
-            <Skeleton width="5rem" border-radius="16px" />
-        </div>
-    </div>
+        </template>
+    </card>
 </template>

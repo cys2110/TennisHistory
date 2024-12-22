@@ -2,8 +2,6 @@ import { DateTime, Duration } from 'luxon'
 import convert from 'convert'
 import { StatusInfo } from './types'
 
-// FIXME: Delete extraneous functions
-
 export const encodeName = (name: string) => {
   return name.replace(/ /g, '_')
 }

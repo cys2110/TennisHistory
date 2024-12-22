@@ -8,7 +8,7 @@ import VChart, { THEME_KEY } from 'vue-echarts'
 import { $dt } from '@primevue/themes'
 import { CHART_OPTIONS } from '@/utils/variables'
 import type { Index } from '@/utils/types'
-import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints'
+import { useGlobalBreakpoints } from '@/composables/useGlobalBreakpoints'
 
 const { isBreakpointOrUp } = useGlobalBreakpoints()
 type Category = 'Match Record' | 'Pressure Points' | 'Environment' | 'Other'

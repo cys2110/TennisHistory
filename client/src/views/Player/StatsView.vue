@@ -6,7 +6,7 @@ import Select from 'primevue/select'
 import PlayerStatsTable from '@/components/Player/PlayerStatsTable.vue'
 import { GET_PLAYER_STATS } from '@/services/PlayerService'
 import { percentage } from '@/utils/functions'
-import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints'
+import { useGlobalBreakpoints } from '@/composables/useGlobalBreakpoints'
 
 const route = useRoute()
 const router = useRouter()

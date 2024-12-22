@@ -3,7 +3,7 @@ import { ref, watch, type Ref } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import { GET_INDEX } from '@/services/PlayerService'
 import type { Index } from '@/utils/types';
-import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints';
+import { useGlobalBreakpoints } from '@/composables/useGlobalBreakpoints';
 
 const { isBreakpointOrUp } = useGlobalBreakpoints()
 

@@ -16,9 +16,10 @@ const menuItems = [
 </script>
 
 <template>
-  <div class="flex justify-between items-center w-full h-16">
-    <div class="heading text-3xl ml-5">TennisHistory</div>
-    <Menubar :model="menuItems" />
+  <div class="bg-violet-800 sticky top-0 z-50 w-full flex items-center justify-between md:px-2 lg:px-10 py-3">
+    <div class="heading text-3xl ml-5 text-zinc-300">TennisHistory
+    </div>
+    <menubar :model="menuItems" />
   </div>
 </template>
 

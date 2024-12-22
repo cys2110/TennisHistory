@@ -1,47 +1,28 @@
 <script setup lang="ts">
-import { type Ref, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useQuery } from '@vue/apollo-composable'
 import Select from 'primevue/select'
 import { GET_UPCOMING } from '@/services/EventService'
-import type { EventCard } from '@/utils/types'
-import { CATEGORIES, MONTHS } from '@/utils/variables'
 
-const router = useRouter()
-const route = useRoute()
-
-// Update document title
-document.title = 'Upcoming Tournaments | TennisHistory'
+// Url params
+const title = useTitle('Upcoming Tournaments | TennisHistory')
+const searchParams = useUrlSearchParams('history')
 
 // Variables
-const events: Ref<EventCard[] | null> = ref(null)
-
-interface Options {
-  label: string
-  value: string | number | null
-}
+const events: Ref<EventCard[]> = ref([])
+const baseOption = { label: 'All', value: null }
 
 // Category filters
-const selectedCategory: Ref<string | null> = ref(route.query.category ? route.query.category as string : null)
-let categories: Options[] = Object.entries(CATEGORIES).map(([key, value]) => ({ label: key, value: value }))
-categories = [
-  { label: 'All', value: null },
-  ...categories
-]
+const category = searchParams.category as string || null
+const baseCategories = CATEGORIES.map((category) => ({ label: category, value: category }))
+const categories = [baseOption, ...baseCategories]
 
 // Month filters
-const selectedMonth: Ref<number | null> = ref(route.query.month ? parseInt(route.query.month as string) : null)
-let months: Options[] = Object.entries(MONTHS).map(([key, value]) => (
-  { label: key, value: value }))
-months = [
-  { label: 'All', value: null },
-  ...months
-]
+const month = useToNumber(searchParams.month as string).value || null
+const baseMonths = MONTHS.map((month, index) => ({ label: month, value: index + 1 }))
+const months = [baseOption, ...baseMonths]
 
 // Surface filters
-const selectedSurface: Ref<string | null> = ref(route.query.surface ? route.query.surface as string : null)
-const surfaces: Options[] = [
-  { label: 'All', value: null },
+const surface = searchParams.surface as string || null
+const surfaces = [baseOption,
   { label: 'Clay', value: 'Clay' },
   { label: 'Grass', value: 'Grass' },
   { label: 'Hard', value: 'Hard' },
@@ -50,15 +31,13 @@ const surfaces: Options[] = [
 
 // Filters
 const selectOptions = [
-  { vModel: selectedCategory, options: categories, label: 'Category' },
-  { vModel: selectedMonth, options: months, label: 'Month' },
-  { vModel: selectedSurface, options: surfaces, label: 'Surface' }
+  { vModel: category, options: categories, label: 'Category' },
+  { vModel: month, options: months, label: 'Month' },
+  { vModel: surface, options: surfaces, label: 'Surface' }
 ]
 
-const handleSelection = (label: string) => router.replace({ query: { category: selectedCategory.value, month: selectedMonth.value, surface: selectedSurface.value } })
-
 // API call to get upcoming tournaments
-const { query, variables } = GET_UPCOMING(selectedSurface.value, selectedMonth.value, selectedCategory.value,)
+const { query, variables } = GET_UPCOMING(surface, month, category)
 const { result, loading, error } = useQuery(query, variables)
 
 watch(result, (newResult) => {
@@ -71,29 +50,31 @@ watch(error, (newError) => {
 </script>
 
 <template>
-  <div class="lg:w-3/4 mx-auto">
-    <Title>
-      <template #title>Upcoming Tournaments</template>
-    </Title>
-    <Toolbar>
-      <template #start>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-          <Select v-for="select in selectOptions" :key="select.label" v-model="select.vModel" :options="select.options"
-            optionLabel="label" optionValue="value" variant="filled" size="small" filter checkmark class="text-center"
-            :placeholder="select.label" @change="handleSelection(select.label)" />
-        </div>
-      </template>
-    </Toolbar>
-    <div v-if="events" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-5">
-      <EventCard v-for="event in events" :key="event.id" :event="event" />
-    </div>
-    <Loading v-else :loading>
-      <template #loading>
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
-          <LoadingCard />
-        </div>
-      </template>
-      <template #none>No upcoming tournaments</template>
-    </Loading>
+  <Title>
+    <template #title>Upcoming Tournaments</template>
+  </Title>
+  <toolbar>
+    <template #center>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <Select v-for="select in selectOptions" :key="select.label" v-model="select.vModel" :options="select.options"
+          optionLabel="label" optionValue="value" size="small" :placeholder="select.label" class="text-center"
+          @change="(value) => searchParams[select.label.toLowerCase()] = value.value">
+          <template #dropdownicon>
+            <i class="fa-solid fa-caret-down text-zinc-400" />
+          </template>
+        </Select>
+      </div>
+    </template>
+  </toolbar>
+  <div v-if="events.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-5">
+    <EventCard v-for="event in events" :key="event.id" :event="event" />
   </div>
+  <div v-else-if="loading" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 mt-5">
+    <LoadingCard v-for="i in new Array(3)" :key="i" />
+  </div>
+  <ErrorMessage v-else message="No upcoming tournaments found.">
+    <template #icon>
+      <i class="fa-duotone fa-solid fa-calendar-exclamation" />
+    </template>
+  </ErrorMessage>
 </template>

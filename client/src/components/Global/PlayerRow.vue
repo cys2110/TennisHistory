@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Player } from '@/utils/types';
 import { getParams } from '@/utils/getParams';
-import { useImages } from '@/utils/useImages';
+import { use2Images2 } from '@/utils/use2Images2';
 
-const { headshot } = useImages()
+const { headshot } = use2Images2()
 const { getPlayerParams } = getParams()
 
 const props = defineProps<{

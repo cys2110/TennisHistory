@@ -1,4 +1,4 @@
-export function useImages() {
+export function use2Images2() {
   const headshot = (player: string) => {
     return new URL(`https://www.atptour.com/-/media/alias/player-headshot/${player}`).href
   }

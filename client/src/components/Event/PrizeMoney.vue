@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useGlobalBreakpoints } from '@/utils/useGlobalBreakpoints';
+import { useGlobalBreakpoints } from '@/composables/useGlobalBreakpoints';
 import { formatCurrency } from '@/utils/functions';
 import { Currency, type Round } from '@/utils/types'
 

@@ -1,10 +1,11 @@
 /** @type {import('tailwindcss').Config} */
+import tailwindcssPrimeUI from 'tailwindcss-primeui'
 export default {
   content: ['./src/**/*.{html,js,vue,ts}'],
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [tailwindcssPrimeUI],
   safelist: [
     'col-span-1',
     'col-span-2',
