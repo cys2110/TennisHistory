@@ -4,7 +4,6 @@ const route = useRoute()
 const pid = ref(route.params.pid)
 const visible = ref(false)
 const checkedSurfaces = ref(true)
-const checkedYears = ref(true)
 const selectedYears = ref([])
 const years = ref([])
 const selectKey = ref(0)
@@ -61,31 +60,13 @@ watch(() => selectedSurfaces.value, () => {
         checkedSurfaces.value = false
     }
 }, { immediate: true })
-
-// Handle check all years checkbox
-const handleCheckYears = (e) => {
-    if (e === true) {
-        selectedYears.value = years.value.map((year) => year.value)
-    } else {
-        selectedYears.value = [years.value[years.value.length - 1].value]
-    }
-}
-
-// Check all years checkbox if all years are selected
-watch(() => selectedYears.value, () => {
-    if (selectedYears.value.length === years.value.length) {
-        checkedYears.value = true
-    } else {
-        checkedYears.value = false
-    }
-}, { immediate: true })
 </script>
 
 <template>
     <div>
         <ClientOnly>
             <Teleport to="#player-toolbar-start">
-                <toggle-button v-model="visible" size="small">
+                <toggle-button v-model="visible" size="small" class="hidden md:inline-flex">
                     <template #icon>
                         <Icon :name="visible ? 'ph:table-duotone' : 'material-symbols:bar-chart-4-bars-rounded'"
                             class="text-2xl" />
@@ -95,26 +76,23 @@ watch(() => selectedYears.value, () => {
         </ClientOnly>
         <toolbar v-if="activeYears" class="mb-5 justify-between">
             <template #start>
-                <div class="flex items-center gap-2">
-                    <div>
-                        <u-checkbox label="All years" v-model="checkedYears" @update:model-value="handleCheckYears" />
-                    </div>
-                    <FloatLabel variant="on">
-                        <multi-select :key="selectKey" display="chip" inputId="year_select" v-model="selectedYears"
-                            :options="years" option-label="label" option-value="value" size="small">
-                            <template #dropdownicon>
-                                <Icon name="material-symbols:arrow-drop-down-circle-outline" class="text-lg" />
-                            </template>
-                        </multi-select>
-                        <label for="year_select">Year</label>
-                    </FloatLabel>
-                </div>
+                <FloatLabel variant="on">
+                    <multi-select :key="selectKey" display="chip" inputId="year_select" v-model="selectedYears"
+                        :options="years" option-label="label" option-value="value" size="small">
+                        <template #dropdownicon>
+                            <Icon name="material-symbols:arrow-drop-down-circle-outline"
+                                class="text-lg text-zinc-400" />
+                        </template>
+                    </multi-select>
+                    <label for="year_select">Year</label>
+                </FloatLabel>
             </template>
             <template #end>
                 <div class="flex items-center gap-2">
                     <div>
-                        <u-checkbox label="All surfaces" v-model="checkedSurfaces"
-                            @update:model-value="handleCheckSurfaces" />
+                        <u-checkbox label="All surfaces" v-model="checkedSurfaces" class="accent-emerald-600"
+                            @update:model-value="handleCheckSurfaces"
+                            :ui="{ label: 'text-zinc-700 dark:text-zinc-400', wrapper: 'flex items-center gap-1' }" />
                     </div>
                     <select-button v-model="selectedSurfaces" :options="surfaces" option-label="name" multiple
                         optionValue="value" class="!text-zinc-800">
@@ -129,19 +107,15 @@ watch(() => selectedYears.value, () => {
             <player-stats-table v-if="!visible" :stats />
             <player-stats-chart v-else :stats />
         </div>
-        <div v-else>
-            <Message size="large" :severity="yearsStatus === 'pending' ? 'info' : 'warn'" variant="outlined"
-                class="mt-5">
-                <template #icon>
-                    <Icon
-                        :name="yearsStatus === 'pending' ? 'line-md:loading-twotone-loop' : 'material-symbols:bar-chart-off-rounded'"
-                        class="text-2xl" />
-                </template>
-                <span v-if="yearsStatus === 'pending'" class="ml-2">Player stats are currently
-                    being
-                    fetched</span>
-                <span v-else class="ml-2">No player stats available</span>
-            </Message>
-        </div>
+        <error-message v-else :status="yearsStatus" error-icon="material-symbols:bar-chart-off-rounded">
+            <template #loading-message>Player stats are currently being fetched</template>
+            <template #error-message>No player stats available</template>
+        </error-message>
     </div>
 </template>
+
+<style scoped>
+:deep(.p-chip-remove-icon) {
+    @apply text-zinc-500 dark:text-zinc-400
+}
+</style>

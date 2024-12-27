@@ -96,7 +96,8 @@ export default defineNuxtConfig({
     fallback: "dark",
   },
   ui: {
-    disableGlobalStyles: true,
+    global: true,
+    // disableGlobalStyles: true,
   },
   echarts: {
     renderer: "svg",
