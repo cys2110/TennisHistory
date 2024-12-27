@@ -11,8 +11,17 @@ export default defineEventHandler(async (query) => {
         WITH p, c, COLLECT(z) AS coaches, tp, r,
         COLLECT(
           CASE WHEN fc IS NOT NULL
-          THEN {id: fc.id, start: apoc.temporal.format(t.start_date, 'dd MMMM YYYY'), end: apoc.temporal.format(t.end_date, 'dd MMMM YYYY')}
-          ELSE NULL
+            THEN {
+              id: fc.id,
+              name: fc.name,
+              dates: CASE
+                WHEN t.start_date.year = t.end_date.year AND t.start_date.month = t.end_date.month THEN apoc.temporal.format(t.start_date, 'dd') || ' - ' || apoc.temporal.format(t.end_date, 'dd MMMM YYYY')
+                WHEN t.start_date.year = t.end_date.year THEN apoc.temporal.format(t.start_date, 'dd MMMM') || ' - ' || apoc.temporal.format(t.end_date, 'dd MMMM YYYY')
+                WHEN t.start_date.year <> t.end_date.year THEN apoc.temporal.format(t.start_date, 'dd MMMM YYYY') || ' - ' || apoc.temporal.format(t.end_date, 'dd MMMM YYYY')
+                ELSE NULL
+              END
+            }
+            ELSE NULL
           END
         ) AS countries,
         CASE
@@ -23,18 +32,21 @@ export default defineEventHandler(async (query) => {
         RETURN {
           ch: toString(p.career_high),
           ch_date: apoc.temporal.format(p.ch_date, 'dd MMMM YYYY'),
-          win: toString(p.win),
-          loss: toString(p.loss),
+          wl: toString(p.win) || '-' || toString(p.loss),
           titles: toString(p.titles),
-          pm: p.pm_USD,
+          pm: apoc.number.format(p.pm_USD, '#,###'),
           coaches: coaches,
           plays: p.rh,
           bh: p.bh1,
           height: p.height_cm,
-          country: c.id,
+          country_id: c.id,
+          country_name: c.name,
           countries: countries,
-          pro: toString(tp.id),
-          retired: toString(r.id),
+          years_active: CASE
+            WHEN tp.id IS NOT NULL AND r.id IS NULL THEN toString(tp.id) || '- present'
+            WHEN tp.id IS NOT NULL AND r.id IS NOT NULL THEN toString(tp.id) || '-' || toString(r.id)
+            ELSE NULL
+          END,
           active_years: toString(active),
           age: toString(duration.between(p.dob, date()).years),
           dob: apoc.temporal.format(p.dob, 'EEEE dd MMMM YYYY'),

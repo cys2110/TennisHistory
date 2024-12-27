@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex flex-col md:flex-row mb-5 lg:mb-12 md:justify-between md:items-center">
+    <div class="flex flex-col items-start gap-2 md:flex-row mb-5 lg:mb-12 md:justify-between md:items-center">
       <div class="text-zinc-600 dark:text-zinc-300 text-3xl md:text-4xl xl:text-5xl">
         <slot name="heading" />
       </div>
