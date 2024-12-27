@@ -22,7 +22,7 @@ const eventParams = computed(() => ({ ...tournamentParams.value, year, eid }))
         <template #title>
             <div class="flex items-center gap-3">
                 <div class="rounded-full dark:bg-violet-800 w-10 h-10 flex justify-center items-center">
-                    <Avatar v-if="category" :image="`/category/${category}.svg`" class="border-none" />
+                    <Avatar v-if="category" :image="`/category/${category}.svg`" class="border-none" :alt="category" />
                 </div>
                 <div>
                     <NuxtLink class="hover-link" :to="{ name: 'tournament', params: tournamentParams }">{{ tname }}
@@ -40,7 +40,7 @@ const eventParams = computed(() => ({ ...tournamentParams.value, year, eid }))
                     <span>{{ city }}</span>
                     <span>
                         <Icon v-if="countryCode" :name="`flag:${countryCode}-4x3`"
-                            class="border border-solid border-zinc-500 rounded" />
+                            class="border border-zinc-500 rounded" />
                         <component v-else :is="`Icons${country}`" />
                     </span>
                 </div>

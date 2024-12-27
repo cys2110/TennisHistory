@@ -45,9 +45,9 @@ const { data: events, status, error } = await useFetch('/api/getUpcomingTourname
         <toolbar>
             <template #center>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    <float-label class="w-full" variant="on">
-                        <Select v-for="(select, index) in selectOptions" :key="select.label"
-                            :inputId="`select-${index}`" v-model="select.vModel" :options="select.options"
+                    <float-label v-for="(select, index) in selectOptions" :key="select.label" class="w-full"
+                        variant="on">
+                        <Select :inputId="`select-${index}`" v-model="select.vModel" :options="select.options"
                             option-label="label" option-value="value" class="text-center" size="small">
                             <template #dropdownicon>
                                 <Icon name="material-symbols:arrow-drop-down-circle-outline" class="text-lg" />
