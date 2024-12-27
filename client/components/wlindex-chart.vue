@@ -13,12 +13,8 @@ const option = ref({
     grid: { left: '15%' },
     tooltip: {
         formatter: function (params) {
-            const stat = params.value.stat
-            const index = params.value.value
-            const wins = params.value.wins
-            const losses = params.value.losses
-            const titles = params.value.titles
-            return `<span style="font-weight: bold">${stat}</span><br/ >${wins}-${losses} (${index})${titles >= 0 ? `<br />${titles} ${titles === 1 ? 'title' : 'titles'}` : ''
+            const { stat, value: index, wins, losses, titles } = params.value
+            return `<span style="font-weight: bold">${stat}</span><br/ >${wins}-${losses} (${index})${titles !== null ? `<br />${titles} ${titles === 1 ? 'title' : 'titles'}` : ''
                 }`
         },
     },

@@ -13,7 +13,7 @@ const columns = [
 
 <template>
     <data-table :value="index" row-group-mode="subheader" group-rows-by="category" striped-rows size="small"
-        class="w-1/2 mx-auto">
+        class="w-full md:w-3/4 lg:w-1/2 mx-auto md:text-base">
         <column v-for="col in columns" :key="col.field" :field="col.field" :header="col.header"
             class="text-xs md:text-sm" :class="{ 'text-center': col.field !== 'stat' }" />
         <template #groupheader="{ data }">
@@ -21,3 +21,13 @@ const columns = [
         </template>
     </data-table>
 </template>
+
+<style scoped>
+:deep(.p-datatable-header-cell:first-of-type) {
+    @apply rounded-tl;
+}
+
+:deep(.p-datatable-header-cell:last-of-type) {
+    @apply rounded-tr;
+}
+</style>

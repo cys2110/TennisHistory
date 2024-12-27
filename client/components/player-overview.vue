@@ -120,8 +120,8 @@ const fieldsetItems = [
                 <Fieldset legend="Country" class="flex items-center justify-center">
                     <div class="flex items-center justify-center gap-2">
                         <Icon v-if="getCountryCode(player.country_id)"
-                            :name="`flag:${getCountryCode(player.country_id)}-4x3`" class="text-base"
-                            :alt="player.country_name" />
+                            :name="`flag:${getCountryCode(player.country_id)}-4x3`"
+                            class="text-lg border border-zinc-400 rounded" :alt="player.country_name" />
                         <component v-else :is="`Icons${player.country_id}`" />
                         <span>{{ player.country_name }}</span>
                     </div>
@@ -136,7 +136,7 @@ const fieldsetItems = [
                         class="grid grid-cols-5 gap-1 text-sm">
                         <div>
                             <Icon v-if="getCountryCode(country.id)" :name="`flag:${getCountryCode(country.id)}-4x3`"
-                                class="text-base" />
+                                class="text-lg border border-zinc-400 rounded" />
                             <component v-else :is="`Icons${country.id}`" />
                         </div>
                         <div class="col-span-2">{{ country.name }}</div>

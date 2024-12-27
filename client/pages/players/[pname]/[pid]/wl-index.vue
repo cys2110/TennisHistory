@@ -17,7 +17,7 @@ const index = computed(() => {
             wins: indice.wins.low,
             losses: indice.losses.low,
             titles: indice.titles?.low || null,
-            value: parseFloat((indice.wins.low / (indice.wins.low + indice.losses.low)).toFixed(3))
+            value: indice.wins.low === 0 && indice.losses.low === 0 ? 0 : parseFloat((indice.wins.low / (indice.wins.low + indice.losses.low)).toFixed(3))
         }))
 
         return formattedIndex
@@ -31,10 +31,10 @@ const index = computed(() => {
         <div v-if="wlindex">
             <ClientOnly>
                 <Teleport to="#player-toolbar-start">
-                    <toggle-button v-model="visible" size="small">
+                    <toggle-button v-model="visible" size="small" class="hidden md:inline-flex">
                         <template #icon>
-                            <Icon :name="visible ? 'ph:table-duotone' : 'material-symbols:bar-chart-4-bars-rounded'"
-                                class="text-2xl" />
+                            <Icon class="text-2xl"
+                                :name="visible ? 'ph:table-duotone' : 'material-symbols:bar-chart-4-bars-rounded'" />
                         </template>
                     </toggle-button>
                 </Teleport>
@@ -42,16 +42,9 @@ const index = computed(() => {
             <wlindex-table v-if="!visible" :index />
             <wlindex-chart v-else :index />
         </div>
-        <div v-else>
-            <Message size="large" :severity="status === 'pending' ? 'info' : 'warn'" variant="outlined" class="mt-5">
-                <template #icon>
-                    <Icon
-                        :name="status === 'pending' ? 'line-md:loading-twotone-loop' : 'material-symbols:bar-chart-off-rounded'"
-                        class="text-2xl" />
-                </template>
-                <span v-if="status === 'pending'" class="ml-2">The index is currently being fetched</span>
-                <span v-else class="ml-2">No index available</span>
-            </Message>
-        </div>
+        <error-message v-else :status error-icon="material-symbols:bar-chart-off-rounded">
+            <template #loading-message>The index is currently being fetched</template>
+            <template #error-message>No index available</template>
+        </error-message>
     </div>
 </template>

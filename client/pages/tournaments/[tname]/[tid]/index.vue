@@ -23,7 +23,7 @@ const { data: tournament, status, error } = await useFetch('/api/getTournamentDe
 
 <template>
     <div>
-        <u-breadcrumb :links class="mb-5"
+        <u-breadcrumb :links class="mb-5 hidden md:inline-flex"
             :ui="{ active: 'text-emerald-400', inactive: 'text-emerald-600', base: 'text-emerald-600 text-lg', icon: { base: 'pr-5' }, divider: { base: 'text-zinc-600 dark:text-zinc-400 mx-1 text-base' } }" />
         <page-title>
             <template #heading>
