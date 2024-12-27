@@ -25,7 +25,7 @@ const footerLinks = [
 <template>
     <div class="flex flex-col min-h-screen bg-gray-100 dark:bg-zinc-900">
         <div id="header"
-            class="bg-violet-800 w-full flex justify-between items-center px-2 lg:px-10 py-3 sticky z-50 top-0">
+            class="bg-violet-800 w-full flex justify-between items-center px-2 md:px-5 lg:px-10 py-3 sticky z-50 top-0">
             <div class="petit-font text-3xl text-zinc-300">TennisHistory</div>
             <ClientOnly>
                 <u-horizontal-navigation v-if="isMediumAndUp" :links="menuItems"
@@ -41,9 +41,9 @@ const footerLinks = [
                         </template>
                     </Button>
                     <Drawer v-model:visible="visible" header="Menu" position="bottom"
-                        class="bg-violet-800 border-none !h-fit">
+                        class="bg-violet-800 border-none h-fit">
                         <u-vertical-navigation :links="menuItems"
-                            :ui="{ icon: { base: 'text-base mx-1', active: 'text-zinc-300', inactive: 'text-zinc-400' }, base: 'text-base my-3', active: 'text-zinc-300', inactive: 'text-zinc-400', wrapper: 'w-fit' }">
+                            :ui="{ icon: { base: 'mx-1', active: 'text-zinc-300', inactive: 'text-zinc-400' }, base: 'my-3', active: 'text-zinc-300', inactive: 'text-zinc-400', wrapper: 'w-fit', size: 'text-base' }">
                             <template #default="{ link }">
                                 <span>{{ link.label }}</span>
                             </template>
@@ -59,15 +59,16 @@ const footerLinks = [
         <div id="footer" class="bg-violet-800 flex flex-col items-center pt-3">
             <div class="px-4 flex flex-col md:flex-row justify-center items-center">
                 <NuxtLink to="/about" class="hover-link text-sm text-zinc-300">About</NuxtLink>
-                <NuxtLink class="hover-link mx-3 text-center text-sm text-zinc-300" target="_blank" external
+                <NuxtLink class="hover-link mx-3 text-center text-sm text-zinc-300" target="_blank"
                     v-for="link in footerLinks" :key="link.name" :to="link.url">{{ link.name }}</NuxtLink>
             </div>
-            <div class="px-4 pt-2 pb-4 text-center text-zinc-300 flex items-center gap-2 flex-wrap justify-center">
+            <div
+                class="px-4 pt-2 pb-4 text-center text-zinc-300 flex items-center gap-2 flex-wrap justify-center text-sm">
                 Built by
-                <a class="hover-link !text-emerald-600 text-base" href="https://www.claire-sheridan.com"
-                    target="_blank">Claire
-                    Sheridan</a>
-                using Nuxt, PrimeVue and TailwindCSS
+                <NuxtLink class="hover-link text-emerald-600" to="https://www.claire-sheridan.com" target="_blank">
+                    Claire
+                    Sheridan</NuxtLink>
+                using Nuxt, PrimeVue, NuxtUI and TailwindCSS
             </div>
         </div>
     </div>

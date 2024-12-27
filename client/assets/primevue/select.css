@@ -1,17 +1,17 @@
-@import './button';
-@import './inputtext';
-@import './iconfield';
+@import "./button";
+@import "./inputtext";
+@import "./iconfield";
 
 .p-select {
   @apply inline-flex cursor-pointer relative select-none rounded-md
-        bg-transparent border border-violet-600
+        bg-transparent border border-emerald-500 dark:border-emerald-600
         shadow-[0_1px_2px_0_rgba(18,18,23,0.05)]
         transition-colors duration-200;
 }
 
 .p-select:not(.p-disabled):hover,
 .p-select:not(.p-disabled).p-focus {
-  @apply border-violet-800;
+  @apply border-emerald-700 dark:border-emerald-800;
 }
 
 .p-select.p-variant-filled {
@@ -100,15 +100,15 @@ input.p-select-label {
 }
 
 .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus {
-  @apply bg-violet-600 dark:bg-violet-800 text-zinc-300 dark:text-surface-0 rounded-lg;
+  @apply bg-emerald-600 dark:bg-emerald-800 text-zinc-300 dark:text-surface-0 rounded-lg;
 }
 
 .p-select-option.p-select-option-selected {
-  @apply bg-violet-700 dark:bg-violet-800 text-zinc-300 rounded-lg;
+  @apply bg-emerald-700 dark:bg-emerald-700 text-zinc-200 rounded-lg;
 }
 
 .p-select-option.p-select-option-selected.p-focus {
-  @apply bg-violet-700 dark:bg-violet-800 text-zinc-300;
+  @apply bg-emerald-700 dark:bg-emerald-700 text-zinc-300;
 }
 
 .p-select-option-check-icon {
