@@ -3,12 +3,8 @@ export default defineEventHandler(async (event) => {
 
   const formattedParams = {
     id: pid,
-    surfaces: Array.isArray(surfaces) ? surfaces : [surfaces],
-    years: Array.isArray(years)
-      ? years.map((year) => parseInt(year))
-      : years
-      ? [parseInt(years)]
-      : [],
+    surfaces: surfaces,
+    years: Array.isArray(years) ? years.map((year) => parseInt(year)) : [],
   };
 
   const { records } = await useDriver().executeQuery(
