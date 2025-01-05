@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const route = useRoute();
-const sidebar1Pages = ["home", "archive"];
+const sidebar1Pages = ["home", "archive", "tournament"];
 const sidebar2Pages = ["home", "archive"];
 </script>
 
