@@ -10,9 +10,9 @@ import re
 
 # For stats matches where p1 first in results and in stats
 
-tid = 7696
-year = 2024
-matches = ['https://www.atptour.com/en/scores/stats-centre/archive/2024/7696/ms003', 'https://www.atptour.com/en/scores/stats-centre/archive/2024/7696/ms002']
+tid = 336
+year = 2025
+matches = ['https://www.atptour.com/en/scores/stats-centre/archive/2025/336/ms003', 'https://www.atptour.com/en/scores/stats-centre/archive/2025/336/ms002']
 matches_info = []
 
 driver = webdriver.Chrome()
@@ -150,8 +150,8 @@ def writeToDb(db):
 
         result = db.run("""
             MATCH (:Player {id: $p1})-[]-(:Entry)-[]-(s1:P1)-[]-(m:Match)-[]-(s2:P2)-[]-(:Entry)-[]-(:Player {id: $p2})
-            WHERE (m)-[]-(:Round {round: 'Final'})-[]-(:Event {id: $eid})
-            SET m.duration_mins = $minutes, s1 += $p1_stats, s2 += $p2_stats
+            WHERE (m)-[]-(:Round)-[]-(:Event {id: $eid})
+            SET m.duration = duration({minutes: $minutes}), s1 += $p1_stats, s2 += $p2_stats
             """, p1=match['p1_id'], p2=match['p2_id'], eid=int(f"{tid}{year}"), minutes=match['duration_mins'], p1_stats=match['p1'], p2_stats=match['p2'])
 
 with GraphDatabase.driver(URI, auth=AUTH) as ndriver:
