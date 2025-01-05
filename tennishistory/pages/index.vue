@@ -130,7 +130,7 @@ const sidebarLinks = computed(() => {
 			</prime-toolbar>
 			<div
 				v-if="events && events.length > 0"
-				class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-10 mt-5"
+				class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-10 mt-5"
 			>
 				<ClientOnly>
 					<event-card
