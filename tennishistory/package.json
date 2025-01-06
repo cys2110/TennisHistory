@@ -74,6 +74,7 @@
     "@iconify-json/solar": "^1.2.2",
     "@iconify-json/system-uicons": "^1.2.2",
     "@primevue/nuxt-module": "^4.2.5",
+    "@types/luxon": "^3.4.2",
     "nuxt-anchorscroll": "^1.0.3",
     "typescript": "^5.7.2",
     "vue-tsc": "^2.1.10"

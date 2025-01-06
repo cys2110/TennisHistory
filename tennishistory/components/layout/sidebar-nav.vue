@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const route = useRoute();
-const sidebar1Pages = ["home", "archive", "tournament"];
+const sidebar1Pages = ["home", "archive", "tournament", "player"];
 const sidebar2Pages = ["home", "archive"];
 </script>
 
@@ -24,7 +24,7 @@ const sidebar2Pages = ["home", "archive"];
 											:to="link.to"
 											active-class="text-emerald-600"
 										>
-											<Icon :name="link.icon" />
+											<icon :name="link.icon" />
 											<span>{{ link.label }}</span>
 										</nuxt-link>
 									</shadcn-sidebar-menu-button>
