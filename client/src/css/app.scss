@@ -1,0 +1,26 @@
+// app global css in SCSS form
+
+body.body--light {
+  color: $blue-grey-7;
+  font-weight: 400;
+  font-size: 0.9rem;
+
+  div {
+    color: $blue-grey-7;
+  }
+}
+
+body.body--dark {
+  color: $blue-grey-3;
+  font-weight: 400;
+  font-size: 0.9rem;
+
+  div {
+    color: $blue-grey-3;
+  }
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

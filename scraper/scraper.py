@@ -8,7 +8,7 @@ import os
 import time
 import re
 
-tid = 339
+tid = 301
 draw = 'Best3'
 year = 2025
 
