@@ -440,18 +440,8 @@
   },
   {
     "from": "@vueuse/core",
-    "name": "createReusableTemplate",
-    "as": "createReusableTemplate"
-  },
-  {
-    "from": "@vueuse/core",
     "name": "createSharedComposable",
     "as": "createSharedComposable"
-  },
-  {
-    "from": "@vueuse/core",
-    "name": "createTemplatePromise",
-    "as": "createTemplatePromise"
   },
   {
     "from": "@vueuse/core",
@@ -462,11 +452,6 @@
     "from": "@vueuse/core",
     "name": "extendRef",
     "as": "extendRef"
-  },
-  {
-    "from": "@vueuse/core",
-    "name": "injectLocal",
-    "as": "injectLocal"
   },
   {
     "from": "@vueuse/core",
@@ -485,11 +470,6 @@
   },
   {
     "from": "@vueuse/core",
-    "name": "onElementRemoval",
-    "as": "onElementRemoval"
-  },
-  {
-    "from": "@vueuse/core",
     "name": "onKeyStroke",
     "as": "onKeyStroke"
   },
@@ -502,11 +482,6 @@
     "from": "@vueuse/core",
     "name": "onStartTyping",
     "as": "onStartTyping"
-  },
-  {
-    "from": "@vueuse/core",
-    "name": "provideLocal",
-    "as": "provideLocal"
   },
   {
     "from": "@vueuse/core",
@@ -595,6 +570,16 @@
   },
   {
     "from": "@vueuse/core",
+    "name": "resolveRef",
+    "as": "resolveRef"
+  },
+  {
+    "from": "@vueuse/core",
+    "name": "resolveUnref",
+    "as": "resolveUnref"
+  },
+  {
+    "from": "@vueuse/core",
     "name": "syncRef",
     "as": "syncRef"
   },
@@ -612,16 +597,6 @@
     "from": "@vueuse/core",
     "name": "toReactive",
     "as": "toReactive"
-  },
-  {
-    "from": "@vueuse/core",
-    "name": "resolveRef",
-    "as": "resolveRef"
-  },
-  {
-    "from": "@vueuse/core",
-    "name": "resolveUnref",
-    "as": "resolveUnref"
   },
   {
     "from": "@vueuse/core",
@@ -665,16 +640,6 @@
   },
   {
     "from": "@vueuse/core",
-    "name": "useAnimate",
-    "as": "useAnimate"
-  },
-  {
-    "from": "@vueuse/core",
-    "name": "useArrayDifference",
-    "as": "useArrayDifference"
-  },
-  {
-    "from": "@vueuse/core",
     "name": "useArrayEvery",
     "as": "useArrayEvery"
   },
@@ -697,11 +662,6 @@
     "from": "@vueuse/core",
     "name": "useArrayFindLast",
     "as": "useArrayFindLast"
-  },
-  {
-    "from": "@vueuse/core",
-    "name": "useArrayIncludes",
-    "as": "useArrayIncludes"
   },
   {
     "from": "@vueuse/core",
@@ -777,11 +737,6 @@
     "from": "@vueuse/core",
     "name": "useClipboard",
     "as": "useClipboard"
-  },
-  {
-    "from": "@vueuse/core",
-    "name": "useClipboardItems",
-    "as": "useClipboardItems"
   },
   {
     "from": "@vueuse/core",
@@ -1115,16 +1070,6 @@
   },
   {
     "from": "@vueuse/core",
-    "name": "useParentElement",
-    "as": "useParentElement"
-  },
-  {
-    "from": "@vueuse/core",
-    "name": "usePerformanceObserver",
-    "as": "usePerformanceObserver"
-  },
-  {
-    "from": "@vueuse/core",
     "name": "usePermission",
     "as": "usePermission"
   },
@@ -1167,11 +1112,6 @@
     "from": "@vueuse/core",
     "name": "usePreferredReducedMotion",
     "as": "usePreferredReducedMotion"
-  },
-  {
-    "from": "@vueuse/core",
-    "name": "usePreferredReducedTransparency",
-    "as": "usePreferredReducedTransparency"
   },
   {
     "from": "@vueuse/core",
@@ -1242,11 +1182,6 @@
     "from": "@vueuse/core",
     "name": "useSpeechSynthesis",
     "as": "useSpeechSynthesis"
-  },
-  {
-    "from": "@vueuse/core",
-    "name": "useSSRWidth",
-    "as": "useSSRWidth"
   },
   {
     "from": "@vueuse/core",
@@ -1450,11 +1385,6 @@
   },
   {
     "from": "@vueuse/core",
-    "name": "watchDeep",
-    "as": "watchDeep"
-  },
-  {
-    "from": "@vueuse/core",
     "name": "watchIgnorable",
     "as": "watchIgnorable"
   },
@@ -1462,11 +1392,6 @@
     "from": "@vueuse/core",
     "name": "ignorableWatch",
     "as": "ignorableWatch"
-  },
-  {
-    "from": "@vueuse/core",
-    "name": "watchImmediate",
-    "as": "watchImmediate"
   },
   {
     "from": "@vueuse/core",
@@ -1687,6 +1612,18 @@
     "name": "default",
     "as": "driver",
     "from": "/Users/clairesheridan/Documents/Projects/tennis/client/src/api/driver.ts",
+    "__source": "dir"
+  },
+  {
+    "name": "getArchiveTournaments",
+    "as": "getArchiveTournaments",
+    "from": "/Users/clairesheridan/Documents/Projects/tennis/client/src/api/getArchiveTournaments.ts",
+    "__source": "dir"
+  },
+  {
+    "name": "getTournamentDetails",
+    "as": "getTournamentDetails",
+    "from": "/Users/clairesheridan/Documents/Projects/tennis/client/src/api/getTournamentDetails.ts",
     "__source": "dir"
   },
   {

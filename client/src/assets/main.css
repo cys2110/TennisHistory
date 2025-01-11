@@ -1,0 +1,43 @@
+@import './base.css';
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+body {
+	@apply bg-slate-200 dark:bg-slate-950 text-slate-600 dark:text-slate-300;
+	font-family: 'Fira Sans Condensed', sans-serif;
+
+	div {
+		@apply text-slate-600 dark:text-slate-400;
+	}
+
+	a {
+		@apply text-slate-600 dark:text-slate-400 active:text-emerald-500 dark:active:text-emerald-500;
+	}
+
+	.el-menu-item {
+		--el-menu-hover-bg-color: theme(colors.slate.300);
+		@media (prefers-color-scheme: dark) {
+			--el-menu-hover-bg-color: theme(colors.slate.700);
+		}
+	}
+
+	.el-tooltip__trigger:focus {
+		outline: non;
+	}
+
+	.el-aside::-webkit-scrollbar {
+		display: none;
+	}
+
+	.el-dropdown-menu {
+		--el-bg-color-overlay: theme(colors.slate.200) @media (prefers-color-scheme: dark) {--el-bg-color-overlay: theme(colors.slate.950)};
+	}
+
+	.el-popper__arrow::before {
+		@apply !invisible;
+	}
+
+	.el-footer {
+		--el-footer-padding: theme(padding.20) 0;
+		--el-footer-height: theme(height.fit);
+	}
+}
