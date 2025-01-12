@@ -1,0 +1,35 @@
+.p-card {
+    @apply flex flex-col rounded-xl
+        bg-surface-0 dark:bg-surface-900
+        border dark:border-primary-800
+        text-surface-700 dark:text-surface-300
+        dark:shadow-sm dark:shadow-violet-600 dark:hover:shadow-md dark:hover:shadow-violet-600 h-full
+}
+
+.p-card-header {
+    @apply w-full rounded-b-none;
+}
+
+.p-card-caption {
+    @apply flex flex-col gap-2
+}
+
+.p-card-body {
+    @apply p-5 flex flex-col gap-2 text-sm h-full flex-1
+}
+
+.p-card-content {
+    @apply flex-1 flex flex-col justify-end
+}
+
+.p-card-title {
+    @apply font-medium text-xl text-surface-300
+}
+
+.p-card-subtitle {
+    @apply text-surface-500 dark:text-surface-400 text-base
+}
+
+.p-card-footer {
+    @apply mx-auto mt-5
+}
