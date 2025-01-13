@@ -8,8 +8,8 @@ import os
 import time
 import re
 
-tid = 339
-draw = 'Best3'
+tid = 580
+draw = 'Best5'
 year = 2025
 
 driver = webdriver.Chrome()

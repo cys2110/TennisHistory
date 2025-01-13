@@ -51,7 +51,7 @@ const eventParams = {
       <button-group>
         <template v-for="page in EVENT_PAGES" :key="page.title">
           <Button v-if="isDisabled" v-tooltip="'Event has not started yet'" disabled size="small" variant="outlined" rounded>
-            <fa-icon :icon="page.icon" />
+            <fa-icon :icon="page.icon" :rotation="page.title === 'Draw' && 90" />
             {{ page.title }}
           </Button>
           <Button v-else size="small" variant="outlined" rounded>

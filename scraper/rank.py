@@ -20,7 +20,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
     driver.verify_connectivity()
 
     records, summary, keys = driver.execute_query(
-        "MATCH (p:Player)-[]-(f:Entry) WHERE f.id STARTS WITH \"3392025\" RETURN p.id",
+        "MATCH (p:Player)-[]-(f:Entry) WHERE f.id STARTS WITH \"5802025\" RETURN p.id",
         database_="neo4j"
     )
 
@@ -29,18 +29,22 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
         selenium_driver.get(f"https://www.atptour.com/en/players/x/{player_id['p.id']}/player-activity?matchType=Singles&year=2024&tournament=all")
         WebDriverWait(selenium_driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'atp_player_content')))
 
-        rank = selenium_driver.find_element(By.XPATH, "/html/body/div[3]/div/div/div[1]/div[2]/div[2]/div[1]/div[2]")
-        rank_no = re.search(r'\d+', rank.text)
+        try:
+            rank = selenium_driver.find_element(By.XPATH, "/html/body/div[3]/div/div/div[1]/div[2]/div[2]/div[1]/div[2]")
+            rank_no = re.search(r'\d+', rank.text)
 
-        if rank_no:
-            players.append({
-                "id": player_id["p.id"],
-                "rank": int(rank_no.group())
-            })
+            if rank_no:
+                players.append({
+                    "id": player_id["p.id"],
+                    "rank": int(rank_no.group())
+                })
+        except:
+            print("Rank not found for player", player_id["p.id"])
+            continue
 
     driver.execute_query("""
         UNWIND $players as player
-        MATCH (:Player {id: player.id})-[]-(f:Entry) WHERE f.id STARTS WITH "3392025"
+        MATCH (:Player {id: player.id})-[]-(f:Entry) WHERE f.id STARTS WITH "5802025"
         SET f.rank = player.rank
         """, players=players)
 

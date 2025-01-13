@@ -1,5 +1,5 @@
 .p-breadcrumb {
-    @apply bg-surface-0 dark:bg-surface-900 p-4 overflow-x-auto
+    @apply bg-surface-0 dark:bg-transparent p-4 overflow-x-auto
 }
 
 .p-breadcrumb-list {
@@ -25,7 +25,7 @@
 }
 
 .p-breadcrumb-item-link:hover .p-breadcrumb-item-label {
-    @apply text-surface-700 dark:text-surface-0
+    @apply cursor-default
 }
 
 .p-breadcrumb-item-label {
@@ -38,4 +38,8 @@
 
 .p-breadcrumb-item-link:hover .p-breadcrumb-item-icon {
     @apply text-surface-500 dark:text-surface-400
+}
+
+.p-breadcrumb-item:last-of-type > .p-breadcrumb-item-link > .p-breadcrumb-item-label {
+    @apply font-semibold text-emerald-600;
 }

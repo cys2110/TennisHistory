@@ -31,7 +31,7 @@ const router = createRouter({
       component: ArchiveView,
     },
     {
-      path: '/players/:name/:pid',
+      path: '/players/:name/:id',
       component: PlayerLayout,
       children: [
         {

@@ -14,7 +14,7 @@ export const getUpcomingTournaments = async (surface: Surfaces[], month: MonthNa
   }
 
   const { records } = await driver.executeQuery(
-    `
+    `/* cypher */
         MATCH (y:Year)<-[:TOOK_PLACE_IN]-(e:Event)-[:ON_SURFACE]->(s:Surface)
         MATCH (t:Tournament)<-[:EDITION_OF]-(e)-[:TOOK_PLACE_IN]->(v:Venue)-[:LOCATED_IN]->(c:Country)
         WHERE

@@ -21,7 +21,7 @@ export const FILTERED_CATEGORIES = [ Categories["ATP 250"], Categories["ATP 500"
 
 export const FILTERED_SURFACES = [Surfaces.Clay, Surfaces.Grass, Surfaces.Hard]
 
-// export const CATEGORIES = ["ATP 250", "ATP 500", "ATP Masters 1000", "Grand Slam", "ATP Finals", "ATP Cup", "ILTF", "ITF", "Laver Cup", "Next Gen Finals", "NTL", "Olympics", "United", "Davis Cup", "Grand Prix"];
+export const CATEGORIES = [Categories["ATP 250"], Categories["ATP 500"], Categories["ATP Masters 1000"], Categories["Grand Slam"], Categories["ATP Finals"], Categories["ATP Cup"], Categories.ILTF, Categories.ITF, Categories["Laver Cup"], Categories["Next Gen Finals"], Categories.NTL, Categories.Olympics, Categories.United, Categories["Davis Cup"], Categories["Grand Prix"]];
 
 export const MONTH_NAMES = [MonthNames.January, MonthNames.February, MonthNames.March, MonthNames.April, MonthNames.May, MonthNames.June, MonthNames.July, MonthNames.August, MonthNames.September, MonthNames.October, MonthNames.November, MonthNames.December]
 
@@ -50,7 +50,7 @@ export const MONTHS: Record<MonthNames, MonthNumbers> = {
 export const EVENT_PAGES = [
 	{ title: "Details", name: "event", icon: ['fad', 'square-info'] },
 	{ title: "Results", name: "results", icon: ['fad', 'grid-2'] },
-	{ title: "Draw", name: "draw", icon: ['fad', 'chart-tree-map'] }
+	{ title: "Draw", name: "draw", icon: ['fad', 'sitemap'] }
 ];
 
 // export const PLAYER_PAGES = [

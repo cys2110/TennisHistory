@@ -7,8 +7,8 @@ const modelValue = defineModel<string[]>()
 </script>
 
 <template>
-  <float-label variant="on">
-    <multi-select v-model="modelValue" :label :input-id="`select-${label}`" :options size="small" display="chip" :max-selected-labels="1"></multi-select>
+  <float-label variant="on" class="w-full">
+    <multi-select v-model="modelValue" :label :input-id="`select-${label}`" :options size="small" display="chip" :max-selected-labels="1" fluid variant="outlined"></multi-select>
     <label :for="`select-${label}`">{{ label }}</label>
   </float-label>
 </template>
