@@ -10,9 +10,9 @@ import re
 
 # For stats matches where winner is 1st in results and stats
 
-year = 2017
-tid = 322
-matches = ['https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms017', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms018', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms019', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms021', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms022', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms023', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms024', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms025', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms026', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms028', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms029', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms030', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms008', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms009', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms010', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms011', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms012', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms013', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms014', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms015', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms004', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms005', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms006', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms007', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms002', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms003', 'https://www.atptour.com/en/scores/match-stats/archive/2017/322/ms001']
+year = 2021
+tid = 404
+matches = ['https://www.atptour.com/en/scores/match-stats/archive/2021/404/ms005']
 matches_info = []
 
 driver = webdriver.Chrome()

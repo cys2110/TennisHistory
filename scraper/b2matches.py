@@ -10,10 +10,10 @@ import re
 
 # For stat matches
 
-tid = 322
+tid = 404
 draw = 'Best3'
-sort_date = '2017-05-21'
-year = 2017
+sort_date = '2021-10-07'
+year = 2021
 
 driver = webdriver.Chrome()
 driver.get(f"https://www.atptour.com/en/scores/archive/x/{tid}/{year}/draws")
@@ -50,11 +50,11 @@ for index, button in enumerate(buttons):
 
         matches_list = round.find_elements(By.CLASS_NAME, 'draw-item')
         match_no = 0
-        if round_header.text == 'Final':
+        if round_header.text == 'Finals':
             match_number = 0
-        elif round_header.text == 'Semifinals':
+        elif round_header.text == 'Semi-Finals':
             match_number = 1
-        elif round_header.text == 'Quarterfinals':
+        elif round_header.text == 'Quarter-Finals':
             match_number = 3
         elif round_header.text == 'Round of 16':
             match_number = 8
@@ -76,7 +76,7 @@ for index, button in enumerate(buttons):
             match_info = {
                 'id': f"{tid}{year} {button.text} {match_no}",
                 'match_no': match_number,
-                'round': round_header.text
+                'round': round_header.text.replace('Quarter-Finals', 'Quarterfinals').replace('Semi-Finals', 'Semifinals').replace('Finals', 'Final')
             }
 
             for player in players:
