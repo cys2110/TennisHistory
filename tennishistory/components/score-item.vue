@@ -11,11 +11,9 @@ defineProps<{ event: any; name: string; tid: string; year: string; eid: string; 
       v-for="(_, index) in new Array(5)"
       :key="index"
     >
-      <span v-if="event[`s${index + 1}`]">
-        {{ event[`s${index + 1}`] }}
-        <sup v-if="event[`t${index + 1}`]">
-          {{ event[`t${index + 1}`] }}
-        </sup>
+      <!--prettier-ignore-->
+      <span v-if="event[`s${index + 1}`]" class="mr-1">
+        {{ event[`s${index + 1}`] }}<sup v-if="event[`t${index + 1}`]">{{ event[`t${index + 1}`] }}</sup>
       </span>
     </template>
   </nuxt-link>

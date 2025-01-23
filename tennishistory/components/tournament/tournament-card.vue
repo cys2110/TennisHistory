@@ -1,15 +1,18 @@
 <script setup lang="ts">
 const props = defineProps<{ event: TournamentEventType }>()
-const route = useRoute()
-const { name, tid } = route.params
+const name = useRouteParams<string>("name")
+const tid = useRouteParams<string>("tid")
 const { year, winner_country, winner_id, winner_name, loser_country, loser_id, loser_name, eid, match_no } = props.event
 </script>
 
 <template>
-  <u-card :id="year">
+  <u-card
+    :id="year"
+    :ui="{ header: 'font-bold' }"
+  >
     <template #header>{{ year }}</template>
 
-    <u-container class="text-sm">
+    <u-container class="text-sm flex flex-col gap-2">
       <div class="flex items-center gap-2">
         <flag-icon
           v-if="winner_country"

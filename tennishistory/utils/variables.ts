@@ -19,7 +19,7 @@ export const ICONS = {
     draw: 'material-symbols-light:flowchart-outline',
     court: 'game-icons:tennis-court',
     check: 'solar:check-circle-bold-duotone',
-    website: 'solar:square-arrow-right-up-line-duotone',
+    website: 'ic:baseline-arrow-outward',
     person: 'material-symbols:account-circle-outline',
     "no-person": 'material-symbols:account-circle-off-outline-rounded',
     "line-scatter": 'ic:baseline-auto-graph',

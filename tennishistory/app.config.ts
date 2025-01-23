@@ -41,7 +41,8 @@ export default defineAppConfig({
         },
         pageHeader: {
             slots: {
-                title: 'text-slate-300'
+                title: 'text-slate-300',
+                headline: 'text-emerald-600'
             }
         },
         pageGrid: {

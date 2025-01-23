@@ -1,39 +1,47 @@
 <script setup lang="ts">
 definePageMeta({ name: "tournament" })
 const toast = useToast()
-const route = useRoute()
-const { name, tid } = route.params
-const links = ref<{ label: string; to: string }[]>([])
-const websiteLink = ref<{ icon: string; to: string; target: string }[]>([])
+const scroll = useScroll()
+const name = useRouteParams<string>("name")
+const tid = useRouteParams<string>("tid")
 
 // API call
 const { data: tournament, status } = await useFetch<TournamentType>("/api/tournamentDetails", {
   query: { tid },
-  onResponse: ({ response }) => {
-    if (response._data.tournament.website) {
-      websiteLink.value = [
-        {
-          icon: ICONS.website,
-          target: "_blank",
-          to: response._data.tournament.website
-        }
-      ]
-    }
-    // Anchor links
-    links.value = response._data.events.map((event: TournamentEventType) => ({
-      label: event.year,
-      to: `#${event.year}`
-    }))
-  },
   onResponseError: () => {
     toast.add({
-      title: "Error fetching data",
+      title: "Error fetching tournament data",
       icon: ICONS.error
     })
   }
 })
 
-useHead({ title: tournament.value?.tournament.name ?? useChangeCase(name as string, "capitalCase").value })
+useHead({ title: tournament.value?.tournament.name ?? useChangeCase(name.value, "capitalCase").value })
+
+// Anchor links for right sidebar
+const links = computed(() => {
+  // Computed value rather than useFetch onResponse to avoid hydration mismatch
+  if (tournament.value) {
+    return tournament.value.events.map((event: TournamentEventType) => ({
+      label: event.year,
+      to: `#${event.year}`
+    }))
+  }
+  return []
+})
+
+const websiteLink = computed(() => {
+  if (tournament.value?.tournament.website) {
+    return [
+      {
+        icon: ICONS.website,
+        target: "_blank",
+        to: tournament.value.tournament.website
+      }
+    ]
+  }
+  return []
+})
 </script>
 
 <template>
@@ -42,7 +50,7 @@ useHead({ title: tournament.value?.tournament.name ?? useChangeCase(name as stri
       <u-page-header
         headline="Tournaments"
         :links="websiteLink"
-        :title="tournament?.tournament.name ?? useChangeCase(name as string, 'capitalCase').value"
+        :title="tournament?.tournament.name ?? useChangeCase(name, 'capitalCase').value"
       >
         <template
           #description
@@ -54,7 +62,10 @@ useHead({ title: tournament.value?.tournament.name ?? useChangeCase(name as stri
     </ClientOnly>
 
     <u-page-body>
-      <u-page-grid v-if="tournament && tournament.events.length > 0">
+      <u-page-grid
+        v-if="tournament && tournament.events.length > 0"
+        class="xl:!grid-cols-3 gap-12"
+      >
         <tournament-card
           v-for="event in tournament.events"
           :key="event.eid"
@@ -66,14 +77,25 @@ useHead({ title: tournament.value?.tournament.name ?? useChangeCase(name as stri
         v-else
         :icon="ICONS['no-calendar']"
       >
-        No details about {{ useChangeCase(name as string, "capitalCase").value }} available
+        No details about {{ useChangeCase(name, "capitalCase").value }} available
       </error-message>
     </u-page-body>
 
     <!--Right sidebar (visible on large+ screens)-->
     <template #right>
       <u-page-aside>
-        <u-page-anchors :links />
+        <div class="text-lg mt-48 mb-2">On this page</div>
+        <u-page-list class="gap-2 ml-5">
+          <div
+            v-for="link in links"
+            :key="link.label"
+            class="hover-link cursor-pointer text-sm"
+            :class="scroll.hash.value === link.to ? 'text-emerald-600' : 'text-slate-400'"
+            @click="scroll.scroll(link.to)"
+          >
+            {{ link.label }}
+          </div>
+        </u-page-list>
       </u-page-aside>
     </template>
   </u-page>
