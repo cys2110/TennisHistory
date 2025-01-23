@@ -36,6 +36,7 @@ export const NAVIGATION_LINKS = [
     { label: 'Home', to: '/', icon: ICONS.home },
     { label: 'Upcoming Tournaments', to: '/upcoming', icon: ICONS["calendar-event"] },
     { label: 'Results Archive', to: '/archive', icon: ICONS.calendar },
+    { label: 'Tournaments', to: '/tournaments', icon: ICONS.trophy },
     { label: 'Head to Head', to: '/h2h', icon: ICONS.swords },
     { label: 'Search', to: '/search', icon: ICONS.search },
     { label: 'About', to: '/about', icon: ICONS.info }
@@ -70,6 +71,8 @@ export const MONTHS: Record<MonthNameEnum, MonthNumberEnum> = {
   [MonthNameEnum.November]: MonthNumberEnum.November,
   [MonthNameEnum.December]: MonthNumberEnum.December
 }
+
+export const LETTERS = ['All', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
 export const EVENT_PAGES = [
     { label: "Details", name: "event", icon: ICONS.details, to: { name: 'event'} },

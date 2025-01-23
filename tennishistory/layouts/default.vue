@@ -3,15 +3,15 @@ const breakpoints = useBreakpoints(breakpointsTailwind)
 const md = breakpoints.md
 const scroll = useScroll()
 const showButton = ref(false)
+// TODO: Add color scheme button
 
+// Show back to top button when page scrolled
 const handleScroll = () => {
   showButton.value = window.scrollY > 200
 }
-
 onMounted(() => {
   window.addEventListener("scroll", handleScroll)
 })
-
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll)
 })
@@ -56,26 +56,28 @@ onUnmounted(() => {
           <span class="font-cursive text-lg xl:text-2xl 2xl:text-3xl mx-auto">TennisHistory</span>
         </template>
         <div class="h-4/5">
-          <u-page-links
-            title="Navigation"
-            :links="NAVIGATION_LINKS"
-            :ui="{ root: 'my-5', item: 'xl:ml-5', link: 'text-xs xl:text-sm 2xl:text-md', title: '2xl:text-lg' }"
-          >
-            <template #title>
-              <div class="flex justify-between w-full items-center">
-                <span>Navigation</span>
-                <u-button
-                  v-if="showButton"
-                  icon="solar:round-alt-arrow-up-bold-duotone"
-                  @click="scroll.scroll('#top')"
-                  variant="ghost"
-                  class="ml-auto"
-                  color="secondary"
-                  label="Back to top"
-                />
-              </div>
-            </template>
-          </u-page-links>
+          <ClientOnly>
+            <u-page-links
+              title="Navigation"
+              :links="NAVIGATION_LINKS"
+              :ui="{ root: 'my-5', item: 'xl:ml-5', link: 'text-xs xl:text-sm 2xl:text-md', title: '2xl:text-lg' }"
+            >
+              <template #title>
+                <div class="flex justify-between w-full items-center">
+                  <span>Navigation</span>
+                  <u-button
+                    v-if="showButton"
+                    icon="solar:round-alt-arrow-up-bold-duotone"
+                    @click="scroll.scroll('#top')"
+                    variant="ghost"
+                    class="ml-auto"
+                    color="secondary"
+                    label="Back to top"
+                  />
+                </div>
+              </template>
+            </u-page-links>
+          </ClientOnly>
           <u-page-links
             title="Related Websites"
             :links="RELATED_LINKS"
