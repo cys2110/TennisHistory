@@ -1,5 +1,6 @@
 <script setup lang="ts">
 // TODO: Update history / styling
+// TODO: Add explainer text about shortcuts
 </script>
 
 <template>

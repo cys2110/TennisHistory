@@ -5,13 +5,13 @@ const { surface, category, name, ename, dates, city, country, tid, eid, year, st
 
 <template>
   <u-card
-    :id="eid"
+    :id="`event-${eid}`"
     :ui="{ header: 'p-0 sm:px-0' }"
   >
     <template #header>
       <div class="relative">
         <nuxt-img
-          :src="`/surfaces/${surface}.jpg`"
+          :src="`/surfaces/${surface ?? 'Hard'}.jpg`"
           :alt="surface"
           loading="lazy"
           class="opacity-75 rounded-t-lg"

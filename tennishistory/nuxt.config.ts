@@ -38,10 +38,18 @@ export default defineNuxtConfig({
     charts: ["ScatterChart", "LineChart", "BarChart", "TreeChart", "GaugeChart", "PieChart"],
     components: ["DatasetComponent", "GridComponent", "TooltipComponent"]
   },
-  modules: ["nuxt-neo4j", "@nuxt/image", "@vueuse/nuxt", "nuxt-echarts", '@nuxt/ui-pro'],
+  modules: [
+    "nuxt-neo4j",
+    "@nuxt/image",
+    "@vueuse/nuxt",
+    "nuxt-echarts",
+    'nuxt-anchorscroll',
+    '@nuxt/ui-pro'
+  ],
   imports: {
     dirs: [
-      'utils'
+      'utils',
+      'composables'
     ],
     presets: [
       {

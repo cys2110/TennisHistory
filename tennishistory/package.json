@@ -18,6 +18,7 @@
     "convert": "^5.7.0",
     "echarts": "^5.6.0",
     "nuxt": "^3.15.2",
+    "nuxt-anchorscroll": "^1.0.5",
     "nuxt-echarts": "^0.2.4",
     "nuxt-neo4j": "^0.0.4",
     "vue": "latest",

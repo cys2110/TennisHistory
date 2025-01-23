@@ -2,29 +2,43 @@
 definePageMeta({ name: "archive" })
 useHead({ title: "Results Archive" })
 const toast = useToast()
+const scroll = useScroll()
 
+// Set shortcuts for select menus
+defineShortcuts({
+  meta_shift_m: () => (months.value.length === MONTH_NAMES.length ? [] : (months.value = MONTH_NAMES)),
+  meta_shift_c: () => (categories.value.length === CATEGORIES.length ? (categories.value = []) : (categories.value = CATEGORIES)),
+  meta_shift_s: () => (surfaces.value.length === SURFACES.length ? (surfaces.value = []) : (surfaces.value = SURFACES)),
+  meta_shift_y: () => (years.value.length === yearsArray.length ? (years.value = []) : (years.value = yearsArray))
+})
+
+// Set filter values - default to all
 const surfaces = useRouteQuery("surfaces", SURFACES)
 const months = useRouteQuery("months", MONTH_NAMES)
 const categories = useRouteQuery("categories", CATEGORIES)
 const years = useRouteQuery("years", [new Date().getFullYear().toString()])
-const links = ref<{ label: string; to: string }[]>([])
 const yearsArray = Array.from({ length: new Date().getFullYear() - 1968 + 1 }, (_, index) => (1968 + index).toString())
 
 const { data: events, status } = await useFetch<EventCardType[]>("/api/archiveTournaments", {
   query: { surfaces, months, categories, years },
-  onResponse: ({ response }) => {
-    // Anchor links
-    links.value = response._data.map((event: EventCardType) => ({
-      label: event.name,
-      to: `#${event.eid}`
-    }))
-  },
   onResponseError: () => {
     toast.add({
       title: "Error fetching data",
       icon: ICONS.error
     })
   }
+})
+
+// Anchor links for right sidebar
+const links = computed(() => {
+  // Computed value rather than useFetch onResponse to avoid hydration mismatch
+  if (events.value) {
+    return events.value.map(event => ({
+      label: event.name,
+      to: `#event-${event.eid}`
+    }))
+  }
+  return []
 })
 </script>
 
@@ -49,29 +63,35 @@ const { data: events, status } = await useFetch<EventCardType[]>("/api/archiveTo
         v-else
         :icon="ICONS['no-calendar']"
       >
-        No upcoming events
+        No events found for the selected filters
       </error-message>
     </u-page-body>
 
     <!--Right sidebar (visible on large+ screens)-->
     <template #right>
       <u-page-aside>
-        <u-container>
-          <div>Filters</div>
-          <year-select
-            v-model="years"
-            :items="yearsArray"
-          />
-          <month-select v-model="months" />
-          <category-select v-model="categories" />
-          <surface-select v-model="surfaces" />
-        </u-container>
-        <ClientOnly>
-          <u-page-anchors
-            v-if="links.length > 0"
-            :links
-          />
-        </ClientOnly>
+        <div class="text-lg mb-2">Filters</div>
+        <year-select
+          v-model="years"
+          :items="yearsArray"
+        />
+        <month-select v-model="months" />
+        <category-select v-model="categories" />
+        <surface-select v-model="surfaces" />
+
+        <!--Anchor links - using anchor scroll module for smooth scrolling-->
+        <div class="text-lg mt-5 mb-2">On this page</div>
+        <u-page-list class="gap-2 ml-5">
+          <div
+            v-for="link in links"
+            :key="link.label"
+            class="hover-link cursor-pointer text-sm"
+            :class="scroll.hash.value === link.to ? 'text-emerald-600' : 'text-slate-400'"
+            @click="scroll.scroll(link.to)"
+          >
+            {{ link.label }}
+          </div>
+        </u-page-list>
       </u-page-aside>
     </template>
   </u-page>

@@ -6,6 +6,10 @@
     --font-cursive: 'Petit Formal Script', cursive;
 }
 
+::-webkit-scrollbar {
+    display: none;
+  }
+
 :root {
     --ui-bg: var(--ui-color-neutral-200);
     --ui-text: var(--ui-color-neutral-600);

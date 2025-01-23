@@ -1,35 +1,24 @@
 <script setup lang="ts">
 import { SurfaceEnum } from "~/types/enums"
 const modelValue = defineModel<SurfaceEnum[]>()
-const checked = ref<boolean | "indeterminate">(true)
-
-watchArray(modelValue, newValue => {
-  if (newValue.length === 0) {
-    checked.value = false
-  } else if (newValue.length === SURFACES.length) {
-    checked.value = true
-  } else {
-    checked.value = "indeterminate"
-  }
-})
-
-const handleCheckAll = () => {
-  if (checked.value === true) {
-    modelValue.value = SURFACES
-  } else if (checked.value === false) {
-    modelValue.value = []
-  }
-}
 </script>
 
 <template>
   <u-form-field label="Surfaces">
-    <u-checkbox
-      v-model="checked"
-      label="Select all"
-      size="sm"
-      @change="handleCheckAll"
-    />
+    <template #hint>
+      <u-kbd
+        value="meta"
+        size="sm"
+      />
+      <u-kbd
+        value="shift"
+        size="sm"
+      />
+      <u-kbd
+        value="s"
+        size="sm"
+      />
+    </template>
     <u-select
       v-model="modelValue"
       multiple

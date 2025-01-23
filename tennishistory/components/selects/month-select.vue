@@ -1,35 +1,24 @@
 <script setup lang="ts">
 import type { MonthNameEnum } from "~/types/enums"
 const modelValue = defineModel<MonthNameEnum[]>()
-const checked = ref<boolean | "indeterminate">(true)
-
-watchArray(modelValue, newValue => {
-  if (newValue.length === 0) {
-    checked.value = false
-  } else if (newValue.length === MONTH_NAMES.length) {
-    checked.value = true
-  } else {
-    checked.value = "indeterminate"
-  }
-})
-
-const handleCheckAll = () => {
-  if (checked.value === true) {
-    modelValue.value = MONTH_NAMES
-  } else if (checked.value === false) {
-    modelValue.value = []
-  }
-}
 </script>
 
 <template>
   <u-form-field label="Months">
-    <u-checkbox
-      v-model="checked"
-      label="Select all"
-      size="sm"
-      @change="handleCheckAll"
-    />
+    <template #hint>
+      <u-kbd
+        value="meta"
+        size="sm"
+      />
+      <u-kbd
+        value="shift"
+        size="sm"
+      />
+      <u-kbd
+        value="m"
+        size="sm"
+      />
+    </template>
     <u-select
       v-model="modelValue"
       multiple
