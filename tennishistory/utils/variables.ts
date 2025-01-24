@@ -81,11 +81,11 @@ export const EVENT_PAGES = [
 ]
 
 export const PLAYER_PAGES = [
-    { label: 'Details', name: 'player-overview', icon: ICONS.person, to: { name: 'player-overview'} },
-    { label: 'Activity', name: 'activity', icon: ICONS.calendar, to: {name: 'activity'} },
-    { label: 'Titles and Finals', name: 'titles', icon: ICONS.trophy, to: {name: 'titles'} },
-    { label: 'Win-Loss Index', name: 'wl-index', icon: ICONS["line-scatter"], to: {name: 'wl-index'} },
-    { label: 'Stats', name: 'stats', icon: ICONS["bar-chart"], to: {name: 'stats'} }
+    { label: 'Details', name: 'player-overview', icon: ICONS.person, to: { name: 'player-overview'}, color: 'secondary', variant: 'subtle' },
+    { label: 'Activity', name: 'activity', icon: ICONS.calendar, to: {name: 'activity'}, color: 'secondary', variant: 'subtle' },
+    { label: 'Titles and Finals', name: 'titles', icon: ICONS.trophy, to: {name: 'titles'}, color: 'secondary', variant: 'subtle' },
+    { label: 'Win-Loss Index', name: 'wl-index', icon: ICONS["line-scatter"], to: {name: 'wl-index'}, color: 'secondary', variant: 'subtle' },
+    { label: 'Stats', name: 'stats', icon: ICONS["bar-chart"], to: {name: 'stats'}, color: 'secondary', variant: 'subtle' }
 ]
 
 export const CURRENCIES: Record<CurrencyEnum, string> = {
