@@ -1,14 +1,19 @@
 <script setup lang="ts">
 definePageMeta({ name: "event", layout: "event-layout" })
-const route = useRoute()
+const eid = useRouteParams<string>("eid")
+const name = useRouteParams<string>("name")
+const year = useRouteParams<string>("year")
 const toast = useToast()
+const tournamentName = useTournamentName()
+tournamentName.tournamentName = name.value
 
 const { data: event, status } = await useFetch<EventDetailsType>("/api/eventDetails", {
-  query: { id: route.params.eid },
-  onResponseError: () => {
+  query: { id: eid.value },
+  onResponseError: ({ error }) => {
     toast.add({
-      title: "Error fetching data",
-      icon: ICONS.error
+      title: `Error fetching details about ${tournamentName.capitalisedName} ${year}`,
+      icon: ICONS.error,
+      description: error?.message
     })
   }
 })
@@ -20,22 +25,22 @@ const { data: event, status } = await useFetch<EventDetailsType>("/api/eventDeta
       v-if="event"
       :event
     />
+
     <error-message
       v-else
       :icon="ICONS['no-info']"
     >
-      No details about {{ useChangeCase(route.params.name as string, "capitalCase").value }} {{ route.params.year }} available
+      No details about {{ tournamentName.capitalisedName }} {{ year }} available
     </error-message>
 
-    <u-container class="flex justify-evenly">
-      <div class="flex flex-col">
-        <awards />
-        <entry-info />
+    <u-container class="my-10">
+      <div class="flex justify-evenly">
+        <div class="flex flex-col">
+          <awards />
+          <entry-info />
+        </div>
+        <seeds />
       </div>
-      <seeds />
-    </u-container>
-
-    <u-container>
       <entries />
     </u-container>
   </u-container>

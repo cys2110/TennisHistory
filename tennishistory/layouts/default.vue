@@ -4,6 +4,9 @@ const breakpoints = useBreakpoints(breakpointsTailwind)
 const md = breakpoints.md
 const scroll = useScroll()
 const showButton = ref(false)
+const route = useRoute()
+
+const navLinks = NAVIGATION_LINKS.map(link => ({ ...link, active: route.path.startsWith(link.to) }))
 
 // Light/dark mode toggle
 const isDark = computed({
@@ -92,7 +95,7 @@ onUnmounted(() => {
           </ClientOnly>
           <u-page-links
             title="Navigation"
-            :links="NAVIGATION_LINKS"
+            :links="navLinks"
             :ui="{ root: 'my-5', item: 'xl:ml-5', link: 'text-xs xl:text-sm 2xl:text-md', title: '2xl:text-lg' }"
           >
           </u-page-links>

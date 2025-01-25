@@ -25,9 +25,6 @@ const modelValue = defineModel<CategoryEnum[]>()
       :items="CATEGORIES"
       :icon="ICONS.trophy"
       :selected-icon="ICONS.check"
-      :ui="{
-        trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-300'
-      }"
       class="w-full"
     />
   </u-form-field>

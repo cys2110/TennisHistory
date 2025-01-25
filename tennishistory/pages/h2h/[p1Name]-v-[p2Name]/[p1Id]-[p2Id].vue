@@ -1,14 +1,19 @@
 <script setup lang="ts">
 definePageMeta({ name: "h2h-page" })
+const p1Name = useRouteParams<string>("p1Name")
+const p2Name = useRouteParams<string>("p2Name")
+const p1Id = useRouteParams<string>("p1Id")
+const p2Id = useRouteParams<string>("p2Id")
 const route = useRoute()
 const toast = useToast()
 
 const { data: h2h, status } = await useFetch<H2H>("/api/h2h", {
-  query: { p1Id: route.params.p1Id, p2Id: route.params.p2Id },
-  onResponseError: () => {
+  query: { p1Id, p2Id },
+  onResponseError: ({ error }) => {
     toast.add({
       title: "Error fetching data",
-      icon: ICONS.error
+      icon: ICONS.error,
+      description: error?.message
     })
   }
 })

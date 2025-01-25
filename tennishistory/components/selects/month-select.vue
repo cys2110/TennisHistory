@@ -25,9 +25,6 @@ const modelValue = defineModel<MonthNameEnum[]>()
       :items="MONTH_NAMES"
       :icon="ICONS['calendar-event']"
       :selected-icon="ICONS.check"
-      :ui="{
-        trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-300'
-      }"
       class="w-full"
     />
   </u-form-field>

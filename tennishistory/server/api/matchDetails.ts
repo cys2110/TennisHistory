@@ -16,7 +16,7 @@ export default defineEventHandler(async (query) => {
           WHEN e.start_date.month <> e.end_date.month THEN apoc.temporal.format(e.start_date, 'dd MMMM') || ' - ' || apoc.temporal.format(e.end_date, 'dd MMMM yyyy')
           ELSE apoc.temporal.format(e.start_date, 'dd') || ' - ' || apoc.temporal.format(e.end_date, 'dd MMMM yyyy')
         END,
-        date: CASE WHEN m.date IS NOT NULL THEN apoc.temporal.format(m.date, 'dd MMMM yyyy') ELSE NULL END,
+        date: CASE WHEN m.date IS NOT NULL THEN apoc.temporal.format(m.date, 'EEEE dd MMMM yyyy') ELSE NULL END,
         court: m.court,
         umpire: u.id,
         duration: CASE WHEN m.duration IS NOT NULL THEN apoc.temporal.format(m.duration, 'hh:mm') ELSE NULL END,

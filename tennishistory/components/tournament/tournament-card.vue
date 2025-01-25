@@ -18,18 +18,11 @@ const { year, winner_country, winner_id, winner_name, loser_country, loser_id, l
           v-if="winner_country"
           :country="winner_country"
         />
-        <player-avatar
-          v-if="winner_id && winner_name"
+        <player-component
+          v-if="winner_name && winner_id"
           :id="winner_id"
           :name="winner_name"
         />
-        <nuxt-link
-          v-if="winner_name && winner_id"
-          class="hover-link"
-          :to="{ name: 'player', params: { name: useChangeCase(winner_name, 'kebabCase').value, id: winner_id } }"
-        >
-          {{ winner_name }}
-        </nuxt-link>
       </div>
       <div class="text-center text-xs">d.</div>
       <div class="flex items-center gap-2">
@@ -37,23 +30,16 @@ const { year, winner_country, winner_id, winner_name, loser_country, loser_id, l
           v-if="loser_country"
           :country="loser_country"
         />
-        <player-avatar
-          v-if="loser_id && loser_name"
+        <player-component
+          v-if="loser_name && loser_id"
           :id="loser_id"
           :name="loser_name"
         />
-        <nuxt-link
-          v-if="loser_name && loser_id"
-          class="hover-link"
-          :to="{ name: 'player', params: { name: useChangeCase(loser_name, 'kebabCase').value, id: loser_id } }"
-        >
-          {{ loser_name }}
-        </nuxt-link>
       </div>
       <div class="text-center">
         <score-item
-          :name="name as string"
-          :tid="tid as string"
+          :name
+          :tid
           :year
           :eid
           :match_no
@@ -64,8 +50,8 @@ const { year, winner_country, winner_id, winner_name, loser_country, loser_id, l
 
     <template #footer>
       <event-buttons
-        :name="name as string"
-        :tid="tid as string"
+        :name
+        :tid
         :year="event.year"
         :eid="event.eid"
       />

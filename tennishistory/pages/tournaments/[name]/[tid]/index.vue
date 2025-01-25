@@ -82,7 +82,10 @@ const websiteLink = computed(() => {
     <template #right>
       <u-page-aside>
         <div class="text-lg mt-48 mb-2">On this page</div>
-        <anchor-links :links />
+        <anchor-links
+          :links
+          class="w-1/6 text-center"
+        />
       </u-page-aside>
     </template>
   </u-page>

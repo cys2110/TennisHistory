@@ -1,27 +1,33 @@
 <script setup lang="ts">
+// @ts-nocheck
 definePageMeta({ name: "match" })
-const route = useRoute()
+const mid = useRouteParams<string>("mid")
+const eid = useRouteParams<string>("eid")
+const tid = useRouteParams<string>("tid")
+const year = useRouteParams<string>("year")
+const tname = useRouteParams<string>("name")
 const toast = useToast()
-const { tname, year, eid, mid, tid } = route.params
+const tournamentName = useTournamentName()
 
 const { data: match, status } = await useFetch<MatchType>("/api/matchDetails", {
   query: { mid, eid },
-  onResponseError: () => {
+  onResponseError: ({ error }) => {
     toast.add({
-      title: "Error fetching data",
-      icon: ICONS.error
+      title: "Error fetching match data",
+      icon: ICONS.error,
+      description: error?.message
     })
   }
 })
-
-useHead({ title: `${match.value?.p1.name} v. ${match.value?.p2.name} | ${match.value?.name ?? useChangeCase(tname as string, "capitalCase").value} ${year}` })
+tournamentName.tournamentName = match.value?.name ?? tname.value
+useHead({ title: `${match.value?.p1.name} v. ${match.value?.p2.name} | ${tournamentName.capitalisedName} ${year.value}` })
 
 const links = computed(() => {
   if (match.value) {
     return [
       { label: match.value.p1.name, avatar: { src: `https://www.atptour.com/-/media/alias/player-headshot/${match.value.p1.id}` }, to: { name: "player", params: { name: useChangeCase(match.value.p1.name, "kebabCase").value, id: match.value.p1.id } } },
       { label: match.value.p2.name, avatar: { src: `https://www.atptour.com/-/media/alias/player-headshot/${match.value.p2.id}` }, to: { name: "player", params: { name: useChangeCase(match.value.p2.name, "kebabCase").value, id: match.value.p2.id } } },
-      { label: "Tournament Details", icon: ICONS.trophy, to: { name: "tournament", params: { name: tname, tid } } },
+      { label: "Tournament Details", icon: ICONS.trophy, to: { name: "tournament", params: { name: tname.value, tid } } },
       ...EVENT_PAGES
     ]
   }
@@ -36,7 +42,7 @@ const links = computed(() => {
         headline="Matches"
         :links
       >
-        <template #title>{{ match ? `${match.p1.name} v. ${match.p2.name}` : `${useChangeCase(tname as string, "capitalCase").value} ${year} ${mid}` }}</template>
+        <template #title>{{ match ? `${match.p1.name} v. ${match.p2.name}` : `${tournamentName.capitalisedName} ${year} ${mid}` }}</template>
         <template
           #description
           v-if="match"

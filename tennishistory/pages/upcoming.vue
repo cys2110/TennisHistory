@@ -51,15 +51,9 @@ const links = computed(() => {
         <category-select v-model="categories" />
       </u-container>
 
-      <events-grid
-        v-if="events && events.length > 0"
-        :events
-      />
+      <events-grid v-if="events && events.length > 0" :events />
       <loading-event-card v-else-if="status === 'pending'" />
-      <error-message
-        v-else
-        :icon="ICONS['no-calendar']"
-      >
+      <error-message v-else :icon="ICONS['no-calendar']">
         No upcoming events
       </error-message>
     </u-page-body>

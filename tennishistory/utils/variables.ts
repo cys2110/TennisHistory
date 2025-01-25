@@ -1,5 +1,4 @@
 import { CategoryEnum, CurrencyEnum, MonthNameEnum, MonthNumberEnum, RoundEnum, StatusEnum, SurfaceEnum } from "~/types/enums";
-const route = useRoute()
 
 export const ICONS = {
     home: 'ic:round-home',
@@ -39,9 +38,9 @@ export const NAVIGATION_LINKS = [
     { label: 'Home', to: '/', icon: ICONS.home },
     { label: 'Upcoming Tournaments', to: '/upcoming', icon: ICONS["calendar-event"] },
     { label: 'Results Archive', to: '/archive', icon: ICONS.calendar },
-    { label: 'Tournaments', to: '/tournaments', icon: ICONS.trophy, active: route.path.startsWith('/tournaments') },
-    { label: 'Players', to: '/players', icon: ICONS.people, active: route.path.startsWith('/players') },
-    { label: 'Head to Head', to: '/h2h', icon: ICONS.swords, active: route.path.startsWith('/h2h') },
+    { label: 'Tournaments', to: '/tournaments', icon: ICONS.trophy },
+    { label: 'Players', to: '/players', icon: ICONS.people },
+    { label: 'Head to Head', to: '/h2h', icon: ICONS.swords },
     { label: 'Search', to: '/search', icon: ICONS.search },
     { label: 'About', to: '/about', icon: ICONS.info }
 ]

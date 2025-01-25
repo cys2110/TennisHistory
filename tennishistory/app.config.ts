@@ -27,10 +27,20 @@ export default defineAppConfig({
             slots: {
                 label: 'text-emerald-600'
             }
+        },
+        select: {
+            slots: {
+                trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-300'
+            }
         }
     },
     uiPro: {
         pageLinks: {
+            slots: {
+                item: 'xl:ml-5',
+                link: 'text-xs xl:text-sm 2xl:text-md',
+                title: '2xl:text-lg'
+            },
             variants: {
                 active: {
                     true: {
@@ -73,5 +83,18 @@ export default defineAppConfig({
                 root: 'flex flex-col ring-violet-600 dark:ring-violet-800 shadow-violet-800 dark:shadow-violet-800 hover:shadow-md hover:shadow-violet-800 dark:hover:shadow-violet-600',
             }
         },
+        user: {
+            slots: {
+                avatar: 'border border-slate-500',
+                name: 'hover-link cursor-pointer'
+            },
+            variants: {
+                to: {
+                    true: {
+                        avatar: 'group-hover/user:!scale-100 group-hover/user:!transform-none'
+                    }
+                }
+            }
+        }
     }
 })
