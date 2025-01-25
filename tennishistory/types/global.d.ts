@@ -1,7 +1,7 @@
 import type { CountriesEnum, RoundEnum, SearchResultKeyEnum, SurfaceEnum } from "./enums";
 
 declare global {
-    type EventCardType = Pick<Event, 'year' | 'surface' | 'tid' | 'name' | 'city' | 'country' | 'start' | 'dates' | 'eid' | 'category' | 'ename'>;
+    type EventCardType = Pick<Event, 'year' | 'surface' | 'tid' | 'name' | 'city' | 'country' | 'start' | 'dates' | 'eid' | 'category' | 'ename' | 'draw'>;
 
     interface TournamentEventType {
         eid: string;

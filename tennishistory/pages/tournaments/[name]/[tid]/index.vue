@@ -2,15 +2,25 @@
 // @ts-nocheck
 definePageMeta({ name: "tournament" }) // Page name for routing
 const toast = useToast()
+const tournamentName = useTournamentName()
 const name = useRouteParams<string>("name")
 const tid = useRouteParams<string>("tid")
 
 // API call
-const { data: tournament, status, error } = await useFetch<TournamentType>("/api/tournamentDetails", { query: { tid } })
+const { data: tournament, status } = await useFetch<TournamentType>("/api/tournamentDetails", {
+  query: { tid },
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: "Error fetching tournament data",
+      icon: ICONS.error,
+      description: error?.message
+    })
+  }
+})
+tournamentName.tournamentName = tournament.value?.tournament.name ?? name.value // Set tournament name
+useHead({ title: tournamentName.capitalisedName }) // Title for tab
 
-useHead({ title: tournament.value?.tournament.name ?? useChangeCase(name.value, "capitalCase").value }) // Title for tab - use api data if available for properly formatted name
-
-// Anchor links for right sidebar
+// Anchor links for right sidebar - computed to avoid hydration mismatch
 const links = computed(() => {
   if (tournament.value) {
     return tournament.value.events.map((event: TournamentEventType) => ({
@@ -34,15 +44,6 @@ const websiteLink = computed(() => {
   }
   return []
 })
-
-// Toast when error fetching data
-whenever(error, () => {
-  toast.add({
-    title: "Error fetching tournament data",
-    icon: ICONS.error,
-    description: `${error.value}`
-  })
-})
 </script>
 
 <template>
@@ -50,7 +51,7 @@ whenever(error, () => {
     <u-page-header
       headline="Tournaments"
       :links="websiteLink"
-      :title="tournament?.tournament.name ?? useChangeCase(name, 'capitalCase').value"
+      :title="tournamentName.capitalisedName"
       :description="tournament?.tournament.years"
     />
 
@@ -73,7 +74,7 @@ whenever(error, () => {
         v-else
         :icon="ICONS['no-calendar']"
       >
-        No details about {{ useChangeCase(name, "capitalCase").value }} available
+        No details about {{ tournamentName.capitalisedName }} available
       </error-message>
     </u-page-body>
 

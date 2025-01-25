@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ name: "upcoming", pageTransition: { name: "rotate" } }) // Define name for routing
+definePageMeta({ name: "upcoming" }) // Define name for routing
 useHead({ title: "Upcoming Tournaments" }) // Define title for tab title
 const toast = useToast()
 
@@ -16,27 +16,26 @@ const months = useRouteQuery("months", MONTH_NAMES)
 const categories = useRouteQuery("categories", CATEGORIES)
 
 // API call
-const { data: events, status, error } = await useFetch<EventCardType[]>("/api/upcomingTournaments", { query: { surfaces, months, categories } })
+const { data: events, status } = await useFetch<EventCardType[]>("/api/upcomingTournaments", {
+  query: { surfaces, months, categories },
+  onResponseError({ error }) {
+    toast.add({
+      title: "Error fetching upcoming tournaments",
+      description: error?.message,
+      icon: ICONS.error
+    })
+  }
+})
 
-// Anchor links for right sidebar
+// Anchor links for right sidebar - computed value to avoid hydration mismatch
 const links = computed(() => {
-  // Computed value rather than useFetch onResponse to avoid hydration mismatch
   if (events.value) {
-    return events.value.map(event => ({
+    return events.value.map((event: EventCardType) => ({
       label: event.name,
       to: `#event-${event.eid}`
     }))
   }
   return []
-})
-
-// Add toast when error fetching data
-whenever(error, () => {
-  toast.add({
-    title: "Error fetching upcoming tournaments",
-    description: `${error.value}`,
-    icon: ICONS.error
-  })
 })
 </script>
 

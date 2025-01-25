@@ -1,5 +1,5 @@
-import { type ButtonProps } from '@nuxt/ui'
 import { CategoryEnum, CurrencyEnum, MonthNameEnum, MonthNumberEnum, RoundEnum, StatusEnum, SurfaceEnum } from "~/types/enums";
+const route = useRoute()
 
 export const ICONS = {
     home: 'ic:round-home',
@@ -23,6 +23,8 @@ export const ICONS = {
     website: 'ic:baseline-arrow-outward',
     person: 'material-symbols:account-circle-outline',
     "no-person": 'material-symbols:account-circle-off-outline-rounded',
+    people: 'ic:twotone-people-alt',
+    'no-people': 'pepicons-print:people-circle-off',
     "line-scatter": 'ic:baseline-auto-graph',
     "bar-chart": 'solar:chart-2-bold-duotone',
     table: 'material-symbols-light:table-outline',
@@ -37,8 +39,9 @@ export const NAVIGATION_LINKS = [
     { label: 'Home', to: '/', icon: ICONS.home },
     { label: 'Upcoming Tournaments', to: '/upcoming', icon: ICONS["calendar-event"] },
     { label: 'Results Archive', to: '/archive', icon: ICONS.calendar },
-    { label: 'Tournaments', to: '/tournaments', icon: ICONS.trophy },
-    { label: 'Head to Head', to: '/h2h', icon: ICONS.swords },
+    { label: 'Tournaments', to: '/tournaments', icon: ICONS.trophy, active: route.path.startsWith('/tournaments') },
+    { label: 'Players', to: '/players', icon: ICONS.people, active: route.path.startsWith('/players') },
+    { label: 'Head to Head', to: '/h2h', icon: ICONS.swords, active: route.path.startsWith('/h2h') },
     { label: 'Search', to: '/search', icon: ICONS.search },
     { label: 'About', to: '/about', icon: ICONS.info }
 ]

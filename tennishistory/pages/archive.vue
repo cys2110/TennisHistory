@@ -19,7 +19,16 @@ const years = useRouteQuery("years", [new Date().getFullYear().toString()])
 const yearsArray = Array.from({ length: new Date().getFullYear() - 1968 + 1 }, (_, index) => (1968 + index).toString()) // All years from Open Era
 
 // API call
-const { data: events, status, error } = await useFetch<EventCardType[]>("/api/archiveTournaments", { query: { surfaces, months, categories, years } })
+const { data: events, status } = await useFetch<EventCardType[]>("/api/archiveTournaments", {
+  query: { surfaces, months, categories, years },
+  onResponseError({ error }) {
+    toast.add({
+      title: "Error fetching archive tournaments",
+      description: error?.message,
+      icon: ICONS.error
+    })
+  }
+})
 
 // Anchor links for right sidebar
 const links = computed(() => {
@@ -31,15 +40,6 @@ const links = computed(() => {
     }))
   }
   return []
-})
-
-// Add toast when error fetching data
-whenever(error, () => {
-  toast.add({
-    title: "Error fetching archive tournaments",
-    description: `${error.value}`,
-    icon: ICONS.error
-  })
 })
 </script>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-definePageMeta({ name: "tournaments" })
-useHead({ title: "Tournaments" })
+definePageMeta({ name: "tournaments" }) // Page name for routing
+useHead({ title: "Tournaments" }) // Tab title
 const toast = useToast()
 const selectedLetter = ref<string | null>(null)
 const page = ref(1)
@@ -15,6 +15,12 @@ const { data: tournaments, status } = await useFetch<{ count: { low: number; hig
     })
   }
 })
+
+// Function to select letter
+const selectLetter = (letter: string) => {
+  page.value = 1
+  selectedLetter.value = selectedLetter.value === letter ? null : letter
+}
 </script>
 
 <template>
@@ -31,7 +37,7 @@ const { data: tournaments, status } = await useFetch<{ count: { low: number; hig
             class="cursor-pointer font-bold"
             :class="{ 'text-emerald-600': selectedLetter === letter }"
             color="neutral"
-            @click="selectedLetter = letter"
+            @click="selectLetter(letter)"
           >
             {{ letter }}
           </u-button>
@@ -58,7 +64,7 @@ const { data: tournaments, status } = await useFetch<{ count: { low: number; hig
           :key="tournament.id"
           :title="tournament.name"
           :to="{ name: 'tournament', params: { tid: tournament.id, name: useChangeCase(tournament.name, 'kebabCase').value } }"
-          class="ring-violet-600 shadow-sm shadow-violet-400 hover:shadow-md hover:shadow-violet-400 text-center"
+          class="tournament-card ring-violet-600 shadow-sm shadow-violet-400 hover:shadow-md hover:shadow-violet-400 text-center"
         />
       </u-page-grid>
 
