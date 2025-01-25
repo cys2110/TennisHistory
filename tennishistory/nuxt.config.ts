@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
+  ssr: false,
   routeRules: {
     '/h2h': {redirect: '/h2h/jannik-sinner-v-alexander-zverev/s0ag-z355'},
   },
@@ -26,6 +27,7 @@ export default defineNuxtConfig({
     }
   ],
   app: {
+    layoutTransition: { name: "layout", mode: "out-in" },
     pageTransition: { name: "page", mode: "out-in" }
   },
   router: {
@@ -44,13 +46,10 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "nuxt-echarts",
     'nuxt-anchorscroll',
-    '@nuxt/ui-pro'
+    '@nuxt/ui-pro',
+    '@pinia/nuxt'
   ],
   imports: {
-    dirs: [
-      'utils',
-      'composables'
-    ],
     presets: [
       {
         from: '@vueuse/integrations/useChangeCase',
@@ -58,7 +57,7 @@ export default defineNuxtConfig({
       },
       {
         from: '@vueuse/core',
-        imports: ['breakpointsTailwind', 'useBreakpoints', 'watchArray']
+        imports: ['breakpointsTailwind', 'useBreakpoints', 'watchArray', 'whenever']
       },
       {
         from: '@vueuse/router',

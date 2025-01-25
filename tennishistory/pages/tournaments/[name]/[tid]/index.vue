@@ -1,26 +1,17 @@
 <script setup lang="ts">
-definePageMeta({ name: "tournament" })
+// @ts-nocheck
+definePageMeta({ name: "tournament" }) // Page name for routing
 const toast = useToast()
-const scroll = useScroll()
 const name = useRouteParams<string>("name")
 const tid = useRouteParams<string>("tid")
 
 // API call
-const { data: tournament, status } = await useFetch<TournamentType>("/api/tournamentDetails", {
-  query: { tid },
-  onResponseError: () => {
-    toast.add({
-      title: "Error fetching tournament data",
-      icon: ICONS.error
-    })
-  }
-})
+const { data: tournament, status, error } = await useFetch<TournamentType>("/api/tournamentDetails", { query: { tid } })
 
-useHead({ title: tournament.value?.tournament.name ?? useChangeCase(name.value, "capitalCase").value })
+useHead({ title: tournament.value?.tournament.name ?? useChangeCase(name.value, "capitalCase").value }) // Title for tab - use api data if available for properly formatted name
 
 // Anchor links for right sidebar
 const links = computed(() => {
-  // Computed value rather than useFetch onResponse to avoid hydration mismatch
   if (tournament.value) {
     return tournament.value.events.map((event: TournamentEventType) => ({
       label: event.year,
@@ -34,6 +25,7 @@ const websiteLink = computed(() => {
   if (tournament.value?.tournament.website) {
     return [
       {
+        color: "secondary",
         icon: ICONS.website,
         target: "_blank",
         to: tournament.value.tournament.website
@@ -42,26 +34,28 @@ const websiteLink = computed(() => {
   }
   return []
 })
+
+// Toast when error fetching data
+whenever(error, () => {
+  toast.add({
+    title: "Error fetching tournament data",
+    icon: ICONS.error,
+    description: `${error.value}`
+  })
+})
 </script>
 
 <template>
   <u-page>
-    <ClientOnly>
-      <u-page-header
-        headline="Tournaments"
-        :links="websiteLink"
-        :title="tournament?.tournament.name ?? useChangeCase(name, 'capitalCase').value"
-      >
-        <template
-          #description
-          v-if="tournament?.tournament.years"
-        >
-          {{ tournament.tournament.years }}
-        </template>
-      </u-page-header>
-    </ClientOnly>
+    <u-page-header
+      headline="Tournaments"
+      :links="websiteLink"
+      :title="tournament?.tournament.name ?? useChangeCase(name, 'capitalCase').value"
+      :description="tournament?.tournament.years"
+    />
 
     <u-page-body>
+      <!--TODO: Add venues and sponsor names-->
       <u-page-grid
         v-if="tournament && tournament.events.length > 0"
         class="xl:!grid-cols-3 gap-12"
@@ -72,7 +66,9 @@ const websiteLink = computed(() => {
           :event
         />
       </u-page-grid>
+
       <loading-tournament-card v-else-if="status === 'pending'" />
+
       <error-message
         v-else
         :icon="ICONS['no-calendar']"
@@ -85,17 +81,7 @@ const websiteLink = computed(() => {
     <template #right>
       <u-page-aside>
         <div class="text-lg mt-48 mb-2">On this page</div>
-        <u-page-list class="gap-2 ml-5">
-          <div
-            v-for="link in links"
-            :key="link.label"
-            class="hover-link cursor-pointer text-sm"
-            :class="scroll.hash.value === link.to ? 'text-emerald-600' : 'text-slate-400'"
-            @click="scroll.scroll(link.to)"
-          >
-            {{ link.label }}
-          </div>
-        </u-page-list>
+        <anchor-links :links />
       </u-page-aside>
     </template>
   </u-page>

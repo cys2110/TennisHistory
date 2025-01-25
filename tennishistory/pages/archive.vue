@@ -1,8 +1,7 @@
 <script setup lang="ts">
-definePageMeta({ name: "archive" })
-useHead({ title: "Results Archive" })
+definePageMeta({ name: "archive" }) // Define name for routing
+useHead({ title: "Results Archive" }) // Define title for tab title
 const toast = useToast()
-const scroll = useScroll()
 
 // Set shortcuts for select menus
 defineShortcuts({
@@ -17,17 +16,10 @@ const surfaces = useRouteQuery("surfaces", SURFACES)
 const months = useRouteQuery("months", MONTH_NAMES)
 const categories = useRouteQuery("categories", CATEGORIES)
 const years = useRouteQuery("years", [new Date().getFullYear().toString()])
-const yearsArray = Array.from({ length: new Date().getFullYear() - 1968 + 1 }, (_, index) => (1968 + index).toString())
+const yearsArray = Array.from({ length: new Date().getFullYear() - 1968 + 1 }, (_, index) => (1968 + index).toString()) // All years from Open Era
 
-const { data: events, status } = await useFetch<EventCardType[]>("/api/archiveTournaments", {
-  query: { surfaces, months, categories, years },
-  onResponseError: () => {
-    toast.add({
-      title: "Error fetching data",
-      icon: ICONS.error
-    })
-  }
-})
+// API call
+const { data: events, status, error } = await useFetch<EventCardType[]>("/api/archiveTournaments", { query: { surfaces, months, categories, years } })
 
 // Anchor links for right sidebar
 const links = computed(() => {
@@ -39,6 +31,15 @@ const links = computed(() => {
     }))
   }
   return []
+})
+
+// Add toast when error fetching data
+whenever(error, () => {
+  toast.add({
+    title: "Error fetching archive tournaments",
+    description: `${error.value}`,
+    icon: ICONS.error
+  })
 })
 </script>
 
@@ -58,7 +59,9 @@ const links = computed(() => {
         v-if="events && events.length > 0"
         :events
       />
+
       <loading-event-card v-else-if="status === 'pending'" />
+
       <error-message
         v-else
         :icon="ICONS['no-calendar']"
@@ -71,27 +74,19 @@ const links = computed(() => {
     <template #right>
       <u-page-aside>
         <div class="text-lg mb-2">Filters</div>
-        <year-select
-          v-model="years"
-          :items="yearsArray"
-        />
-        <month-select v-model="months" />
-        <category-select v-model="categories" />
-        <surface-select v-model="surfaces" />
+        <div class="flex flex-col gap-2 ml-5">
+          <year-select
+            v-model="years"
+            :items="yearsArray"
+          />
+          <month-select v-model="months" />
+          <category-select v-model="categories" />
+          <surface-select v-model="surfaces" />
+        </div>
 
         <!--Anchor links - using anchor scroll module for smooth scrolling-->
         <div class="text-lg mt-5 mb-2">On this page</div>
-        <u-page-list class="gap-2 ml-5">
-          <div
-            v-for="link in links"
-            :key="link.label"
-            class="hover-link cursor-pointer text-sm"
-            :class="scroll.hash.value === link.to ? 'text-emerald-600' : 'text-slate-400'"
-            @click="scroll.scroll(link.to)"
-          >
-            {{ link.label }}
-          </div>
-        </u-page-list>
+        <anchor-links :links />
       </u-page-aside>
     </template>
   </u-page>

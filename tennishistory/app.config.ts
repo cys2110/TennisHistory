@@ -13,7 +13,7 @@ export default defineAppConfig({
         },
         card: {
             slots: {
-                root: 'flex flex-col ring-violet-800 shadow-violet-600 hover:shadow-md hover:shadow-violet-600',
+                root: 'flex flex-col ring-violet-600 dark:ring-violet-800 shadow-violet-800 dark:shadow-violet-800 hover:shadow-md hover:shadow-violet-800 dark:hover:shadow-violet-600',
                 body: 'flex-1',
                 footer: 'flex justify-center mt-auto'
             }
@@ -41,7 +41,7 @@ export default defineAppConfig({
         },
         pageHeader: {
             slots: {
-                title: 'text-slate-300',
+                title: 'text-slate-600 dark:text-slate-300',
                 headline: 'text-emerald-600'
             }
         },
@@ -56,6 +56,22 @@ export default defineAppConfig({
                     }
                 }
             }
-        }
+        },
+        pageFeature: {
+            slots: {
+                title: 'text-slate-400',
+                description: 'text-slate-300'
+            }
+        },
+        pageSection: {
+            slots: {
+                title: 'text-slate-300'
+            }
+        },
+        pageCard: {
+            slots: {
+                root: 'flex flex-col ring-violet-600 dark:ring-violet-800 shadow-violet-800 dark:shadow-violet-800 hover:shadow-md hover:shadow-violet-800 dark:hover:shadow-violet-600',
+            }
+        },
     }
 })

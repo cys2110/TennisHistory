@@ -1,16 +1,19 @@
 <script setup lang="ts">
-definePageMeta({ name: "player-overview", layout: "player-layout" })
-const route = useRoute()
+definePageMeta({ name: "player-overview", layout: "player-layout" }) // Page name for routing
+const id = useRouteParams<string>("id")
+const name = useRouteParams<string>("name")
 const toast = useToast()
 
-const { data: player, status } = await useFetch<PlayerDetails>("/api/playerDetails", {
-  query: { id: route.params.id },
-  onResponseError: () => {
-    toast.add({
-      title: "Error fetching data",
-      icon: ICONS.error
-    })
-  }
+// API call
+const { data: player, status, error } = await useFetch<PlayerDetails>("/api/playerDetails", { query: { id } })
+
+// Error handling
+whenever(error, () => {
+  toast.add({
+    title: "Error fetching player details",
+    icon: ICONS.error,
+    description: `${error.value}`
+  })
 })
 </script>
 
@@ -20,15 +23,15 @@ const { data: player, status } = await useFetch<PlayerDetails>("/api/playerDetai
       v-if="player"
       :player
     />
+
     <loading-page-cards v-else-if="status === 'pending'" />
     <error-message
       v-else
       :icon="ICONS['no-person']"
     >
-      No details about {{ useChangeCase(route.params.name as string, "capitalCase").value }} available
+      No details about {{ useChangeCase(name, "capitalCase").value }} available
     </error-message>
 
-    <!--Major results-->
     <major-results />
   </u-container>
 </template>

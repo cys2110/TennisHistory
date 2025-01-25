@@ -24,7 +24,7 @@ const isDisabled = props.start ? currentDate < startDate : false
           :to="{ name: page.name, params: { name: useChangeCase(name, 'kebabCase').value, tid, year, eid } }"
           color="secondary"
           variant="subtle"
-          :ui="{ base: 'text-slate-300 shadow-xs shadow-emerald-400 hover:shadow-md hover:shadow-emerald-400 rounded-full' }"
+          :ui="{ base: 'text-slate-500 dark:text-slate-300 shadow-xs shadow-emerald-600 dark:shadow-emerald-400 hover:shadow-md hover:shadow-emerald-800 dark:hover:shadow-emerald-400 rounded-full' }"
         >
           {{ page.label }}
         </u-button>

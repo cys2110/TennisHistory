@@ -1,20 +1,24 @@
 <script setup lang="ts">
+// @ts-nocheck
 import defaultLayout from "~/layouts/default.vue"
+import usePlayerName from "~/stores/usePlayerName"
 const name = useRouteParams<string>("name")
 const id = useRouteParams<string>("id")
 const route = useRoute()
+const playerName = usePlayerName()
 
+// API call
 const { data: player } = await useFetch<PlayerName>("/api/playerName", { query: { id: id.value } })
+playerName.playerName = player.value?.name ?? name.value // Set player name in store
 
+// Filter player pages
 const page = computed(() => {
-  return PLAYER_PAGES.find(page => page.name === route.name) || null
+  const filteredPage = PLAYER_PAGES.find(page => page.name === route.name) || null
+  const filteredLinks = PLAYER_PAGES.filter(page => page.name !== route.name)
+  return { page: filteredPage, links: filteredLinks }
 })
 
-const filteredLinks = computed(() => {
-  return PLAYER_PAGES.filter(page => page.name !== route.name)
-})
-
-useHead({ title: `${page.value?.label} | ${player.value?.name ?? useChangeCase(name.value, "capitalCase").value}` })
+useHead({ title: `${page.value?.label} | ${playerName.capitalisedName}` })
 </script>
 
 <template>
@@ -22,9 +26,9 @@ useHead({ title: `${page.value?.label} | ${player.value?.name ?? useChangeCase(n
     <u-page>
       <u-page-header
         headline="Players"
-        :description="page?.label"
-        :links="filteredLinks || PLAYER_PAGES"
-        :title="player?.name ?? useChangeCase(name, 'capitalCase').value"
+        :description="page?.page.label"
+        :links="page?.links || PLAYER_PAGES"
+        :title="playerName.capitalisedName"
       />
       <u-page-body>
         <slot />

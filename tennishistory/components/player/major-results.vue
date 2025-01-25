@@ -1,16 +1,18 @@
 <script setup lang="ts">
-const route = useRoute()
 const toast = useToast()
+const id = useRouteParams<string>("id")
+const name = useRouteParams<string>("name")
 
 // API call
-const { data: results, status } = await useFetch<PlayerBestResultsType[]>("/api/majorResults", {
-  query: { id: route.params.id },
-  onResponseError: () => {
-    toast.add({
-      title: "Error fetching data",
-      icon: ICONS.error
-    })
-  }
+const { data: results, status, error } = await useFetch<PlayerBestResultsType[]>("/api/majorResults", { query: { id } })
+
+// Error handling
+whenever(error, () => {
+  toast.add({
+    title: "Error fetching player's best results",
+    icon: ICONS.error,
+    description: `${error.value}`
+  })
 })
 </script>
 
@@ -20,6 +22,7 @@ const { data: results, status } = await useFetch<PlayerBestResultsType[]>("/api/
       #features
       v-if="results || status === 'pending'"
     >
+      <!--Loading skeleton-->
       <u-page-feature
         v-if="status === 'pending'"
         v-for="i in new Array(4)"
@@ -35,6 +38,7 @@ const { data: results, status } = await useFetch<PlayerBestResultsType[]>("/api/
           </div>
         </template>
       </u-page-feature>
+
       <u-page-feature
         v-else
         v-for="result in results"
@@ -69,7 +73,7 @@ const { data: results, status } = await useFetch<PlayerBestResultsType[]>("/api/
       #description
       v-else
     >
-      <error-message :icon="ICONS['no-trophy']">{{ useChangeCase(route.params.name as string, "capitalCase").value }}'s major results are not available</error-message>
+      <error-message :icon="ICONS['no-trophy']">{{ useChangeCase(name, "capitalCase").value }}'s major results are not available</error-message>
     </template>
   </u-page-section>
 </template>

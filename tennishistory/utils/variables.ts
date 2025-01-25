@@ -1,3 +1,4 @@
+import { type ButtonProps } from '@nuxt/ui'
 import { CategoryEnum, CurrencyEnum, MonthNameEnum, MonthNumberEnum, RoundEnum, StatusEnum, SurfaceEnum } from "~/types/enums";
 
 export const ICONS = {

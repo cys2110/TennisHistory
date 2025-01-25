@@ -38,10 +38,10 @@ const { surface, category, name, ename, dates, city, country, tid, eid, year, st
         {{ ename }}
       </div>
       <div class="flex gap-2 items-center">
-        <span class="text-slate-400 text-sm">{{ city }}</span>
+        <span class="text-slate-500 dark:text-slate-400 text-sm">{{ city }}</span>
         <flag-icon :country />
       </div>
-      <div class="text-slate-400 text-sm">{{ dates }}</div>
+      <div class="text-slate-500 dark:text-slate-400 text-sm">{{ dates }}</div>
     </div>
 
     <template #footer>

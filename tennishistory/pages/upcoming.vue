@@ -1,8 +1,7 @@
 <script setup lang="ts">
-definePageMeta({ name: "upcoming" })
-useHead({ title: "Upcoming Tournaments" })
+definePageMeta({ name: "upcoming", pageTransition: { name: "rotate" } }) // Define name for routing
+useHead({ title: "Upcoming Tournaments" }) // Define title for tab title
 const toast = useToast()
-const scroll = useScroll()
 
 // Set shortcuts for select menus
 defineShortcuts({
@@ -17,15 +16,7 @@ const months = useRouteQuery("months", MONTH_NAMES)
 const categories = useRouteQuery("categories", CATEGORIES)
 
 // API call
-const { data: events, status } = await useFetch<EventCardType[]>("/api/upcomingTournaments", {
-  query: { surfaces, months, categories },
-  onResponseError: () => {
-    toast.add({
-      title: "Error fetching upcoming tournaments",
-      icon: ICONS.error
-    })
-  }
-})
+const { data: events, status, error } = await useFetch<EventCardType[]>("/api/upcomingTournaments", { query: { surfaces, months, categories } })
 
 // Anchor links for right sidebar
 const links = computed(() => {
@@ -37,6 +28,15 @@ const links = computed(() => {
     }))
   }
   return []
+})
+
+// Add toast when error fetching data
+whenever(error, () => {
+  toast.add({
+    title: "Error fetching upcoming tournaments",
+    description: `${error.value}`,
+    icon: ICONS.error
+  })
 })
 </script>
 
@@ -69,7 +69,7 @@ const links = computed(() => {
     <template #right>
       <u-page-aside>
         <div class="text-lg mb-2">Filters</div>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 ml-5">
           <month-select v-model="months" />
           <category-select v-model="categories" />
           <surface-select v-model="surfaces" />
@@ -77,17 +77,7 @@ const links = computed(() => {
 
         <!--Anchor links - using anchor scroll module for smooth scrolling-->
         <div class="text-lg mt-5 mb-2">On this page</div>
-        <u-page-list class="gap-2 ml-5">
-          <div
-            v-for="link in links"
-            :key="link.label"
-            class="hover-link cursor-pointer text-sm"
-            :class="scroll.hash.value === link.to ? 'text-emerald-600' : 'text-slate-400'"
-            @click="scroll.scroll(link.to)"
-          >
-            {{ link.label }}
-          </div>
-        </u-page-list>
+        <anchor-links :links />
       </u-page-aside>
     </template>
   </u-page>
