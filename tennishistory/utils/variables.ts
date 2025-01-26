@@ -78,9 +78,9 @@ export const MONTHS: Record<MonthNameEnum, MonthNumberEnum> = {
 export const LETTERS = ['All', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
 export const EVENT_PAGES = [
-    { label: "Details", name: "event", icon: ICONS.details, to: { name: 'event'} },
-    { label: 'Results', name: 'results', icon: ICONS.cards, to: {name: 'results'} },
-    { label: 'Draw', name: 'draw', icon: ICONS.draw, to: {name: 'draw'}}
+    { label: "Details", name: "event", icon: ICONS.details, to: { name: 'event'}, color: 'secondary', variant: 'subtle' },
+    { label: 'Results', name: 'results', icon: ICONS.cards, to: {name: 'results'}, color: 'secondary', variant: 'subtle' },
+    { label: 'Draw', name: 'draw', icon: ICONS.draw, to: {name: 'draw'}, color: 'secondary', variant: 'subtle'}
 ]
 
 export const PLAYER_PAGES = [

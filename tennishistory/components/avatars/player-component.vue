@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ id: string; name: string }>()
+defineProps<{ id: string; name: string; ui?: any }>()
 </script>
 
 <template>
@@ -7,5 +7,6 @@ defineProps<{ id: string; name: string }>()
     :name
     :avatar="{ src: `https://www.atptour.com/-/media/alias/player-headshot/${id}` }"
     :to="{ name: 'player', params: { id, name: useChangeCase(name, 'kebabCase').value } }"
+    :ui="ui"
   />
 </template>

@@ -56,7 +56,7 @@ export default defineNuxtConfig({
       },
       {
         from: '@vueuse/core',
-        imports: ['breakpointsTailwind', 'useBreakpoints', 'watchArray', 'whenever']
+        imports: ['breakpointsTailwind', 'useBreakpoints', 'watchArray', 'whenever', 'useCssVar']
       },
       {
         from: '@vueuse/router',

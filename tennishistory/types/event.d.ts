@@ -162,16 +162,7 @@ declare global {
 
 	interface MatchStatsType {
 		name: string;
-		p1: string;
-		p1_pc: {
-			low: number;
-			high: number;
-		};
-		p2: string;
-		p2_pc: {
-			low: number;
-			high: number;
-		};
+		values: number[];
 	}
 
 	interface MatchType {

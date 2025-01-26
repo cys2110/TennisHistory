@@ -1,28 +1,25 @@
 <script setup lang="ts">
-defineProps<{ stats: MatchStatsType[]; p1_name: string; p2_name: string; p1_id: string; p2_id: string }>()
+defineProps<{ stats: MatchStatsType[]; title: string }>()
 const checked = ref(false)
 </script>
 
 <template>
-  <u-container>
-    <u-switch
-      v-model="checked"
-      :checked-icon="ICONS['bar-chart']"
-      :unchecked-icon="ICONS['table']"
-    />
+  <u-container class="my-10">
+    <div class="flex justify-between mb-10">
+      <div class="text-2xl font-semibold">{{ title }}</div>
+      <u-switch
+        v-model="checked"
+        :checked-icon="ICONS['bar-chart']"
+        :unchecked-icon="ICONS['table']"
+        color="secondary"
+        size="lg"
+        :ui="{ base: 'data-[state=unchecked]:bg-emerald-500 data-[state=unchecked]:dark:bg-emerald-800', icon: 'group-data-[state=unchecked]:text-emerald-700' }"
+      />
+    </div>
     <match-stats-chart
       v-if="checked"
-      :stats="stats"
-      :p1_name="p1_name"
-      :p2_name="p2_name"
+      :stats
     />
-    <match-stats-table
-      v-else
-      :stats="stats"
-      :p1_name="p1_name"
-      :p2_name="p2_name"
-      :p1_id
-      :p2_id
-    />
+    <match-stats-table :stats />
   </u-container>
 </template>
