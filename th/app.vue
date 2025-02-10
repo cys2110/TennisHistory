@@ -1,6 +1,5 @@
 <script setup lang="ts">
 useHead({ titleTemplate: pageTitle => (pageTitle ? `${pageTitle} | TennisHistory` : "TennisHistory") })
-// FIXME: Back button
 
 const route = useRoute()
 const anchorScroll = useScrollTo()
@@ -53,7 +52,7 @@ const footerColumns = [
   {
     label: "Other",
     children: [
-      { label: "Disclaimer", to: "/about" },
+      { label: "About", to: "/about" },
       { label: "About me", to: "https://www.claire-sheridan.com", target: "_blank" }
     ]
   }
@@ -73,9 +72,7 @@ const footerColumns = [
     >
       <u-navigation-menu
         :items="navLinks"
-        variant="link"
         highlight
-        color="secondary"
         content-orientation="vertical"
       />
       <template #right>
@@ -88,7 +85,7 @@ const footerColumns = [
           color="secondary"
           size="xl"
         />
-        <!--XXX: Customisation not applying - check when stable-->
+        <!--[Alpha] Customisation not applying-->
         <u-color-mode-button
           color="secondary"
           variant="link"
@@ -100,8 +97,6 @@ const footerColumns = [
         <u-navigation-menu
           :items="navLinks"
           orientation="vertical"
-          color="secondary"
-          variant="link"
           highlight
         />
       </template>

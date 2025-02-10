@@ -20,11 +20,11 @@ export default defineAppConfig({
         navigationMenu: {
             variants: {
                 highlightColor: {
-                    secondary: 'text-teal-600'
+                    secondary: 'text-teal-500'
                 },
                 active: {
                     false: {
-                        link: 'text-slate-300',
+                        link: 'text-slate-300 hover:text-slate-400',
                         linkLeadingIcon: 'text-slate-300'
                     }
                 }
@@ -34,8 +34,8 @@ export default defineAppConfig({
                     active: true,
                     variant: 'link',
                     class: {
-                        link: 'text-teal-600',
-                        linkLeadingIcon: 'text-teal-600',
+                        link: 'text-teal-500',
+                        linkLeadingIcon: 'text-teal-500',
                     }
                 },
                 {
@@ -53,8 +53,32 @@ export default defineAppConfig({
                     class: {
                         link: 'after:-bottom-1'
                     }
+                },
+                {
+                    disabled: false,
+                    active: false,
+                    variant: 'link',
+                    class: {
+                        link: 'hover:text-slate-400',
+                        linkLeadingIcon: 'group-hover:text-slate-400',
+                    }
+                },
+                {
+                    disabled: false,
+                    active: false,
+                    variant: 'link',
+                    orientation: 'horizontal',
+                    class: {
+                        link: 'data-[state=open]:text-slate-400',
+                        linkLeadingIcon: 'group-data-[state=open]:text-slate-400'
+                    }
                 }
-            ]
+            ],
+            defaultVariants: {
+                color: 'secondary',
+                variant: 'link',
+                highlightColor: 'secondary'
+            }
         },
         button: {
             compoundVariants: [
