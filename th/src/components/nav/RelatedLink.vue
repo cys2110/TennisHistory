@@ -5,8 +5,8 @@ export interface RelatedLinkProps {
 }
 
 withDefaults(defineProps<RelatedLinkProps>(), {
-  link: '',
   title: '',
+  link: '',
 })
 </script>
 
