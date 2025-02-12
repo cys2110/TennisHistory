@@ -1,12 +1,22 @@
 // app global css in SCSS form
-.body--light {
-    background-color: $blue-grey-1;
+
+:root {
+    --q-text: #{$text-light};
+    --q-text-dark: #{$text-dark};
+    --q-heading: #{$heading-light};
+    --q-heading-dark: #{$heading-dark};
+    --q-bg-dark: #{$dark};
 }
 
-.body--dark {
-    background-color: $blue-grey-10;
+.body--light{
+    color: var(--q-text);
 }
 
-a {
-    text-decoration: none;
+.body--dark{
+    color: var(--q-text-dark);
+    background-color: var(--q-bg-dark);
+}
+
+.text-heading {
+    color: var(--q-heading) !important;
 }

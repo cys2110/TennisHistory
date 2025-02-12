@@ -1,8 +1,8 @@
 {
   "name": "th",
   "version": "0.0.1",
-  "description": "tennis",
-  "productName": "th",
+  "description": "Tennis database\u0017",
+  "productName": "TennisHistory",
   "author": "cys2110 <csheridan2110@gmail.com>",
   "type": "module",
   "private": true,
@@ -15,7 +15,6 @@
     "postinstall": "quasar prepare"
   },
   "dependencies": {
-    "pinia": "^2.0.11",
     "@quasar/extras": "^1.16.4",
     "quasar": "^2.16.0",
     "vue": "^3.4.18",

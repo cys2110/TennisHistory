@@ -11,15 +11,22 @@
 // It's highly recommended to change the default colors
 // to match your app's branding.
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
-$primary   : #6d28d9;
-$secondary : #047857;
-$accent    : #a78bfa;
+$typography-font-family: 'Fira Sans', serif !default;
 
-$dark      : #1D1D1D;
-$dark-page : #121212;
+$primary: #6d28d9;
+$secondary: #205723;
+$accent: #b388ff;
+$text-light: #475569;
+$text-dark: #cbd5e1;
+$heading-light: #64748b;
+$heading-dark: #94a3b8;
 
-$positive  : #21BA45;
-$negative  : #C10015;
-$info      : #31CCEC;
-$warning   : #F2C037;
+$dark: #1d1d1d;
+$dark-page: #020617;
+
+$positive: #21ba45;
+$negative: #c10015;
+$info: #0e4686;
+$warning: #f2c037;

@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { type RelatedLinkProps } from 'src/components/nav/RelatedLink.vue'
+import MenuLink from 'src/components/MenuLink.vue'
 
-const relatedList: RelatedLinkProps[] = [
+interface LinkProps {
+  title: string
+  link: string
+  icon?: string
+}
+
+const relatedList: LinkProps[] = [
   {
     title: 'ATP',
     link: 'https://www.atptour.com/',
@@ -30,10 +36,20 @@ const relatedList: RelatedLinkProps[] = [
 </script>
 
 <template>
-  <q-layout view="hhh lpR fFf">
-    <q-header elevated>
+  <q-layout view="hHh lpR fFf">
+    <q-header reveal elevated class="bg-primary text-white" height-hint="98">
       <q-toolbar>
-        <q-toolbar-title> TennisHistory </q-toolbar-title>
+        <q-toolbar-title>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
+          </q-avatar>
+          Title
+        </q-toolbar-title>
+        <q-tabs align="left">
+          <q-route-tab to="/page1" label="Page One" />
+          <q-route-tab to="/page2" label="Page Two" />
+          <q-route-tab to="/page3" label="Page Three" />
+        </q-tabs>
       </q-toolbar>
     </q-header>
 
@@ -41,27 +57,29 @@ const relatedList: RelatedLinkProps[] = [
       <router-view />
     </q-page-container>
 
-    <q-footer bordered class="text-center q-py-md">
-      <div class="flex flex-col md:flex-row justify-evenly q-mb-md footer q-mx-auto">
-        <div v-for="link in relatedList" :key="link.title">
-          <router-link :to="link.link" target="_blank" class="text-blue-grey-1 no-underline">{{
-            link.title
-          }}</router-link>
-        </div>
+    <q-footer elevated class="footer bg-primary text-text-heading q-pb-md">
+      <div
+        class="justify-evenly text-text-heading q-mx-xl"
+        :class="{ row: $q.screen.gt.xs, column: $q.screen.lt.sm }"
+      >
+        <MenuLink v-for="link in relatedList" :key="link.title" :item="link" />
       </div>
-      <div>
-        Created by
-        <a href="https://www.claire-sheridan.com" target="_blank" class="text-green-6 no-underline"
-          >Claire Sheridan</a
+      <div class="text-center">
+        Built by
+        <router-link
+          to="https://www.claire-sheridan.com"
+          target="_blank"
+          class="text-green-6 no-underline"
+          >Claire Sheridan</router-link
         >
-        using Vue, Quasar and TypeScript
+        using TypeScript and Quasar
       </div>
     </q-footer>
   </q-layout>
 </template>
 
-<style lang="scss" scoped>
+<!-- <style lang="scss" scoped>
 .footer {
-  width: 50%;
+  color: var(--q-heading-dark);
 }
-</style>
+</style> -->

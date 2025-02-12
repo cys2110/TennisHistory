@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import NavLink, { type NavLinkProps } from 'src/components/nav/NavLink.vue'
-import RelatedLink, { type RelatedLinkProps } from 'src/components/nav/RelatedLink.vue'
+interface LinkProps {
+  title: string
+  link: string
+  icon?: string
+}
 
-const navList: NavLinkProps[] = [
+const navList: LinkProps[] = [
   {
     title: 'Home',
     icon: 'fa-duotone fa-solid fa-house',
@@ -30,7 +33,7 @@ const navList: NavLinkProps[] = [
   },
 ]
 
-const relatedList: RelatedLinkProps[] = [
+const relatedList: LinkProps[] = [
   {
     title: 'ATP',
     link: 'https://www.atptour.com/',
@@ -60,7 +63,7 @@ const relatedList: RelatedLinkProps[] = [
 
 <template>
   <q-layout view="hHh LpR fFf">
-    <q-header v-if="$q.screen.lt.lg" elevated class="bg-deep-purple-8 text-blue-grey-3">
+    <q-header reveal elevated class="bg-deep-purple-8 text-blue-grey-3" height-hint="98">
       <q-toolbar class="glossy">
         <q-toolbar-title class="header-font"> TennisHistory </q-toolbar-title>
         <q-btn-dropdown
@@ -91,45 +94,11 @@ const relatedList: RelatedLinkProps[] = [
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      v-if="$q.screen.gt.md"
-      show-if-above
-      bordered
-      class="column left-sidebar hide-scrollbar"
-      side="left"
-      elevated
-    >
-      <div class="text-h4 q-pa-lg bg-deep-purple-8 header-font text-blue-grey-2">TennisHistory</div>
-
-      <q-list>
-        <q-item-label header class="text-subtitle-1 text-weight-bold q-mt-md">
-          Navigation
-        </q-item-label>
-        <nav-link v-for="link in navList" :key="link.title" v-bind="link" />
-        <q-separator inset class="q-mt-md" />
-        <q-item-label header class="text-subtitle-1 text-weight-bold q-mt-md">
-          Related websites
-        </q-item-label>
-        <related-link v-for="link in relatedList" :key="link.title" v-bind="link" />
-      </q-list>
-
-      <div class="q-mt-auto q-pa-lg bg-deep-purple-8 text-blue-grey-3">
-        Built by
-        <router-link
-          to="https://www.claire-sheridan.com"
-          target="_blank"
-          class="text-green-6 no-underline"
-          >Claire Sheridan</router-link
-        >
-        using TypeScript and Quasar
-      </div>
-    </q-drawer>
-
     <q-page-container class="page-wrapper">
       <router-view />
     </q-page-container>
 
-    <q-footer bordered class="bg-deep-purple-8 lt-lg text-center q-py-md q-mt-auto">
+    <q-footer elevated class="bg-deep-purple-8 lt-lg text-center q-py-md q-mt-auto">
       <div
         class="justify-evenly q-mb-md"
         :class="{ row: $q.screen.gt.xs, column: $q.screen.lt.sm }"
@@ -157,16 +126,8 @@ const relatedList: RelatedLinkProps[] = [
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Petit+Formal+Script&display=swap');
 
-.left-sidebar {
-  width: fit-content;
-}
-
 .header-font {
   font-family: 'Petit Formal Script', serif;
-}
-
-.no-underline {
-  text-decoration: none;
 }
 
 .page-wrapper {
