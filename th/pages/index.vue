@@ -1,4 +1,6 @@
 <script setup lang="ts">
+useHead({ title: "Home", templateParams: { subPage: null } })
+
 const links = [
   { label: "Results Archive", to: { name: "archive" }, icon: ICONS.calendar, color: "secondary", variant: "subtle" },
   { label: "Tournaments", to: { name: "tournaments" }, icon: ICONS.trophy, color: "secondary", variant: "subtle" },

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ name: "tournament", title: "Tournament" })
+definePageMeta({ name: "tournament" })
 const toast = useToast()
 const formatName = useFormatName()
 const paramName = useRouteParams<string>("name")
@@ -19,18 +19,7 @@ const { data: tournament } = await useFetch<TournamentDetails>("/api/tournamentD
 
 const tournamentName = computed(() => tournament.value?.tournament.name ?? paramName.value)
 formatName.name.value = tournamentName.value
-useHead({ title: formatName.capitaliseName })
-
-// Anchor links for right sidebar - computed to avoid hydration mismatch
-const links = computed(() => {
-  if (tournament.value) {
-    return tournament.value.events.map(event => ({
-      label: event.year,
-      to: `#${event.year}`
-    }))
-  }
-  return []
-})
+useHead({ title: formatName.capitaliseName, templateParams: { subPage: null } })
 
 const websiteLink = computed(() => {
   if (tournament.value?.tournament.website) {
@@ -43,6 +32,17 @@ const websiteLink = computed(() => {
         variant: "link"
       }
     ]
+  }
+  return []
+})
+
+// Anchor links for right sidebar - computed to avoid hydration mismatch
+const links = computed(() => {
+  if (tournament.value) {
+    return tournament.value.events.map(event => ({
+      label: event.year,
+      to: `#${event.year}`
+    }))
   }
   return []
 })

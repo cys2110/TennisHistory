@@ -1,5 +1,5 @@
 <script setup lang="ts">
-useHead({ titleTemplate: pageTitle => (pageTitle ? `${pageTitle} | TennisHistory` : "TennisHistory") })
+useHead({ titleTemplate: "%s %separator %subPage %separator TennisHistory" })
 
 const route = useRoute()
 const anchorScroll = useScrollTo()
@@ -52,7 +52,7 @@ const footerColumns = [
   {
     label: "Other",
     children: [
-      { label: "About", to: "/about" },
+      { label: "About", to: { name: "about" } },
       { label: "About me", to: "https://www.claire-sheridan.com", target: "_blank" }
     ]
   }

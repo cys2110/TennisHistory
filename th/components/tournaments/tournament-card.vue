@@ -6,7 +6,7 @@ const tid = useRouteParams<string>("tid")
 
 <template>
   <u-page-card
-    :id="event.year"
+    :id="`year-${event.year}`"
     :ui="{ header: 'font-bold', body: 'w-full' }"
     :title="event.year"
     reverse

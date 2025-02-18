@@ -116,6 +116,9 @@ export default defineAppConfig({
                         indicator: 'bg-teal-600'
                     }
                 }
+            },
+            defaultVariants: {
+                color: 'secondary'
             }
         },
         avatar: {
@@ -137,6 +140,11 @@ export default defineAppConfig({
             slots: {
                 base: 'data-[state=unchecked]:bg-emerald-500 data-[state=unchecked]:dark:bg-emerald-800', icon: 'group-data-[state=unchecked]:text-emerald-700'
             }
+        },
+        pagination: {
+            slots: {
+                label: 'cursor-pointer',
+            }
         }
     },
     uiPro: {
@@ -148,7 +156,7 @@ export default defineAppConfig({
         },
         pageHeader: {
             slots: {
-                title: 'text-slate-700 dark:text-slate-400',
+                title: 'text-slate-500 dark:text-slate-400',
                 headline: 'text-teal-600'
             }
         },
@@ -177,7 +185,8 @@ export default defineAppConfig({
             slots: {
                 wrapper: 'flex flex-col items-start',
                 footer: 'self-center mt-auto pt-4',
-                root: 'shadow-md shadow-violet-700 dark:shadow-violet-300 hover:shadow-lg hover:shadow-violet-700 dark:hover:shadow-violet-300'
+                root: 'shadow-md shadow-violet-700 dark:shadow-violet-300 hover:shadow-lg hover:shadow-violet-700 dark:hover:shadow-violet-300',
+                title: 'text-slate-600 dark:text-slate-300'
             }
         }
     }

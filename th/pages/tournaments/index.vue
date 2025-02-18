@@ -1,6 +1,6 @@
 <script setup lang="ts">
-definePageMeta({ name: "tournaments", title: "Tournaments" })
-useHead({ title: "Tournaments" })
+definePageMeta({ name: "tournaments" })
+useHead({ title: "Tournaments", templateParams: { subPage: null } })
 const toast = useToast()
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const xlAndUp = breakpoints.greaterOrEqual("xl")
@@ -41,10 +41,11 @@ defineShortcuts({
 // API call
 const { data: tournaments } = await useFetch<{ count: { low: number; high: number }; tournaments: { id: string; name: string }[] }>("/api/allTournaments", {
   query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * 24) },
-  onResponseError: () => {
+  onResponseError: error => {
     toast.add({
       title: "Error fetching tournaments",
-      icon: ICONS.error
+      icon: ICONS.error,
+      description: error.error?.message
     })
   }
 })
@@ -62,7 +63,6 @@ const { data: tournaments } = await useFetch<{ count: { low: number; high: numbe
           orientation="horizontal"
           class="my-5"
           @update:model-value="page = 1"
-          color="secondary"
           :size="xlAndUp ? 'md' : 'sm'"
         >
           <template #legend>
@@ -98,9 +98,9 @@ const { data: tournaments } = await useFetch<{ count: { low: number; high: numbe
           :total="tournaments.count.low"
           :items-per-page="24"
           color="secondary"
-          variant="subtle"
+          variant="soft"
           active-color="secondary"
-          active-variant="solid"
+          active-variant="outline"
         />
       </u-container>
 
