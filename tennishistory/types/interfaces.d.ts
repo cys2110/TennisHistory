@@ -161,9 +161,10 @@ declare global {
   interface WLIndexInterface {
     category: string
     stat: string
-    wins: string
-    losses: string
-    titles: string | null
+    wins: number
+    losses: number
+    titles: number | null
+    value: number
   }
 
   interface PlayerStatsInterface {

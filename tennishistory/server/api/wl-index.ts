@@ -30,5 +30,24 @@ export default defineEventHandler(async query => {
 
   const player = records[0].toObject()
 
-  return player.index
+  interface IndexItem {
+    category: string
+    stat: string
+    wins: string
+    losses: string
+    titles?: string
+  }
+
+  const index = player.index.map((stat: IndexItem) => {
+    return {
+      category: stat.category,
+      stat: stat.stat,
+      wins: Number(stat.wins),
+      losses: Number(stat.losses),
+      titles: stat.titles ? Number(stat.titles) : null,
+      value: Number(stat.losses) === 0 ? 0 : Number((Number(stat.wins) / (Number(stat.wins) + Number(stat.losses))).toFixed(3))
+    }
+  })
+
+  return index
 })

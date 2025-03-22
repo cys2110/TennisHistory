@@ -7,7 +7,7 @@ const columns: TableColumn<WLIndexInterface>[] = [
   { accessorKey: "stat", header: "Statistic" },
   { accessorKey: "wins", header: "Wins" },
   { accessorKey: "losses", header: "Losses" },
-  { accessorKey: "titles", header: "Titles" },
+  { accessorFn: row => row.titles ?? "—", header: "Titles" },
   { accessorKey: "value", header: "Index" }
 ]
 </script>
@@ -17,6 +17,6 @@ const columns: TableColumn<WLIndexInterface>[] = [
     :data="index"
     :columns
     sticky
-    class="xl:w-3/4 mx-auto"
+    class="max-w-full xl:w-3/4 mx-auto"
   />
 </template>

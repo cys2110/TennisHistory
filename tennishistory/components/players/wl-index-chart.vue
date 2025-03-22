@@ -12,11 +12,11 @@ const categoryColours = {
 const option = ref({
   backgroundColor: "transparent",
   textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
-  grid: { left: "15%" },
+  grid: { left: "20%" },
   tooltip: {
     formatter: function (params: any) {
       const { stat, value: index, wins, losses, titles } = params.value
-      return `<span style="font-weight: bold">${stat}</span><br/ >${wins}-${losses} (${index})${titles !== null ? `<br />${titles} ${titles === 1 ? "title" : "titles"}` : ""}`
+      return `<span style="font-weight: bold">${stat}</span><br/ >${params.marker}  ${wins}-${losses} (${index})${titles !== null ? `<br /><span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${CHART_COLOURS.orange600}"></span> ${titles} ${titles === 1 ? "title" : "titles"}` : ""}`
     }
   },
   dataset: {
