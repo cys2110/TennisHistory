@@ -1,14 +1,15 @@
 <script setup lang="ts">
-definePageMeta({
-  name: "players",
-  layout: "dashboard-layout"
-})
-useHead({
-  title: "Players",
-  templateParams: { subPage: null }
-})
-
+definePageMeta({ name: "players", layout: "dashboard-layout" })
+useHead({ title: "Players", templateParams: { subPage: null } })
 const toast = useToast()
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
+
+interface PlayerAPIResponse {
+  count: number
+  players: Pick<PlayerInterface, "id" | "name" | "country" | "active_years">[]
+}
+
 const selectedLetter = ref<string>("All")
 const page = ref(1)
 
@@ -43,7 +44,7 @@ defineShortcuts({
 })
 
 // API call
-const { data } = await useFetch<{ count: string; players: Pick<PlayerInterface, "id" | "name" | "country">[] }>("/api/all-players", {
+const { data } = await useFetch<PlayerAPIResponse>("/api/all-players", {
   query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * 25) },
   onResponseError: () => {
     toast.add({
@@ -74,22 +75,26 @@ const { data } = await useFetch<{ count: string; players: Pick<PlayerInterface, 
 
       <template #body>
         <u-page-grid
-          v-if="data && Number(data.count) > 0"
+          v-if="data && data.count > 0"
           class="mt-10"
         >
           <u-page-card
             v-for="player in data.players"
             :key="player.id"
             :title="player.name"
+            :description="player.active_years || ''"
             :to="{ name: 'player', params: { name: useChangeCase(player.name, 'kebabCase').value, id: player.id } }"
+            :icon="`flag:${player.country.alpha2}-4x3`"
             highlight
-            :ui="{ container: 'justify-center items-center text-center' }"
+            :ui="{ body: 'max-h-70', container: 'lg:flex items-center text-center' }"
             prefetch-on="interaction"
+            orientation="vertical"
+            reverse
           >
             <nuxt-img
               :src="`https://www.atptour.com/-/media/alias/player-headshot/${player.id}`"
               :alt="player.name"
-              class="rounded-full border border-neutral-500"
+              class="rounded-full border border-neutral-500 max-h-40"
             />
           </u-page-card>
         </u-page-grid>
@@ -99,10 +104,11 @@ const { data } = await useFetch<{ count: string; players: Pick<PlayerInterface, 
           title="No players found"
         />
         <pagination
-          v-if="data && Number(data.count) > 0"
+          v-if="data && data.count > 0"
           v-model="page"
-          :total="Number(data.count)"
+          :total="data.count"
           class="mx-auto mt-auto"
+          :size="mdAndUp ? 'lg' : 'xs'"
         />
       </template>
     </u-dashboard-panel>

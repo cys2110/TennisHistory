@@ -1,21 +1,41 @@
 export default defineEventHandler(async query => {
-  const { letter, skip } = getQuery<{ letter: string; skip: string }>(query)
+  interface QueryProps {
+    letter: string
+    skip: string
+  }
+  const { letter, skip } = getQuery<QueryProps>(query)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (p:Player)-[:REPRESENTS]->(c:Country) WHERE $letter IS NULL OR p.last_name STARTS WITH $letter
-      WITH COLLECT({player: p, country: c}) AS all, COUNT(p) AS count
+      MATCH (p:Player) WHERE $letter IS NULL OR p.last_name STARTS WITH $letter
+      WITH COLLECT(p) AS all, COUNT(p) AS count
       UNWIND all AS p
-      ORDER BY p.player.last_name
+      MATCH (p)-[:REPRESENTS]->(c:Country)
+      OPTIONAL MATCH (p)-[:TURNED_PRO]->(t:Year)
+      OPTIONAL MATCH (p)-[:RETIRED]->(r:Year)
+      ORDER BY p.last_name
       SKIP toInteger($skip)
       LIMIT 25
-      WITH COLLECT({id: p.player.id, name: p.player.first_name || ' ' || p.player.last_name, country: { id: p.country.id, name: p.country.name, alpha2: p.country.alpha2 } }) AS players, count
-      RETURN {count: toString(count), players: players} AS results
+      RETURN toString(count) AS count, {
+        id: p.id,
+        name: p.first_name || ' ' || p.last_name,
+        country: {
+          id: c.id,
+          name: c.name,
+          alpha2: c.alpha2
+        },
+        active_years: CASE
+          WHEN r IS NOT NULL AND t IS NOT NULL THEN toString(t.id) || ' — ' || toString(r.id)
+          WHEN t IS NOT NULL THEN toString(t.id) || ' — present'
+          ELSE null
+        END
+      } AS player
     `,
     { letter: letter === "All" ? null : letter, skip }
   )
 
-  const results = records[0].toObject()
+  const count = records[0].get("count")
+  const players = records.map(record => record.get("player"))
 
-  return results.results
+  return { count: Number(count), players }
 })
