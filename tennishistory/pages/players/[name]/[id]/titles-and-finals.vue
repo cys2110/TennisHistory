@@ -1,8 +1,5 @@
 <script setup lang="ts">
-definePageMeta({
-  name: "titles-and-finals",
-  layout: "dashboard-layout"
-})
+definePageMeta({ name: "titles-and-finals", layout: "dashboard-layout" })
 const id = useRouteParams<string>("id")
 const toast = useToast()
 const formatName = useFormatName()

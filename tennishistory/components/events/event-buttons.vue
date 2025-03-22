@@ -1,6 +1,10 @@
 <script setup lang="ts">
 const { name, tid, year, eid, drawType, start } = defineProps<{ name: string; tid: string; year: string; eid: string; drawType: DrawType; start?: string }>()
 
+const route = useRoute()
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
+
 const startDate = computed(() => (start ? new Date(start) : new Date(1968, 0, 1)))
 const isDisabled = computed(() => new Date() < startDate.value)
 
@@ -35,7 +39,7 @@ const showButton = (page: string) => {
           <u-button
             v-if="showButton(page.name)"
             :label="page.label"
-            :icon="page.icon"
+            :icon="route.name === 'titles-and-finals' && !mdAndUp ? undefined : page.icon"
             :to="{ name: page.name, params: { name: useChangeCase(name, 'kebabCase').value, tid, year, eid } }"
             :disabled="isDisabled"
             prefetch-on="interaction"

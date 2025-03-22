@@ -62,7 +62,7 @@ const items = computed(() => [{ label: "Players", to: { name: "players" } }, { l
             </ClientOnly>
           </template>
         </u-dashboard-navbar>
-        <u-dashboard-toolbar v-if="route.name !== 'player'">
+        <u-dashboard-toolbar v-if="$slots['toolbar'] || $slots['toolbar-left'] || $slots['toolbar-right']">
           <template
             #left
             v-if="$slots['toolbar-left']"

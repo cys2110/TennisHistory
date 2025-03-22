@@ -53,7 +53,11 @@ export default defineEventHandler(async query => {
     { id }
   )
 
-  const player = records[0].toObject()
+  const results = records[0].toObject()
+  const player = {
+    titles: results.result.titles.filter((title: any) => title.title !== null),
+    finals: results.result.finals.filter((title: any) => title.title !== null)
+  }
 
-  return player.result
+  return player
 })

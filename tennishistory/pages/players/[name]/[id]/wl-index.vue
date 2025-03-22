@@ -45,7 +45,10 @@ const { data: index } = await useFetch<WLIndexInterface[]>("/api/wl-index", {
         <div class="text-neutral-600 dark:text-neutral-400 self-center text-xs lg:text-sm">{{ entry[0] }}</div>
       </div>
     </template>
-    <template #toolbar-right>
+    <template
+      #toolbar-right
+      v-if="mdAndUp"
+    >
       <u-switch
         v-model="checked"
         :checked-icon="ICONS.table"
