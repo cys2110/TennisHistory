@@ -1,14 +1,15 @@
 <script setup lang="ts">
-definePageMeta({
-  name: "tournaments",
-  layout: "dashboard-layout"
-})
-useHead({
-  title: "Tournaments",
-  templateParams: { subPage: null }
-})
-
+definePageMeta({ name: "tournaments", layout: "dashboard-layout" })
+useHead({ title: "Tournaments", templateParams: { subPage: null } })
 const toast = useToast()
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
+
+interface TournamentAPIResponse {
+  count: number
+  tournaments: Pick<TournamentInterface, "id" | "name" | "years">[]
+}
+
 const selectedLetter = ref<string>("All")
 const page = ref(1)
 
@@ -43,7 +44,7 @@ defineShortcuts({
 })
 
 // API call
-const { data } = await useFetch<{ count: string; tournaments: Pick<TournamentInterface, "id" | "name">[] }>("/api/all-tournaments", {
+const { data } = await useFetch<TournamentAPIResponse>("/api/all-tournaments", {
   query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * 25) },
   onResponseError: () => {
     toast.add({
@@ -74,13 +75,14 @@ const { data } = await useFetch<{ count: string; tournaments: Pick<TournamentInt
 
       <template #body>
         <u-page-grid
-          v-if="data && Number(data.count) > 0"
+          v-if="data && data.count > 0"
           class="mt-10"
         >
           <u-page-card
             v-for="tournament in data.tournaments"
             :key="tournament.id"
             :title="tournament.name"
+            :description="tournament.years"
             :to="{ name: 'tournament', params: { name: useChangeCase(tournament.name, 'kebabCase').value, tid: tournament.id } }"
             highlight
             :ui="{ container: 'justify-center items-center text-center' }"
@@ -93,10 +95,11 @@ const { data } = await useFetch<{ count: string; tournaments: Pick<TournamentInt
           title="No tournaments found"
         />
         <pagination
-          v-if="data && Number(data.count) > 0"
+          v-if="data && data.count > 0"
           v-model="page"
-          :total="Number(data.count)"
+          :total="data.count"
           class="mx-auto mt-auto"
+          :size="mdAndUp ? 'lg' : 'xs'"
         />
       </template>
     </u-dashboard-panel>

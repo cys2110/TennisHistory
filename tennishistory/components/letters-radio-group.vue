@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const lgAndUp = breakpoints.greaterOrEqual("lg")
 const modelValue = defineModel<string>()
 </script>
 
@@ -7,8 +9,14 @@ const modelValue = defineModel<string>()
     v-model="modelValue"
     :items="LETTERS"
     orientation="horizontal"
-    @update:model-value="emits('update:modelValue', $event)"
+    @update:model-value="$emit('update:modelValue', $event)"
+    :size="lgAndUp ? 'lg' : 'sm'"
   >
-    <template #legend> Use <u-kbd value="meta" /> <u-kbd value="shift" /> <u-kbd value="letter" /> to select a letter </template>
+    <template
+      #legend
+      v-if="lgAndUp"
+    >
+      Use <u-kbd value="meta" /> <u-kbd value="shift" /> <u-kbd value="letter" /> to select a letter
+    </template>
   </u-radio-group>
 </template>

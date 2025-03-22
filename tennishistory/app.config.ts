@@ -102,13 +102,13 @@ export default defineAppConfig({
     },
     radioGroup: {
       slots: {
-        fieldset: "flex-wrap"
+        fieldset: "grid grid-cols-6 sm:grid-cols-8 md:grid-cols-16 xl:flex"
       },
       variants: {
         color: {
           secondary: {
-            base: "focus-visible:outline-secondary-600 ring-secondary-600",
-            indicator: "bg-secondary-600"
+            base: "focus-visible:outline-secondary-600 dark:focus-visible:outline-secondary-500 ring-secondary-600 dark:ring-secondary-500",
+            indicator: "bg-secondary-600 dark:bg-secondary-400"
           }
         }
       },
