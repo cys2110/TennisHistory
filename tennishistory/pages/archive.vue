@@ -74,12 +74,14 @@ const links = computed(() => {
         </u-dashboard-navbar>
 
         <!--Select menus-->
-        <u-dashboard-toolbar :ui="{ root: 'grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-10' }">
-          <years-all-select v-model="year" />
-          <month-select v-model="months" />
-          <category-select v-model="categories" />
-          <surface-select v-model="surfaces" />
-        </u-dashboard-toolbar>
+        <ClientOnly>
+          <u-dashboard-toolbar :ui="{ root: 'grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-10' }">
+            <years-all-select v-model="year" />
+            <month-select v-model="months" />
+            <category-select v-model="categories" />
+            <surface-select v-model="surfaces" />
+          </u-dashboard-toolbar>
+        </ClientOnly>
       </template>
 
       <template #body>

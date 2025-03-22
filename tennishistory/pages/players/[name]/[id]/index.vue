@@ -1,8 +1,5 @@
 <script setup lang="ts">
-definePageMeta({
-  name: "player",
-  layout: "dashboard-layout"
-})
+definePageMeta({ name: "player", layout: "dashboard-layout" })
 const id = useRouteParams<string>("id")
 const toast = useToast()
 const formatName = useFormatName()

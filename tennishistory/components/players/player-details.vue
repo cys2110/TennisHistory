@@ -7,7 +7,7 @@ const playerDetails = computed(() => [
   { title: "Titles", value: player.titles },
   { title: "Prize Money", value: `$${player.pm}` },
   { title: "Age", value: player.age ? `${player.age} years (${player.dod ? `${player.dob} - ${player.dod}` : player.dob})` : "Unknown" },
-  { title: "Height", value: player.height ? `${player.height} cm (${convertToFt(Number(player.height))})` : "Unknown" },
+  { title: "Height", value: player.height ? `${player.height} cm (${convertToFt(player.height)})` : "Unknown" },
   { title: "Plays", value: player.rh ? handedness(player.rh) : "Unknown" },
   { title: "Backhand", value: player.bh ? `${player.bh}-Handed` : "Unknown" },
   { title: "Hall of Fame Induction", value: player.hof ?? "—" }
@@ -15,10 +15,7 @@ const playerDetails = computed(() => [
 </script>
 
 <template>
-  <div class="w-full flex flex-col">
-    <div class="h-(--ui-header-height) flex items-center border-b border-(--ui-border) px-4 sm:px-6 gap-1.5 mb-5">
-      <h1 class="flex items-center gap-1.5 font-semibold text-(--ui-text-highlighted)">Details</h1>
-    </div>
+  <dashboard-subpanel title="Details">
     <u-page-grid class="lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       <u-page-card
         v-for="detail in playerDetails"
@@ -40,9 +37,9 @@ const playerDetails = computed(() => [
             :key="coach.id"
           >
             <u-link
-              v-if="coach.name"
+              v-if="coach.labels.includes('Player')"
               class="hover-link"
-              :to="{ name: 'player', params: { name: useChangeCase(coach.name, 'kebabCase').value, id: coach.id } }"
+              :to="{ name: 'player', params: { name: useChangeCase(coach.name || '', 'kebabCase').value, id: coach.id } }"
               prefetch-on="interaction"
             >
               {{ coach.name }}
@@ -72,5 +69,5 @@ const playerDetails = computed(() => [
         </template>
       </u-page-card>
     </u-page-grid>
-  </div>
+  </dashboard-subpanel>
 </template>

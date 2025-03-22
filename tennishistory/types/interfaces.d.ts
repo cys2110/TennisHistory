@@ -119,6 +119,7 @@ declare global {
     ch: string | null
     ch_date: string | null
     coaches: {
+      labels: string[]
       id: string
       name: string | null
     }[]
@@ -127,7 +128,7 @@ declare global {
     dob: string | null
     dod: string | null
     gladiator: boolean
-    height: string | null
+    height: number | null
     hof: string | null
     id: string
     losses: string

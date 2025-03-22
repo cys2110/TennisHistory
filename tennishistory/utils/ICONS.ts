@@ -43,5 +43,6 @@ export default {
   stadium: "material-symbols:stadium-outline-rounded",
   whistle: "game-icons:whistle",
   clipboard: "solar:clipboard-bold-duotone",
-  toc: "mdi:table-of-contents"
+  toc: "mdi:table-of-contents",
+  layer: "solar:layers-minimalistic-line-duotone"
 }
