@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui"
-const { stats } = defineProps<{ stats: PlayerStatsInterface[] }>()
-
-const numberStats = stats.map(stat => ({
-  ...stat,
-  value: Number(stat.value)
-}))
+defineProps<{ stats: PlayerStatsInterface[] }>()
 
 const columns: TableColumn<{ category: string; value: number; suffix?: boolean }>[] = [
   { accessorKey: "category", header: "Category", meta: { class: { th: "w-1/2", td: "w-1/3" } } },
@@ -15,9 +10,9 @@ const columns: TableColumn<{ category: string; value: number; suffix?: boolean }
 
 <template>
   <u-table
-    :data="numberStats"
+    :data="stats"
     :columns
-    class="md:w-3/4 lg:w-2/3 mx-auto"
+    class="w-full md:w-3/4 lg:w-2/3 mx-auto"
   >
     <template #value-cell="{ row }">
       <template v-if="row.original.suffix === false">{{ row.original.value }}</template>

@@ -18,6 +18,7 @@ const ALL_YEARS = Array.from({ length: new Date().getFullYear() - 1968 + 1 }, (_
       :icon="ICONS.calendar"
       class="w-full"
       variant="none"
+      placeholder="Select year"
     />
   </u-form-field>
 </template>

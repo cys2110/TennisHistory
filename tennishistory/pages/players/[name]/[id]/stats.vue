@@ -1,17 +1,16 @@
 <script setup lang="ts">
-definePageMeta({
-  name: "stats",
-  layout: "dashboard-layout"
-})
+definePageMeta({ name: "stats", layout: "dashboard-layout" })
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
 const id = useRouteParams<string>("id")
 const toast = useToast()
 const formatName = useFormatName()
 const startYear = useState<number>("startYear")
 const endYear = useState<number>("endYear")
 const yearsArray = ref<number[]>(startYear.value > 0 ? Array.from({ length: (endYear.value > 0 ? endYear.value : new Date().getFullYear()) - startYear.value + 1 }, (_, i) => (endYear.value > 0 ? endYear.value : new Date().getFullYear()) - i) : [])
-const years = ref(yearsArray.value)
-const surfaces = ref<SurfaceEnum[]>(SURFACES)
-const checked = ref(false)
+const years = ref<number[] | undefined>()
+const surfaces = ref<SurfaceEnum[] | undefined>()
+const checked = ref(mdAndUp.value ? false : true)
 
 // API call
 const { data: stats } = await useFetch<PlayerStatsInterface[]>("/api/player-stats", {
@@ -36,6 +35,7 @@ const { data: stats } = await useFetch<PlayerStatsInterface[]>("/api/player-stat
       />
       <surface-select v-model="surfaces" />
       <u-switch
+        v-if="mdAndUp"
         v-model="checked"
         :checked-icon="ICONS.table"
         :unchecked-icon="ICONS['bar-chart']"

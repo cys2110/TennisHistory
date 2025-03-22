@@ -1,23 +1,13 @@
 <script setup lang="ts">
-const props = defineProps<{ stats: PlayerStatsInterface[] }>()
+const { stats } = defineProps<{ stats: PlayerStatsInterface[] }>()
 const colorMode = useColorMode()
-
-const flattenedStats = computed(() => {
-  return props.stats.map(stat => {
-    return {
-      category: stat.category,
-      value: Number(stat.value),
-      suffix: stat.suffix
-    }
-  })
-})
 
 const option = ref({
   backgroundColor: "transparent",
   textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
-  grid: { left: "20%" },
+  grid: { left: "25%" },
   dataset: {
-    source: flattenedStats,
+    source: stats,
     dimensions: ["category", "value"]
   },
   tooltip: {

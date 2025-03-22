@@ -1,19 +1,25 @@
 import { SurfaceEnum } from "~/utils/enums"
 
 export default defineEventHandler(async event => {
-  const { surfaces, years, id } = getQuery<{ surfaces: SurfaceEnum | SurfaceEnum[]; years: string | string[]; id: string }>(event)
+  interface QueryProps {
+    surfaces: SurfaceEnum | SurfaceEnum[]
+    years: string | string[]
+    id: string
+  }
+
+  const { surfaces, years, id } = getQuery<QueryProps>(event)
 
   const formattedParams = {
     id,
-    surfaces: Array.isArray(surfaces) ? surfaces : [surfaces],
-    years: Array.isArray(years) ? years.map(year => Number(year)) : years ? [Number(years)] : []
+    surfaces: surfaces ? (Array.isArray(surfaces) ? surfaces : [surfaces]) : [],
+    years: years ? (Array.isArray(years) ? years.map(year => Number(year)) : [Number(years)]) : []
   }
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (p:Player {id: $id})-[:ENTERED]->(:Entry)-[:SCORED]->(s:Score)-[:SCORED]->(:Match)-[:PLAYED]->(:Round)-[:ROUND_OF]->(e:Event)-[:IN_YEAR]->(y:Year)
-      WHERE y.id IN $years
-      MATCH (e)-[:ON_SURFACE]-(z:Surface) WHERE z.surface IN $surfaces
+      WHERE $years = [] OR y.id IN $years
+      MATCH (e)-[:ON_SURFACE]-(z:Surface) WHERE $surfaces = [] OR z.surface IN $surfaces
       RETURN [
         {category: 'Aces', value: toString(sum(s.aces)), suffix: false},
         {category: 'Double faults', value: toString(sum(s.dfs)), suffix: false},
@@ -32,7 +38,13 @@ export default defineEventHandler(async event => {
     formattedParams
   )
 
-  const stats = records[0].toObject()
+  const statsObject = records[0].toObject()
+  const stats = statsObject.stats.map((stat: { category: string; value: string; suffix?: boolean }) => {
+    return {
+      ...stat,
+      value: Number(stat.value)
+    }
+  })
 
-  return stats.stats
+  return stats
 })

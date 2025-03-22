@@ -155,7 +155,8 @@ declare global {
 
   interface PlayerStatsInterface {
     category: string
-    value: string
+    value: number
+    suffix?: boolean
   }
 
   interface WLIndexInterface {
