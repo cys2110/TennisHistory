@@ -19,7 +19,7 @@ const tagColors = {
 </script>
 
 <template>
-  <u-card>
+  <u-card :ui="{ footer: 'flex flex-col md:flex-row items-center gap-2' }">
     <template #header>
       <div class="flex justify-between items-center">
         <tournament-link
@@ -27,11 +27,18 @@ const tagColors = {
           :tid="event.tid"
           class="font-semibold text-base"
         />
-        <div v-if="event.ename">{{ event.ename }}</div>
+        <div
+          v-if="event.ename"
+          class="text-right"
+          >{{ event.ename }}</div
+        >
       </div>
       <div class="flex justify-between items-center">
         <div>{{ event.dates }}</div>
-        <div>{{ event.venue.city }} <flag-icon :country="event.venue.country" /></div>
+        <div class="flex items-center gap-2">
+          {{ event.venue.city }}
+          <flag-icon :country="event.venue.country" />
+        </div>
       </div>
     </template>
 
@@ -44,7 +51,7 @@ const tagColors = {
     />
 
     <template #footer>
-      <div class="flex gap-1">
+      <div class="flex gap-1 flex-wrap">
         <template
           v-for="(value, key) in earnings"
           :key

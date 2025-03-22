@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui"
 defineProps<{ matches: Pick<MatchInterface, "country" | "id" | "incomplete" | "mid" | "name" | "player_incomplete" | "rank" | "round" | "sets" | "seed" | "status" | "tbs" | "winner">[]; year: string; name: string; tid: string; eid: string }>()
-const formatName = useFormatName()
 const id = useRouteParams<string>("id")
 
 const columns: TableColumn<Pick<MatchInterface, "country" | "id" | "incomplete" | "mid" | "name" | "player_incomplete" | "rank" | "round" | "sets" | "seed" | "status" | "tbs" | "winner">>[] = [{ accessorKey: "round", header: "Round" }, { accessorKey: "name", header: "Opponent" }, { accessorKey: "rank", header: "Rank" }, { accessorKey: "winner", header: "" }, { id: "score", header: "Score" }, { id: "h2h" }]
@@ -11,7 +10,7 @@ const columns: TableColumn<Pick<MatchInterface, "country" | "id" | "incomplete" 
   <u-table
     :data="matches"
     :columns
-    class="mx-auto"
+    class="mx-auto w-full"
   >
     <template #name-cell="{ row }">
       <div

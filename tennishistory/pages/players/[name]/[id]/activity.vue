@@ -1,8 +1,5 @@
 <script setup lang="ts">
-definePageMeta({
-  name: "activity",
-  layout: "dashboard-layout"
-})
+definePageMeta({ name: "activity", layout: "dashboard-layout" })
 const toast = useToast()
 const formatName = useFormatName()
 const id = useRouteParams<string>("id")
@@ -59,7 +56,7 @@ const links = computed(() => {
 
     <u-page-grid
       v-if="yearActivity"
-      class="xl:grid-cols-3 2xl:grid-cols-3 2xl:w-1/2 mx-auto"
+      class="grid-cols-3 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 2xl:w-1/2 mx-auto"
     >
       <year-stat-card
         v-for="stat in yearActivity.stats"
@@ -70,7 +67,7 @@ const links = computed(() => {
 
     <u-page-list
       v-if="yearActivity && yearActivity.activity.length > 0"
-      class="m-10 gap-10 2xl:w-1/2 mx-auto"
+      class="m-10 gap-10 w-full 2xl:w-1/2 mx-auto"
     >
       <activity-card
         v-for="event in yearActivity.activity"
