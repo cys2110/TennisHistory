@@ -8,28 +8,28 @@ export default defineEventHandler(async query => {
   }
 
   const { surfaces, categories, months } = getQuery<QueryProps>(query)
-  const monthArray = Array.isArray(months) ? months : [months]
+  const monthArray = months ? (Array.isArray(months) ? months : [months]) : []
   const monthNumbers = monthArray.map(month => MonthsEnum[month])
 
   // Ensure that all params are arrays
   const formattedParams = {
-    surfaces: Array.isArray(surfaces) ? surfaces : [surfaces],
+    surfaces: surfaces ? (Array.isArray(surfaces) ? surfaces : [surfaces]) : [],
     months: monthNumbers,
-    categories: Array.isArray(categories) ? categories : [categories]
+    categories: categories ? (Array.isArray(categories) ? categories : [categories]) : []
   }
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (y:Year)<-[:IN_YEAR]-(e:Event)-[:EDITION_OF]->(t:Tournament)
         WHERE e.end_date >= date()
-        AND e.start_date.month IN $months
-        AND e.category IN $categories
-      MATCH (e)-[:ON_SURFACE]->(s:Surface) WHERE s.surface IN $surfaces
+        AND ($months = [] OR e.start_date.month IN $months)
+        AND ($categories = [] OR e.category IN $categories)
+      MATCH (e)-[:ON_SURFACE]->(s:Surface) WHERE ($surfaces = [] OR s.surface IN $surfaces)
       OPTIONAL MATCH (e)-[:TOOK_PLACE_IN]->(v:Venue)-[:LOCATED_IN]->(c:Country)
       WITH y, e, t, s, v, c
         ORDER BY e.start_date
       WITH y, e, t, s, COLLECT({city: v.city, country: {id: c.id, name: c.name, alpha2: c.alpha2}}) AS venues
-      WITH {
+      RETURN {
         year: toString(toInteger(y.id)),
         surface: s.surface,
         tid: toString(t.id),
@@ -46,12 +46,11 @@ export default defineEventHandler(async query => {
         END,
         draw_type: e.draw_type
       } AS event
-      RETURN COLLECT(DISTINCT event) AS events
     `,
     formattedParams
   )
 
-  const results = records[0].toObject()
+  const results = records.map(record => record.get("event"))
 
-  return results.events
+  return results
 })

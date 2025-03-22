@@ -52,7 +52,10 @@ const links = computed(() => {
 
 <template>
   <div class="w-full">
-    <u-dashboard-panel class="max-h-screen">
+    <u-dashboard-panel
+      id="archive"
+      class="max-h-screen"
+    >
       <template #header>
         <u-dashboard-navbar title="Results Archive">
           <template #leading>

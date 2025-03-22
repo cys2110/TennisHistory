@@ -1,18 +1,12 @@
 <script setup lang="ts">
-definePageMeta({
-  name: "upcoming",
-  layout: "dashboard-layout"
-})
-useHead({
-  title: "Upcoming Tournaments",
-  templateParams: { subPage: null }
-})
+definePageMeta({ name: "upcoming", layout: "dashboard-layout" })
+useHead({ title: "Upcoming Tournaments", templateParams: { subPage: null } })
 const toast = useToast()
 
 // Set select values - default to all
-const months = ref(MONTH_NAMES)
-const categories = ref(BASE_CATEGORIES)
-const surfaces = ref(SURFACES)
+const months = ref<(keyof typeof MonthsEnum)[] | undefined>()
+const categories = ref<BaseCategoryEnumType[] | undefined>()
+const surfaces = ref<SurfaceEnum[] | undefined>()
 
 // Set shortcuts for select menus
 defineShortcuts({
@@ -28,8 +22,8 @@ defineShortcuts({
   meta_o: () => (months.value = [MONTH_NAMES[9]]),
   meta_n: () => (months.value = [MONTH_NAMES[10]]),
   meta_d: () => (months.value = [MONTH_NAMES[11]]),
-  meta_shift_c: () => (categories.value = categories.value.length === BASE_CATEGORIES.length ? [] : BASE_CATEGORIES),
-  meta_shift_s: () => (surfaces.value = surfaces.value.length === SURFACES.length ? [] : SURFACES)
+  meta_shift_c: () => (categories.value = categories.value && categories.value.length === BASE_CATEGORIES.length ? [] : BASE_CATEGORIES),
+  meta_shift_s: () => (surfaces.value = surfaces.value && surfaces.value.length === SURFACES.length ? [] : SURFACES)
 })
 
 // API call
@@ -56,7 +50,10 @@ const links = computed(() => {
 
 <template>
   <div class="w-full">
-    <u-dashboard-panel id="upcoming">
+    <u-dashboard-panel
+      id="upcoming"
+      class="max-h-screen"
+    >
       <template #header>
         <u-dashboard-navbar title="Upcoming Tournaments">
           <template #leading>
@@ -75,7 +72,7 @@ const links = computed(() => {
         </u-dashboard-navbar>
 
         <!--Select menus-->
-        <u-dashboard-toolbar :ui="{ root: 'grid grid-cols-1 md:grid-cols-3 gap-5' }">
+        <u-dashboard-toolbar :ui="{ root: 'grid grid-cols-2 md:grid-cols-3 gap-1 md:gap-5' }">
           <month-select v-model="months" />
           <base-category-select v-model="categories" />
           <surface-select v-model="surfaces" />
