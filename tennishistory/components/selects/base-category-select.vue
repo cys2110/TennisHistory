@@ -17,6 +17,7 @@ const modelValue = defineModel<BaseCategoryEnumType[]>()
       :icon="ICONS.court"
       class="w-full"
       variant="none"
+      placeholder="Select categories"
     />
   </u-form-field>
 </template>

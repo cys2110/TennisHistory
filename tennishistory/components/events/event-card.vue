@@ -9,18 +9,16 @@ defineProps<{ event: ArchiveEventType }>()
       reverse
       :icon="`flag:${event.locations[0].country.alpha2}-4x3`"
       class="h-full"
-      :ui="{ description: 'text-sm flex flex-col gap-1' }"
+      :ui="{ description: 'text-sm flex flex-col gap-1', wrapper: 'order-last' }"
     >
       <div class="relative">
         <nuxt-img
-          v-if="event.surface"
           :src="`/surfaces/${event.surface}.jpg`"
           :alt="event.surface"
           class="opacity-75 rounded-lg"
         />
         <category-avatar
-          v-if="event.category"
-          :category="event.category"
+          :category="event.category ?? ''"
           class="absolute top-3 left-3"
         />
       </div>

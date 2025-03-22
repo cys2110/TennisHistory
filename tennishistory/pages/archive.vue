@@ -1,19 +1,13 @@
 <script setup lang="ts">
-definePageMeta({
-  name: "archive",
-  layout: "dashboard-layout"
-})
-useHead({
-  title: "Results Archive",
-  templateParams: { subPage: null }
-})
+definePageMeta({ name: "archive", layout: "dashboard-layout" })
+useHead({ title: "Results Archive", templateParams: { subPage: null } })
 const toast = useToast()
 
 // Set select values - default year to current year and others to all
 const year = useRouteQuery("year", new Date().getFullYear().toString())
-const months = ref(MONTH_NAMES)
-const categories = ref(CATEGORIES)
-const surfaces = ref(SURFACES)
+const months = ref<(keyof typeof MonthsEnum)[] | undefined>()
+const categories = ref<CategoryEnumType[] | undefined>()
+const surfaces = ref<SurfaceEnum[] | undefined>()
 
 // Set shortcuts for select menus
 defineShortcuts({
@@ -29,8 +23,8 @@ defineShortcuts({
   meta_o: () => (months.value = [MONTH_NAMES[9]]),
   meta_n: () => (months.value = [MONTH_NAMES[10]]),
   meta_d: () => (months.value = [MONTH_NAMES[11]]),
-  meta_shift_c: () => (categories.value = categories.value.length === CATEGORIES.length ? [] : CATEGORIES),
-  meta_shift_s: () => (surfaces.value = surfaces.value.length === SURFACES.length ? [] : SURFACES)
+  meta_shift_c: () => (categories.value = categories.value && categories.value.length === CATEGORIES.length ? [] : CATEGORIES),
+  meta_shift_s: () => (surfaces.value = surfaces.value && surfaces.value.length === SURFACES.length ? [] : SURFACES)
 })
 
 // API call
@@ -49,7 +43,7 @@ const { data: events } = await useFetch<ArchiveEventType[]>("/api/archive-tourna
 const links = computed(() => {
   if (events.value) {
     return events.value.map(event => ({
-      to: `#event-${event.eid}`,
+      to: "#event-" + event.eid,
       label: event.name
     }))
   }
@@ -77,7 +71,7 @@ const links = computed(() => {
         </u-dashboard-navbar>
 
         <!--Select menus-->
-        <u-dashboard-toolbar :ui="{ root: 'grid grid-cols-1 md:grid-cols-4 gap-10' }">
+        <u-dashboard-toolbar :ui="{ root: 'grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-10' }">
           <years-all-select v-model="year" />
           <month-select v-model="months" />
           <category-select v-model="categories" />

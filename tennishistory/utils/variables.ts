@@ -127,10 +127,30 @@ export const NAV_LINKS = [
       { label: "All Tournaments", to: { name: "tournaments" }, icon: ICONS.trophy }
     ]
   },
-  { label: "Players", to: { name: "players" }, icon: ICONS.people },
-  { label: "Head to Head", to: { name: "h2h" }, icon: ICONS.swords },
-  { label: "Search", to: { name: "search" }, icon: ICONS.search },
-  { label: "Stats/Records", to: { name: "statistics" }, icon: ICONS["line-scatter"] }
+  {
+    label: "Players",
+    icon: ICONS.people,
+    defaultOpen: true,
+    children: [
+      { label: "All Players", to: { name: "players" }, icon: ICONS.people },
+      { label: "Head to Head", to: { name: "h2h" }, icon: ICONS.swords }
+    ]
+  },
+  { label: "Stats/Records", to: { name: "statistics" }, icon: ICONS["line-scatter"] },
+  {
+    label: "Other",
+    icon: ICONS.info,
+    defaultOpen: true,
+    children: [
+      { label: "Coaches", to: { name: "coaches" }, icon: ICONS.person },
+      { label: "Umpires", to: { name: "umpires" }, icon: ICONS.whistle },
+      { label: "Countries", to: { name: "countries" }, icon: ICONS.world },
+      { label: "Venues", to: { name: "venues" }, icon: ICONS.stadium },
+      { label: "Surfaces", to: { name: "surfaces" }, icon: ICONS.court },
+      { label: "Supervisors", to: { name: "supervisors" }, icon: ICONS.clipboard }
+    ]
+  },
+  { label: "Search", to: { name: "search" }, icon: ICONS.search }
 ]
 
 export const PLAYER_PAGES = [
@@ -170,7 +190,7 @@ export const RELATED_LINKS = [
 export const SEARCH_RESULTS = {
   Player: { label: "Players", icon: ICONS.people, value: "Player" },
   Tournament: { label: "Tournaments", icon: ICONS.trophy, value: "Tournament" },
-  Coach: { label: "Coaches", icon: ICONS.search, value: "Coach" },
+  Coach: { label: "Coaches", icon: ICONS.person, value: "Coach" },
   Country: { label: "Countries", icon: ICONS.world, value: "Country" },
   Venue: { label: "Venues", icon: ICONS.stadium, value: "Venue" },
   Surface: { label: "Surfaces", icon: ICONS.court, value: "Surface" },

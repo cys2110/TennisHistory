@@ -1,9 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+definePageMeta({
+  name: "countries",
+  layout: "dashboard-layout"
+})
+</script>
 
 <template>
-  <div>
-    Page: countries/index
-  </div>
+  <div> Page: countries/index </div>
 </template>
-
-<style scoped></style>

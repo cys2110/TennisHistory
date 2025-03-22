@@ -1,4 +1,7 @@
 <script setup lang="ts">
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const md = breakpoints.md
+const lgAndUp = breakpoints.greaterOrEqual("lg")
 const modelValue = defineModel<(keyof typeof MonthsEnum)[]>()
 
 const shortcuts = {
@@ -18,8 +21,14 @@ const shortcuts = {
 </script>
 
 <template>
-  <u-form-field label="Months">
-    <template #hint>
+  <u-form-field
+    label="Months"
+    :size="lgAndUp ? 'md' : md ? 'sm' : 'xs'"
+  >
+    <template
+      #hint
+      v-if="lgAndUp"
+    >
       <u-modal title="Months shortcuts">
         <u-button
           icon="ic:sharp-help"
@@ -52,6 +61,7 @@ const shortcuts = {
       :icon="ICONS['calendar-event']"
       class="w-full"
       variant="none"
+      placeholder="Select months"
     />
   </u-form-field>
 </template>

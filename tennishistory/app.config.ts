@@ -63,7 +63,7 @@ export default defineAppConfig({
         {
           color: "secondary",
           variant: "subtle",
-          class: "text-secondary-700 ring-secondary-600 bg-secondary-600/10 hover:bg-secondary-600/20 hover:shadow-sm hover:shadow-secondary-800 dark:hover:shadow-secondary-500"
+          class: "text-secondary-700 dark:text-secondary-500 ring-secondary-600 bg-secondary-600/10 dark:bg-secondary-400/10 hover:bg-secondary-600/20 hover:shadow-sm hover:shadow-secondary-800 dark:hover:shadow-secondary-500"
         }
       ],
       defaultVariants: {
@@ -231,7 +231,8 @@ export default defineAppConfig({
     },
     dashboardPanel: {
       slots: {
-        root: "max-h-screen"
+        root: "max-h-screen",
+        body: "scroll-smooth"
       }
     },
     user: {

@@ -4,7 +4,7 @@ const groups = computed(() => [
   {
     id: "links",
     label: "Go to",
-    items: [...(NAV_LINKS[0].children || []), ...NAV_LINKS.slice(1).filter(Boolean)]
+    items: NAV_LINKS.flatMap(group => (group.children ? group.children : group))
   }
 ])
 </script>

@@ -1,10 +1,19 @@
 <script setup lang="ts">
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const md = breakpoints.md
+const lgAndUp = breakpoints.greaterOrEqual("lg")
 const modelValue = defineModel<SurfaceEnum[]>()
 </script>
 
 <template>
-  <u-form-field label="Surfaces">
-    <template #hint>
+  <u-form-field
+    label="Surfaces"
+    :size="lgAndUp ? 'md' : md ? 'sm' : 'xs'"
+  >
+    <template
+      #hint
+      v-if="lgAndUp"
+    >
       <u-kbd value="meta" />
       <u-kbd value="shift" />
       <u-kbd value="s" />
@@ -17,6 +26,7 @@ const modelValue = defineModel<SurfaceEnum[]>()
       :icon="ICONS.court"
       class="w-full"
       variant="none"
+      placeholder="Select surfaces"
     />
   </u-form-field>
 </template>
