@@ -82,7 +82,7 @@ const { data } = await useFetch<UmpiresAPIResponse>("/api/all-umpires", {
             v-for="umpire in data.umpires"
             :key="umpire"
             :title="umpire"
-            :to="{ name: 'umpire', params: { id: umpire } }"
+            :to="{ name: 'umpire', params: { id: useChangeCase(umpire, 'kebabCase').value } }"
             highlight
             prefetch-on="interaction"
             :ui="{ container: 'justify-center items-center text-center' }"
@@ -91,7 +91,7 @@ const { data } = await useFetch<UmpiresAPIResponse>("/api/all-umpires", {
         <error-message
           v-else
           :icon="ICONS['no-people']"
-          title="No players found"
+          title="No umpires found"
         />
         <pagination
           v-if="data && data.count > 0"
