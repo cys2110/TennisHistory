@@ -32,7 +32,7 @@ declare global {
 
   type TitlesAndFinalsType = Pick<PlayerInterface, "finals"> & { titles: { title: string; events: Pick<EventInterface, "eid" | "tid" | "name" | "surface" | "dates" | "draw_type">[] }[] }
 
-  type PlayerActivityType = Pick<EventInterface, "currency" | "dates" | "draw_type" | "eid" | "ename" | "incomplete" | "name" | "points" | "pm" | "rank" | "seed" | "status" | "winner" | "sets" | "tbs" | "player_incomplete" | "matches" | "surface" | "venue" | "tid">
+  type PlayerActivityType = Pick<EventInterface, "currency" | "dates" | "draw_type" | "eid" | "ename" | "incomplete" | "name" | "points" | "pm" | "rank" | "seed" | "status" | "winner" | "sets" | "tbs" | "player_incomplete" | "matches" | "surface" | "locations" | "tid">
 
   type PlayerActivityAPIType = {
     stats: PlayerStatsInterface[]

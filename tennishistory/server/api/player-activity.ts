@@ -23,9 +23,19 @@ export default defineEventHandler(async event => {
     `/* cypher */
       MATCH (p:Player {id: $id})-[:ENTERED]->(f:Entry)-[:SCORED]->(s:Score)-[:SCORED]->(m:Match)-[:PLAYED]->(r:Round)-[:ROUND_OF]->(e:Event)-[:IN_YEAR]->(:Year {id: $year})
       MATCH (t:Tournament)<-[:EDITION_OF]-(e)-[:ON_SURFACE]->(z:Surface)
-      MATCH (e)-[:TOOK_PLACE_IN]->(v:Venue)-[:LOCATED_IN]->(c:Country)
-      WITH p, f, s, m, r, e, t, z, v, c
-        ORDER BY e.start_date, m.match_no DESC
+      WITH p, f, s, m, r, e, t, z
+      ORDER BY e.start_date, m.match_no DESC
+      CALL (e) {
+        MATCH (e)-[:TOOK_PLACE_IN]->(v:Venue)-[:LOCATED_IN]->(c:Country)
+        WITH {
+          city: v.city,
+          country: {
+            id: c.id,
+            name: c.name,
+            alpha2: c.alpha2
+          }} AS location
+        RETURN COLLECT(location) AS locations
+      }
       CALL (m, s, r, e) {
         OPTIONAL MATCH (m)<-[:SCORED]-(os:Score)<-[:SCORED]-(of:Entry)<-[:ENTERED]-(op:Player) WHERE op.id <> $id
         MATCH (m)<-[:SCORED]-(:Winner)<-[:SCORED]-(:Entry)<-[:ENTERED]-(w:Player)
@@ -59,9 +69,8 @@ export default defineEventHandler(async event => {
           player_incomplete: coalesce(s.incomplete, os.incomplete, null)
         } AS match
       }
-      WITH e, t, z, v, c, f, COLLECT(match) AS matches
-      WITH e, t, z, v, c, f, matches
-      RETURN COLLECT(DISTINCT {
+      WITH e, t, z, f, COLLECT(match) AS matches, locations
+      RETURN {
         name: t.name,
         tid: toString(t.id),
         eid: toString(e.id),
@@ -72,14 +81,7 @@ export default defineEventHandler(async event => {
           ELSE apoc.temporal.format(e.start_date, 'dd') || ' - ' || apoc.temporal.format(e.end_date, 'dd MMMM YYYY')
         END,
         category: e.category,
-        venue: {
-          city: v.city,
-          country: {
-            id: c.id,
-            name: c.name,
-            alpha2: c.alpha2
-          }
-        },
+        locations: locations,
         surface: z.id,
         seed: toString(f.seed),
         status: f.status,
@@ -89,13 +91,13 @@ export default defineEventHandler(async event => {
         currency: e.currency,
         matches: matches,
         draw_type: e.draw_type
-      }) AS events
+      } AS event
     `,
     formattedParams
   )
 
   const statsResults = statsRecords[0].toObject()
-  const activityResults = activityRecords[0].toObject()
+  const activityResults = activityRecords.map(record => record.get("event"))
 
-  return { stats: statsResults.stats, activity: activityResults.events }
+  return { stats: statsResults.stats, activity: activityResults }
 })

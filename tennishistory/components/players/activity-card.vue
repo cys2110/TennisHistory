@@ -36,8 +36,8 @@ const tagColors = {
       <div class="flex justify-between items-center">
         <div>{{ event.dates }}</div>
         <div class="flex items-center gap-2">
-          {{ event.venue.city }}
-          <flag-icon :country="event.venue.country" />
+          <div>{{ event.locations.map(location => location.city).join(" | ") }}</div>
+          <flag-icon :country="event.locations[0].country" />
         </div>
       </div>
     </template>
