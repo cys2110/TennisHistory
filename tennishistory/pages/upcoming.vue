@@ -58,6 +58,7 @@ const links = computed(() => {
         <u-dashboard-navbar title="Upcoming Tournaments">
           <template #leading>
             <u-dashboard-sidebar-collapse />
+            <u-icon :name="ICONS['calendar-event']" />
           </template>
           <template #right>
             <u-dropdown-menu :items="links">

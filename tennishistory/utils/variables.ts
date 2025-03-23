@@ -142,7 +142,7 @@ export const NAV_LINKS = [
     icon: ICONS.info,
     defaultOpen: true,
     children: [
-      { label: "Coaches", to: { name: "coaches" }, icon: ICONS.person },
+      { label: "Coaches", to: { name: "coaches" }, icon: ICONS.coach },
       { label: "Umpires", to: { name: "umpires" }, icon: ICONS.whistle },
       { label: "Countries", to: { name: "countries" }, icon: ICONS.world },
       { label: "Venues", to: { name: "venues" }, icon: ICONS.stadium },
@@ -190,7 +190,7 @@ export const RELATED_LINKS = [
 export const SEARCH_RESULTS = {
   Player: { label: "Players", icon: ICONS.people, value: "Player" },
   Tournament: { label: "Tournaments", icon: ICONS.trophy, value: "Tournament" },
-  Coach: { label: "Coaches", icon: ICONS.person, value: "Coach" },
+  Coach: { label: "Coaches", icon: ICONS.coach, value: "Coach" },
   Country: { label: "Countries", icon: ICONS.world, value: "Country" },
   Venue: { label: "Venues", icon: ICONS.stadium, value: "Venue" },
   Surface: { label: "Surfaces", icon: ICONS.court, value: "Surface" },

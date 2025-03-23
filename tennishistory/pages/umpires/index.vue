@@ -63,6 +63,7 @@ const { data } = await useFetch<UmpiresAPIResponse>("/api/all-umpires", {
         <u-dashboard-navbar title="Umpires">
           <template #leading>
             <u-dashboard-sidebar-collapse />
+            <u-icon :name="ICONS.whistle" />
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar :ui="{ root: 'w-full flex justify-center' }">

@@ -44,5 +44,6 @@ export default {
   whistle: "game-icons:whistle",
   clipboard: "solar:clipboard-bold-duotone",
   toc: "mdi:table-of-contents",
-  layer: "solar:layers-minimalistic-line-duotone"
+  layer: "solar:layers-minimalistic-line-duotone",
+  coach: "map:stadium"
 }

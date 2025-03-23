@@ -37,6 +37,10 @@ const items = computed(() => [{ label: "Players", to: { name: "players" } }, { l
         <u-dashboard-navbar>
           <template #leading>
             <u-dashboard-sidebar-collapse />
+            <u-icon
+              v-if="currentPage"
+              :name="currentPage.icon"
+            />
           </template>
           <template #title>
             <u-breadcrumb :items />

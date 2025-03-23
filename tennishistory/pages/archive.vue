@@ -60,6 +60,7 @@ const links = computed(() => {
         <u-dashboard-navbar title="Results Archive">
           <template #leading>
             <u-dashboard-sidebar-collapse />
+            <u-icon :name="ICONS.calendar" />
           </template>
           <template #right>
             <u-dropdown-menu :items="links">

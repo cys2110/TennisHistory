@@ -63,6 +63,7 @@ const { data } = await useFetch<SurfacesAPIResponse>("/api/all-surfaces", {
         <u-dashboard-navbar title="Surfaces">
           <template #leading>
             <u-dashboard-sidebar-collapse />
+            <u-icon :name="ICONS.court" />
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar :ui="{ root: 'w-full flex justify-center' }">

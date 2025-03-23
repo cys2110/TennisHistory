@@ -63,6 +63,7 @@ const { data } = await useFetch<CountriesAPIResponse>("/api/all-countries", {
         <u-dashboard-navbar title="Countries">
           <template #leading>
             <u-dashboard-sidebar-collapse />
+            <u-icon :name="ICONS.world" />
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar :ui="{ root: 'w-full flex justify-center' }">

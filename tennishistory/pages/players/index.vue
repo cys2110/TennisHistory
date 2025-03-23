@@ -63,6 +63,7 @@ const { data } = await useFetch<PlayerAPIResponse>("/api/all-players", {
         <u-dashboard-navbar title="Players">
           <template #leading>
             <u-dashboard-sidebar-collapse />
+            <u-icon :name="ICONS.people" />
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar :ui="{ root: 'w-full flex justify-center' }">

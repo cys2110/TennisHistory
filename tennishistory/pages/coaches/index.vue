@@ -68,6 +68,7 @@ const { data } = await useFetch<CoachesAPIResponse>("/api/all-coaches", {
         <u-dashboard-navbar title="Coaches">
           <template #leading>
             <u-dashboard-sidebar-collapse />
+            <u-icon :name="ICONS.coach" />
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar :ui="{ root: 'w-full flex justify-center' }">
