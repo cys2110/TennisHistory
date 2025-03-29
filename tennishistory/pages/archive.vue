@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ name: "archive", layout: "dashboard-layout" })
+definePageMeta({ name: "archive", layout: false })
 useHead({ title: "Results Archive", templateParams: { subPage: null } })
 const toast = useToast()
 
@@ -51,52 +51,44 @@ const links = computed(() => {
 </script>
 
 <template>
-  <div class="w-full">
-    <u-dashboard-panel
-      id="archive"
-      class="max-h-screen"
-    >
-      <template #header>
-        <u-dashboard-navbar title="Results Archive">
-          <template #leading>
-            <u-dashboard-sidebar-collapse />
-            <u-icon :name="ICONS.calendar" />
-          </template>
-          <template #right>
-            <u-dropdown-menu :items="links">
-              <u-button
-                :icon="ICONS.toc"
-                color="neutral"
-                variant="link"
-                size="xl"
-              />
-            </u-dropdown-menu>
-          </template>
-        </u-dashboard-navbar>
-
-        <!--Select menus-->
-        <ClientOnly>
-          <u-dashboard-toolbar :ui="{ root: 'grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-10' }">
-            <years-all-select v-model="year" />
-            <month-select v-model="months" />
-            <category-select v-model="categories" />
-            <surface-select v-model="surfaces" />
-          </u-dashboard-toolbar>
-        </ClientOnly>
-      </template>
-
-      <template #body>
-        <!--Event cards-->
-        <events-grid
-          v-if="events && events.length > 0"
-          :events
-        />
-        <error-message
-          v-else
-          :icon="ICONS['no-calendar']"
-          :title="`No events found in ${year}`"
+  <div>
+    <nuxt-layout name="default">
+      <template #leading-icon>
+        <u-icon
+          :name="ICONS.calendar"
+          class="text-xl"
         />
       </template>
-    </u-dashboard-panel>
+      <template #title>Results Archive</template>
+      <template #right>
+        <u-dropdown-menu :items="links">
+          <u-button
+            :icon="ICONS.toc"
+            color="neutral"
+            variant="link"
+            size="xl"
+          />
+        </u-dropdown-menu>
+      </template>
+
+      <!--Select menus-->
+      <template #toolbar>
+        <years-all-select v-model="year" />
+        <month-select v-model="months" />
+        <category-select v-model="categories" />
+        <surface-select v-model="surfaces" />
+      </template>
+
+      <!--Event cards-->
+      <events-grid
+        v-if="events && events.length > 0"
+        :events
+      />
+      <error-message
+        v-else
+        :icon="ICONS['no-calendar']"
+        :title="`No events found in ${year}`"
+      />
+    </nuxt-layout>
   </div>
 </template>

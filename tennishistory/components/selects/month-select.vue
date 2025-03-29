@@ -35,6 +35,7 @@ const shortcuts = {
           variant="link"
           color="neutral"
           size="xs"
+          class="cursor-pointer"
         />
         <template #body>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">

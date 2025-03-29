@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ name: "activity", layout: "dashboard-layout" })
+definePageMeta({ name: "activity", layout: false })
 const toast = useToast()
 const formatName = useFormatName()
 const id = useRouteParams<string>("id")
@@ -32,56 +32,55 @@ const links = computed(() => {
 </script>
 
 <template>
-  <player-wrapper>
-    <template #toolbar>
-      <ClientOnly>
-        <year-select
-          v-model="year"
-          :items="yearsArray"
-        />
-        <u-dropdown-menu
-          v-if="yearActivity"
-          :items="links"
-        >
-          <u-button
-            :icon="ICONS.toc"
-            color="neutral"
-            variant="link"
-            size="xl"
-            class="justify-self-end"
+  <div>
+    <nuxt-layout name="player-layout">
+      <template #toolbar>
+        <ClientOnly>
+          <year-select
+            v-model="year"
+            :items="yearsArray"
           />
-        </u-dropdown-menu>
-      </ClientOnly>
-    </template>
-
-    <u-page-grid
-      v-if="yearActivity"
-      class="grid-cols-3 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 2xl:w-1/2 mx-auto"
-    >
-      <year-stat-card
-        v-for="stat in yearActivity.stats"
-        :key="stat.category"
-        :stats="stat"
+          <u-dropdown-menu
+            v-if="yearActivity"
+            :items="links"
+          >
+            <u-button
+              :icon="ICONS.toc"
+              color="neutral"
+              variant="link"
+              size="xl"
+              class="justify-self-end"
+            />
+          </u-dropdown-menu>
+        </ClientOnly>
+      </template>
+      <u-page-grid
+        v-if="yearActivity"
+        class="grid-cols-3 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 2xl:w-1/2 mx-auto"
+      >
+        <year-stat-card
+          v-for="stat in yearActivity.stats"
+          :key="stat.category"
+          :stats="stat"
+        />
+      </u-page-grid>
+      <u-page-list
+        v-if="yearActivity && yearActivity.activity.length > 0"
+        class="m-10 gap-10 w-full 2xl:w-1/2 mx-auto"
+      >
+        <activity-card
+          v-for="event in yearActivity.activity"
+          :key="event.eid"
+          :id="`event-${event.eid}`"
+          :event
+          :year
+        />
+      </u-page-list>
+      <error-message
+        v-else
+        :icon="ICONS['no-calendar']"
+        :title="`${formatName.capitaliseName.value} has no activity for ${year}`"
       />
-    </u-page-grid>
-
-    <u-page-list
-      v-if="yearActivity && yearActivity.activity.length > 0"
-      class="m-10 gap-10 w-full 2xl:w-1/2 mx-auto"
-    >
-      <activity-card
-        v-for="event in yearActivity.activity"
-        :key="event.eid"
-        :id="`event-${event.eid}`"
-        :event
-        :year
-      />
-    </u-page-list>
-
-    <error-message
-      v-else
-      :icon="ICONS['no-calendar']"
-      :title="`${formatName.capitaliseName.value} has no activity for ${year}`"
-    />
-  </player-wrapper>
+    </nuxt-layout>
+  </div>
 </template>

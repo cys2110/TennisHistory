@@ -23,7 +23,6 @@
     "eslint": "^9.22.0",
     "kmh-to-mph": "^1.0.0",
     "nuxt": "^3.16.0",
-    "nuxt-anchorscroll": "^1.0.5",
     "nuxt-auth-utils": "^0.5.16",
     "nuxt-echarts": "^0.2.6",
     "nuxt-neo4j": "^0.0.4",

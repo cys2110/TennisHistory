@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ name: "venues", layout: "dashboard-layout" })
+definePageMeta({ name: "venues", layout: false })
 useHead({ title: "Venues", templateParams: { subPage: null } })
 const toast = useToast()
 const breakpoints = useBreakpoints(breakpointsTailwind)
@@ -64,68 +64,63 @@ const { data } = await useFetch<VenuesAPIResponse>("/api/all-venues", {
 </script>
 
 <template>
-  <div class="w-full">
-    <u-dashboard-panel class="max-h-screen">
-      <template #header>
-        <u-dashboard-navbar title="Venues">
-          <template #leading>
-            <u-dashboard-sidebar-collapse />
-            <u-icon :name="ICONS.stadium" />
-          </template>
-        </u-dashboard-navbar>
-        <ClientOnly>
-          <u-dashboard-toolbar :ui="{ root: 'w-full flex justify-center' }">
-            <letters-radio-group
-              v-model="selectedLetter"
-              @update:modelValue="page = 1"
-            />
-          </u-dashboard-toolbar>
-        </ClientOnly>
+  <div>
+    <nuxt-layout name="default">
+      <template #title>Venues</template>
+      <template #leading-icon>
+        <u-icon
+          :name="ICONS.stadium"
+          class="text-xl"
+        />
+      </template>
+      <template #toolbar>
+        <letters-radio-group
+          v-model="selectedLetter"
+          @update:modelValue="page = 1"
+        />
       </template>
 
-      <template #body>
-        <u-page-columns
-          v-if="data && data.count > 0"
-          class="mt-10"
+      <u-page-columns
+        v-if="data && data.count > 0"
+        class="mt-10"
+      >
+        <u-page-card
+          v-for="city in data.cities"
+          :key="city.city"
+          highlight
+          :ui="{ description: 'flex flex-col gap-1 text-sm', title: 'flex items-center gap-2' }"
         >
-          <u-page-card
-            v-for="city in data.cities"
-            :key="city.city"
-            highlight
-            :ui="{ description: 'flex flex-col gap-1 text-sm', title: 'flex items-center gap-2' }"
-          >
-            <template #title>
-              <flag-icon :country="city.country" />
-              {{ city.city }}
-            </template>
-            <template #description>
-              <nuxt-link
-                v-for="venue in city.venues"
-                :key="venue.id"
-                :to="{ name: 'venue', params: { id: useChangeCase(venue.id, 'kebabCase').value } }"
-                class="hover-link w-fit"
-                prefetch-on="interaction"
-              >
-                {{ venue.name }}
-              </nuxt-link>
-            </template>
-          </u-page-card>
-        </u-page-columns>
-        <error-message
-          v-else
-          icon="mdi:earth-remove"
-          title="No venues found"
+          <template #title>
+            <flag-icon :country="city.country" />
+            {{ city.city }}
+          </template>
+          <template #description>
+            <nuxt-link
+              v-for="venue in city.venues"
+              :key="venue.id"
+              :to="{ name: 'venue', params: { id: useChangeCase(venue.id, 'kebabCase').value } }"
+              class="hover-link w-fit"
+              prefetch-on="interaction"
+            >
+              {{ venue.name }}
+            </nuxt-link>
+          </template>
+        </u-page-card>
+      </u-page-columns>
+      <error-message
+        v-else
+        icon="mdi:earth-remove"
+        title="No venues found"
+      />
+      <ClientOnly>
+        <pagination
+          v-if="data && data.count > 0"
+          v-model="page"
+          :total="data.count"
+          class="mx-auto mt-auto"
+          :size="mdAndUp ? 'lg' : 'xs'"
         />
-        <ClientOnly>
-          <pagination
-            v-if="data && data.count > 0"
-            v-model="page"
-            :total="data.count"
-            class="mx-auto mt-auto"
-            :size="mdAndUp ? 'lg' : 'xs'"
-          />
-        </ClientOnly>
-      </template>
-    </u-dashboard-panel>
+      </ClientOnly>
+    </nuxt-layout>
   </div>
 </template>

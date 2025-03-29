@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ name: "upcoming", layout: "dashboard-layout" })
+definePageMeta({ name: "upcoming", layout: false })
 useHead({ title: "Upcoming Tournaments", templateParams: { subPage: null } })
 const toast = useToast()
 
@@ -49,51 +49,41 @@ const links = computed(() => {
 </script>
 
 <template>
-  <div class="w-full">
-    <u-dashboard-panel
-      id="upcoming"
-      class="max-h-screen"
-    >
-      <template #header>
-        <u-dashboard-navbar title="Upcoming Tournaments">
-          <template #leading>
-            <u-dashboard-sidebar-collapse />
-            <u-icon :name="ICONS['calendar-event']" />
-          </template>
-          <template #right>
-            <u-dropdown-menu :items="links">
-              <u-button
-                :icon="ICONS.toc"
-                color="neutral"
-                variant="link"
-                size="xl"
-              />
-            </u-dropdown-menu>
-          </template>
-        </u-dashboard-navbar>
-
-        <!--Select menus-->
-        <ClientOnly>
-          <u-dashboard-toolbar :ui="{ root: 'grid grid-cols-2 md:grid-cols-3 gap-1 md:gap-5' }">
-            <month-select v-model="months" />
-            <base-category-select v-model="categories" />
-            <surface-select v-model="surfaces" />
-          </u-dashboard-toolbar>
-        </ClientOnly>
-      </template>
-
-      <template #body>
-        <!--Event cards-->
-        <events-grid
-          v-if="events && events.length > 0"
-          :events
-        />
-        <error-message
-          v-else
-          :icon="ICONS['no-calendar']"
-          title="No upcoming tournaments"
+  <div>
+    <nuxt-layout name="default">
+      <template #leading-icon>
+        <u-icon
+          :name="ICONS['calendar-event']"
+          class="text-xl"
         />
       </template>
-    </u-dashboard-panel>
+      <template #title>Upcoming Tournaments</template>
+      <template #right>
+        <u-dropdown-menu :items="links">
+          <u-button
+            :icon="ICONS.toc"
+            color="neutral"
+            variant="link"
+            size="xl"
+          />
+        </u-dropdown-menu>
+      </template>
+      <template #toolbar>
+        <month-select v-model="months" />
+        <base-category-select v-model="categories" />
+        <surface-select v-model="surfaces" />
+      </template>
+
+      <!--Event cards-->
+      <events-grid
+        v-if="events && events.length > 0"
+        :events
+      />
+      <error-message
+        v-else
+        :icon="ICONS['no-calendar']"
+        title="No upcoming tournaments"
+      />
+    </nuxt-layout>
   </div>
 </template>

@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "@nuxt/image", "@vueuse/nuxt", "nuxt-auth-utils", "nuxt-echarts", "nuxt-anchorscroll", "nuxt-neo4j", "@nuxt/ui-pro"],
+  modules: ["@nuxt/eslint", "@nuxt/image", "@vueuse/nuxt", "nuxt-auth-utils", "nuxt-echarts", "nuxt-neo4j", "@nuxt/ui-pro"],
   app: {
     layoutTransition: { name: "layout", mode: "out-in" },
     pageTransition: { name: "page", mode: "out-in" }
@@ -13,7 +13,6 @@ export default defineNuxtConfig({
     }
   },
   routeRules: {
-    "/**": { appMiddleware: "auth" },
     "/h2h": { redirect: "h2h/jannik-sinner-v-alexander-zverev/s0ag-z355" }
   },
   components: [

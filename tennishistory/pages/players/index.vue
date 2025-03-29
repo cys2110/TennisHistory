@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ name: "players", layout: "dashboard-layout" })
+definePageMeta({ name: "players", layout: false })
 useHead({ title: "Players", templateParams: { subPage: null } })
 const toast = useToast()
 const breakpoints = useBreakpoints(breakpointsTailwind)
@@ -57,61 +57,57 @@ const { data } = await useFetch<PlayerAPIResponse>("/api/all-players", {
 </script>
 
 <template>
-  <div class="w-full">
-    <u-dashboard-panel class="max-h-screen">
-      <template #header>
-        <u-dashboard-navbar title="Players">
-          <template #leading>
-            <u-dashboard-sidebar-collapse />
-            <u-icon :name="ICONS.people" />
-          </template>
-        </u-dashboard-navbar>
-        <u-dashboard-toolbar :ui="{ root: 'w-full flex justify-center' }">
-          <letters-radio-group
-            v-model="selectedLetter"
-            @update:modelValue="page = 1"
-          />
-        </u-dashboard-toolbar>
+  <div>
+    <nuxt-layout name="default">
+      <template #leading-icon>
+        <u-icon
+          :name="ICONS.people"
+          class="text-xl"
+        />
+      </template>
+      <template #title>Players</template>
+      <template #toolbar>
+        <letters-radio-group
+          v-model="selectedLetter"
+          @update:modelValue="page = 1"
+        />
       </template>
 
-      <template #body>
-        <u-page-grid
-          v-if="data && data.count > 0"
-          class="mt-10"
+      <u-page-grid
+        v-if="data && data.count > 0"
+        class="mt-10"
+      >
+        <u-page-card
+          v-for="player in data.players"
+          :key="player.id"
+          :title="player.name"
+          :description="player.active_years || ''"
+          :to="{ name: 'player', params: { name: useChangeCase(player.name, 'kebabCase').value, id: player.id } }"
+          :icon="`flag:${player.country.alpha2}-4x3`"
+          highlight
+          :ui="{ body: 'max-h-70', container: 'lg:flex items-center text-center' }"
+          orientation="vertical"
+          reverse
         >
-          <u-page-card
-            v-for="player in data.players"
-            :key="player.id"
-            :title="player.name"
-            :description="player.active_years || ''"
-            :to="{ name: 'player', params: { name: useChangeCase(player.name, 'kebabCase').value, id: player.id } }"
-            :icon="`flag:${player.country.alpha2}-4x3`"
-            highlight
-            :ui="{ body: 'max-h-70', container: 'lg:flex items-center text-center' }"
-            prefetch-on="interaction"
-            orientation="vertical"
-            reverse
-          >
-            <nuxt-img
-              :src="`https://www.atptour.com/-/media/alias/player-headshot/${player.id}`"
-              :alt="player.name"
-              class="rounded-full border border-neutral-500 max-h-40"
-            />
-          </u-page-card>
-        </u-page-grid>
-        <error-message
-          v-else
-          :icon="ICONS['no-people']"
-          title="No players found"
-        />
-        <pagination
-          v-if="data && data.count > 0"
-          v-model="page"
-          :total="data.count"
-          class="mx-auto mt-auto"
-          :size="mdAndUp ? 'lg' : 'xs'"
-        />
-      </template>
-    </u-dashboard-panel>
+          <nuxt-img
+            :src="`https://www.atptour.com/-/media/alias/player-headshot/${player.id}`"
+            :alt="player.name"
+            class="rounded-full border border-neutral-500 max-h-40"
+          />
+        </u-page-card>
+      </u-page-grid>
+      <error-message
+        v-else
+        :icon="ICONS['no-people']"
+        title="No players found"
+      />
+      <pagination
+        v-if="data && data.count > 0"
+        v-model="page"
+        :total="data.count"
+        class="mx-auto mt-auto"
+        :size="mdAndUp ? 'lg' : 'xs'"
+      />
+    </nuxt-layout>
   </div>
 </template>

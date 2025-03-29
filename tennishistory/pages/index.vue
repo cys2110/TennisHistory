@@ -1,12 +1,6 @@
 <script setup lang="ts">
-definePageMeta({
-  name: "home",
-  layout: "visitor-layout"
-})
-useHead({
-  title: "Home",
-  templateParams: { subPage: null }
-})
+definePageMeta({ name: "home", layout: false })
+useHead({ title: "Home", templateParams: { subPage: null } })
 
 const features = [
   {
@@ -30,29 +24,32 @@ const features = [
     description: "Charge up your tennis trivia with fun facts and figures"
   }
 ]
-
-const links = [
-  { label: "Sign Up", to: { name: "signup" }, icon: "material-symbols:person-raised-hand-outline" },
-  { label: "Log In", to: { name: "login" }, icon: "solar:login-3-bold" }
-]
 </script>
 
 <template>
-  <u-page class="lg:w-4/5 mx-auto">
-    <u-page-hero
-      title="Tennis History in the Open Era"
-      description="Explore the history of men's tennis since 1968"
-      :links />
-
-    <div class="text-center mb-10">Sign up to gain access to decades of ATP men's singles data and see statistics in beautiful, easy to understand layouts.</div>
-    <u-page-grid>
-      <!--TODO: Add in screenshots-->
-      <u-page-feature
-        v-for="feat in features"
-        :key="feat.title"
-        :title="feat.title"
-        :icon="feat.icon"
-        :description="feat.description" />
-    </u-page-grid>
-  </u-page>
+  <div>
+    <nuxt-layout name="default">
+      <template #leading-icon>
+        <u-icon
+          :name="ICONS.home"
+          class="text-xl"
+        />
+      </template>
+      <template #title>Home</template>
+      <u-page-hero
+        title="Tennis History in the Open Era"
+        description="Explore the history of men's tennis since 1968"
+      />
+      <u-page-grid class="2xl:grid-cols-4 2xl:w-3/4 mx-auto">
+        <!--TODO: Add in screenshots-->
+        <u-page-feature
+          v-for="feat in features"
+          :key="feat.title"
+          :title="feat.title"
+          :icon="feat.icon"
+          :description="feat.description"
+        />
+      </u-page-grid>
+    </nuxt-layout>
+  </div>
 </template>

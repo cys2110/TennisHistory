@@ -136,7 +136,7 @@ export const NAV_LINKS = [
       { label: "Head to Head", to: { name: "h2h" }, icon: ICONS.swords }
     ]
   },
-  { label: "Stats/Records", to: { name: "statistics" }, icon: ICONS["line-scatter"] },
+  { label: "Stats/Records", to: { name: "statistics-and-records" }, icon: ICONS["line-scatter"] },
   {
     label: "Other",
     icon: ICONS.info,

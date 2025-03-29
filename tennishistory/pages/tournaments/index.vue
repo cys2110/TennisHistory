@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ name: "tournaments", layout: "dashboard-layout" })
+definePageMeta({ name: "tournaments", layout: false })
 useHead({ title: "Tournaments", templateParams: { subPage: null } })
 const toast = useToast()
 const breakpoints = useBreakpoints(breakpointsTailwind)
@@ -57,51 +57,43 @@ const { data } = await useFetch<TournamentAPIResponse>("/api/all-tournaments", {
 </script>
 
 <template>
-  <div class="w-full">
-    <u-dashboard-panel class="max-h-screen">
-      <template #header>
-        <u-dashboard-navbar title="Tournaments">
-          <template #leading>
-            <u-dashboard-sidebar-collapse />
-          </template>
-        </u-dashboard-navbar>
-        <u-dashboard-toolbar :ui="{ root: 'w-full flex justify-center' }">
-          <letters-radio-group
-            v-model="selectedLetter"
-            @update:modelValue="page = 1"
-          />
-        </u-dashboard-toolbar>
+  <div>
+    <nuxt-layout name="default">
+      <template #title>Tournaments</template>
+      <template #toolbar>
+        <letters-radio-group
+          v-model="selectedLetter"
+          @update:modelValue="page = 1"
+        />
       </template>
 
-      <template #body>
-        <u-page-grid
-          v-if="data && data.count > 0"
-          class="mt-10"
-        >
-          <u-page-card
-            v-for="tournament in data.tournaments"
-            :key="tournament.id"
-            :title="tournament.name"
-            :description="tournament.years"
-            :to="{ name: 'tournament', params: { name: useChangeCase(tournament.name, 'kebabCase').value, tid: tournament.id } }"
-            highlight
-            :ui="{ container: 'justify-center items-center text-center' }"
-            prefetch-on="interaction"
-          />
-        </u-page-grid>
-        <error-message
-          v-else
-          :icon="ICONS['no-trophy']"
-          title="No tournaments found"
+      <u-page-grid
+        v-if="data && data.count > 0"
+        class="mt-10"
+      >
+        <u-page-card
+          v-for="tournament in data.tournaments"
+          :key="tournament.id"
+          :title="tournament.name"
+          :description="tournament.years"
+          :to="{ name: 'tournament', params: { name: useChangeCase(tournament.name, 'kebabCase').value, tid: tournament.id } }"
+          highlight
+          :ui="{ container: 'justify-center items-center text-center' }"
+          prefetch-on="interaction"
         />
-        <pagination
-          v-if="data && data.count > 0"
-          v-model="page"
-          :total="data.count"
-          class="mx-auto mt-auto"
-          :size="mdAndUp ? 'lg' : 'xs'"
-        />
-      </template>
-    </u-dashboard-panel>
+      </u-page-grid>
+      <error-message
+        v-else
+        :icon="ICONS['no-trophy']"
+        title="No tournaments found"
+      />
+      <pagination
+        v-if="data && data.count > 0"
+        v-model="page"
+        :total="data.count"
+        class="mx-auto mt-auto"
+        :size="mdAndUp ? 'lg' : 'xs'"
+      />
+    </nuxt-layout>
   </div>
 </template>

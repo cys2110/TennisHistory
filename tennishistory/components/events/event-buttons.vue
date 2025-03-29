@@ -42,7 +42,6 @@ const showButton = (page: string) => {
             :icon="route.name === 'titles-and-finals' && !mdAndUp ? undefined : page.icon"
             :to="{ name: page.name, params: { name: useChangeCase(name, 'kebabCase').value, tid, year, eid } }"
             :disabled="isDisabled"
-            prefetch-on="interaction"
           />
         </template>
       </u-button-group>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ name: "stats", layout: "dashboard-layout" })
+definePageMeta({ name: "stats", layout: false })
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const mdAndUp = breakpoints.greaterOrEqual("md")
 const id = useRouteParams<string>("id")
@@ -26,40 +26,39 @@ const { data: stats } = await useFetch<PlayerStatsInterface[]>("/api/player-stat
 </script>
 
 <template>
-  <player-wrapper>
-    <template #toolbar>
-      <years-select
-        v-if="yearsArray.length > 0"
-        v-model="years"
-        :items="yearsArray"
+  <div>
+    <nuxt-layout name="player-layout">
+      <template #toolbar>
+        <years-select
+          v-if="yearsArray.length > 0"
+          v-model="years"
+          :items="yearsArray"
+        />
+        <surface-select v-model="surfaces" />
+        <u-switch
+          v-if="mdAndUp"
+          v-model="checked"
+          :checked-icon="ICONS.table"
+          :unchecked-icon="ICONS['bar-chart']"
+          :label="checked ? 'Table view' : 'Chart view'"
+          class="justify-self-end"
+        />
+      </template>
+      <!--Key added to force re-render when select options change-->
+      <player-stats-table
+        v-if="stats && checked"
+        :stats
+        :key="JSON.stringify(stats)"
       />
-      <surface-select v-model="surfaces" />
-      <u-switch
-        v-if="mdAndUp"
-        v-model="checked"
-        :checked-icon="ICONS.table"
-        :unchecked-icon="ICONS['bar-chart']"
-        :label="checked ? 'Table view' : 'Chart view'"
-        class="justify-self-end"
+      <player-stats-chart
+        v-else-if="stats"
+        :stats
       />
-    </template>
-
-    <!--Key added to force re-render when select options change-->
-    <player-stats-table
-      v-if="stats && checked"
-      :stats
-      :key="JSON.stringify(stats)"
-    />
-
-    <player-stats-chart
-      v-else-if="stats"
-      :stats
-    />
-
-    <error-message
-      v-else
-      :icon="ICONS['no-chart']"
-      :title="`No stats available for ${formatName.capitaliseName.value}`"
-    />
-  </player-wrapper>
+      <error-message
+        v-else
+        :icon="ICONS['no-chart']"
+        :title="`No stats available for ${formatName.capitaliseName.value}`"
+      />
+    </nuxt-layout>
+  </div>
 </template>
