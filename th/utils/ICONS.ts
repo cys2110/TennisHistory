@@ -36,5 +36,6 @@ export default {
   umpire: "game-icons:whistle",
   upcoming: "ph:racquet-light",
   venue: "ic:twotone-stadium",
+  website: "line-md:external-link-rounded",
   year: "solar:calendar-search-bold-duotone"
 }

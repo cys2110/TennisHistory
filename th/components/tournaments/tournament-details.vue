@@ -1,9 +1,13 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+defineProps<{ events: TournamentEventType[] }>()
+</script>
 
 <template>
-  <div>
-    Component: tournaments/tournament-details
-  </div>
+  <u-page-grid>
+    <tournament-card
+      v-for="event in events"
+      :key="event.eid"
+      :event
+    />
+  </u-page-grid>
 </template>
-
-<style scoped></style>

@@ -126,8 +126,7 @@ export default defineAppConfig({
     tabs: {
       defaultVariants: {
         color: "secondary",
-        size: "sm",
-        variant: "link"
+        size: "sm"
       }
     },
     table: {

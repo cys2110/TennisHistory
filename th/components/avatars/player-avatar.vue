@@ -5,8 +5,8 @@ const mdAndUp = breakpoints.greaterOrEqual("md")
 </script>
 
 <template>
-  <ClientOnly>
-    <div class="flex items-center gap-2">
+  <div class="flex items-center gap-2">
+    <ClientOnly>
       <flag-icon :country="player.country" />
       <u-user
         :name="player.name"
@@ -14,6 +14,6 @@ const mdAndUp = breakpoints.greaterOrEqual("md")
         :to="{ name: 'player', params: { id: player.id, name: encodeName(player.name) } }"
         :size="mdAndUp ? 'md' : 'sm'"
       />
-    </div>
-  </ClientOnly>
+    </ClientOnly>
+  </div>
 </template>

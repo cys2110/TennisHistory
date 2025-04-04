@@ -1,10 +1,11 @@
 <script setup lang="ts">
-defineProps<{ events: CountryEventType[] }>()
+defineProps<{ events: TournamentEventType[] }>()
+const paramName = useRouteParams<string>("name")
 </script>
 
 <template>
   <u-page-grid>
-    <country-card
+    <tournament-card
       v-for="event in events"
       :key="event.eid"
       :event
