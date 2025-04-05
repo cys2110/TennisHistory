@@ -10,6 +10,9 @@ definePageMeta({
   ]
 })
 const toast = useToast()
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const xlAndUp = breakpoints.greaterOrEqual("xl")
+const lgAndUp = breakpoints.greaterOrEqual("lg")
 const paramName = useRouteParams<string>("name")
 const tid = useRouteParams<string>("id")
 const name = computed(() => decodeName(paramName.value))
@@ -37,11 +40,43 @@ const items = computed(() => [{ label: "Home", to: { name: "home" }, icon: ICONS
 
 // Anchor links
 const links = computed(() => {
-  if (tournament.value)
+  if (selectedTab.value === "numbers") {
+    return [
+      {
+        to: "#historical-pm",
+        label: "Historical Prize Money"
+      },
+      {
+        to: "#winners",
+        label: "Winners"
+      },
+      {
+        to: "#runners-up",
+        label: "Runners Up by No. of Finals"
+      },
+      {
+        to: "#finalists",
+        label: "Finalists by No. of Finals"
+      },
+      {
+        to: "#country-winners",
+        label: "Countries by No. of Winners"
+      },
+      {
+        to: "#winners-by-age",
+        label: "Winners by Age"
+      },
+      {
+        to: "#games-sets-lost",
+        label: "Winners by Games & Sets Lost"
+      }
+    ]
+  } else if (tournament.value) {
     return tournament.value.events.map(event => ({
       to: "#event-" + event.eid,
       label: event.year
     }))
+  }
 })
 </script>
 
@@ -53,33 +88,41 @@ const links = computed(() => {
       </template>
 
       <template #right>
-        <u-button
-          v-if="tournament?.website"
-          :to="tournament.website"
-          target="_blank"
-          label="Website"
-          :icon="ICONS.website"
-        />
+        <ClientOnly>
+          <u-button
+            v-if="tournament?.website"
+            :to="tournament.website"
+            target="_blank"
+            label="Website"
+            :icon="ICONS.website"
+            :size="lgAndUp ? 'md' : 'sm'"
+          />
+        </ClientOnly>
       </template>
 
       <template #toolbar>
-        <div class="text-(--ui-text-muted)">{{ tournament?.years }}</div>
-
-        <u-tabs
-          v-model="selectedTab"
-          :items="tabs"
-          class="w-96"
-        />
-
-        <!--TOC-->
-        <u-dropdown-menu :items="links">
-          <u-button
-            :icon="ICONS.toc"
-            color="neutral"
-            variant="link"
-            size="xl"
-          />
-        </u-dropdown-menu>
+        <ClientOnly>
+          <div class="flex flex-wrap items-center justify-between w-full gap-5 lg:gap-30 2xl:gap-50">
+            <div class="text-(--ui-text-muted) order-1">{{ tournament?.years }}</div>
+            <u-tabs
+              v-model="selectedTab"
+              :items="tabs"
+              class="order-3 sm:order-2"
+              variant="link"
+              :size="xlAndUp ? 'md' : 'xs'"
+            />
+            <!--TOC-->
+            <u-dropdown-menu :items="links">
+              <u-button
+                :icon="ICONS.toc"
+                color="neutral"
+                variant="link"
+                size="xl"
+                class="order-2 sm:order-3"
+              />
+            </u-dropdown-menu>
+          </div>
+        </ClientOnly>
       </template>
 
       <div v-if="selectedTab === 'winners'">

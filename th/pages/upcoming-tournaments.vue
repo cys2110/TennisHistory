@@ -70,9 +70,11 @@ const links = computed(() => {
 
       <!--Select menus-->
       <template #toolbar>
-        <month-select v-model="months" />
-        <base-category-select v-model="categories" />
-        <surface-select v-model="surfaces" />
+        <ClientOnly>
+          <month-select v-model="months" />
+          <base-category-select v-model="categories" />
+          <surface-select v-model="surfaces" />
+        </ClientOnly>
       </template>
 
       <!--Event cards-->
