@@ -1,12 +1,19 @@
 <script setup lang="ts">
-defineProps<{ sets: (string | null)[]; tbs: (string | null)[]; name: string; tid: string; year: string; eid: string; match_no: string }>()
+defineProps<{
+  sets: (string | null)[]
+  tbs: (string | null)[]
+  name: string
+  tid: string
+  year: string
+  eid: string
+  mid: string
+}>()
 </script>
 
 <template>
-  <nuxt-link
+  <u-link
     class="hover-link"
-    :to="{ name: 'match', params: { name: useChangeCase(name, 'kebabCase').value, tid, year, eid, mid: match_no } }"
-    prefetch-on="interaction"
+    :to="{ name: 'match', params: { name: encodeName(name), id: tid, year, eid, mid } }"
   >
     <template
       v-for="(set, index) in sets"
@@ -17,5 +24,5 @@ defineProps<{ sets: (string | null)[]; tbs: (string | null)[]; name: string; tid
         {{ set }}<sup v-if="tbs[index]">{{ tbs[index] }}</sup>
       </span>
     </template>
-  </nuxt-link>
+  </u-link>
 </template>

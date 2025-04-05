@@ -1,6 +1,4 @@
-<script setup lang="ts">
-definePageMeta({ name: "h2h" })
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div> Page: h2h/index </div>

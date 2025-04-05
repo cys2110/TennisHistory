@@ -1,27 +1,31 @@
 <script setup lang="ts">
-const modelValue = defineModel<CategoryEnum[]>()
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const md = breakpoints.md
+const lgAndUp = breakpoints.greaterOrEqual("lg")
+const modelValue = defineModel<CategoryEnumType[]>()
 </script>
 
 <template>
   <u-form-field
     label="Categories"
-    size="sm"
+    :size="lgAndUp ? 'md' : md ? 'sm' : 'xs'"
   >
-    <template #hint>
-      <div class="hidden lg:flex items-center gap-1">
-        <u-kbd value="meta" />
-        <u-kbd value="shift" />
-        <u-kbd value="c" />
-      </div>
+    <template
+      #hint
+      v-if="lgAndUp"
+    >
+      <u-kbd value="meta" />
+      <u-kbd value="shift" />
+      <u-kbd value="c" />
     </template>
 
     <u-select
       v-model="modelValue"
       multiple
-      :items="variables.CATEGORIES"
+      :items="CATEGORIES"
       :icon="ICONS.court"
       class="w-full"
-      variant="none"
+      placeholder="Select categories"
     />
   </u-form-field>
 </template>

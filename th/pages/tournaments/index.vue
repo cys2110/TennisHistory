@@ -1,12 +1,16 @@
 <script setup lang="ts">
-definePageMeta({ name: "tournaments" })
+definePageMeta({ name: "tournaments", layout: false })
 useHead({ title: "Tournaments", templateParams: { subPage: null } })
 const toast = useToast()
-const breakpoints = useBreakpoints(breakpointsTailwind)
-const xlAndUp = breakpoints.greaterOrEqual("xl")
 
-const selectedLetter = ref<string | null>(null)
+interface TournamentAPIResponse {
+  count: number
+  tournaments: Pick<TournamentInterface, "id" | "name" | "years">[]
+}
+
+const selectedLetter = ref<string>("All")
 const page = ref(1)
+const pageSize = ref(25)
 
 // Set shortcuts for radio group
 defineShortcuts({
@@ -39,76 +43,69 @@ defineShortcuts({
 })
 
 // API call
-const { data: tournaments } = await useFetch<{ count: { low: number; high: number }; tournaments: { id: string; name: string }[] }>("/api/allTournaments", {
-  query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * 24) },
-  onResponseError: error => {
+const { data, status } = await useFetch<TournamentAPIResponse>("/api/all-tournaments", {
+  query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * 25), limit: pageSize },
+  onResponseError: () => {
     toast.add({
       title: "Error fetching tournaments",
       icon: ICONS.error,
-      description: error.error?.message
+      color: "error"
     })
   }
 })
+
+// Breadcrumbs
+const items = computed(() => [
+  { label: "Home", to: { name: "home" }, icon: ICONS.home },
+  { label: "Tournaments", icon: ICONS.tournament }
+])
 </script>
 
 <template>
-  <u-page>
-    <u-page-header title="Tournaments" />
+  <div>
+    <nuxt-layout name="default">
+      <template #title>
+        <u-breadcrumb :items />
+      </template>
 
-    <u-page-body>
-      <u-container class="flex justify-center">
-        <u-radio-group
+      <template #right>
+        <set-page-size v-model="pageSize" />
+      </template>
+
+      <template #toolbar>
+        <letters-radio-group
           v-model="selectedLetter"
-          :items="variables.LETTERS"
-          orientation="horizontal"
-          class="my-5"
-          @update:model-value="page = 1"
-          :size="xlAndUp ? 'md' : 'sm'"
-        >
-          <template #legend>
-            <div class="hidden lg:flex">
-              Use
-              <u-kbd value="meta" />
-              <u-kbd value="shift" />
-              <u-kbd value="letter" />
-              to select a letter
-            </div>
-          </template>
-        </u-radio-group>
-      </u-container>
-
-      <u-container
-        v-if="tournaments && tournaments.tournaments.length > 0"
-        class="flex flex-col items-center gap-10"
-      >
-        <u-page-grid class="w-full">
-          <u-page-card
-            v-for="tournament in tournaments.tournaments"
-            :key="tournament.id"
-            :title="tournament.name"
-            :to="{ name: 'tournament', params: { name: useChangeCase(tournament.name, 'kebabCase').value, tid: tournament.id } }"
-            highlight
-            :ui="{ container: 'justify-center items-center text-center' }"
-            prefetch-on="interaction"
-          />
-        </u-page-grid>
-
-        <u-pagination
-          v-model:page="page"
-          :total="tournaments.count.low"
-          :items-per-page="24"
-          color="secondary"
-          variant="soft"
-          active-color="secondary"
-          active-variant="outline"
+          @update:modelValue="page = 1"
         />
-      </u-container>
+      </template>
 
+      <u-page-grid
+        v-if="data && data.count > 0"
+        class="mt-10"
+      >
+        <u-page-card
+          v-for="tournament in data.tournaments"
+          :key="tournament.id"
+          :title="tournament.name"
+          :description="tournament.years"
+          :to="{ name: 'tournament', params: { name: encodeName(tournament.name), id: tournament.id } }"
+          highlight
+          :ui="{ container: 'justify-center items-center text-center' }"
+          prefetch-on="interaction"
+        />
+      </u-page-grid>
       <error-message
         v-else
-        :icon="ICONS['no-trophy']"
+        :icon="ICONS.noTournament"
         title="No tournaments found"
+        :status
       />
-    </u-page-body>
-  </u-page>
+      <pagination-component
+        v-if="data && data.count > 0"
+        v-model="page"
+        :total="data.count"
+        :page-size="pageSize"
+      />
+    </nuxt-layout>
+  </div>
 </template>

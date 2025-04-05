@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Handle, Position } from "@vue-flow/core"
-defineProps<{ match: Pick<MatchType, "round" | "incomplete" | "winner_id" | "p1" | "p2" | "mid"> }>()
-const name = useRouteParams<string>("name")
+defineProps<{ match: DrawMatchType }>()
+const paramName = useRouteParams<string>("name")
+const name = computed(() => decodeName(paramName.value))
 const tid = useRouteParams<string>("tid")
 const eid = useRouteParams<string>("eid")
 const year = useRouteParams<string>("year")
@@ -34,9 +35,9 @@ const year = useRouteParams<string>("year")
         <small>{{ match.p2?.seed || match.p2?.status ? `(${match.p2.seed ?? ""}${match.p2.status ?? ""})` : "" }}</small>
         <div>
           <u-icon
-            v-if="match.p1?.id === match.winner_id"
-            :name="ICONS.check"
-            class="text-green-600 dark:text-green-300 text-lg"
+            v-if="match.p1?.id === match.winner"
+            :name="ICONS.success"
+            class="text-success-600 dark:text-success-300 text-lg"
           />
           <u-badge
             v-else-if="match.p1?.incomplete"
@@ -46,9 +47,9 @@ const year = useRouteParams<string>("year")
         </div>
         <div>
           <u-icon
-            v-if="match.p2?.id === match.winner_id"
-            :name="ICONS.check"
-            class="text-green-600 dark:text-green-300 text-lg"
+            v-if="match.p2?.id === match.winner"
+            :name="ICONS.success"
+            class="text-success-600 dark:text-success-300 text-lg"
           />
           <u-badge
             v-else-if="match.p2?.incomplete"
@@ -87,7 +88,7 @@ const year = useRouteParams<string>("year")
           label="Stats"
           variant="subtle"
           color="secondary"
-          :icon="ICONS['line-scatter']"
+          :icon="ICONS.stats"
           :disabled="!!match.incomplete"
           :to="{ name: 'match', params: { name, tid, year, eid, mid: match.mid } }"
         />
@@ -95,8 +96,11 @@ const year = useRouteParams<string>("year")
           label="H2H"
           variant="subtle"
           color="secondary"
-          :icon="ICONS.swords"
-          :to="{ name: 'h2h-players', params: { p1Name: useChangeCase(match.p1.name, 'kebabCase').value, p1Id: match.p1.id, p2Name: useChangeCase(match.p2.name, 'kebabCase').value, p2Id: match.p2.id } }"
+          :icon="ICONS.h2h"
+          :to="{
+            name: 'h2h-players',
+            params: { p1Name: encodeName(match.p1.name), p1Id: match.p1.id, p2Name: encodeName(match.p2.name), p2Id: match.p2.id }
+          }"
         />
       </u-button-group>
     </template>

@@ -1,83 +1,86 @@
 <script setup lang="ts">
-definePageMeta({ name: "activity", layout: "player-layout" })
+definePageMeta({ name: "activity" })
 const toast = useToast()
-const formatName = useFormatName()
+const paramName = useRouteParams<string>("name")
+const name = computed(() => decodeName(paramName.value))
 const id = useRouteParams<string>("id")
-const lastYear = useState<string>("lastYear")
-const year = useRouteQuery<string>("year", lastYear.value)
-const yearsArray = useState<string[]>("yearsArray")
+const playerYears = useState<number[]>("player-years")
+const currentYear = new Date().getFullYear()
+const year = useRouteQuery<number>("year", playerYears.value && playerYears.value[playerYears.value.length - 1] === currentYear ? playerYears.value[playerYears.value.length - 1] : currentYear)
 
 // API call
-const { data: events } = await useFetch<PlayerYearType>("/api/playerActivity", {
+const { data: yearActivity, status } = await useFetch<PlayerActivityAPIType>("/api/player-activity", {
   query: { id, year },
-  onResponseError: error => {
+  onResponseError: () => {
     toast.add({
-      title: "Error fetching player's activity",
+      title: `Error fetching ${name}'s ${year.value} activity`,
       icon: ICONS.error,
-      description: error.error?.message
+      color: "error"
     })
   }
 })
 
-// Sidebar links - computed to avoid hydration mismatch
+// Anchor links
 const links = computed(() => {
-  if (events.value) {
-    return events.value.activity.map((event: PlayerActivityType) => ({
-      label: event.name,
-      to: `#${event.eid}`
+  if (yearActivity.value && yearActivity.value.activity.length)
+    return yearActivity.value.activity.map(event => ({
+      to: `#event-${event.eid}`,
+      label: event.name
     }))
-  }
-  return []
 })
 </script>
 
 <template>
-  <u-page>
-    <u-page-body>
-      <u-container>
-        <u-form-field label="Year">
-          <u-select
+  <div>
+    <nuxt-layout name="player-layout">
+      <template #toolbar>
+        <ClientOnly>
+          <year-select
             v-model="year"
-            :items="yearsArray"
-            :icon="ICONS.calendar"
-            class="w-full"
-            variant="none"
+            :items="playerYears"
           />
-        </u-form-field>
-      </u-container>
-
-      <u-container v-if="events">
-        <u-page-grid class="xl:!grid-cols-3">
-          <u-page-card
-            v-for="stat in events.stats"
-            :key="stat.category"
-            :title="stat.category"
-            :description="stat.value"
-            highlight
-          />
-        </u-page-grid>
-
-        <u-page-list class="my-10 gap-10">
-          <activity-card
-            v-for="event in events.activity"
-            :key="event.eid"
-            :event
-            :year
-          />
-        </u-page-list>
-      </u-container>
+          <u-dropdown-menu
+            v-if="yearActivity"
+            :items="links"
+          >
+            <u-button
+              :icon="ICONS.toc"
+              color="neutral"
+              variant="link"
+              size="xl"
+              class="justify-self-end"
+            />
+          </u-dropdown-menu>
+        </ClientOnly>
+      </template>
+      <u-page-grid
+        v-if="yearActivity"
+        class="grid-cols-3 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 2xl:w-1/2 mx-auto"
+      >
+        <year-stat-card
+          v-for="stat in yearActivity.stats"
+          :key="stat.category"
+          :stats="stat"
+        />
+      </u-page-grid>
+      <u-page-list
+        v-if="yearActivity && yearActivity.activity.length > 0"
+        class="m-10 gap-10 w-full 2xl:w-1/2 mx-auto"
+      >
+        <activity-card
+          v-for="event in yearActivity.activity"
+          :key="event.eid"
+          :id="`event-${event.eid}`"
+          :event
+          :year
+        />
+      </u-page-list>
       <error-message
         v-else
-        :icon="ICONS['no-calendar']"
-        :title="`${formatName.capitaliseName.value}'s activity is not available`"
+        :icon="ICONS.noCalendar"
+        :title="`${name} has no activity for ${year}`"
+        :status
       />
-    </u-page-body>
-
-    <template #right>
-      <u-page-aside v-if="links.length > 0">
-        <div>On this page</div>
-        <anchor-links :links />
-      </u-page-aside>
-    </template>
-  </u-page>
+    </nuxt-layout>
+  </div>
 </template>

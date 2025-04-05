@@ -1,5 +1,5 @@
-export default defineEventHandler(async (query) => {
-  const { p1Id, p2Id } = getQuery(query);
+export default defineEventHandler(async query => {
+  const { p1Id, p2Id } = getQuery(query)
 
   const { records: p1Details } = await useDriver().executeQuery(
     `/* cypher */
@@ -11,25 +11,19 @@ export default defineEventHandler(async (query) => {
       OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(:Loser)-[:SCORED]->(l:Best3 | Best5)
       WITH p, y, c, COUNT(DISTINCT(t)) AS titles, COUNT(DISTINCT(w)) AS wins, COUNT(DISTINCT(l)) AS losses
       RETURN {
-        id: p.id,
-        name: p.first_name || ' ' || p.last_name,
-        wl: toString(wins) || '/' || toString(losses),
-        wl_pc: toString(round(wins / (toFloat(wins) + toFloat(losses)) * 100, 0)),
-        pm: toString(p.pm),
+        wins: toString(wins),
+        losses: toString(losses),
+        pm: apoc.number.format(p.pm, '#,###'),
         rh: p.rh,
         bh: p.bh,
-        country: {
-          id: c.id,
-          name: c.name,
-          alpha2: c.alpha2
-        },
         pro: toString(y.id),
         titles: toString(titles),
         dob: apoc.temporal.format(p.dob, 'dd/MM/yy'),
         height: toString(p.height),
         ch: toString(p.ch)
       } As p1
-    `, { id: p1Id }
+    `,
+    { id: p1Id }
   )
 
   const { records: p2Details } = await useDriver().executeQuery(
@@ -42,82 +36,39 @@ export default defineEventHandler(async (query) => {
       OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(:Loser)-[:SCORED]->(l:Best3 | Best5)
       WITH p, y, c, COUNT(DISTINCT(t)) AS titles, COUNT(DISTINCT(w)) AS wins, COUNT(DISTINCT(l)) AS losses
       RETURN {
-        id: p.id,
-        name: p.first_name || ' ' || p.last_name,
-        wl: toString(wins) || '/' || toString(losses),
-        wl_pc: toString(round(wins / (toFloat(wins) + toFloat(losses)) * 100, 0)),
-        pm: toString(p.pm),
+        wins: toString(wins),
+        losses: toString(losses),
+        pm: apoc.number.format(p.pm, '#,###'),
         rh: p.rh,
         bh: p.bh,
-        country: {
-          id: c.id,
-          name: c.name,
-          alpha2: c.alpha2
-        },
         pro: toString(y.id),
         titles: toString(titles),
         dob: apoc.temporal.format(p.dob, 'dd/MM/yy'),
         height: toString(p.height),
         ch: toString(p.ch)
       } AS p2
-    `, { id: p2Id }
+    `,
+    { id: p2Id }
   )
 
-  const { records: matchesDetails } = await useDriver().executeQuery(
+  const { records: wl } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (p1:Player {id: $p1Id})
-      MATCH (p2:Player {id: $p2Id})
-      OPTIONAL MATCH (p1)-[:ENTERED]->(:Entry)-[:SCORED]->(s1:Score)-[:SCORED]->(m)<-[:SCORED]-(s2:Score)<-[:SCORED]-(:Entry)<-[:ENTERED]-(p2)
-      OPTIONAL MATCH (w:Player)-[:ENTERED]->(:Entry)-[:SCORED]->(:Winner)-[:SCORED]->(m)-[:PLAYED]->(r:Round)-[:ROUND_OF]->(e:Event)-[:EDITION_OF]->(t:Tournament)
-      OPTIONAL MATCH (s:Surface)<-[:ON_SURFACE]-(e)-[:IN_YEAR]->(y:Year)
-      WITH t, e, m, w, r, s, y, s1, s2
-        ORDER BY e.start_date
-      WITH {
-        name: t.name,
-        tid: toString(t.id),
-        eid: toString(e.id),
-        mid: toString(m.match_no),
-        winner_id: w.id,
-        round: r.round,
-        surface: s.id,
-        year: toString(y.id),
-        sets: [toString(s1.s1) || toString(s2.s1), toString(s1.s2) || toString(s2.s2), toString(s1.s3) || toString(s2.s3), toString(s1.s4) || toString(s2.s4), toString(s1.s5) || toString(s2.s5)],
-        tbs: [
-          CASE
-            WHEN s1.t1 IS NOT NULL THEN toString(apoc.coll.min([s1.t1, s2.t1]))
-            ELSE NULL
-          END,
-          CASE
-            WHEN s1.t2 IS NOT NULL THEN toString(apoc.coll.min([s1.t2, s2.t2]))
-            ELSE NULL
-          END,
-          CASE
-            WHEN s1.t3 IS NOT NULL THEN toString(apoc.coll.min([s1.t3, s2.t3]))
-            ELSE NULL
-          END,
-          CASE
-            WHEN s1.t4 IS NOT NULL THEN toString(apoc.coll.min([s1.t4, s2.t4]))
-            ELSE NULL
-          END,
-          CASE
-            WHEN s1.t5 IS NOT NULL THEN toString(apoc.coll.min([s1.t5, s2.t5]))
-            ELSE NULL
-          END
-        ],
-        incomplete: CASE
-          WHEN s1.incomplete IS NOT NULL THEN s1.incomplete
-          WHEN s2.incomplete IS NOT NULL THEN s2.incomplete
-          ELSE NULL
-        END
-      } AS match
-      WITH COLLECT(DISTINCT match) as matches
-      RETURN matches
-    `, { p1Id, p2Id }
-  );
+      OPTIONAL MATCH (:Player {id: $p1Id})-[:ENTERED]->(:Entry)-[:SCORED]->(s1:Winner)-[:SCORED]->(:Best3|Best5)<-[:SCORED]-(:Loser)<-[:SCORED]-(:Entry)<-[:ENTERED]-(:Player {id: $p2Id})
+      OPTIONAL MATCH (:Player {id: $p2Id})-[:ENTERED]->(:Entry)-[:SCORED]->(s2:Winner)-[:SCORED]->(:Best3|Best5)<-[:SCORED]-(:Loser)<-[:SCORED]-(:Entry)<-[:ENTERED]-(:Player {id: $p1Id})
+      RETURN toString(COUNT(DISTINCT s1)) AS p1, toString(COUNT(DISTINCT s2)) AS p2
+    `,
+    { p1Id, p2Id }
+  )
 
-  const p1 = p1Details.map((record) => record.toObject());
-  const p2 = p2Details.map((record) => record.toObject());
-  const matches = matchesDetails.map((record) => record.toObject());
+  const p1 = p1Details[0].get("p1")
+  const p2 = p2Details[0].get("p2")
+  const p1Wins = wl[0].get("p1")
+  const p2Wins = wl[0].get("p2")
 
-  return { p1: p1[0].p1, p2: p2[0].p2, matches: matches[0].matches };
-});
+  return {
+    p1: { ...p1, height: Number(p1.height), wins: Number(p1.wins), losses: Number(p1.losses), titles: Number(p1.titles), ch: Number(p1.ch) },
+    p2: { ...p2, height: Number(p2.height), wins: Number(p2.wins), losses: Number(p2.losses), titles: Number(p2.titles), ch: Number(p2.ch) },
+    p1Wins: Number(p1Wins),
+    p2Wins: Number(p2Wins)
+  }
+})

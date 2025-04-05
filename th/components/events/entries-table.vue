@@ -1,21 +1,9 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui"
-import STATUS_INFO from "~/utils/STATUS_INFO"
-defineProps<{ entries: EventEntryType[] }>()
+defineProps<{ entries: EntryTableType[] }>()
 const UButton = resolveComponent("u-button")
-const UIcon = resolveComponent("u-icon")
 
-const columns: TableColumn<EventEntryType>[] = [
-  {
-    accessorKey: "country",
-    header: "",
-    meta: { class: { th: "text-center", td: "text-center" } }
-  },
-  {
-    accessorKey: "id",
-    header: "",
-    meta: { class: { th: "text-center", td: "text-center" } }
-  },
+const columns: TableColumn<EntryTableType>[] = [
   {
     accessorKey: "last",
     header: ({ column }) => {
@@ -25,19 +13,12 @@ const columns: TableColumn<EventEntryType>[] = [
         color: "neutral",
         variant: "link",
         label: "Player",
-        icon:
-          isSorted ?
-            isSorted === "asc" ?
-              ICONS["sort-alpha-up"]
-            : ICONS["sort-alpha-down"]
-          : ICONS["sort-alpha"],
+        icon: isSorted ? (isSorted === "asc" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold"
+        class: "-mx-2.5 font-semibold text-(--ui-text)"
       })
-    },
-    meta: { class: { th: "text-slate-500 dark:text-slate-400", td: "text-slate-600 dark:text-slate-300" } }
+    }
   },
-  { accessorKey: "name" },
   {
     accessorKey: "seed",
     header: ({ column }) => {
@@ -47,17 +28,11 @@ const columns: TableColumn<EventEntryType>[] = [
         color: "neutral",
         variant: "link",
         label: "Seed",
-        icon:
-          isSorted ?
-            isSorted === "asc" ?
-              ICONS["sort-number-up"]
-            : ICONS["sort-number-down"]
-          : ICONS["sort-number"],
+        icon: isSorted ? (isSorted === "asc" ? ICONS.sortNumberUp : ICONS.sortNumberDown) : ICONS.sortNumber,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold"
+        class: "-mx-2.5 font-semibold text-(--ui-text)"
       })
-    },
-    meta: { class: { th: "text-slate-500 dark:text-slate-400 text-center", td: "text-center text-slate-600 dark:text-slate-300" } }
+    }
   },
   {
     accessorKey: "status",
@@ -68,18 +43,11 @@ const columns: TableColumn<EventEntryType>[] = [
         color: "neutral",
         variant: "link",
         label: "Status",
-        icon:
-          isSorted ?
-            isSorted === "asc" ?
-              ICONS["sort-alpha-up"]
-            : ICONS["sort-alpha-down"]
-          : ICONS["sort-alpha"],
+        icon: isSorted ? (isSorted === "asc" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold"
+        class: "-mx-2.5 font-semibold text-(--ui-text)"
       })
-    },
-    cell: ({ row }) => STATUS_INFO[row.getValue("status") as keyof typeof STATUS_INFO],
-    meta: { class: { th: "text-slate-500 dark:text-slate-400 text-center", td: "text-center text-slate-600 dark:text-slate-300" } }
+    }
   },
   {
     accessorKey: "rank",
@@ -90,81 +58,54 @@ const columns: TableColumn<EventEntryType>[] = [
         color: "neutral",
         variant: "link",
         label: "Rank",
-        icon:
-          isSorted ?
-            isSorted === "asc" ?
-              ICONS["sort-number-up"]
-            : ICONS["sort-number-down"]
-          : ICONS["sort-number"],
+        icon: isSorted ? (isSorted === "asc" ? ICONS.sortNumberUp : ICONS.sortNumberDown) : ICONS.sortNumber,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold"
+        class: "-mx-2.5 font-semibold text-(--ui-text)"
       })
-    },
-    meta: { class: { th: "text-slate-500 dark:text-slate-400 text-center", td: "text-center text-slate-600 dark:text-slate-300" } }
+    }
   },
   {
     accessorKey: "withdrew",
-    header: "Withdrew",
-    cell: ({ row }) =>
-      row.getValue("withdrew") ?
-        typeof row.getValue("withdrew") === "boolean" ?
-          h(UIcon, { name: ICONS.check, class: "text-red-300 text-xl" })
-        : row.getValue("withdrew")
-      : undefined,
-    meta: { class: { th: "text-slate-500 dark:text-slate-400 text-center", td: "text-center text-slate-600 dark:text-slate-300" } }
+    header: "Withdrew"
   }
 ]
-
-const columnVisibility = ref({
-  name: false
-})
 </script>
 
 <template>
-  <div>
-    <u-table
-      :data="entries"
-      :columns
-      :column-visibility
-    >
-      <template #country-cell="{ row }">
-        <flag-icon :country="row.getValue('country')" />
-      </template>
-
-      <template #id-cell="{ row }">
-        <u-avatar
-          :src="`https://www.atptour.com/-/media/alias/player-headshot/${row.getValue('id')}`"
-          size="sm"
+  <u-table
+    :data="entries"
+    :columns
+    class="w-fit mx-auto my-5"
+  >
+    <template #last-cell="{ row }">
+      <div class="flex items-center gap-2">
+        <flag-icon :country="row.original.country" />
+        <u-user
+          :name="row.original.name"
+          :avatar="{ src: `https://www.atptour.com/-/media/alias/player-headshot/${row.original.id}`, icon: ICONS.player }"
+          :to="{ name: 'player', params: { id: row.original.id, name: encodeName(row.original.name) } }"
+          prefetch-on="interaction"
+          :ui="{ name: row.original.withdrew ? 'line-through' : '' }"
         />
-      </template>
+      </div>
+    </template>
+    <template #status-cell="{ row }">
+      <u-badge
+        v-if="row.original.status"
+        :class="STATUSES[row.original.status].class"
+        :label="STATUSES[row.original.status].longName"
+      />
+    </template>
 
-      <template #last-cell="{ row }">
-        <nuxt-link
-          :to="{ name: 'player', params: { name: useChangeCase(row.getValue('name'), 'kebabCase').value, id: row.getValue('id') } }"
-          class="hover-link"
-          :class="{ 'line-through': row.getValue('withdrew') }"
-        >
-          {{ row.getValue("name") }}
-        </nuxt-link>
-      </template>
-
-      <template #seed-cell="{ row }">
-        <span :class="{ 'line-through': row.getValue('withdrew') }">
-          {{ row.getValue("seed") ?? undefined }}
-        </span>
-      </template>
-
-      <template #status-cell="{ row }">
-        <span :class="{ 'line-through': row.getValue('withdrew') }">
-          {{ row.getValue("status") ?? undefined }}
-        </span>
-      </template>
-
-      <template #rank-cell="{ row }">
-        <span :class="{ 'line-through': row.getValue('withdrew') }">
-          {{ row.getValue("rank") ?? "—" }}
-        </span>
-      </template>
-    </u-table>
-  </div>
+    <template #withdrew-cell="{ row }">
+      <span v-if="typeof row.original.withdrew === 'string'">{{ row.getValue("withdrew") }}</span>
+      <span v-else-if="row.original.withdrew">
+        <u-icon
+          :name="ICONS.success"
+          class="text-error-600 dark:text-error-400 text-xl"
+        />
+      </span>
+      <template v-else>{{ "" }}</template>
+    </template>
+  </u-table>
 </template>

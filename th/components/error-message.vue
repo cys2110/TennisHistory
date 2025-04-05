@@ -1,12 +1,10 @@
 <script setup lang="ts">
-defineProps<{ icon: string; title: string }>()
+defineProps<{ title: string; icon?: string; status: string }>()
 </script>
 
 <template>
   <u-alert
-    variant="subtle"
-    color="warning"
-    :icon="icon"
-    :title
+    :title="status === 'pending' ? 'Loading...' : title"
+    :icon="status === 'pending' ? ICONS.loading : icon"
   />
 </template>

@@ -1,55 +1,63 @@
 <script setup lang="ts">
-definePageMeta({ name: "stats", layout: "player-layout" })
-const toast = useToast()
-const formatName = useFormatName()
+definePageMeta({ name: "stats", layout: false })
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
 const id = useRouteParams<string>("id")
-const checked = ref(false)
-const surfaces = useRouteQuery("surfaces", variables.SURFACES)
-const lastYear = useState<string>("lastYear")
-const years = useRouteQuery<string[]>("years", [lastYear.value])
-const yearsArray = useState<string[]>("yearsArray")
+const paramName = useRouteParams<string>("name")
+const name = computed(() => decodeName(paramName.value))
+const toast = useToast()
+const playerYears = useState<number[]>("player-years")
+const years = ref<number[] | undefined>()
+const surfaces = ref<SurfaceEnum[] | undefined>()
+const checked = ref(mdAndUp.value ? false : true)
 
-// Get player's stats
-const { data: stats } = await useFetch<PlayerStatsType[]>("/api/playerStats", {
+// API call
+const { data: stats, status } = await useFetch<PlayerStatsInterface[]>("/api/player-stats", {
   query: { id, years, surfaces },
-  onResponseError: error => {
+  onResponseError: () => {
     toast.add({
-      title: "Error fetching player's stats",
+      title: `Error fetching ${name}'s stats`,
       icon: ICONS.error,
-      description: error.error?.message
+      color: "error"
     })
   }
 })
 </script>
 
 <template>
-  <u-container v-if="stats">
-    <u-container class="flex justify-between items-center w-full">
-      <year-select
-        v-model="years"
-        :items="yearsArray"
-      />
-      <surface-select v-model="surfaces" />
-      <u-switch
-        v-model="checked"
-        :checked-icon="ICONS['bar-chart']"
-        :unchecked-icon="ICONS.table"
-      />
-    </u-container>
-    <u-container>
-      <player-stats-chart
-        v-if="checked"
-        :stats
-      />
+  <div>
+    <nuxt-layout name="player-layout">
+      <template #toolbar>
+        <years-select
+          v-if="playerYears && playerYears.length > 0"
+          v-model="years"
+          :items="playerYears"
+        />
+        <surface-select v-model="surfaces" />
+        <u-switch
+          v-if="mdAndUp"
+          v-model="checked"
+          :checked-icon="ICONS.table"
+          :unchecked-icon="ICONS.barChart"
+          :label="checked ? 'Table view' : 'Chart view'"
+        />
+      </template>
+      <!--Key added to force re-render when select options change-->
       <player-stats-table
-        v-else
+        v-if="stats && checked"
+        :stats
+        :key="JSON.stringify(stats)"
+      />
+      <player-stats-chart
+        v-else-if="stats"
         :stats
       />
-    </u-container>
-  </u-container>
-  <error-message
-    v-else
-    :icon="ICONS['no-chart']"
-    :title="`${formatName.capitaliseName.value}'s stats are not available`"
-  />
+      <error-message
+        v-else
+        :icon="ICONS.noChart"
+        :title="`No stats available for ${name}`"
+        :status
+      />
+    </nuxt-layout>
+  </div>
 </template>

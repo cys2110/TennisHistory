@@ -1,23 +1,18 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui"
-const { stats } = defineProps<{ stats: PlayerStatsType[] }>()
-
-const numberStats = stats.map(stat => ({
-  ...stat,
-  value: Number(stat.value)
-}))
+defineProps<{ stats: PlayerStatsInterface[] }>()
 
 const columns: TableColumn<{ category: string; value: number; suffix?: boolean }>[] = [
-  { accessorKey: "category", header: "Category", meta: { class: { th: "text-slate-500 dark:text-slate-400 text-center text-lg w-1/2", td: "text-center text-slate-600 dark:text-slate-300 w-1/3" } } },
-  { accessorKey: "value", header: "", meta: { class: { th: "text-slate-500 dark:text-slate-400 text-center text-lg w-2/3", td: "text-center text-slate-600 dark:text-slate-300 w-2/3" } } }
+  { accessorKey: "category", header: "Category", meta: { class: { th: "w-1/2", td: "w-1/3" } } },
+  { accessorKey: "value", header: "", meta: { class: { th: "w-2/3", td: "w-2/3" } } }
 ]
 </script>
 
 <template>
   <u-table
-    :data="numberStats"
+    :data="stats"
     :columns
-    class="md:w-3/4 lg:w-2/3 mx-auto"
+    class="w-full md:w-3/4 lg:w-2/3 xl:w-1/2 mx-auto"
   >
     <template #value-cell="{ row }">
       <template v-if="row.original.suffix === false">{{ row.original.value }}</template>
@@ -25,7 +20,7 @@ const columns: TableColumn<{ category: string; value: number; suffix?: boolean }
         v-else
         v-model="row.original.value"
         :max="100"
-        :ui="{ base: 'bg-violet-300 dark:bg-violet-950', indicator: 'bg-violet-600', status: '!w-full text-slate-700 dark:text-slate-300' }"
+        :ui="{ base: 'bg-primary-300 dark:bg-primary-950', indicator: 'bg-primary-600', status: '!w-full text-(--ui-text-muted)' }"
       >
         <template #status="{ percent }">{{ percent }}%</template>
       </u-progress>

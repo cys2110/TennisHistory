@@ -1,149 +1,102 @@
-interface TournamentType {
-    name: string;
-    website: string | null;
-    years: string
-}
-
-interface TournamentVenues {
-    venue: string;
-    city: string;
-    country: {
-        name: string;
-        alpha2: string | null;
-        id: string
-    };
-    start: string;
-    end: string;
-}
-
-interface TournamentNames {
-    name: string | null;
-    start: string;
-    end: string;
-}
-
 declare global {
-    type CurrencyType = 'AUD' | 'EUR' | 'GBP' | 'USD';
+  type CurrencyType = "AUD" | "EUR" | "GBP" | "USD"
 
-    type StatusType = 'WC' | 'AL' | 'LL' | 'Q' | 'PR' | 'SE'
+  type DrawType = "Round of 128" | "Round of 64" | "Round of 32" | "Round robin" | "Country draw" | "Laver Cup" | null
 
-    interface TournamentDetails {
-        tournament: TournamentType;
-        names: TournamentNames[];
-        venues: TournamentVenues[];
-        events: Pick<Event, 'year' | 'winner' | 'loser' | 'sets' | 'tbs' | 'eid' | 'incomplete'>[];
-    }
+  type IncompleteType = "B" | "R" | "Def" | "WO"
 
-    interface MatchPlayer {
-        id: string;
-        name: string;
-        country: {
-            id: string;
-            alpha2: string | null;
-            name: string;
-        };
-        seed: string | null;
-        status: StatusType | null;
-        sets: (string | null)[];
-        tbs: (string | null)[];
-        incomplete: IncompleteType | null;
-    }
+  type StatusType = "Q" | "WC" | "SE" | "PR" | "LL" | "AL"
 
-    interface LongType {
-        low: number;
-        high: number;
-    }
+  type RoundType = "Win" | "Final" | "Semifinals" | "Quarterfinals" | "Round of 16" | "Round of 32" | "Round of 64" | "Round of 128"
 
-    interface MatchType {
-        name: string;
-        tid: string;
-        eid: string;
-        mid: string;
-        year: string;
-        surface: string;
-        round: RoundType;
-        date: string | null;
-        dates: string;
-        court: string | null;
-        duration: string | null;
-        incomplete: IncompleteType | null;
-        umpire: string | null;
-        winner: Omit<MatchPlayer, 'incomplete'>;
-        winner_id: string;
-        loser: MatchPlayer;
-        p1: MatchPlayer;
-        p2: MatchPlayer;
-        sets: (string | null)[];
-        tbs: (string | null)[];
-        aces: number[];
-        dfs: number[];
-        serve1: number[];
-        serve2: number[];
-        bps_saved: number[];
-        ret1: number[];
-        ret2: number[];
-        bps_converted: number[];
-        winners: number[];
-        ues: number[];
-        net: number[];
-        max_speed: number[];
-        avg1_speed: number[];
-        avg2_speed: number[];
-    }
+  type EventCardType = Pick<EventInterface, "category" | "dates" | "draw_type" | "eid" | "ename" | "locations" | "name" | "start" | "surface" | "tid" | "year">
 
-    type MatchDetails = Omit<MatchType, 'winner' | 'loser' | 'tid' | 'eid' | 'year' | 'sets' | 'tbs'>
+  type TournamentEventType = Pick<EventInterface, "eid" | "year" | "winner" | "loser" | "sets" | "tbs" | "incomplete" | "draw_type">
 
-    interface H2HType {
-        p1: Pick<PlayerType, 'id' | 'name' | 'country' | 'wl' | 'wl_pc' | 'pm' | 'rh' | 'bh' | 'pro' | 'titles' | 'dob' | 'height' | 'ch'>;
-        p2: Pick<PlayerType, 'id' | 'name' | 'country' | 'wl' | 'wl_pc' | 'pm' | 'rh' | 'bh' | 'pro' | 'titles' | 'dob' | 'height' | 'ch'>;
-        matches: Pick<MatchType, 'mid' | 'round' | 'surface' | 'name' | 'tid' | 'eid' | 'winner_id' | 'year' | 'sets' | 'tbs' | 'incomplete'>[];
-    }
+  type TournamentNumbers = Pick<EventInterface, "year", "ename" | "surface" | "currency" | "venue" | "category" | "rounds">
 
-    type SearchResultKeyType = 'players' | 'tournaments' | 'coaches' | 'countries' | 'venues' | 'surfaces' | 'supervisors' | 'umpires';
+  type CountryEventType = Pick<EventInterface, "eid" | "year" | "c1" | "c2" | "score">
 
-    interface SearchResultsType extends Record<SearchResultKeyType, any> {
-        players?: Pick<PlayerType, 'id' | 'name' | 'country'>[];
-        surfaces?: string[];
-        supervisors?: string[];
-        umpires?: string[];
-        countries?: {
-            id: string;
-            name: string;
-            alpha2: string | null;
-        }[],
-        coaches?: {
-            id: string;
-            name: string | null;
-        }[],
-        tournaments?: {
-            id: string;
-            name: string;
-        }[],
-        venues?: {
-            name: string;
-            city: string;
-            country: {
-                id: string;
-                name: string;
-                alpha2: string | null
-            };
-        }[]
-    }
+  type EventDetailsType = Pick<EventInterface, "name" | "ename" | "category" | "surface" | "venues" | "dates" | "tfc" | "pm" | "currency" | "supervisors">
 
-    interface UmpireSearchResultsType {
-        name: string;
-        tid: string;
-        eid: string;
-        year: string;
-        rounds: {
-            round: RoundType;
-            matches: {
-                mid: string;
-                p1: string;
-                p2:string
-            }[]
-        }[]
-    }
+  type SeedType = Pick<EntryInterface, "id" | "name" | "country" | "last" | "seed" | "rank" | "rank2" | "withdrew">
+
+  type EntryInfoType = {
+    label: string
+    content: Pick<EntryInterface, "id" | "name" | "country" | "status" | "reason" | "rank">[]
+  }
+
+  type EntryTableType = Pick<EntryInterface, "id" | "name" | "country" | "last" | "rank" | "seed" | "status" | "withdrew">
+
+  type PlayerDetailsType = Pick<PlayerInterface, "ch" | "ch_date" | "wl" | "titles" | "pm" | "coaches" | "rh" | "bh" | "height" | "countries" | "age" | "dob" | "hof" | "dod" | "name">
+
+  type TitlesAndFinalsType = Pick<PlayerInterface, "finals"> & { titles: { title: string; events: Pick<EventInterface, "eid" | "tid" | "name" | "surface" | "dates" | "draw_type">[] }[] }
+
+  type PlayerActivityType = Pick<
+    EventInterface,
+    | "currency"
+    | "dates"
+    | "draw_type"
+    | "eid"
+    | "ename"
+    | "incomplete"
+    | "name"
+    | "points"
+    | "pm"
+    | "rank"
+    | "seed"
+    | "status"
+    | "winner"
+    | "sets"
+    | "tbs"
+    | "player_incomplete"
+    | "matches"
+    | "surface"
+    | "locations"
+    | "tid"
+  >
+
+  type PlayerActivityAPIType = {
+    stats: PlayerStatsInterface[]
+    activity: PlayerActivityType[]
+  }
+
+  type H2HMatchType = Pick<MatchInterface, "name" | "tid" | "eid" | "mid" | "winner" | "round" | "surface" | "year" | "sets" | "tbs" | "incomplete">
+
+  type MatchPlayerType = Pick<PlayerInterface, "id" | "name" | "country"> & Pick<EventInterface, "seed" | "status" | "rank" | "sets" | "tbs" | "incomplete">
+
+  type MatchDetailsType = Pick<
+    MatchInterface,
+    | "name"
+    | "surface"
+    | "dates"
+    | "date"
+    | "court"
+    | "umpire"
+    | "duration"
+    | "winner"
+    | "round"
+    | "p1"
+    | "p2"
+    | "aces"
+    | "dfs"
+    | "serve1"
+    | "serve2"
+    | "bps_saved"
+    | "ret1"
+    | "ret2"
+    | "bps_converted"
+    | "winners"
+    | "ues"
+    | "net"
+    | "max_speed"
+    | "avg1_speed"
+    | "avg2_speed"
+  >
+
+  type ResultsMatchType = Pick<MatchInterface, "mid" | "date" | "court" | "duration" | "incomplete" | "umpire" | "loser"> & { winner: MatchPlayerType }
+
+  type DrawMatchType = Pick<MatchInterface, "round" | "mid" | "incomplete" | "winner" | "p1" | "p2">
 }
 
 export {}

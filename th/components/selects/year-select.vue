@@ -1,28 +1,16 @@
 <script setup lang="ts">
-defineProps<{ items: string[] }>()
-const modelValue = defineModel<string[]>()
+defineProps<{ items: number[] }>()
+const modelValue = defineModel<number>()
 </script>
 
 <template>
-  <u-form-field
-    label="Years"
-    size="sm"
-  >
-    <template #hint>
-      <div class="hidden lg:flex items-center gap-1">
-        <u-kbd value="meta" />
-        <u-kbd value="shift" />
-        <u-kbd value="y" />
-      </div>
-    </template>
-
+  <u-form-field label="Year">
     <u-select
       v-model="modelValue"
-      multiple
       :items
-      :icon="ICONS.calendar"
+      :icon="ICONS.year"
       class="w-full"
-      variant="none"
+      placeholder="Select year"
     />
   </u-form-field>
 </template>

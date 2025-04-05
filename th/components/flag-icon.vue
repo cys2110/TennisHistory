@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ country: { id: string; alpha2: string | null; name: string } }>()
+defineProps<{ country: CountryInterface }>()
 </script>
 
 <template>

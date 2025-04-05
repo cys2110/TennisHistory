@@ -1,27 +1,27 @@
 <script setup lang="ts">
-defineProps<{ stats: { key?: string; label: string; percent?: boolean; value: number[] }[]; title: string }>()
-const checked = ref(false)
+defineProps<{
+  stats: { key?: string; label: string; percent?: boolean; value: number[] }[]
+  title: string
+  checked: boolean
+  p1: Pick<PlayerInterface, "name" | "id" | "country">
+  p2: Pick<PlayerInterface, "name" | "id" | "country">
+}>()
 </script>
 
 <template>
-  <u-container class="my-10">
-    <div class="flex justify-between mb-10">
-      <div class="text-2xl font-semibold">{{ title }}</div>
-      <u-switch
-        v-model="checked"
-        :checked-icon="ICONS['bar-chart']"
-        :unchecked-icon="ICONS['table']"
-        color="secondary"
-        size="lg"
-      />
-    </div>
-    <match-stats-chart
+  <dashboard-subpanel :title>
+    <match-stats-table
       v-if="checked"
       :stats
+      :p1
+      :p2
     />
-    <match-stats-table
+
+    <match-stats-chart
       v-else
       :stats
+      :p1
+      :p2
     />
-  </u-container>
+  </dashboard-subpanel>
 </template>

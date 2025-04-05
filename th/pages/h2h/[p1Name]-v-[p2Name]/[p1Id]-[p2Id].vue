@@ -1,103 +1,121 @@
 <script setup lang="ts">
 definePageMeta({ name: "h2h-players" })
-const p1Name = useRouteParams<string>("p1Name")
-const p2Name = useRouteParams<string>("p2Name")
+const p1ParamName = useRouteParams<string>("p1Name")
+const p1Name = computed(() => decodeName(p1ParamName.value))
+const p2ParamName = useRouteParams<string>("p2Name")
+const p2Name = computed(() => decodeName(p2ParamName.value))
 const p1Id = useRouteParams<string>("p1Id")
 const p2Id = useRouteParams<string>("p2Id")
+useHead({ title: `${p1Name.value} v. ${p2Name.value}`, templateParams: { subPage: "H2H" } })
 const toast = useToast()
-const formatName = useFormatName()
+
+interface H2HCountry {
+  id: string
+  name: string
+  alpha2: string
+}
 
 // API call
-const { data: h2h } = await useFetch<H2HType>("/api/h2h", {
+const { data: h2h } = await useFetch<{ p1: H2HCountry; p2: H2HCountry }>("/api/h2h-countries", {
   query: { p1Id, p2Id },
-  onResponseError: ({ error }) => {
+  onResponseError: () => {
     toast.add({
-      title: "Error fetching head to head data",
-      icon: ICONS.error,
-      description: error?.message
+      title: "Error",
+      description: `Failed to fetch head to head between ${p1Name.value} and ${p2Name.value}`,
+      icon: ICONS.error
     })
   }
 })
 
-const p1_name = computed(() => h2h.value?.p1.name ?? p1Name.value)
-formatName.name.value = p1_name.value
-const p2_name = computed(() => h2h.value?.p2.name ?? p2Name.value)
-formatName.name.value = p2_name.value
+// Breadcrumbs
+const items = [
+  { label: "Home", to: { name: "home" }, icon: ICONS.home },
+  { label: "Head to Head", to: { name: "h2h" }, icon: ICONS.h2h },
+  { slot: "players" as const, label: `${p1Name.value} v. ${p2Name.value}` }
+]
 
-useHead({ title: `${p1_name.value} vs ${p2_name.value}` })
-
-// Header links
+// Related links
 const links = computed(() => [
   {
-    label: p1_name.value,
-    to: { name: "player", params: { name: p1Name.value, id: p1Id.value } },
+    label: p1Name.value,
+    to: { name: "player", params: { name: p1ParamName.value, id: p1Id.value } },
     avatar: {
-      src: `https://www.atptour.com/-/media/alias/player-headshot/${p1Id.value}`
-    },
-    color: "secondary",
-    variant: "subtle"
+      src: `https://www.atptour.com/-/media/alias/player-headshot/${p1Id.value}`,
+      icon: ICONS.player,
+      class: "border border-neutral-400"
+    }
   },
   {
-    label: p2_name.value,
-    to: { name: "player", params: { name: p2Name.value, id: p2Id.value } },
+    label: p2Name.value,
+    to: { name: "player", params: { name: p2ParamName.value, id: p2Id.value } },
     avatar: {
-      src: `https://www.atptour.com/-/media/alias/player-headshot/${p2Id.value}`
-    },
-    color: "secondary",
-    variant: "subtle"
+      src: `https://www.atptour.com/-/media/alias/player-headshot/${p2Id.value}`,
+      icon: ICONS.player,
+      class: "border border-neutral-400"
+    }
   }
 ])
-
-const winLoss = computed(() => {
-  if (h2h.value) {
-    const totalMatches = h2h.value.matches.length
-    const p1Wins = h2h.value.matches.filter(match => match.winner_id === p1Id.value).length
-    return [p1Wins, totalMatches - p1Wins]
-  }
-  return [0, 0]
-})
 </script>
 
 <template>
-  <u-page>
-    <!--@vue-expect-error-->
-    <u-page-header
-      headline="Head to Head"
-      :links
-      :title="`${p1_name} v. ${p2_name}`"
-    />
+  <div>
+    <nuxt-layout name="default">
+      <template #title>
+        <u-breadcrumb :items>
+          <template #players-leading>
+            <u-avatar
+              :src="`https://www.atptour.com/-/media/alias/player-headshot/${p1Id}`"
+              :icon="ICONS.player"
+              class="border border-neutral-400"
+            />
+          </template>
+          <template #players-trailing>
+            <u-avatar
+              :src="`https://www.atptour.com/-/media/alias/player-headshot/${p2Id}`"
+              :icon="ICONS.player"
+              class="border border-neutral-400"
+            />
+          </template>
+        </u-breadcrumb>
+      </template>
 
-    <u-page-body>
-      <template v-if="h2h">
-        <u-page-columns class="xl:w-4/5 2xl:2/3 mx-auto">
-          <h2h-player-card
-            :player="h2h.p1"
-            :index="1"
-          />
-          <div class="flex flex-col items-center">
-            <h2h-doughnut-chart :winLoss />
-            <h2h-table :h2h />
-          </div>
-          <h2h-player-card
-            :player="h2h.p2"
-            :index="2"
-          />
-        </u-page-columns>
-
-        <h2h-match-table
-          :matches="h2h.matches"
-          :p1_name
-          :p1Id
-          :p2_name
-          :p2Id
+      <template #right>
+        <u-button
+          v-for="link in links"
+          :key="link.label"
+          :to="link.to"
+          :label="link.label"
+          :avatar="link.avatar"
         />
       </template>
 
-      <error-message
-        v-else
-        :icon="ICONS['no-swords']"
-        :title="`No head to head data found for ${p1_name} and ${p2_name}`"
+      <template #toolbar-left>
+        <player-search
+          v-if="h2h"
+          :index="1"
+          :country="h2h?.p1"
+        />
+      </template>
+
+      <template #toolbar-right>
+        <player-search
+          v-if="h2h"
+          :index="2"
+          :country="h2h?.p2"
+        />
+      </template>
+
+      <h2h-details
+        v-if="h2h"
+        :c1="h2h.p1"
+        :c2="h2h.p2"
       />
-    </u-page-body>
-  </u-page>
+
+      <match-table
+        v-if="h2h"
+        :c1="h2h.p1"
+        :c2="h2h.p2"
+      />
+    </nuxt-layout>
+  </div>
 </template>

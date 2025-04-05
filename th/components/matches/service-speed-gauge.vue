@@ -1,33 +1,38 @@
 <script setup lang="ts">
-const { stat } = defineProps<{ stat: { key?: string; label: string; percent?: boolean; value: number[] } }>()
+// @ts-ignore
+import kmhToMph from "kmh-to-mph"
+const { stat, p1, p2 } = defineProps<{
+  stat: { key?: string; label: string; percent?: boolean; value: number[] }
+  p1: Pick<PlayerInterface, "name" | "id" | "country">
+  p2: Pick<PlayerInterface, "name" | "id" | "country">
+}>()
 const colorMode = useColorMode()
 
-const axisColor = computed(() => (colorMode.value === "dark" ? "#94a3b8" : "#475569"))
 const kmhData = [
   {
     value: stat.value[0],
     name: stat.label,
-    title: { offsetCenter: ["0%", "100%"], color: axisColor.value },
+    title: { offsetCenter: ["0%", "100%"], color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
     detail: {
       offsetCenter: ["-100%", "100%"],
-      color: "#7c3aed",
-      borderColor: "#7c3aed"
+      color: CHART_COLOURS.violet700,
+      borderColor: CHART_COLOURS.violet700
     },
-    itemStyle: { color: "#7c3aed" }
+    itemStyle: { color: CHART_COLOURS.violet700 }
   },
   {
     value: stat.value[1],
-    itemStyle: { color: "#0d9488" },
+    itemStyle: { color: CHART_COLOURS.emerald700 },
     detail: {
       offsetCenter: ["100%", "100%"],
-      color: "#0d9488",
-      borderColor: "#0d9488"
+      color: CHART_COLOURS.emerald700,
+      borderColor: CHART_COLOURS.emerald700
     }
   }
 ]
 
 const option = ref({
-  darkMode: true,
+  darkMode: colorMode.value === "dark",
   backgroundColor: "transparent",
   series: [
     {
@@ -37,7 +42,7 @@ const option = ref({
       axisLine: { show: false },
       axisLabel: {
         distance: 25,
-        color: axisColor.value
+        color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText
       },
       title: { fontSize: 14 },
       detail: {
@@ -50,7 +55,7 @@ const option = ref({
         borderRadius: 10,
         borderWidth: 1,
         formatter: function (value: any) {
-          const milesPerHour = (value / 1.609344).toFixed(0)
+          const milesPerHour = kmhToMph(value).toFixed(0)
           return `${value} km/h\n${milesPerHour} mph`
         }
       }
@@ -61,7 +66,7 @@ const option = ref({
 
 <template>
   <v-chart
-    class="!h-[400px]"
+    class="min-h-96"
     :option="option"
     :autoresize="true"
   />

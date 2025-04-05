@@ -1,45 +1,82 @@
 <script setup lang="ts">
-const route = useRoute()
-const eid = useRouteParams<string>("eid")
+import defaultLayout from "./default.vue"
+const id = useRouteParams<string>("id")
+const paramName = useRouteParams<string>("name")
+const name = computed(() => decodeName(paramName.value))
 const year = useRouteParams<string>("year")
-const name = useRouteParams<string>("name")
-const tid = useRouteParams<string>("tid")
-const formatName = useFormatName()
+const eid = useRouteParams<string>("eid")
+const route = useRoute()
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
 
-const { data: event } = await useFetch<{ name: string }>("/api/tournamentName", { query: { id: eid } })
+const currentPage = computed(() => EVENT_PAGES.find(page => page.name === route.name))
+useHead({ title: currentPage.value?.label ?? "", templateParams: { subPage: name.value } })
 
-const tournamentName = computed(() => event.value?.name ?? name.value)
-formatName.name.value = tournamentName.value
-
-const eventButtons = eVENTPAGES.map(page => ({
-  label: page.label,
-  icon: page.icon,
-  to: {
-    name: page.name,
-    params: { name, tid, eid, year }
-  }
-}))
-
-const pages = computed(() => {
-  const currentPage = eVENTPAGES.find(page => page.name === route.name)
-  const filteredPages = eventButtons.filter(page => page.to.name !== route.name)
-  return { currentPage, filteredPages }
+// API call
+const { data: drawType } = await useFetch("/api/event-drawtype", {
+  query: { eid }
 })
 
-useHead({ title: `${pages.value.currentPage?.label ? `${pages.value.currentPage.label} | ` : ""}${formatName.capitaliseName.value} ${year.value}` })
+// Breadcrumbs
+const items = computed(() => [
+  { label: "Home", to: { name: "home" }, icon: ICONS.home },
+  { label: "Tournaments", to: { name: "tournaments" }, icon: ICONS.tournament },
+  { label: name.value, to: { name: "tournament", params: { name: paramName.value, id: id.value } } },
+  { label: year.value, to: { name: "event", params: { name: paramName.value, id: id.value, year: year.value, eid: eid.value } } },
+  { label: currentPage.value?.label ?? "", icon: currentPage.value?.icon }
+])
 </script>
 
 <template>
-  <u-page>
-    <!--@vue-expect-error-->
-    <u-page-header
-      headline="Events"
-      :title="`${formatName.capitaliseName.value} ${year}`"
-      :description="pages.currentPage?.label"
-      :links="pages.filteredPages ?? eventButtons"
-    />
-    <u-page-body>
+  <div>
+    <default-layout>
+      <template #title>
+        <u-breadcrumb :items />
+      </template>
+
+      <template #right>
+        <ClientOnly>
+          <event-page-button
+            v-if="mdAndUp && drawType"
+            :name="paramName"
+            :id
+            :eid
+            :year
+            :draw-type="drawType"
+          />
+          <u-dropdown-menu
+            v-else
+            :items="EVENT_PAGES"
+          >
+            <u-button
+              :icon="ICONS.layers"
+              color="neutral"
+              variant="link"
+              size="xl"
+            />
+          </u-dropdown-menu>
+        </ClientOnly>
+      </template>
+
+      <template
+        #toolbar-left
+        v-if="$slots['toolbar-left']"
+      >
+        <slot name="toolbar-left" />
+      </template>
+      <template
+        #toolbar-right
+        v-if="$slots['toolbar-right']"
+      >
+        <slot name="toolbar-right" />
+      </template>
+      <template
+        #toolbar
+        v-if="$slots['toolbar']"
+      >
+        <slot name="toolbar" />
+      </template>
       <slot />
-    </u-page-body>
-  </u-page>
+    </default-layout>
+  </div>
 </template>

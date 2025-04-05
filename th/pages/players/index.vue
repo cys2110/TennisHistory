@@ -1,14 +1,16 @@
 <script setup lang="ts">
-definePageMeta({ name: "players" })
-useHead({ title: "Players" })
+definePageMeta({ name: "players", layout: false })
+useHead({ title: "Players", templateParams: { subPage: null } })
 const toast = useToast()
 
-const breakpoints = useBreakpoints(breakpointsTailwind)
-const xlAndUp = breakpoints.greaterOrEqual("xl")
+interface PlayerAPIResponse {
+  count: number
+  players: Pick<PlayerInterface, "id" | "name" | "country" | "min_year" | "max_year">[]
+}
 
-const selectedLetter = ref<string | null>(null)
+const selectedLetter = ref<string>("All")
 const page = ref(1)
-
+const pageSize = ref(25)
 // Set shortcuts for radio group
 defineShortcuts({
   meta_shift_a: () => (selectedLetter.value = "A"),
@@ -40,84 +42,64 @@ defineShortcuts({
 })
 
 // API call
-const { data: players } = await useFetch<{ count: { low: number; high: number }; players: Pick<PlayerType, "id" | "name" | "country">[] }>("/api/allPlayers", {
-  query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * 24) },
+const { data, status } = await useFetch<PlayerAPIResponse>("/api/all-players", {
+  query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * 25), limit: pageSize },
   onResponseError: () => {
     toast.add({
       title: "Error fetching players",
-      icon: ICONS.error
+      icon: ICONS.error,
+      color: "error"
     })
   }
 })
+
+// Breadcrumbs
+const items = computed(() => [
+  { label: "Home", to: { name: "home" }, icon: ICONS.home },
+  { label: "Players", icon: ICONS.people }
+])
 </script>
 
 <template>
-  <u-page>
-    <u-page-header title="Players" />
-
-    <u-page-body>
-      <u-container class="flex justify-center">
-        <u-radio-group
-          v-model="selectedLetter"
-          :items="variables.LETTERS"
-          orientation="horizontal"
-          class="my-5"
-          @update:model-value="page = 1"
-          color="secondary"
-          :size="xlAndUp ? 'md' : 'sm'"
+  <div>
+    <ClientOnly>
+      <nuxt-layout name="default">
+        <template #title>
+          <u-breadcrumb :items />
+        </template>
+        <template #right>
+          <set-page-size v-model="pageSize" />
+        </template>
+        <template #toolbar>
+          <letters-radio-group
+            v-model="selectedLetter"
+            @update:modelValue="page = 1"
+          />
+        </template>
+        <u-page-grid
+          v-if="data && data.count > 0"
+          class="mt-10"
         >
-          <template #legend>
-            <div class="hidden lg:flex">
-              Use
-              <u-kbd value="meta" />
-              <u-kbd value="shift" />
-              <u-kbd value="letter" />
-              to select a letter
-            </div>
-          </template>
-        </u-radio-group>
-      </u-container>
-
-      <u-container
-        v-if="players && players.players.length > 0"
-        class="flex flex-col items-center gap-10"
-      >
-        <u-page-grid class="w-full">
-          <u-page-card
-            v-for="player in players.players"
+          <player-card
+            v-for="player in data.players"
             :key="player.id"
-            :title="player.name"
-            :to="{ name: 'player', params: { id: player.id, name: useChangeCase(player.name, 'kebabCase').value } }"
-            :icon="`flag:${player.country.alpha2}-4x3`"
-            highlight
-            :ui="{ container: 'justify-center items-center text-center' }"
-            orientation="horizontal"
-            prefetch-on="interaction"
-          >
-            <nuxt-img
-              :src="`https://www.atptour.com/-/media/alias/player-headshot/${player.id}`"
-              alt="Player image"
-              class="rounded-full border border-slate-500"
-            />
-          </u-page-card>
+            :id="player.id"
+            :player
+          />
         </u-page-grid>
-
-        <u-pagination
-          v-model:page="page"
-          :total="players.count.low"
-          :items-per-page="24"
-          color="secondary"
-          variant="subtle"
-          active-color="secondary"
-          active-variant="solid"
+        <error-message
+          v-else
+          :icon="ICONS.noPeople"
+          title="No players found"
+          :status
         />
-      </u-container>
-
-      <error-message
-        v-else
-        :icon="ICONS['no-people']"
-        title="No players found"
-      />
-    </u-page-body>
-  </u-page>
+        <pagination-component
+          v-if="data && data.count > 0"
+          v-model="page"
+          :total="data.count"
+          :page-size="pageSize"
+        />
+      </nuxt-layout>
+    </ClientOnly>
+  </div>
 </template>

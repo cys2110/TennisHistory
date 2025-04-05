@@ -1,50 +1,42 @@
 <script setup lang="ts">
-const toast = useToast()
+defineProps<{ checked: boolean }>()
 const eid = useRouteParams<string>("eid")
-const formatName = useFormatName()
-const checked = ref(false)
+const year = useRouteParams<string>("year")
+const paramName = useRouteParams<string>("name")
+const name = computed(() => decodeName(paramName.value))
+const toast = useToast()
 
 // API call
-const { data: entries } = await useFetch<EventEntryType[]>("/api/eventEntries", {
+const { data: entries, status } = await useFetch<EntryTableType[]>("/api/event-entries", {
   query: { eid },
   onResponseError: () => {
     toast.add({
-      title: "Error fetching event entries",
-      icon: ICONS.error
+      title: `Error fetching entries for ${name.value} ${year.value}`,
+      icon: ICONS.error,
+      color: "error"
     })
   }
 })
 </script>
 
 <template>
-  <u-container
-    v-if="entries"
-    class="border-3 border-violet-400 rounded-xl p-4"
+  <dashboard-subpanel
+    title="Entries"
+    :icon="ICONS.player"
   >
-    <div class="flex justify-between items-center my-2">
-      <div class="text-slate-500 dark:text-slate-400 font-bold text-xl">Entries</div>
-      <u-switch
-        v-model="checked"
-        :checked-icon="ICONS.cards"
-        :unchecked-icon="ICONS.table"
-        color="secondary"
-        size="lg"
-      />
-    </div>
-
-    <entries-cards
-      v-if="checked"
-      :entries
-    />
-
     <entries-table
-      v-else
+      v-if="checked && entries && entries.length > 0"
       :entries
     />
-  </u-container>
-  <error-message
-    v-else
-    :icon="ICONS['no-info']"
-    :title="`No entries available for ${formatName.capitaliseName.value}`"
-  />
+    <entry-card
+      v-else-if="entries && entries.length > 0"
+      :entries
+    />
+    <error-message
+      v-else
+      :icon="ICONS.noPeople"
+      :title="`No entries found for ${name} ${year}`"
+      :status
+    />
+  </dashboard-subpanel>
 </template>

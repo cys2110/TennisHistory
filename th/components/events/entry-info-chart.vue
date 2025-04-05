@@ -1,7 +1,6 @@
 <script setup lang="ts">
-const { data } = defineProps<{ data: EventEntryInfoType[] }>()
-
-// FIXME: Dark mode colors
+const { data } = defineProps<{ data: EntryInfoType[] }>()
+const colorMode = useColorMode()
 
 const treeData = {
   name: "Entry Information",
@@ -9,7 +8,7 @@ const treeData = {
     name: info.label,
     children: info.content.map(player => {
       const childNodes = []
-      if (player.rank) childNodes.push({ name: parseInt(player.rank) })
+      if (player.rank) childNodes.push({ name: Number(player.rank) })
       if (player.reason) childNodes.push({ name: player.reason })
 
       return {
@@ -22,7 +21,8 @@ const treeData = {
 
 const option = ref({
   backgroundColor: "transparent",
-  textStyle: { color: "#cbd5e1" },
+  darkMode: colorMode.value === "dark",
+  textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
   series: [
     {
       type: "tree",
@@ -44,10 +44,11 @@ const option = ref({
           align: "left"
         }
       },
-      itemStyle: { color: "#7c3aed" },
+      itemStyle: { color: CHART_COLOURS.violet700 },
       expandAndCollapse: true,
       animationDuration: 550,
-      animationDurationUpdate: 750
+      animationDurationUpdate: 750,
+      initialTreeDepth: 4
     }
   ]
 })
@@ -56,7 +57,7 @@ const option = ref({
 <template>
   <v-chart
     ref="chartRef"
-    class="!h-[500px] !w-full"
+    class="min-h-200 w-full"
     :option="option"
     :autoresize="true"
   />

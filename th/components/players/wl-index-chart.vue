@@ -1,21 +1,34 @@
 <script setup lang="ts">
-const { index } = defineProps<{ index: WLIndexType[] }>()
+const { index } = defineProps<{ index: WLIndexInterface[] }>()
+const colorMode = useColorMode()
 
 const categoryColours = {
-  "Match Record": "#0284c7",
-  "Pressure Points": "#c026d3",
-  Environment: "#7c3aed",
-  Other: "#059669"
+  "Match Record": CHART_COLOURS.sky700,
+  "Pressure Points": CHART_COLOURS.fuchsia600,
+  Environment: CHART_COLOURS.violet700,
+  Other: CHART_COLOURS.emerald700
 }
 
 const option = ref({
   backgroundColor: "transparent",
-  textStyle: { color: "#71717a" },
-  grid: { left: "15%" },
+  textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
+  grid: { left: "20%" },
   tooltip: {
     formatter: function (params: any) {
       const { stat, value: index, wins, losses, titles } = params.value
-      return `<span style="font-weight: bold">${stat}</span><br/ >${wins}-${losses} (${index})${titles !== null ? `<br />${titles} ${titles === 1 ? "title" : "titles"}` : ""}`
+      return `
+      <span style="font-weight: bold">${stat}</span>
+      <br/ >
+      <span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${
+        categoryColours[params.data.category as keyof typeof categoryColours]
+      }"></span>  ${wins}-${losses} (${index})${
+        titles !== null
+          ? `<br />
+      <span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${CHART_COLOURS.orange600}"></span>
+      ${titles} ${titles === 1 ? "title" : "titles"}`
+          : ""
+      }
+      `
     }
   },
   dataset: {
@@ -23,7 +36,7 @@ const option = ref({
     dimensions: ["category", "stat", "win", "loss", "titles", "value"]
   },
   xAxis: [
-    { type: "value", name: "Index" },
+    { type: "value", name: "Index", max: 1 },
     { type: "value", name: "Titles", splitLine: { show: false } }
   ],
   yAxis: { type: "category", inverse: true },
@@ -42,31 +55,16 @@ const option = ref({
       type: "scatter",
       encode: { x: "titles", y: "stat" },
       xAxisIndex: 1,
-      itemStyle: { color: "#f97316" }
+      itemStyle: { color: CHART_COLOURS.orange600 }
     }
   ]
 })
 </script>
 
 <template>
-  <div>
-    <div class="flex justify-center">
-      <div
-        v-for="(entry, index) in Object.entries(categoryColours)"
-        :key="index"
-        class="mx-5 flex"
-      >
-        <div
-          class="rounded-lg !w-9 mx-2"
-          :style="{ backgroundColor: entry[1] }"
-        ></div>
-        <div class="text-zinc-400 self-center">{{ entry[0] }}</div>
-      </div>
-    </div>
-    <v-chart
-      class="!h-[600px] !w-full"
-      :option="option"
-      :autoresize="true"
-    />
-  </div>
+  <v-chart
+    class="h-96 w-full"
+    :option="option"
+    :autoresize="true"
+  />
 </template>

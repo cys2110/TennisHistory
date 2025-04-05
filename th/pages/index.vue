@@ -1,31 +1,54 @@
 <script setup lang="ts">
+definePageMeta({ name: "home" })
 useHead({ title: "Home", templateParams: { subPage: null } })
 
-const links = [
-  { label: "Results Archive", to: { name: "archive" }, icon: ICONS.calendar, color: "secondary", variant: "subtle" },
-  { label: "Tournaments", to: { name: "tournaments" }, icon: ICONS.trophy, color: "secondary", variant: "subtle" },
-  { label: "Players", to: { name: "players" }, icon: ICONS.people, color: "secondary", variant: "subtle" },
-  { label: "Head to Head", to: { name: "h2h" }, icon: ICONS.swords, color: "secondary", variant: "subtle" }
+const features = [
+  {
+    title: "Results",
+    icon: ICONS.event,
+    description: "Explore tournament results starting from the Open Era"
+  },
+  {
+    title: "Players",
+    icon: ICONS.people,
+    description: "Discover player profiles and activity"
+  },
+  {
+    title: "Head to Head",
+    icon: ICONS.h2h,
+    description: "Examine match ups between players"
+  },
+  {
+    title: "Statistics and Records",
+    icon: ICONS.stats,
+    description: "Charge up your tennis trivia with fun facts and figures"
+  }
 ]
+
+// Breadcrumbs
+const items = [{ label: "Home", icon: ICONS.home }]
 </script>
 
 <template>
-  <u-page>
-    <u-page-body>
-      <!--@vue-expect-error - type errors arising from lack of stabilisation-->
+  <div>
+    <nuxt-layout name="default">
+      <template #title>
+        <u-breadcrumb :items />
+      </template>
       <u-page-hero
         title="Tennis History in the Open Era"
         description="Explore the history of men's tennis since 1968"
-        :links
       />
-
-      <p class="text-center">
-        Keyboard shortcuts appear in this format:
-        <u-kbd value="meta" />
-        <u-kbd value="shift" />
-        <u-kbd value="a" />
-        . If a keyboard shortcut appears with a dropdown menu, it offers the option to select or deselect all options.</p
-      >
-    </u-page-body>
-  </u-page>
+      <u-page-grid class="2xl:grid-cols-4 2xl:w-3/4 mx-auto">
+        <!--TODO: Add in screenshots-->
+        <u-page-feature
+          v-for="feat in features"
+          :key="feat.title"
+          :title="feat.title"
+          :icon="feat.icon"
+          :description="feat.description"
+        />
+      </u-page-grid>
+    </nuxt-layout>
+  </div>
 </template>

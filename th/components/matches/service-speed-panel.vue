@@ -1,35 +1,32 @@
 <script setup lang="ts">
-defineProps<{ stats: { key?: string; label: string; percent?: boolean; value: number[] }[] }>()
-const checked = ref(false)
+defineProps<{
+  stats: { key?: string; label: string; percent?: boolean; value: number[] }[]
+  checked: boolean
+  p1: Pick<PlayerInterface, "name" | "id" | "country">
+  p2: Pick<PlayerInterface, "name" | "id" | "country">
+}>()
 </script>
 
 <template>
-  <u-container class="my-10">
-    <div class="flex justify-between mb-10">
-      <div class="text-2xl font-semibold">Service Speed</div>
-      <u-switch
-        v-model="checked"
-        :checked-icon="ICONS.gauge"
-        :unchecked-icon="ICONS.table"
-        color="secondary"
-        size="lg"
-      />
-    </div>
-
+  <dashboard-subpanel title="Service Speed">
     <div
-      v-if="checked"
-      class="flex flex-col gap-1 xl:flex-row"
+      v-if="!checked"
+      class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2"
     >
       <service-speed-gauge
         v-for="stat in stats"
         :key="stat.label"
         :stat
+        :p1="p1"
+        :p2="p2"
       />
     </div>
 
     <service-speed-table
       v-else
       :stats
+      :p1="p1"
+      :p2="p2"
     />
-  </u-container>
+  </dashboard-subpanel>
 </template>

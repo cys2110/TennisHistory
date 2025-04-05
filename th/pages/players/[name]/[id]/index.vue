@@ -1,52 +1,51 @@
 <script setup lang="ts">
-definePageMeta({ name: "player", layout: "player-layout" })
-const formatName = useFormatName()
-const id = useRouteParams<string>("id")
+definePageMeta({ name: "player" })
 const toast = useToast()
+const id = useRouteParams<string>("id")
+const paramName = useRouteParams<string>("name")
+const name = computed(() => decodeName(paramName.value))
+const playerYears = useState<number[]>("player-years")
+const currentYear = new Date().getFullYear()
 
 // API call
-const { data: player } = await useFetch<Omit<PlayerType, "id" | "name" | "wl_pc" | "pro">>("/api/playerDetails", {
+const { data: player } = await useFetch<Pick<PlayerInterface, "gladiator" | "country">>("/api/player-overview", {
   query: { id },
-  onResponseError: error => {
+  onResponseError: () => {
     toast.add({
-      title: `Error fetching ${formatName.capitaliseName.value}'s details`,
+      title: `Error fetching overview for ${name.value}`,
       icon: ICONS.error,
-      description: error.error?.message
+      color: "error"
     })
   }
 })
 </script>
 
 <template>
-  <u-container v-if="player">
-    <u-page-section
-      :headline="player.active_years.endsWith('present') ? 'Active' : 'Retired'"
-      :title="formatName.capitaliseName.value"
-      :icon="`flag:${player.country.alpha2}-4x3`"
-      :description="`Years active: ${player.active_years} (${player.years_total} years)`"
-      orientation="horizontal"
-      reverse
-    >
-      <nuxt-img
-        v-if="player.gladiator"
-        :src="`https://www.atptour.com/-/media/alias/player-gladiator-headshot/${id}`"
-        :alt="formatName.capitaliseName.value"
-        loading="lazy"
-      />
-      <nuxt-img
-        v-else
-        :src="`https://www.atptour.com/-/media/alias/player-headshot/${id}`"
-        :alt="formatName.capitaliseName.value"
-        class="border border-slate-500 rounded-full"
-        loading="lazy"
-      />
-    </u-page-section>
-    <player-overview :player />
-    <major-results />
-  </u-container>
-  <error-message
-    v-else
-    :icon="ICONS['no-person']"
-    :title="`No details found for ${formatName.capitaliseName.value}`"
-  />
+  <div>
+    <nuxt-layout name="player-layout">
+      <u-page-section
+        :headline="playerYears[playerYears.length - 1] === currentYear ? 'Active' : 'Retired'"
+        :icon="`flag:${player?.country.alpha2}-4x3`"
+        :description="`Years active: ${playerYears[0]} - ${playerYears[playerYears.length - 1] === currentYear ? 'present' : playerYears[playerYears.length - 1]}`"
+        orientation="horizontal"
+        reverse
+      >
+        <nuxt-img
+          v-if="player?.gladiator"
+          :src="`https://www.atptour.com/-/media/alias/player-gladiator-headshot/${id}`"
+          :alt="name"
+        />
+        <nuxt-img
+          v-else
+          :src="`https://www.atptour.com/-/media/alias/player-headshot/${id}`"
+          :alt="name"
+          class="border border-neutral-500 rounded-full"
+        />
+      </u-page-section>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <player-details />
+        <major-results />
+      </div>
+    </nuxt-layout>
+  </div>
 </template>

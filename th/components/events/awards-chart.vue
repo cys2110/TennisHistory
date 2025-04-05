@@ -1,16 +1,17 @@
 <script setup lang="ts">
-const { awards } = defineProps<{ awards: EventAwardType[] }>()
+const { awards } = defineProps<{ awards: RoundInterface[] }>()
+const colorMode = useColorMode()
 
 const flattenedAwards = awards.map(award => ({
   ...award,
-  pm: award.pm ? parseInt(award.pm.replace(",", "")) : 0,
-  points: award.points ? parseInt(award.points.replace(",", "")) : 0
+  pm: award.pm ? Number(award.pm.replaceAll(",", "")) : 0,
+  points: award.points ? Number(award.points.replace(",", "")) : 0
 }))
-const currency: CurrencyType | null = awards[0].currency
+const currency: CurrencyType = awards[0].currency ?? "USD"
 
 const option = ref({
   backgroundColor: "transparent",
-  textStyle: { color: "#cbd5e1" },
+  textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
   grid: { left: "15%" },
   dataset: { source: flattenedAwards, dimensions: ["round", "points", "pm", "currency"] },
   tooltip: {
@@ -33,12 +34,13 @@ const option = ref({
   xAxis: {
     type: "value",
     name: "Points",
-    splitLine: { show: false }
+    splitLine: { show: false },
+    axisLabel: { formatter: (value: number) => value.toLocaleString("en-GB") }
   },
   yAxis: {
     type: "value",
     name: "Prize Money",
-    axisLabel: { formatter: (value: number) => `${currency ? CURRENCIES[currency] : ""}${value.toLocaleString("en-GB")}` },
+    axisLabel: { formatter: (value: number) => `${CURRENCIES[currency]}${value.toLocaleString("en-GB")}` },
     splitLine: { show: false }
   },
   series: [
@@ -46,7 +48,7 @@ const option = ref({
       symbolSize: 20,
       type: "scatter",
       encode: { x: "points", y: "pm" },
-      itemStyle: { color: "#7c3aed" }
+      itemStyle: { color: CHART_COLOURS.violet700 }
     }
   ]
 })
@@ -55,7 +57,7 @@ const option = ref({
 <template>
   <v-chart
     ref="chartRef"
-    class="!h-[500px] !w-full my-auto"
+    class="min-h-96 w-full my-auto"
     :option
     :autoresize="true"
   />

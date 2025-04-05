@@ -1,12 +1,13 @@
 <script setup lang="ts">
-const { seeds } = defineProps<{ seeds: EventSeedType[] }>()
-const flattenedSeeds = computed(() => seeds.map(seed => ({ ...seed, seed: parseInt(seed.seed), rank1: seed.rank1 ? parseInt(seed.rank1) : 0, rank2: seed.rank2 ? parseInt(seed.rank2) : 0 })))
+const { seeds } = defineProps<{ seeds: SeedType[] }>()
+const colorMode = useColorMode()
+const flattenedSeeds = computed(() => seeds.map(seed => ({ ...seed, seed: seed.seed ? Number(seed.seed) : "—", rank: seed.rank ? Number(seed.rank) : 0, rank2: seed.rank2 ? Number(seed.rank2) : 0 })))
 
 const option = ref({
   backgroundColor: "transparent",
-  textStyle: { color: "#cbd5e1" },
+  textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
   grid: { bottom: "30%" },
-  dataset: { source: flattenedSeeds.value, dimensions: ["seed", "rank1", "rank2", "name"] },
+  dataset: { source: flattenedSeeds.value, dimensions: ["seed", "rank", "rank2", "name"] },
   tooltip: {
     trigger: "axis"
   },
@@ -23,19 +24,19 @@ const option = ref({
       name: "Seed",
       type: "line",
       encode: { x: "name", y: "seed" },
-      itemStyle: { color: "#7c3aed" }
+      itemStyle: { color: CHART_COLOURS.violet700 }
     },
     {
       name: "Rank at event",
       label: {
         show: true,
-        formatter: (params: any) => (params.value.rank1 === 0 ? "" : "Event"),
+        formatter: (params: any) => (params.value.rank === 0 ? "" : "Event"),
         rotate: 90
       },
       type: "bar",
       encode: { x: "name", y: "rank1" },
       yAxisIndex: 1,
-      itemStyle: { color: "#0d9488" }
+      itemStyle: { color: CHART_COLOURS.emerald700 }
     },
     {
       name: "Rank at draw",
@@ -47,7 +48,7 @@ const option = ref({
       type: "bar",
       encode: { x: "name", y: "rank2" },
       yAxisIndex: 1,
-      itemStyle: { color: "#c026d3" }
+      itemStyle: { color: CHART_COLOURS.fuchsia600 }
     }
   ]
 })
@@ -56,7 +57,7 @@ const option = ref({
 <template>
   <v-chart
     ref="chartRef"
-    class="!h-[700px] !w-full"
+    class="min-h-96 w-full"
     :option
     :autoresize="true"
   />

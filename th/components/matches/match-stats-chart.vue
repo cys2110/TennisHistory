@@ -1,10 +1,10 @@
 <script setup lang="ts">
-const { stats } = defineProps<{ stats: { key?: string; label: string; percent?: boolean; value: number[] }[] }>()
+const { stats, p1, p2 } = defineProps<{
+  stats: { key?: string; label: string; percent?: boolean; value: number[] }[]
+  p1: Pick<PlayerInterface, "name" | "id" | "country">
+  p2: Pick<PlayerInterface, "name" | "id" | "country">
+}>()
 const colorMode = useColorMode()
-const p1_name = inject<string>("p1Name")
-const p2_name = inject<string>("p2Name")
-
-const axisColor = computed(() => (colorMode.value === "dark" ? "#94a3b8" : "#475569"))
 
 const flattenedStats = computed(() => {
   return stats.map(stat => {
@@ -19,7 +19,7 @@ const flattenedStats = computed(() => {
 const option = ref({
   backgroundColor: "transparent",
   grid: { left: "15%" },
-  textStyle: { color: axisColor.value },
+  textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
   dataset: {
     source: flattenedStats.value,
     dimensions: ["category", "p1", "p2"]
@@ -28,18 +28,18 @@ const option = ref({
   yAxis: { type: "category", inverse: true },
   series: [
     {
-      name: p1_name,
+      name: p1.name,
       type: "bar",
       encode: { x: "p1", y: "category" },
-      itemStyle: { color: "#7c3aed" },
-      label: { show: true, color: "#cbd5e1", formatter: "{a}" }
+      itemStyle: { color: CHART_COLOURS.violet700 },
+      label: { show: true, color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText, formatter: "{a}" }
     },
     {
-      name: p2_name,
+      name: p2.name,
       type: "bar",
       encode: { x: "p2", y: "category" },
-      itemStyle: { color: "#0d9488" },
-      label: { show: true, color: "#cbd5e1", formatter: "{a}" }
+      itemStyle: { color: CHART_COLOURS.emerald700 },
+      label: { show: true, color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText, formatter: "{a}" }
     }
   ]
 })
@@ -47,7 +47,7 @@ const option = ref({
 
 <template>
   <v-chart
-    class="!h-[600px] !w-full"
+    class="min-h-96 w-full"
     :option="option"
     :autoresize="true"
   />
