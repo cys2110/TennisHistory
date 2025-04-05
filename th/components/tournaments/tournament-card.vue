@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{ event: TournamentEventType }>()
 const name = useRouteParams<string>("name")
-const tid = useRouteParams<string>("tid")
+const tid = useRouteParams<string>("id")
 </script>
 
 <template>

@@ -11,7 +11,7 @@ const groups = computed(() => [
 <template>
   <u-dashboard-group>
     <!--Command palette-->
-    <u-dashboard-search />
+    <u-dashboard-search :groups />
 
     <u-dashboard-sidebar collapsible>
       <template #header="{ collapsed }">

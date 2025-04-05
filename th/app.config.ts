@@ -48,7 +48,8 @@ export default defineAppConfig({
     },
     navigationMenu: {
       slots: {
-        link: "text-xs xl:text-sm"
+        link: "text-xs xl:text-sm",
+        linkLabel: "text-wrap"
       },
       variants: {
         highlightColor: {
@@ -266,7 +267,7 @@ export default defineAppConfig({
     },
     dashboardToolbar: {
       slots: {
-        root: "py-2"
+        root: "py-2 flex-wrap"
       }
     },
     dashboardPanel: {
