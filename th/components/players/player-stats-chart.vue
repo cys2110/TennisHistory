@@ -5,7 +5,7 @@ const colorMode = useColorMode()
 const option = ref({
   backgroundColor: "transparent",
   textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
-  grid: { left: "25%" },
+  grid: { containLabel: true },
   dataset: {
     source: stats,
     dimensions: ["category", "value"]

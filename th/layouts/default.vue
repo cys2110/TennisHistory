@@ -49,6 +49,12 @@ const groups = computed(() => [
             <slot name="title" />
           </template>
           <template
+            #trailing
+            v-if="$slots.trailing"
+          >
+            <slot name="trailing" />
+          </template>
+          <template
             #right
             v-if="$slots.right"
           >

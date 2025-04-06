@@ -1,4 +1,5 @@
 export default {
+  areaChart: "ic:round-area-chart",
   awards: "tdesign:money",
   barChart: "material-symbols:bar-chart-rounded",
   calendar: "solar:calendar-bold-duotone",

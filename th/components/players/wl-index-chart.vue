@@ -12,7 +12,7 @@ const categoryColours = {
 const option = ref({
   backgroundColor: "transparent",
   textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
-  grid: { left: "20%" },
+  grid: { containLabel: true },
   tooltip: {
     formatter: function (params: any) {
       const { stat, value: index, wins, losses, titles } = params.value

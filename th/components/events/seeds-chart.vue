@@ -6,7 +6,7 @@ const flattenedSeeds = computed(() => seeds.map(seed => ({ ...seed, seed: seed.s
 const option = ref({
   backgroundColor: "transparent",
   textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
-  grid: { bottom: "30%" },
+  grid: { containLabel: true },
   dataset: { source: flattenedSeeds.value, dimensions: ["seed", "rank", "rank2", "name"] },
   tooltip: {
     trigger: "axis"
