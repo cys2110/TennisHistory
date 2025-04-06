@@ -18,7 +18,7 @@ const flattenedStats = computed(() => {
 
 const option = ref({
   backgroundColor: "transparent",
-  grid: { left: "15%" },
+  grid: { containLabel: true },
   textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
   dataset: {
     source: flattenedStats.value,

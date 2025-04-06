@@ -12,11 +12,10 @@ const currency: CurrencyType = awards[0].currency ?? "USD"
 const option = ref({
   backgroundColor: "transparent",
   textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
-  grid: { left: "15%" },
+  grid: { containLabel: true },
   dataset: { source: flattenedAwards, dimensions: ["round", "points", "pm", "currency"] },
   tooltip: {
     trigger: "item",
-    confine: true,
     formatter: (params: any) => {
       return `
           <div class="font-bold">${params.value.round}</div>

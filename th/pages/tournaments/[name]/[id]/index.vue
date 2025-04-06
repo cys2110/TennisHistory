@@ -11,6 +11,7 @@ definePageMeta({
 })
 const toast = useToast()
 const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
 const xlAndUp = breakpoints.greaterOrEqual("xl")
 const lgAndUp = breakpoints.greaterOrEqual("lg")
 const paramName = useRouteParams<string>("name")
@@ -22,6 +23,7 @@ const tabs = [
   { label: "Winners", value: "winners", icon: ICONS.tournament },
   { label: "By the Numbers", value: "numbers", icon: ICONS.stats }
 ]
+const checked = ref(false)
 
 // API call
 const { data: tournament, status } = await useFetch<Pick<TournamentInterface, "website" | "years"> & { events: TournamentEventType[] }>("/api/tournament-details", {
@@ -86,6 +88,9 @@ const links = computed(() => {
       <template #title>
         <u-breadcrumb :items />
       </template>
+      <template #trailing>
+        <span class="text-sm text-(--ui-text-muted)">({{ tournament?.years }})</span>
+      </template>
 
       <template #right>
         <ClientOnly>
@@ -103,7 +108,15 @@ const links = computed(() => {
       <template #toolbar>
         <ClientOnly>
           <div class="flex flex-wrap items-center justify-between w-full gap-5 lg:gap-30 2xl:gap-50">
-            <div class="text-(--ui-text-muted) order-1">{{ tournament?.years }}</div>
+            <div class="order-1">
+              <u-switch
+                v-if="mdAndUp && selectedTab === 'numbers'"
+                v-model="checked"
+                :checked-icon="ICONS.table"
+                :unchecked-icon="ICONS.areaChart"
+                :label="checked ? 'Table view' : 'Chart view'"
+              />
+            </div>
             <u-tabs
               v-model="selectedTab"
               :items="tabs"
@@ -137,7 +150,10 @@ const links = computed(() => {
           :status
         />
       </div>
-      <tournament-numbers v-if="selectedTab === 'numbers'" />
+      <tournament-numbers
+        v-if="selectedTab === 'numbers'"
+        :checked
+      />
     </nuxt-layout>
   </div>
 </template>

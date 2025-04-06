@@ -33,7 +33,12 @@ const items = computed(() => [
       <template #title>
         <u-breadcrumb :items />
       </template>
-
+      <template
+        #trailing
+        v-if="$slots.trailing"
+      >
+        <slot name="trailing" />
+      </template>
       <template #right>
         <ClientOnly>
           <event-page-button

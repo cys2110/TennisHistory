@@ -3,14 +3,45 @@ export const BASE_CATEGORIES = Object.values(BaseCategoryEnum)
 export const CATEGORIES = Object.values(CategoryEnum)
 
 export const CHART_COLOURS = {
-  lightText: "#475569",
-  darkText: "#cbd5e1",
+  emerald300: "#6ee7b7",
   emerald700: "#047857",
+  violet300: "#c4b5fd",
   violet700: "#6d28d9",
+  fuchsia300: "#f0abfc",
   fuchsia600: "#c026d3",
+  sky300: "#7dd3fc",
   sky700: "#0284c7",
-  orange600: "#f97316"
+  orange300: "#fdba74",
+  orange600: "#f97316",
+  rose300: "#fda4af",
+  rose700: "#be123c",
+  lime300: "#bef264",
+  lime500: "#84cc16",
+  cyan300: "#67e8f9",
+  cyan600: "#0891b2",
+  red300: "#fca5a5",
+  red700: "#b91c1c",
+  amber300: "#fcd34d",
+  amber600: "#d97706",
+  yellow300: "#fde047",
+  yellow600: "#ca8a04",
+  green300: "#86efac",
+  green600: "#16a34a",
+  teal300: "#5eead4",
+  teal700: "#0f766e",
+  blue300: "#93c5fd",
+  blue700: "#1d4ed8",
+  indigo300: "#a5b4fc",
+  indigo700: "#4338ca",
+  purple300: "#d8b4fe",
+  purple600: "#9333ea",
+  pink300: "#f9a8d4",
+  pink600: "#db2777",
+  lightText: "#475569",
+  darkText: "#cbd5e1"
 }
+
+export const CATEGORY_COLOURS = Object.values(CHART_COLOURS)
 
 export const CURRENCIES: Record<CurrencyType, string> = {
   AUD: "A$",

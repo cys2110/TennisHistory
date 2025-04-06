@@ -52,7 +52,8 @@ export default defineNuxtConfig({
   echarts: {
     renderer: "canvas",
     charts: ["ScatterChart", "LineChart", "BarChart", "TreeChart", "GaugeChart", "PieChart"],
-    components: ["DatasetComponent", "GridComponent", "TooltipComponent"]
+    components: ["DatasetComponent", "GridComponent", "TooltipComponent", "LegendComponent", "PolarComponent", "TransformComponent"],
+    features: ["UniversalTransition", "LabelLayout"]
   },
   ui: {
     theme: {

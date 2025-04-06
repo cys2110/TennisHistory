@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { TableColumn } from "@nuxt/ui"
-const UButton = resolveComponent("u-button")
+defineProps<{ checked: boolean }>()
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
@@ -16,7 +15,7 @@ interface APIResponse {
   QF: number
   SF: number
   F: number
-  currency: string
+  currency: CurrencyType
   yoy: string
 }
 
@@ -31,32 +30,6 @@ const { data: pm, status } = await useFetch<APIResponse[]>("/api/tournament-hist
     })
   }
 })
-
-const columns: TableColumn<APIResponse>[] = [
-  {
-    accessorKey: "year",
-    header: ({ column }) => {
-      const isSorted = column.getIsSorted()
-      return h(UButton, {
-        color: "neutral",
-        variant: "link",
-        label: "Year",
-        icon: isSorted ? (isSorted === "asc" ? ICONS.sortNumberUp : ICONS.sortNumberDown) : ICONS.sortNumber,
-        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
-      })
-    }
-  },
-  { accessorFn: row => row.pm.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Prize Money" },
-  { accessorFn: row => row.yoy, header: "Increase (YoY)" },
-  { accessorFn: row => row.F.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Final" },
-  { accessorFn: row => row.SF.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Semi-final" },
-  { accessorFn: row => row.QF.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Quarter-final" },
-  { accessorFn: row => row.R16.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Round of 16" },
-  { accessorFn: row => row.R32.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Round of 32" },
-  { accessorFn: row => (row.R64 ? row.R64.toLocaleString("en-US", { style: "currency", currency: row.currency }) : "—"), header: "Round of 64" },
-  { accessorFn: row => (row.R128 ? row.R128.toLocaleString("en-US", { style: "currency", currency: row.currency }) : "—"), header: "Round of 128" }
-]
 </script>
 
 <template>
@@ -64,12 +37,16 @@ const columns: TableColumn<APIResponse>[] = [
     title="Historical Prize Money"
     :icon="ICONS.awards"
   >
-    <u-table
-      v-if="pm"
-      :data="pm"
-      :columns="columns"
-    >
-    </u-table>
+    <div v-if="pm">
+      <tournament-historical-pm-table
+        v-if="checked"
+        :pm
+      />
+      <tournament-historical-pm-chart
+        v-else
+        :pm
+      />
+    </div>
     <error-message
       v-else
       :icon="ICONS.noAwards"
