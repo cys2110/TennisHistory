@@ -80,9 +80,6 @@ const formattedData = computed<FormattedData[]>(() => {
 // Get all years
 const allYears = computed(() => [...new Set(formattedData.value.map(d => d.year))].sort())
 
-// Get all countries
-const allCountries = computed(() => [...new Set(formattedData.value.map(d => d.country))])
-
 // Get unique countries
 const uniqueCountries = computed(() => [...new Set(formattedData.value.map(d => d.country))])
 
@@ -100,7 +97,7 @@ const paddedData = computed(() => {
 
   const result: FormattedData[] = []
 
-  for (const country of allCountries.value) {
+  for (const country of uniqueCountries.value) {
     const entries = countryDataMap.get(country) ?? []
     const byYear = Object.fromEntries(entries.map(e => [e.year, e]))
 

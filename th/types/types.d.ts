@@ -19,6 +19,8 @@ declare global {
 
   type EventDetailsType = Pick<EventInterface, "name" | "ename" | "category" | "surface" | "venues" | "dates" | "tfc" | "pm" | "currency" | "supervisors">
 
+  type CountryEventDetailsType = Pick<EventInterface, "name" | "surface" | "venues" | "dates" | "tfc" | "currency" | "supervisors">
+
   type SeedType = Pick<EntryInterface, "id" | "name" | "country" | "last" | "seed" | "rank" | "rank2" | "withdrew">
 
   type EntryInfoType = {
@@ -27,6 +29,8 @@ declare global {
   }
 
   type EntryTableType = Pick<EntryInterface, "id" | "name" | "country" | "last" | "rank" | "seed" | "status" | "withdrew">
+
+  type CountryEntryType = Pick<EntryInterface, "id" | "name" | "country" | "last" | "rank">
 
   type PlayerDetailsType = Pick<PlayerInterface, "ch" | "ch_date" | "wl" | "titles" | "pm" | "coaches" | "rh" | "bh" | "height" | "countries" | "age" | "dob" | "hof" | "dod" | "name">
 

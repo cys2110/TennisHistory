@@ -1,11 +1,10 @@
 <script setup lang="ts">
-definePageMeta({ name: "tournaments", layout: false })
+definePageMeta({ name: "tournaments" })
 useHead({ title: "Tournaments", templateParams: { subPage: null } })
-const toast = useToast()
 
 interface TournamentAPIResponse {
   count: number
-  tournaments: Pick<TournamentInterface, "id" | "name" | "years">[]
+  tournaments: (Pick<TournamentInterface, "id" | "name" | "years"> & { draw_type: DrawType })[]
 }
 
 const selectedLetter = ref<string>("All")
@@ -43,16 +42,7 @@ defineShortcuts({
 })
 
 // API call
-const { data, status } = await useFetch<TournamentAPIResponse>("/api/all-tournaments", {
-  query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * 25), limit: pageSize },
-  onResponseError: () => {
-    toast.add({
-      title: "Error fetching tournaments",
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data, status } = await useFetch<TournamentAPIResponse>("/api/all-tournaments", { query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * 25), limit: pageSize } })
 
 // Breadcrumbs
 const items = computed(() => [
@@ -88,10 +78,9 @@ const items = computed(() => [
           :key="tournament.id"
           :title="tournament.name"
           :description="tournament.years"
-          :to="{ name: 'tournament', params: { name: encodeName(tournament.name), id: tournament.id } }"
+          :to="{ name: COUNTRY_DRAWS.includes(tournament.id) ? 'country-tournament' : 'tournament', params: { name: encodeName(tournament.name), id: tournament.id } }"
           highlight
           :ui="{ container: 'justify-center items-center text-center' }"
-          prefetch-on="interaction"
         />
       </u-page-grid>
       <error-message
@@ -99,6 +88,7 @@ const items = computed(() => [
         :icon="ICONS.noTournament"
         title="No tournaments found"
         :status
+        error="Error fetching tournaments"
       />
       <pagination-component
         v-if="data && data.count > 0"

@@ -39,7 +39,7 @@ const groups = computed(() => [
         />
       </template>
     </u-dashboard-sidebar>
-    <u-dashboard-panel>
+    <u-dashboard-panel class="min-h-screen">
       <template #header>
         <u-dashboard-navbar>
           <template #leading>

@@ -43,6 +43,8 @@ export const CHART_COLOURS = {
 
 export const CATEGORY_COLOURS = Object.values(CHART_COLOURS)
 
+export const COUNTRY_DRAWS = ["8888", "615", "9900"]
+
 export const CURRENCIES: Record<CurrencyType, string> = {
   AUD: "A$",
   EUR: "€",

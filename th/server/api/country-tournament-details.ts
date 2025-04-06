@@ -9,8 +9,8 @@ export default defineEventHandler(async query => {
       MATCH (x:Tie)-[:TIE_OF]->(r:Round {round: 'Final'})-[:ROUND_OF]->(e)
       WITH y, e, t, x, b, a
         ORDER BY y.id
-        MATCH (c1:Country {alpha2: x.c1})
-        MATCH (c2:Country {alpha2: x.c2})
+        MATCH (c1:Country {id: x.c1})
+        MATCH (c2:Country {id: x.c2})
       RETURN DISTINCT {
         eid: toString(e.id),
         year: toString(y.id),
@@ -20,7 +20,7 @@ export default defineEventHandler(async query => {
       } AS event, t.website AS website, CASE
         WHEN a IS NULL THEN toString(b.id) || ' — present'
         WHEN b.id = a.id THEN toString(b.id)
-        ELSE toString(e.id) || ' — ' || toString(b.id)
+        ELSE toString(b.id) || ' — ' || toString(a.id)
       END AS years
     `,
     { id: Number(tid) }

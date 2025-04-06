@@ -15,7 +15,7 @@ interface APIResponse {
   currency: CurrencyType
   yoy: string
 }
-defineProps<{ pm: APIResponse[] }>()
+const { pm } = defineProps<{ pm: APIResponse[] }>()
 
 const columns: TableColumn<APIResponse>[] = [
   {
@@ -38,10 +38,14 @@ const columns: TableColumn<APIResponse>[] = [
   { accessorFn: row => row.SF.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Semi-final" },
   { accessorFn: row => row.QF.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Quarter-final" },
   { accessorFn: row => row.R16.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Round of 16" },
-  { accessorFn: row => row.R32.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Round of 32" },
-  { accessorFn: row => (row.R64 ? row.R64.toLocaleString("en-US", { style: "currency", currency: row.currency }) : "—"), header: "Round of 64" },
-  { accessorFn: row => (row.R128 ? row.R128.toLocaleString("en-US", { style: "currency", currency: row.currency }) : "—"), header: "Round of 128" }
+  { accessorFn: row => row.R32.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Round of 32" }
 ]
+if (pm[0].R64) {
+  columns.push({ accessorFn: row => (row.R64 ? row.R64.toLocaleString("en-US", { style: "currency", currency: row.currency }) : "—"), header: "Round of 64" })
+}
+if (pm[0].R128) {
+  columns.push({ accessorFn: row => (row.R128 ? row.R128.toLocaleString("en-US", { style: "currency", currency: row.currency }) : "—"), header: "Round of 128" })
+}
 </script>
 
 <template>
