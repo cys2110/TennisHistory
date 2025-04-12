@@ -1,7 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ name: "results-archive" })
 useHead({ title: "Results Archive", templateParams: { subPage: null } })
-const toast = useToast()
 
 // Set select values - default year to current year and others to all
 const year = useRouteQuery("year", new Date().getFullYear().toString())
@@ -28,16 +27,7 @@ defineShortcuts({
 })
 
 // API call
-const { data: events, status } = await useFetch<EventCardType[]>("/api/archive-tournaments", {
-  query: { surfaces, months, categories, year },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching tournaments for ${year.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: events, status } = await useFetch<EventCardType[]>("/api/archive-tournaments", { query: { surfaces, months, categories, year } })
 
 // Breadcrumbs
 const items = [
@@ -47,11 +37,7 @@ const items = [
 
 // Anchor links
 const links = computed(() => {
-  if (events.value)
-    return events.value.map(event => ({
-      to: "#event-" + event.eid,
-      label: event.name
-    }))
+  if (events.value) return events.value.map(event => ({ to: "#event-" + event.eid, label: event.name }))
 })
 </script>
 
@@ -76,10 +62,12 @@ const links = computed(() => {
 
       <!--Select menus-->
       <template #toolbar>
-        <years-all-select v-model="year" />
-        <month-select v-model="months" />
-        <category-select v-model="categories" />
-        <surface-select v-model="surfaces" />
+        <ClientOnly>
+          <years-all-select v-model="year" />
+          <month-select v-model="months" />
+          <category-select v-model="categories" />
+          <surface-select v-model="surfaces" />
+        </ClientOnly>
       </template>
 
       <!--Event cards-->
@@ -89,9 +77,10 @@ const links = computed(() => {
       />
       <error-message
         v-else
-        title="No upcoming tournaments"
+        :title="`No tournaments in ${year}`"
         :icon="ICONS.noCalendar"
         :status
+        :error="`Error fetching tournaments for ${year}`"
       />
     </nuxt-layout>
   </div>

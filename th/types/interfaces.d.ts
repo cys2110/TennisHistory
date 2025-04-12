@@ -30,7 +30,6 @@ declare global {
     eid: string
     ename: string | null
     incomplete: IncompleteType | null
-    locations: VenueInterface[]
     loser: Pick<PlayerType, "id" | "name" | "country"> | null
     matches: Pick<MatchInterface, "country" | "id" | "incomplete" | "mid" | "name" | "player_incomplete" | "rank" | "round" | "sets" | "seed" | "status" | "tbs" | "winner">[]
     name: string

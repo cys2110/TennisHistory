@@ -23,7 +23,7 @@ const items = computed(() => [
   { label: "Tournaments", to: { name: "tournaments" }, icon: ICONS.tournament },
   { label: name.value, to: { name: "tournament", params: { name: paramName.value, id: id.value } } },
   { label: year.value, to: { name: "event", params: { name: paramName.value, id: id.value, year: year.value, eid: eid.value } } },
-  { label: currentPage.value?.label ?? "", icon: currentPage.value?.icon }
+  { label: currentPage.value?.label ?? "", icon: currentPage.value?.icon, slot: "page" }
 ])
 </script>
 
@@ -31,7 +31,15 @@ const items = computed(() => [
   <div>
     <default-layout>
       <template #title>
-        <u-breadcrumb :items />
+        <u-breadcrumb :items>
+          <template #page-leading="{ item }">
+            <u-icon
+              v-if="item.icon === ICONS.draw"
+              :name="item.icon"
+              class="rotate-90 text-lg"
+            />
+          </template>
+        </u-breadcrumb>
       </template>
       <template
         #trailing

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useVueFlow } from "@vue-flow/core"
 definePageMeta({ name: "draw" })
-const toast = useToast()
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 const { fitView } = useVueFlow()
@@ -23,13 +22,6 @@ const { data: nodes, status } = await useFetch("/api/event-draw", {
         },
         type: "draw-card"
       }
-    })
-  },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching draw for ${name.value} ${year.value}`,
-      icon: ICONS.error,
-      color: "error"
     })
   }
 })
@@ -82,8 +74,9 @@ async function layoutGraph() {
     <error-message
       v-else
       :icon="ICONS.error"
-      title="No draw available"
+      :title="`No draw available for ${name} ${year}`"
       :status
+      :error="`Error fetching draw for ${name} ${year}`"
     />
   </event-wrapper>
 </template>

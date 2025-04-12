@@ -2,13 +2,15 @@
 definePageMeta({ name: "years" })
 const toast = useToast()
 const id = useRouteQuery<string>("year", new Date().getFullYear().toString())
-useHead({ title: id.value, templateParams: { subPage: "Years" } })
+useHead({ title: () => id.value, templateParams: { subPage: "Years" } })
 
 interface YearAPIResponse {
   established_tournaments: Pick<TournamentInterface, "id" | "name">[]
   abolished_tournaments: Pick<TournamentInterface, "id" | "name">[]
   pro_players: Pick<PlayerInterface, "id" | "name" | "country">[]
   retired_players: Pick<PlayerInterface, "id" | "name" | "country">[]
+  born_players: Pick<PlayerInterface, "id" | "name" | "country">[]
+  died_players: Pick<PlayerInterface, "id" | "name" | "country">[]
 }
 
 const { data: year, status } = await useFetch<YearAPIResponse>("/api/year-details", {
@@ -54,14 +56,21 @@ const items = [
             :trailing-icon="ICONS.chevronDown"
           />
           <template #content>
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2 max-h-100 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent scrollbar-thumb-rounded-full">
               <tournament-link
+                v-if="year.established_tournaments.length > 0"
                 v-for="tournament in year.established_tournaments"
                 :key="tournament.id"
                 :name="tournament.name"
                 :id="tournament.id"
                 class="text-sm w-fit"
               />
+              <span
+                v-else
+                class="text-sm text-center"
+              >
+                No tournaments established in {{ id }}
+              </span>
             </div>
           </template>
         </u-collapsible>
@@ -76,14 +85,21 @@ const items = [
             :trailing-icon="ICONS.chevronDown"
           />
           <template #content>
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2 max-h-100 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent scrollbar-thumb-rounded-full">
               <tournament-link
+                v-if="year.abolished_tournaments.length > 0"
                 v-for="tournament in year.abolished_tournaments"
                 :key="tournament.id"
                 :name="tournament.name"
                 :id="tournament.id"
                 class="text-sm w-fit"
               />
+              <span
+                v-else
+                class="text-sm text-center"
+              >
+                No tournaments abolished in {{ id }}
+              </span>
             </div>
           </template>
         </u-collapsible>
@@ -98,12 +114,19 @@ const items = [
             :trailing-icon="ICONS.chevronDown"
           />
           <template #content>
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2 max-h-100 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent scrollbar-thumb-rounded-full">
               <player-avatar
+                v-if="year.pro_players.length > 0"
                 v-for="player in year.pro_players"
                 :key="player.id"
                 :player
               />
+              <span
+                v-else
+                class="text-sm text-center"
+              >
+                No players who turned pro in {{ id }}
+              </span>
             </div>
           </template>
         </u-collapsible>
@@ -118,12 +141,73 @@ const items = [
             :trailing-icon="ICONS.chevronDown"
           />
           <template #content>
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2 max-h-100 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent scrollbar-thumb-rounded-full">
               <player-avatar
+                v-if="year.retired_players.length > 0"
                 v-for="player in year.retired_players"
                 :key="player.id"
                 :player
               />
+              <span
+                v-else
+                class="text-sm text-center"
+              >
+                No players who retired in {{ id }}
+              </span>
+            </div>
+          </template>
+        </u-collapsible>
+
+        <u-collapsible v-if="year.born_players">
+          <u-button
+            class="group my-2"
+            label="Players who were born"
+            color="neutral"
+            :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
+            block
+            :trailing-icon="ICONS.chevronDown"
+          />
+          <template #content>
+            <div class="flex flex-col gap-2 max-h-100 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent scrollbar-thumb-rounded-full">
+              <player-avatar
+                v-if="year.born_players.length > 0"
+                v-for="player in year.born_players"
+                :key="player.id"
+                :player
+              />
+              <span
+                v-else
+                class="text-sm text-center"
+              >
+                No players born in {{ id }}
+              </span>
+            </div>
+          </template>
+        </u-collapsible>
+
+        <u-collapsible v-if="year.died_players">
+          <u-button
+            class="group my-2"
+            label="Players who died"
+            color="neutral"
+            :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
+            block
+            :trailing-icon="ICONS.chevronDown"
+          />
+          <template #content>
+            <div class="flex flex-col gap-2 max-h-100 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent scrollbar-thumb-rounded-full">
+              <player-avatar
+                v-if="year.died_players.length > 0"
+                v-for="player in year.died_players"
+                :key="player.id"
+                :player
+              />
+              <span
+                v-else
+                class="text-sm text-center"
+              >
+                No players who died in {{ id }}
+              </span>
             </div>
           </template>
         </u-collapsible>
@@ -133,7 +217,8 @@ const items = [
         v-else
         :title="`No details found for ${id}`"
         :icon="ICONS.noCalendar"
-        :status
+        :status="status"
+        :error="`Error fetching year details for ${id}`"
       />
     </nuxt-layout>
   </div>

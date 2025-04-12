@@ -55,7 +55,6 @@ const option = ref({
 
 <template>
   <v-chart
-    ref="chartRef"
     class="min-h-96 w-full my-auto"
     :option
     :autoresize="true"

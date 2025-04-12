@@ -7,9 +7,9 @@ declare global {
 
   type StatusType = "Q" | "WC" | "SE" | "PR" | "LL" | "AL"
 
-  type RoundType = "Win" | "Final" | "Semifinals" | "Quarterfinals" | "Round of 16" | "Round of 32" | "Round of 64" | "Round of 128"
+  type RoundType = "Win" | "Final" | "Semifinals" | "Quarterfinals" | "Round of 16" | "Round of 32" | "Round of 64" | "Round of 128" | "Group Stages" | "Round robin"
 
-  type EventCardType = Pick<EventInterface, "category" | "dates" | "draw_type" | "eid" | "ename" | "locations" | "name" | "start" | "surface" | "tid" | "year">
+  type EventCardType = Pick<EventInterface, "category" | "dates" | "draw_type" | "eid" | "ename" | "venues" | "name" | "start" | "surface" | "tid" | "year">
 
   type TournamentEventType = Pick<EventInterface, "eid" | "year" | "winner" | "loser" | "sets" | "tbs" | "incomplete" | "draw_type">
 

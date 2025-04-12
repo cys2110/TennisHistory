@@ -7,7 +7,6 @@ const p2Name = computed(() => decodeName(p2ParamName.value))
 const p1Id = useRouteParams<string>("p1Id")
 const p2Id = useRouteParams<string>("p2Id")
 useHead({ title: `${p1Name.value} v. ${p2Name.value}`, templateParams: { subPage: "H2H" } })
-const toast = useToast()
 
 interface H2HCountry {
   id: string
@@ -16,16 +15,7 @@ interface H2HCountry {
 }
 
 // API call
-const { data: h2h } = await useFetch<{ p1: H2HCountry; p2: H2HCountry }>("/api/h2h-countries", {
-  query: { p1Id, p2Id },
-  onResponseError: () => {
-    toast.add({
-      title: "Error",
-      description: `Failed to fetch head to head between ${p1Name.value} and ${p2Name.value}`,
-      icon: ICONS.error
-    })
-  }
-})
+const { data: h2h, status } = await useFetch<{ p1: H2HCountry; p2: H2HCountry }>("/api/h2h-countries", { query: { p1Id, p2Id } })
 
 // Breadcrumbs
 const items = [
@@ -115,6 +105,13 @@ const links = computed(() => [
         v-if="h2h"
         :c1="h2h.p1"
         :c2="h2h.p2"
+      />
+      <error-message
+        v-else
+        :icon="ICONS.noH2H"
+        :title="`Error fetching head to head between ${p1Name} and ${p2Name}`"
+        :status
+        :error="`Error fetching head to head between ${p1Name} and ${p2Name}`"
       />
     </nuxt-layout>
   </div>

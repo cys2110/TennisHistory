@@ -29,7 +29,7 @@ export default defineNuxtConfig({
     presets: [
       {
         from: "@vueuse/core",
-        imports: ["breakpointsTailwind", "useBreakpoints", "watchArray", "whenever", "useCssVar"]
+        imports: ["breakpointsTailwind", "useBreakpoints", "watchArray", "useVirtualList", "useCssVar"]
       },
       {
         from: "@vueuse/router",

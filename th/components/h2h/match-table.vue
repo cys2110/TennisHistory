@@ -7,19 +7,9 @@ const p1ParamName = useRouteParams<string>("p1Name")
 const p1Name = computed(() => decodeName(p1ParamName.value))
 const p2ParamName = useRouteParams<string>("p2Name")
 const p2Name = computed(() => decodeName(p2ParamName.value))
-const toast = useToast()
 
 // API call
-const { data: matches, status } = await useFetch<H2HMatchType[]>("/api/h2h-matches", {
-  query: { p1Id, p2Id },
-  onResponseError: () => {
-    toast.add({
-      title: "Error",
-      description: `Failed to fetch head to headmatches for ${p1Name.value} v. ${p2Name.value}`,
-      icon: ICONS.error
-    })
-  }
-})
+const { data: matches, status } = await useFetch<H2HMatchType[]>("/api/h2h-matches", { query: { p1Id, p2Id } })
 
 const columns: TableColumn<H2HMatchType>[] = [
   { accessorKey: "year", header: "Year" },
@@ -88,6 +78,7 @@ const columns: TableColumn<H2HMatchType>[] = [
       :title="`No matches found for ${p1Name} v. ${p2Name}`"
       :icon="ICONS.noInfo"
       :status
+      :error="`No matches found for ${p1Name} v. ${p2Name}`"
     />
   </dashboard-subpanel>
 </template>

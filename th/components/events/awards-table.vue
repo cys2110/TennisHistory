@@ -3,19 +3,9 @@ import type { TableColumn } from "@nuxt/ui"
 const { awards } = defineProps<{ awards: RoundInterface[] }>()
 
 const columns: TableColumn<RoundInterface>[] = [
-  {
-    accessorKey: "round",
-    header: "Round"
-  },
-  {
-    accessorKey: "points",
-    header: "Points",
-    cell: ({ row }) => row.getValue("points") ?? "—"
-  },
-  {
-    accessorFn: row => (row.currency && row.pm ? `${CURRENCIES[row.currency]}${row.pm}` : "—"),
-    header: "Prize Money"
-  }
+  { accessorKey: "round", header: "Round" },
+  { accessorKey: "points", header: "Points", cell: ({ row }) => row.getValue("points") ?? "—" },
+  { accessorFn: row => (row.currency && row.pm ? `${CURRENCIES[row.currency]}${row.pm}` : "—"), header: "Prize Money" }
 ]
 </script>
 

@@ -6,19 +6,9 @@ const p1ParamName = useRouteParams<string>("p1Name")
 const p2ParamName = useRouteParams<string>("p2Name")
 const p1Name = computed(() => decodeName(p1ParamName.value))
 const p2Name = computed(() => decodeName(p2ParamName.value))
-const toast = useToast()
 
 // API call
-const { data: h2h, status } = await useFetch<{ p1: H2HPlayerInterface; p2: H2HPlayerInterface; p1Wins: number; p2Wins: number }>("/api/h2h", {
-  query: { p1Id, p2Id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching player details for ${p1Name.value} v. ${p2Name.value}`,
-      description: "Please try again later",
-      color: "error"
-    })
-  }
-})
+const { data: h2h, status } = await useFetch<{ p1: H2HPlayerInterface; p2: H2HPlayerInterface; p1Wins: number; p2Wins: number }>("/api/h2h", { query: { p1Id, p2Id } })
 </script>
 
 <template>
@@ -55,5 +45,6 @@ const { data: h2h, status } = await useFetch<{ p1: H2HPlayerInterface; p2: H2HPl
     :title="`No head to head found for ${p1Name} v. ${p2Name}`"
     :icon="ICONS.noH2H"
     :status
+    :error="`No head to head found for ${p1Name} v. ${p2Name}`"
   />
 </template>

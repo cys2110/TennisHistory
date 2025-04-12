@@ -1,7 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ name: "upcoming-tournaments" })
 useHead({ title: "Upcoming Tournaments", templateParams: { subPage: null } })
-const toast = useToast()
 
 // Set select values - default to all
 const months = ref<(keyof typeof MonthsEnum)[] | undefined>()
@@ -27,15 +26,7 @@ defineShortcuts({
 })
 
 // API call
-const { data: events, status } = await useFetch<EventCardType[]>("/api/upcoming-tournaments", {
-  query: { surfaces, months, categories },
-  onResponseError: () =>
-    toast.add({
-      title: "Error fetching upcoming tournaments",
-      icon: ICONS.error,
-      color: "error"
-    })
-})
+const { data: events, status } = await useFetch<EventCardType[]>("/api/upcoming-tournaments", { query: { surfaces, months, categories } })
 
 // Breadcrumbs
 const items = [
@@ -87,6 +78,7 @@ const links = computed(() => {
         title="No upcoming tournaments"
         :icon="ICONS.noCalendar"
         :status
+        error="Error fetching upcoming tournaments"
       />
     </nuxt-layout>
   </div>

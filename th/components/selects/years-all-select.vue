@@ -8,16 +8,18 @@ const ALL_YEARS = Array.from({ length: new Date().getFullYear() - 1968 + 1 }, (_
 </script>
 
 <template>
-  <u-form-field
-    label="Year"
-    :size="lgAndUp ? 'md' : md ? 'sm' : 'xs'"
-  >
-    <u-select
-      v-model="modelValue"
-      :items="ALL_YEARS"
-      :icon="ICONS.year"
-      class="w-full"
-      placeholder="Select year"
-    />
-  </u-form-field>
+  <ClientOnly>
+    <u-form-field
+      label="Year"
+      :size="lgAndUp ? 'md' : md ? 'sm' : 'xs'"
+    >
+      <u-select
+        v-model="modelValue"
+        :items="ALL_YEARS"
+        :icon="ICONS.year"
+        class="w-full"
+        placeholder="Select year"
+      />
+    </u-form-field>
+  </ClientOnly>
 </template>

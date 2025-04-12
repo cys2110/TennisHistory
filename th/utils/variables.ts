@@ -186,7 +186,9 @@ export const SHORT_ROUNDS: Record<RoundType, string> = {
   "Round of 16": "R16",
   "Round of 32": "R32",
   "Round of 64": "R64",
-  "Round of 128": "R128"
+  "Round of 128": "R128",
+  "Group Stages": "G",
+  "Round robin": "RR"
 }
 
 export const STATUSES: Record<StatusType, { longName: string; class: string }> = {

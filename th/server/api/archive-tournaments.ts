@@ -28,7 +28,7 @@ export default defineEventHandler(async query => {
       OPTIONAL MATCH (e)-[:TOOK_PLACE_IN]->(v:Venue)-[:LOCATED_IN]->(c:Country)
       WITH y, e, t, s, v, c
         ORDER BY e.start_date
-      WITH y, e, t, s, COLLECT({name: v.name, city: v.city, country: {id: c.id, name: c.name, alpha2: c.alpha2}}) AS venues
+      WITH y, e, t, s, COLLECT({id: v.id, name: v.name, city: v.city, country: {id: c.id, name: c.name, alpha2: c.alpha2}}) AS venues
       RETURN {
         year: toString(y.id),
         surface: s.surface,
@@ -37,7 +37,7 @@ export default defineEventHandler(async query => {
         name: t.name,
         ename: e.sponsor_name,
         category: e.category,
-        locations: venues,
+        venues: venues,
         start: apoc.temporal.format(e.start_date, 'yyyy-MM-dd'),
         dates: CASE
           WHEN e.start_date.year <> e.end_date.year THEN apoc.temporal.format(e.start_date, 'dd MMMM yyyy') || ' - ' || apoc.temporal.format(e.end_date, 'dd MMMM yyyy')
