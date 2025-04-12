@@ -1,6 +1,5 @@
 <script setup lang="ts">
 definePageMeta({ name: "years" })
-const toast = useToast()
 const id = useRouteQuery<string>("year", new Date().getFullYear().toString())
 useHead({ title: () => id.value, templateParams: { subPage: "Years" } })
 
@@ -13,20 +12,12 @@ interface YearAPIResponse {
   died_players: Pick<PlayerInterface, "id" | "name" | "country">[]
 }
 
-const { data: year, status } = await useFetch<YearAPIResponse>("/api/year-details", {
-  query: { id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching year details for ${id.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: year, status } = await useFetch<YearAPIResponse>("/api/year-details", { query: { id } })
 
 // Breadcrumbs
 const items = [
   { label: "Home", to: { name: "home" }, icon: ICONS.home },
+  { label: "Years", icon: ICONS.calendar },
   { label: id.value, icon: ICONS.year }
 ]
 </script>

@@ -1,7 +1,9 @@
 <script setup lang="ts">
+// [FUTURE: Add coach's players' stats]
 definePageMeta({ name: "coach" })
-const toast = useToast()
 const id = useRouteParams<string>("id")
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
 
 interface CoachAPIResponse {
   labels: string[]
@@ -10,21 +12,16 @@ interface CoachAPIResponse {
 }
 
 // API call
-const { data: coach, status } = await useFetch<CoachAPIResponse>("/api/coach-details", {
-  query: { id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching coach details`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: coach, status } = await useFetch<CoachAPIResponse>("/api/coach-details", { query: { id } })
 
-useHead({ title: coach.value?.name, templateParams: { subPage: "Coaches" } })
+useHead({ title: coach.value?.name ?? decodeName(id.value), templateParams: { subPage: "Coaches" } })
 
 // Breadcrumbs
-const items = computed(() => [{ label: "Home", to: { name: "home" }, icon: ICONS.home }, { label: "Coaches", to: { name: "coaches" }, icon: ICONS.coach }, { label: coach.value?.name }])
+const items = computed(() => [
+  { label: "Home", to: { name: "home" }, icon: ICONS.home },
+  { label: "Coaches", to: { name: "coaches" }, icon: ICONS.coach },
+  { slot: "coach", label: coach.value?.name }
+])
 
 // Anchor links
 const links = computed(() => {
@@ -40,11 +37,36 @@ const links = computed(() => {
   <div>
     <nuxt-layout name="default">
       <template #title>
-        <u-breadcrumb :items="items" />
+        <u-breadcrumb :items="items">
+          <template #coach-leading>
+            <u-avatar
+              v-if="coach && coach.labels.includes('Player')"
+              :src="`https://www.atptour.com/-/media/alias/player-headshot/${id}`"
+              :to="{ name: 'player', params: { id, name: encodeName(coach.name) } }"
+              :icon="ICONS.coach"
+              class="border border-neutral-400"
+              size="sm"
+            />
+          </template>
+        </u-breadcrumb>
       </template>
 
-      <!--TOC-->
       <template #right>
+        <ClientOnly>
+          <u-button
+            v-if="coach && coach.labels.includes('Player')"
+            :icon="ICONS.player"
+            label="Player Profile"
+            :to="{ name: 'player', params: { id, name: encodeName(coach.name) } }"
+            :size="mdAndUp ? 'md' : 'sm'"
+          />
+        </ClientOnly>
+      </template>
+
+      <template #toolbar>
+        <div class="text-(--ui-text-muted) text-sm font-semibold">Players coached by {{ coach?.name }}</div>
+
+        <!--TOC-->
         <u-dropdown-menu :items="links">
           <u-button
             :icon="ICONS.toc"
@@ -55,14 +77,7 @@ const links = computed(() => {
         </u-dropdown-menu>
       </template>
 
-      <template #toolbar>
-        <div class="text-(--ui-text-muted) text-sm font-semibold">Players coached by {{ coach?.name }}</div>
-      </template>
-
-      <u-page-grid
-        v-if="coach && coach.players.length > 0"
-        class="mt-10"
-      >
+      <u-page-grid v-if="coach && coach.players.length > 0">
         <player-card
           v-for="player in coach.players"
           :key="player.id"
@@ -75,7 +90,8 @@ const links = computed(() => {
         v-else
         :icon="ICONS.noPeople"
         :title="`No players coached by ${coach?.name}`"
-        :status
+        :status="status"
+        :error="`Error fetching details about ${decodeName(id)}`"
       />
     </nuxt-layout>
   </div>
