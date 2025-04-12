@@ -5,7 +5,6 @@ const mdAndUp = breakpoints.greaterOrEqual("md")
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const toast = useToast()
 const checked = ref(mdAndUp.value ? false : true)
 
 const categoryColours = {
@@ -17,16 +16,7 @@ const categoryColours = {
 }
 
 // API call
-const { data: index, status } = await useFetch<WLIndexInterface[]>("/api/wl-index", {
-  query: { id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching ${name}'s details`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: index, status } = await useFetch<WLIndexInterface[]>("/api/wl-index", { query: { id } })
 </script>
 
 <template>
@@ -73,7 +63,8 @@ const { data: index, status } = await useFetch<WLIndexInterface[]>("/api/wl-inde
           v-else
           :icon="ICONS.noChart"
           :title="`No win-loss index available for ${name}`"
-          :status
+          :status="status"
+          :error="`Error fetching ${name}'s win-loss index`"
         />
       </nuxt-layout>
     </ClientOnly>

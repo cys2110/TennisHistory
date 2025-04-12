@@ -1,21 +1,12 @@
 <script setup lang="ts">
 definePageMeta({ name: "titles-and-finals" })
-const toast = useToast()
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 const checked = ref(false)
+
 // API call
-const { data, status } = await useFetch<TitlesAndFinalsType>("/api/titles-and-finals", {
-  query: { id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching ${name.value}'s titles and finals`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data, status } = await useFetch<TitlesAndFinalsType>("/api/titles-and-finals", { query: { id } })
 </script>
 
 <template>
@@ -41,7 +32,8 @@ const { data, status } = await useFetch<TitlesAndFinalsType>("/api/titles-and-fi
         v-else
         :icon="ICONS.noTournament"
         :title="checked ? `${name} has not played any finals` : `${name} has not won any titles`"
-        :status
+        :status="status"
+        :error="`Error fetching ${name}'s titles and finals`"
       />
     </nuxt-layout>
   </div>
