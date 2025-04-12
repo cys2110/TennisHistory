@@ -56,7 +56,7 @@ declare global {
     | "player_incomplete"
     | "matches"
     | "surface"
-    | "locations"
+    | "venues"
     | "tid"
   >
 

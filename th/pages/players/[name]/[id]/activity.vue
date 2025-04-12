@@ -1,28 +1,18 @@
 <script setup lang="ts">
 definePageMeta({ name: "activity" })
-const toast = useToast()
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 const id = useRouteParams<string>("id")
 const playerYears = useState<number[]>("player-years")
 const currentYear = new Date().getFullYear()
-const year = useRouteQuery<number>("year", playerYears.value && playerYears.value[playerYears.value.length - 1] === currentYear ? playerYears.value[playerYears.value.length - 1] : currentYear)
+const year = useRouteQuery<number>("year", playerYears.value ? playerYears.value[playerYears.value.length - 1] : currentYear)
 
 // API call
-const { data: yearActivity, status } = await useFetch<PlayerActivityAPIType>("/api/player-activity", {
-  query: { id, year },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching ${name}'s ${year.value} activity`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: yearActivity, status } = await useFetch<PlayerActivityAPIType>("/api/player-activity", { query: { id, year } })
 
 // Anchor links
 const links = computed(() => {
-  if (yearActivity.value && yearActivity.value.activity.length)
+  if (yearActivity.value)
     return yearActivity.value.activity.map(event => ({
       to: `#event-${event.eid}`,
       label: event.name
@@ -79,7 +69,8 @@ const links = computed(() => {
         v-else
         :icon="ICONS.noCalendar"
         :title="`${name} has no activity for ${year}`"
-        :status
+        :status="status"
+        :error="`Error fetching ${name}'s ${year} activity`"
       />
     </nuxt-layout>
   </div>

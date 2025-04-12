@@ -44,7 +44,7 @@ export default {
   success: "line-md:confirm-circle-twotone",
   supervisor: "solar:clipboard-bold-duotone",
   table: "material-symbols-light:table-view-outline-rounded",
-  toc: "line-md:list",
+  toc: "line-md:list-indented",
   tournament: "ph:trophy-duotone",
   treeDiagram: "icon-park-outline:tree-diagram",
   umpire: "game-icons:whistle",
