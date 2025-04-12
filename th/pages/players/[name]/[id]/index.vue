@@ -39,10 +39,10 @@ const { data: player } = await useFetch<Pick<PlayerInterface, "gladiator" | "cou
           v-else
           :src="`https://www.atptour.com/-/media/alias/player-headshot/${id}`"
           :alt="name"
-          class="border border-neutral-500 rounded-full"
+          class="border border-neutral-500 rounded-full max-h-96 max-w-96 mx-auto"
         />
       </u-page-section>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <player-details />
         <major-results />
       </div>

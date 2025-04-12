@@ -3,13 +3,16 @@ export default defineEventHandler(async query => {
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (:Player {id: $id})-[:ENTERED]->(:Entry)-[:SCORED]->(:Score)-[:SCORED]->(:Match)-[:PLAYED]->(:Round)-[:ROUND_OF]->(:Event)-[:IN_YEAR]->(y:Year)
-      WITH y
+      MATCH (p:Player {id: $id})-[:ENTERED]->(:Entry)-[:SCORED]->(:Score)-[:SCORED]->(:Match)-[:PLAYED]->(:Round)-[:ROUND_OF]->(:Event)-[:IN_YEAR]->(y:Year)
+      WITH y, p
       ORDER BY y.id
-      RETURN DISTINCT toString(y.id) AS year
+      RETURN COLLECT(DISTINCT toString(y.id)) AS years, labels(p) AS labels
     `,
     { id }
   )
 
-  return records.map(record => Number(record.get("year")))
+  const years = records[0].get("years").map((y: string) => Number(y))
+  const labels = records.map(record => record.get("labels"))
+
+  return { years, labels }
 })

@@ -38,7 +38,7 @@ export default defineEventHandler(async query => {
       }
       RETURN
         toString(p.ch) AS ch,
-        apoc.temporal.format(p.ch_date, 'dd MMMM YYYY') AS ch_date,
+        CASE WHEN p.ch_date IS NOT NULL THEN apoc.temporal.format(p.ch_date, 'dd MMMM YYYY') ELSE NULL END AS ch_date,
         toString(win) || '-' || toString(loss) AS wl,
         toString(titles) AS titles,
         apoc.number.format(p.pm, '#,###') AS pm,

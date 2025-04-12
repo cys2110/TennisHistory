@@ -2,28 +2,18 @@
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const toast = useToast()
 
 // API call
-const { data: player, status } = await useFetch<PlayerDetailsType>("/api/player-details", {
-  query: { id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching ${name.value}'s details`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: player, status } = await useFetch<PlayerDetailsType>("/api/player-details", { query: { id } })
 
 const playerDetails = computed(() => {
   if (player.value)
     return [
-      { title: "Career High", value: player.value.ch ? `${player.value.ch} (${player.value.ch_date})` : "—" },
+      { title: "Career High", value: player.value.ch ?? "—", description: player.value.ch_date ?? undefined },
       { title: "Win-Loss", value: player.value.wl },
       { title: "Titles", value: player.value.titles },
       { title: "Prize Money", value: `$${player.value.pm}` },
-      { title: "Age", value: player.value.age ? `${player.value.age} years (${player.value.dod ? `${player.value.dob} - ${player.value.dod}` : player.value.dob})` : "Unknown" },
+      { title: "Age", value: player.value.age ? `${player.value.age} years` : "Unknown", description: player.value.dod ? `${player.value.dob} - ${player.value.dod}` : player.value.dob ?? undefined },
       { title: "Height", value: player.value.height ? `${player.value.height} cm (${convertToFt(player.value.height)})` : "Unknown" },
       { title: "Plays", value: player.value.rh ? handedness(player.value.rh) : "Unknown" },
       { title: "Backhand", value: player.value.bh ? `${player.value.bh}-Handed` : "Unknown" },
@@ -33,10 +23,13 @@ const playerDetails = computed(() => {
 </script>
 
 <template>
-  <dashboard-subpanel title="Details">
+  <dashboard-subpanel
+    title="Details"
+    :icon="ICONS.overview"
+  >
     <u-page-columns
       v-if="player"
-      class="lg:columns-3 2xl:columns-3"
+      class="lg:columns-2 xl:columns-3 2xl:columns-3"
     >
       <u-page-card
         v-for="detail in playerDetails"
@@ -45,27 +38,36 @@ const playerDetails = computed(() => {
         :description="detail?.value"
         spotlight
         variant="outline"
-      />
+        :ui="{ footer: 'text-sm text-(--ui-text-dimmed) pt-2 pb-0 self-start mt-0' }"
+      >
+        <template
+          #footer
+          v-if="detail?.description"
+        >
+          {{ detail.description }}
+        </template>
+      </u-page-card>
       <u-page-card
         :title="player.coaches.length === 1 ? 'Coach' : 'Coaches'"
         spotlight
         variant="outline"
       >
         <template #description>
-          <template
+          <div
             v-if="player.coaches.length > 0"
             v-for="coach in player.coaches"
             :key="coach.id"
+            class="flex flex-col gap-1"
           >
             <u-link
               v-if="coach.labels.includes('Player')"
-              class="hover-link"
+              class="hover-link w-fit"
               :to="{ name: 'player', params: { name: encodeName(coach.name || ''), id: coach.id } }"
             >
               {{ coach.name }}
             </u-link>
             <template v-else>{{ coach.id }}</template>
-          </template>
+          </div>
           <template v-else>—</template>
         </template>
       </u-page-card>
@@ -94,6 +96,7 @@ const playerDetails = computed(() => {
       :icon="ICONS.noPlayer"
       :title="`No details found for ${name}`"
       :status
+      :error="`Error fetching details for ${name}`"
     />
   </dashboard-subpanel>
 </template>

@@ -4,7 +4,6 @@ const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 const route = useRoute()
-const toast = useToast()
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const mdAndUp = breakpoints.greaterOrEqual("md")
 
@@ -12,19 +11,10 @@ const currentPage = computed(() => PLAYER_PAGES.find(page => page.name === route
 useHead({ title: currentPage.value?.label ?? "", templateParams: { subPage: name.value } })
 
 // API call
-const { data: years } = await useFetch("/api/player-years", {
-  query: { id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching years active for ${name.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: years } = await useFetch<{ years: number[]; labels: string[][] }>("/api/player-years", { query: { id } })
 
 // Set state for other player components
-const playerYears = useState("player-years", () => years.value ?? [])
+const playerYears = useState("player-years", () => years.value?.years ?? [])
 
 // Breadcrumbs
 const items = computed(() => [
@@ -53,9 +43,16 @@ const items = computed(() => [
             :name="paramName"
             :id
           />
+          <u-button
+            v-if="mdAndUp && years && years.labels[0].includes('Coach')"
+            :icon="ICONS.coach"
+            label="Coach Profile"
+            :to="{ name: 'coach', params: { id } }"
+            size="xs"
+          />
           <u-dropdown-menu
-            v-else
-            :items="PLAYER_PAGES"
+            v-if="!mdAndUp"
+            :items="[...PLAYER_PAGES, { label: 'Coach Profile', icon: ICONS.coach, to: { name: 'coach', params: { id } } }]"
           >
             <u-button
               :icon="ICONS.layers"

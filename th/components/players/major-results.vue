@@ -2,26 +2,19 @@
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const toast = useToast()
 
 // API call
-const { data: results, status } = await useFetch("/api/major-results", {
-  query: { id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching ${name.value}'s best results`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: results, status } = await useFetch("/api/major-results", { query: { id } })
 </script>
 
 <template>
-  <dashboard-subpanel title="Best Results">
+  <dashboard-subpanel
+    title="Best Results"
+    :icon="ICONS.tournament"
+  >
     <u-page-columns
       v-if="results"
-      class="lg:columns-2 2xl:columns-2"
+      class="lg:columns-2 xl:columns-2 2xl:columns-2"
     >
       <u-page-card
         v-for="result in results"
@@ -57,7 +50,8 @@ const { data: results, status } = await useFetch("/api/major-results", {
       v-else
       :icon="ICONS.noTournament"
       :title="`No results found for ${name}`"
-      :status
+      :status="status"
+      :error="`Error fetching results for ${name}`"
     />
   </dashboard-subpanel>
 </template>
