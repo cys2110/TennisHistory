@@ -4,7 +4,7 @@ const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 
 // API call
-const { data: results, status } = await useFetch("/api/major-results", { query: { id } })
+const { data: results, status } = await useFetch<MajorResultsInterface[]>("/api/major-results", { query: { id } })
 </script>
 
 <template>
@@ -16,42 +16,27 @@ const { data: results, status } = await useFetch("/api/major-results", { query: 
       v-if="results"
       class="lg:columns-2 xl:columns-2 2xl:columns-2"
     >
-      <u-page-card
+      <major-results-card
         v-for="result in results"
         :key="result.tid"
-        :title="result.name"
-        spotlight
-        variant="outline"
-        :ui="{ description: 'flex flex-col gap-1' }"
-      >
-        <template #title>
-          <tournament-link
-            :name="result.name"
-            :id="result.tid"
-          />
-          — {{ result.round }}
-        </template>
-
-        <template #description>
-          <event-link
-            v-for="event in result.events"
-            :key="event.year"
-            :name="result.name"
-            :tid="result.tid"
-            :eid="event.eid"
-            :year="event.year"
-          >
-            {{ event.year }}
-          </event-link>
-        </template>
-      </u-page-card>
+        :result
+      />
+    </u-page-columns>
+    <u-page-columns
+      v-else-if="status === 'pending'"
+      class="lg:columns-2 xl:columns-2 2xl:columns-2"
+    >
+      <major-results-loading-card
+        v-for="_ in 5"
+        :key="_"
+      />
     </u-page-columns>
     <error-message
       v-else
-      :icon="ICONS.noTournament"
       :title="`No results found for ${name}`"
-      :status="status"
+      :status
       :error="`Error fetching results for ${name}`"
+      :icon="ICONS.noTournament"
     />
   </dashboard-subpanel>
 </template>

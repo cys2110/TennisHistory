@@ -28,10 +28,30 @@ const columns: TableColumn<H2HMatchType>[] = [
     class="2xl:w-3/4 mx-auto"
   >
     <u-table
-      v-if="matches"
-      :data="matches"
+      :data="matches || []"
       :columns
+      :loading="status === 'pending'"
     >
+      <template #empty>
+        <div
+          v-if="status === 'pending'"
+          class="flex flex-col gap-4"
+        >
+          <div
+            v-for="_ in 6"
+            :key="_"
+            class="flex gap-8"
+          >
+            <u-skeleton class="h-4 w-1/7 rounded-lg" />
+            <u-skeleton class="h-4 w-1/7 rounded-lg" />
+            <u-skeleton class="h-4 w-1/7 rounded-lg" />
+            <u-skeleton class="h-4 w-1/7 rounded-lg" />
+            <u-skeleton class="h-4 w-1/7 rounded-lg" />
+            <u-skeleton class="h-4 w-1/7 rounded-lg" />
+          </div>
+        </div>
+        <template v-else>No stats available</template>
+      </template>
       <template #year-cell="{ row }">
         <event-link
           :name="row.original.name"
@@ -56,6 +76,9 @@ const columns: TableColumn<H2HMatchType>[] = [
           :id="row.original.tid"
         />
       </template>
+      <template #surface-cell="{ row }">
+        <surface-link :surface="row.original.surface" />
+      </template>
       <template #score-cell="{ row }">
         <score-item
           :sets="row.original.sets"
@@ -74,11 +97,11 @@ const columns: TableColumn<H2HMatchType>[] = [
       </template>
     </u-table>
     <error-message
-      v-else
+      v-if="status === 'error'"
       :title="`No matches found for ${p1Name} v. ${p2Name}`"
       :icon="ICONS.noInfo"
       :status
-      :error="`No matches found for ${p1Name} v. ${p2Name}`"
+      :error="`Error fetching matches found for ${p1Name} v. ${p2Name}`"
     />
   </dashboard-subpanel>
 </template>

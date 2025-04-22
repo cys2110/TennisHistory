@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui"
-defineProps<{ entries: EntryTableType[] }>()
+defineProps<{ entries: EntryTableType[] | null; status: string }>()
 const UButton = resolveComponent("u-button")
 
 const columns: TableColumn<EntryTableType>[] = [
@@ -73,10 +73,30 @@ const columns: TableColumn<EntryTableType>[] = [
 
 <template>
   <u-table
-    :data="entries"
+    :data="entries || []"
     :columns
     class="w-fit mx-auto my-5"
+    :loading="status === 'pending'"
   >
+    <template #empty>
+      <div
+        v-if="status === 'pending'"
+        class="flex flex-col gap-4"
+      >
+        <div
+          v-for="_ in 6"
+          :key="_"
+          class="flex gap-8"
+        >
+          <u-skeleton
+            v-for="_ in 5"
+            :key="_"
+            class="h-4 w-1/2 rounded-lg"
+          />
+        </div>
+      </div>
+      <template v-else>No awards available</template>
+    </template>
     <template #last-cell="{ row }">
       <div class="flex items-center gap-2">
         <flag-icon :country="row.original.country" />

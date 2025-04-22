@@ -8,6 +8,6 @@ defineProps<{ stats: PlayerStatsInterface }>()
     :description="stats.value.toString()"
     spotlight
     variant="outline"
-    :ui="{ description: 'text-center', wrapper: 'items-center' }"
+    :ui="{ description: 'text-center text-3xl', wrapper: 'items-center', title: 'text-center' }"
   />
 </template>

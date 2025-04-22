@@ -1,5 +1,7 @@
 <script setup lang="ts">
-defineProps<{ checked: boolean }>()
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
+const checked = ref(false)
 </script>
 
 <template>
@@ -7,7 +9,16 @@ defineProps<{ checked: boolean }>()
     title="Countries by No. of Winners"
     :icon="ICONS.countries"
   >
-    <tournament-country-winners-table v-if="checked" />
-    <tournament-country-winners-chart v-else />
+    <template #right>
+      <u-switch
+        v-if="mdAndUp"
+        v-model="checked"
+        :label="checked ? 'Chart' : 'Table'"
+        :checked-icon="ICONS.lineChart"
+        :unchecked-icon="ICONS.table"
+      />
+    </template>
+    <tournament-country-winners-chart v-if="checked" />
+    <tournament-country-winners-table v-else />
   </dashboard-subpanel>
 </template>

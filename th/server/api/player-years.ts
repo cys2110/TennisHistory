@@ -11,8 +11,8 @@ export default defineEventHandler(async query => {
     { id }
   )
 
-  const years = records[0].get("years").map((y: string) => Number(y))
-  const labels = records.map(record => record.get("labels"))
+  const years = records[0].get("years")
+  const labels = records[0].get("labels")
 
   return { years, labels }
 })

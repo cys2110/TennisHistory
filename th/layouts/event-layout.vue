@@ -13,9 +13,7 @@ const currentPage = computed(() => EVENT_PAGES.find(page => page.name === route.
 useHead({ title: currentPage.value?.label ?? "", templateParams: { subPage: name.value } })
 
 // API call
-const { data: drawType } = await useFetch("/api/event-drawtype", {
-  query: { eid }
-})
+const { data: drawType } = await useFetch("/api/event-drawtype", { query: { eid } })
 
 // Breadcrumbs
 const items = computed(() => [
@@ -48,41 +46,27 @@ const items = computed(() => [
         <slot name="trailing" />
       </template>
       <template #right>
-        <ClientOnly>
-          <event-page-button
-            v-if="mdAndUp && drawType"
-            :name="paramName"
-            :id
-            :eid
-            :year
-            :draw-type="drawType"
+        <event-page-button
+          v-if="mdAndUp && drawType"
+          :name="paramName"
+          :id
+          :eid
+          :year
+          :draw-type="drawType"
+        />
+        <u-dropdown-menu
+          v-else
+          :items="EVENT_PAGES"
+        >
+          <u-button
+            :icon="ICONS.layers"
+            color="neutral"
+            variant="link"
+            size="xl"
           />
-          <u-dropdown-menu
-            v-else
-            :items="EVENT_PAGES"
-          >
-            <u-button
-              :icon="ICONS.layers"
-              color="neutral"
-              variant="link"
-              size="xl"
-            />
-          </u-dropdown-menu>
-        </ClientOnly>
+        </u-dropdown-menu>
       </template>
 
-      <template
-        #toolbar-left
-        v-if="$slots['toolbar-left']"
-      >
-        <slot name="toolbar-left" />
-      </template>
-      <template
-        #toolbar-right
-        v-if="$slots['toolbar-right']"
-      >
-        <slot name="toolbar-right" />
-      </template>
       <template
         #toolbar
         v-if="$slots['toolbar']"

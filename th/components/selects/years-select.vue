@@ -1,11 +1,11 @@
 <script setup lang="ts">
-defineProps<{ items: number[] }>()
+defineProps<{ items: string[] }>()
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const md = breakpoints.md
 const lgAndUp = breakpoints.greaterOrEqual("lg")
 
-const modelValue = defineModel<number[]>()
+const modelValue = defineModel<string[]>()
 </script>
 
 <template>

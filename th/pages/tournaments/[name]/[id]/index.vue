@@ -9,7 +9,6 @@ definePageMeta({
     }
   ]
 })
-const toast = useToast()
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const mdAndUp = breakpoints.greaterOrEqual("md")
 const xlAndUp = breakpoints.greaterOrEqual("xl")
@@ -23,19 +22,9 @@ const tabs = [
   { label: "Winners", value: "winners", icon: ICONS.tournament },
   { label: "By the Numbers", value: "numbers", icon: ICONS.stats }
 ]
-const checked = ref(false)
 
 // API call
-const { data: tournament, status } = await useFetch<Pick<TournamentInterface, "website" | "years"> & { events: TournamentEventType[] }>("/api/tournament-details", {
-  query: { tid },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching overview for ${name.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: tournament, status } = await useFetch<Pick<TournamentInterface, "website" | "years"> & { events: TournamentEventType[] }>("/api/tournament-details", { query: { tid } })
 
 // Breadcrumbs
 const items = computed(() => [{ label: "Home", to: { name: "home" }, icon: ICONS.home }, { label: "Tournaments", to: { name: "tournaments" }, icon: ICONS.tournament }, { label: name.value }])
@@ -93,49 +82,36 @@ const links = computed(() => {
       </template>
 
       <template #right>
-        <ClientOnly>
-          <u-button
-            v-if="tournament?.website"
-            :to="tournament.website"
-            target="_blank"
-            label="Website"
-            :icon="ICONS.website"
-            :size="lgAndUp ? 'md' : 'sm'"
-          />
-        </ClientOnly>
+        <u-button
+          v-if="tournament?.website"
+          :to="tournament.website"
+          target="_blank"
+          label="Website"
+          :icon="ICONS.website"
+          :size="lgAndUp ? 'md' : 'sm'"
+        />
       </template>
 
       <template #toolbar>
-        <ClientOnly>
-          <div class="flex flex-wrap items-center justify-between w-full gap-5 lg:gap-30 2xl:gap-50">
-            <div class="order-1">
-              <u-switch
-                v-if="mdAndUp && selectedTab === 'numbers'"
-                v-model="checked"
-                :checked-icon="ICONS.table"
-                :unchecked-icon="ICONS.areaChart"
-                :label="checked ? 'Table view' : 'Chart view'"
-              />
-            </div>
-            <u-tabs
-              v-model="selectedTab"
-              :items="tabs"
-              class="order-3 sm:order-2"
+        <div class="flex flex-wrap items-center justify-between w-full gap-5 lg:gap-30 2xl:gap-50">
+          <u-tabs
+            v-model="selectedTab"
+            :items="tabs"
+            class="order-last sm:order-first"
+            variant="link"
+            :size="xlAndUp ? 'md' : 'xs'"
+          />
+          <!--TOC-->
+          <u-dropdown-menu :items="links">
+            <u-button
+              :icon="ICONS.toc"
+              color="neutral"
               variant="link"
-              :size="xlAndUp ? 'md' : 'xs'"
+              size="xl"
+              class="order-first sm:order-last"
             />
-            <!--TOC-->
-            <u-dropdown-menu :items="links">
-              <u-button
-                :icon="ICONS.toc"
-                color="neutral"
-                variant="link"
-                size="xl"
-                class="order-2 sm:order-3"
-              />
-            </u-dropdown-menu>
-          </div>
-        </ClientOnly>
+          </u-dropdown-menu>
+        </div>
       </template>
 
       <div v-if="selectedTab === 'winners'">
@@ -143,17 +119,21 @@ const links = computed(() => {
           v-if="tournament && tournament.events.length > 0"
           :events="tournament?.events"
         />
+        <u-page-grid v-else-if="status === 'pending'">
+          <tournament-event-loading-card
+            v-for="_ in 10"
+            :key="_"
+          />
+        </u-page-grid>
         <error-message
           v-else-if="tournament"
           :icon="ICONS.noTournament"
           :title="`No events found for ${name}`"
           :status
+          :error="`Error fetching events for ${name}`"
         />
       </div>
-      <tournament-numbers
-        v-if="selectedTab === 'numbers'"
-        :checked
-      />
+      <tournament-numbers v-if="selectedTab === 'numbers'" />
     </nuxt-layout>
   </div>
 </template>

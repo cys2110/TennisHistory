@@ -1,6 +1,5 @@
 <script setup lang="ts">
 definePageMeta({ name: "country-tournament" })
-const toast = useToast()
 const tid = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
@@ -57,6 +56,14 @@ const links = computed(() => {
         v-if="tournament && tournament.events.length > 0"
         :events="tournament.events"
       />
+
+      <u-page-grid v-else-if="status === 'pending'">
+        <tournament-event-loading-card
+          v-for="_ in 5"
+          :key="_"
+        />
+      </u-page-grid>
+
       <error-message
         v-else
         :icon="ICONS.noTournament"

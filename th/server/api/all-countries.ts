@@ -6,14 +6,15 @@ export default defineEventHandler(async query => {
   }
   const { letter, skip, limit } = getQuery<QueryProps>(query)
 
+  // TODO: Remove c.id is not null
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (c:Country) WHERE $letter IS NULL OR c.name STARTS WITH $letter
-      WITH COLLECT(c) AS all, COUNT(c) AS count
-      UNWIND all AS c
+      MATCH (c:Country) WHERE ($letter IS NULL OR c.name STARTS WITH $letter) AND c.id IS NOT NULL
+      WITH c
       ORDER BY c.name
-      SKIP toInteger($skip)
-      LIMIT toInteger($limit)
+      WITH COLLECT(c) AS all, COUNT(c) AS count
+      WITH all[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS sliced, count
+      UNWIND CASE WHEN sliced = [] THEN [null] ELSE sliced END AS c
       RETURN toString(count) AS count, {id: c.id, name: c.name, alpha2: c.alpha2} AS country
     `,
     { letter: letter === "All" ? null : letter, skip, limit }

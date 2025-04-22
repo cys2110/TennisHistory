@@ -11,7 +11,7 @@ const { data: entries, status } = await useFetch<CountryEntryType[]>("/api/count
 const mappedCountries = computed(() => {
   if (!entries.value) return []
 
-  const countryMap = new Map<string, { country: Country; entries: CountryEntryType[] }>()
+  const countryMap = new Map<string, { country: CountryInterface; entries: CountryEntryType[] }>()
 
   for (const entry of entries.value) {
     const { id } = entry.country
@@ -38,9 +38,9 @@ const mappedCountries = computed(() => {
     <template #right>
       <u-switch
         v-model="checked"
-        :label="checked ? 'Table view' : 'Card view'"
-        :checked-icon="ICONS.table"
-        :unchecked-icon="ICONS.cards"
+        :label="checked ? 'Cards' : 'Table'"
+        :checked-icon="ICONS.cards"
+        :unchecked-icon="ICONS.table"
       />
     </template>
     <u-page-grid
@@ -50,14 +50,21 @@ const mappedCountries = computed(() => {
       <dashboard-subpanel
         v-for="country in mappedCountries"
         :key="country.country.id"
-        :title="country.country.name"
-        :icon="`flag:${country.country.alpha2}-4x3`"
       >
-        <country-entries-table
+        <template #title>
+          <div class="flex items-center gap-2">
+            <country-link
+              :country="country.country"
+              class="text-xl"
+            />
+            {{ country.country.name }}
+          </div>
+        </template>
+        <country-entries-grid
           v-if="checked"
           :entries="country.entries"
         />
-        <country-entries-grid
+        <country-entries-table
           v-else
           :entries="country.entries"
         />

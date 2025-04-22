@@ -1,11 +1,5 @@
 <script setup lang="ts">
-interface APIResponse {
-  finals: number
-  losses: number
-  player: Pick<PlayerInterface, "id" | "name" | "country">
-  wins: number
-}
-const { finalists } = defineProps<{ finalists: APIResponse[] }>()
+const { finalists } = defineProps<{ finalists: TournamentFinalistsInterface[] }>()
 const colorMode = useColorMode()
 const formattedData = computed(() =>
   finalists.map(finalist => ({
@@ -59,9 +53,10 @@ const option = ref({
 </script>
 
 <template>
-  <v-chart
-    class="min-h-150 w-full my-auto mt-10"
-    :option
-    :autoresize="true"
-  />
+  <div class="h-[600px] w-full my-auto mt-10">
+    <v-chart
+      :option
+      :autoresize="true"
+    />
+  </div>
 </template>

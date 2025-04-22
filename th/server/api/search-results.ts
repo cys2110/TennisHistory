@@ -31,7 +31,12 @@ export default defineEventHandler(async query => {
     { searchTerm }
   )
 
-  const results = records.map(record => record.toObject().results)
+  const resultsObject = records.map(record => record.toObject().results)
+  const results = resultsObject.map((result: any) => ({
+    ...result,
+    max_year: result.max_year ? Number(result.max_year) : null,
+    min_year: result.min_year ? Number(result.min_year) : null
+  }))
 
   // Get unique labels for tab display on FE
   const categories = results.reduce((acc: string[], result) => {

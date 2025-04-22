@@ -7,6 +7,6 @@ defineProps<{ venue: VenueInterface }>()
     class="hover-link"
     :to="{ name: 'venue', params: { id: encodeName(venue.id) } }"
   >
-    {{ venue.name }}, {{ venue.city }}
+    {{ venue.name ? `${venue.name}, ${venue.city}` : venue.city }}
   </u-link>
 </template>

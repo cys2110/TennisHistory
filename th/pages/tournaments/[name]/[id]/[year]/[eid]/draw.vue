@@ -55,22 +55,23 @@ async function layoutGraph() {
 
 <template>
   <event-wrapper>
-    <ClientOnly v-if="nodes">
-      <div class="h-screen w-full overflow-x-auto">
-        <VueFlow
-          :nodes
-          :edges
-          @nodes-initialized="layoutGraph()"
-        >
-          <template #node-draw-card="props">
-            <draw-card
-              :id="props.id"
-              :match="props.data.match"
-            />
-          </template>
-        </VueFlow>
-      </div>
-    </ClientOnly>
+    <div
+      v-if="nodes"
+      class="h-screen w-full overflow-x-auto"
+    >
+      <VueFlow
+        :nodes
+        :edges
+        @nodes-initialized="layoutGraph()"
+      >
+        <template #node-draw-card="props">
+          <draw-card
+            :id="props.id"
+            :match="props.data.match"
+          />
+        </template>
+      </VueFlow>
+    </div>
     <error-message
       v-else
       :icon="ICONS.error"

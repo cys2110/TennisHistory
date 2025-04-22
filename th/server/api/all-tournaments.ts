@@ -9,13 +9,13 @@ export default defineEventHandler(async query => {
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (t:Tournament) WHERE $letter IS NULL OR t.name STARTS WITH $letter
+      WITH t
+      ORDER BY t.name
       WITH COLLECT(t) AS all, COUNT(t) AS count
-      UNWIND all AS t
+      WITH all[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS sliced, count
+      UNWIND CASE WHEN sliced = [] THEN [null] ELSE sliced END AS t
       MATCH (t)-[:ESTABLISHED]-(e:Year)
       OPTIONAL MATCH (t)-[:ABOLISHED]-(a:Year)
-      ORDER BY t.name
-      SKIP toInteger($skip)
-      LIMIT toInteger($limit)
       RETURN toString(count) AS count, {
         id: toString(t.id),
         name: t.name,

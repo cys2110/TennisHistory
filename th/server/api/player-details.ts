@@ -4,6 +4,8 @@ export default defineEventHandler(async query => {
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (p:Player {id: $id})
+      OPTIONAL MATCH (p)-[:TURNED_PRO]->(t:Year)
+      OPTIONAL MATCH (p)-[:RETIRED]->(r:Year)
       CALL (p) {
         OPTIONAL MATCH (p)-[t:REPRESENTED]->(fc:Country)
         WITH CASE
@@ -24,17 +26,12 @@ export default defineEventHandler(async query => {
       }
       CALL (p) {
         OPTIONAL MATCH (p)<-[:COACHES]-(z:Coach)
-        RETURN COLLECT(DISTINCT z) AS coaches
+        RETURN COLLECT(DISTINCT {labels: labels(z), id: z.id, name: z.first_name || ' ' || z.last_name}) AS coaches
       }
       CALL (p) {
-        OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(w:Winner)-[:SCORED]->(:Best3 | Best5)
-        OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(l:Loser)-[:SCORED]->(:Best3 | Best5)
-        WITH COUNT(DISTINCT(w)) AS win, COUNT(DISTINCT(l)) AS loss
-        RETURN win, loss
-      }
-      CALL (p) {
-        OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(w:Winner)-[:SCORED]->(:Match)-[:PLAYED]->(:Round {round: 'Final'})
-        RETURN COUNT(DISTINCT(w)) AS titles
+        OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(s:Score)-[:SCORED]->(m:Match)-[:PLAYED]->(r:Round)
+WITH DISTINCT s, m, r
+        RETURN SUM(CASE WHEN s:Winner AND (m:Best3 OR m:Best5) THEN 1 ELSE 0 END) AS win, SUM(CASE WHEN s:Loser AND (m:Best3 OR m:Best5) THEN 1 ELSE 0 END) AS loss, SUM(CASE WHEN s:Winner AND r.round = 'Final' THEN 1 ELSE 0 END) AS titles
       }
       RETURN
         toString(p.ch) AS ch,
@@ -60,26 +57,19 @@ export default defineEventHandler(async query => {
         CASE
           WHEN p.dod IS NOT NULL THEN apoc.temporal.format(p.dod, 'EEEE dd MMMM YYYY')
           ELSE NULL
-        END AS dod
+        END AS dod,
+        toString(t.id) AS pro,
+        toString(r.id) AS retired
     `,
     { id }
   )
 
   const player = records[0].toObject()
-  const height = records[0].get("height")
-  const coachesObject = records[0].get("coaches")
-
-  const coaches = coachesObject.map((coach: any) => {
-    return {
-      labels: coach.labels,
-      name: coach.properties.first_name + " " + coach.properties.last_name,
-      id: coach.properties.id
-    }
-  })
 
   return {
     ...player,
-    height: height ? Number(height) : null,
-    coaches: coaches
+    height: player.height ? Number(player.height) : null,
+    pro: player.pro ? Number(player.pro) : null,
+    retired: player.retired ? Number(player.retired) : null
   }
 })

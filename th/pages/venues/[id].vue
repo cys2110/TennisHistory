@@ -1,27 +1,17 @@
 <script setup lang="ts">
 definePageMeta({ name: "venue" })
-const toast = useToast()
 const id = useRouteParams<string>("id")
 const name = computed(() => decodeName(id.value))
 useHead({ title: name.value, templateParams: { subPage: "Venues" } })
 
 // API call
-const { data: events, status } = await useFetch<EventCardType[]>("/api/venue-details", {
-  query: { id: name.value },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching ${name.value}'s details`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: events, status } = await useFetch<EventCardType[]>("/api/venue-details", { query: { id: name.value } })
 
 // Breadcrumbs
 const items = computed(() => [
   { label: "Home", to: { name: "home" }, icon: ICONS.home },
   { label: "Venues", to: { name: "venues" }, icon: ICONS.venue },
-  { label: events.value ? events.value[0].locations[0].name + ", " + events.value[0].locations[0].city : name.value, icon: `flag:${events.value?.[0].locations[0].country.alpha2}-4x3` }
+  { label: events.value ? events.value[0].venues[0].name + ", " + events.value[0].venues[0].city : name.value, icon: `flag:${events.value?.[0].venues[0].country.alpha2}-4x3` }
 ])
 
 // Anchor links
@@ -41,8 +31,10 @@ const links = computed(() => {
         <u-breadcrumb :items />
       </template>
 
-      <!--TOC-->
-      <template #right>
+      <template #toolbar>
+        <div class="text-(--ui-text-muted) text-sm font-semibold">Events which took place in {{ events?.[0].venues[0].name ? `${events?.[0].venues[0].name}, ${events?.[0].venues[0].city}` : events?.[0].venues[0].city }}</div>
+
+        <!--TOC-->
         <u-dropdown-menu :items="links">
           <u-button
             :icon="ICONS.toc"
@@ -53,10 +45,6 @@ const links = computed(() => {
         </u-dropdown-menu>
       </template>
 
-      <template #toolbar>
-        <div class="text-(--ui-text-muted) text-sm font-semibold">Events which took place in {{ events?.[0].locations[0].name }}, {{ events?.[0].locations[0].city }}</div>
-      </template>
-
       <!--Event cards-->
       <event-grid
         v-if="events && events.length > 0"
@@ -64,11 +52,18 @@ const links = computed(() => {
         class="mt-10"
       />
 
+      <u-page-grid v-else-if="status === 'pending'">
+        <event-loading-card
+          v-for="_ in 10"
+          :key="_"
+        />
+      </u-page-grid>
+
       <error-message
         v-else
-        :icon="ICONS.noSupervisor"
-        :title="`No events which took place in ${events?.[0].locations[0].name}`"
+        :title="`No events which took place in ${events?.[0].venues[0].name}`"
         :status
+        :error="`Error fetching events which took place in ${events?.[0].venues[0].name}`"
       />
     </nuxt-layout>
   </div>

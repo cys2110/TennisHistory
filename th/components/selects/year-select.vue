@@ -1,6 +1,6 @@
 <script setup lang="ts">
-defineProps<{ items: number[] }>()
-const modelValue = defineModel<number>()
+defineProps<{ items: string[] }>()
+const modelValue = defineModel<string>()
 </script>
 
 <template>

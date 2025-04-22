@@ -12,15 +12,21 @@ const tid = useRouteParams<string>("tid")
     :ui="{ body: 'w-full', description: 'flex flex-col gap-3 items-center w-full' }"
   >
     <template #description>
-      <div class="flex items-center gap-2">
-        <flag-icon :country="event.c1" />
-        <span>{{ event.c1.name }}</span>
-      </div>
+      <u-link
+        class="flex items-center gap-2"
+        :to="{ name: 'country', params: { id: event.c1.id } }"
+      >
+        <u-icon :name="`flag:${event.c1.alpha2}-4x3`" />
+        <span class="hover-link w-fit">{{ event.c1.name }}</span>
+      </u-link>
       <div class="text-sm">d.</div>
-      <div class="flex items-center gap-2">
-        <flag-icon :country="event.c2" />
-        <span>{{ event.c2.name }}</span>
-      </div>
+      <u-link
+        class="flex items-center gap-2"
+        :to="{ name: 'country', params: { id: event.c2.id } }"
+      >
+        <u-icon :name="`flag:${event.c2.alpha2}-4x3`" />
+        <span class="hover-link w-fit">{{ event.c2.name }}</span>
+      </u-link>
       <div class="text-sm">{{ event.score }}</div>
     </template>
     <template #footer>

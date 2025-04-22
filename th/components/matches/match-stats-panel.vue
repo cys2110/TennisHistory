@@ -10,14 +10,14 @@ defineProps<{
 
 <template>
   <dashboard-subpanel :title>
-    <match-stats-table
+    <match-stats-chart
       v-if="checked"
       :stats
       :p1
       :p2
     />
 
-    <match-stats-chart
+    <match-stats-table
       v-else
       :stats
       :p1

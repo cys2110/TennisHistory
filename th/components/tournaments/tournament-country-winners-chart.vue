@@ -2,7 +2,6 @@
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const toast = useToast()
 const colorMode = useColorMode()
 
 interface APIResponse {
@@ -12,16 +11,7 @@ interface APIResponse {
 }
 
 // API call
-const { data: countries, status } = await useFetch<APIResponse[]>("/api/tournament-country-winners-chart", {
-  query: { id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching winners by country for ${name.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: countries, status } = await useFetch<APIResponse[]>("/api/tournament-country-winners-chart", { query: { id } })
 
 interface FormattedData {
   country: string
@@ -159,5 +149,6 @@ const baseOption = {
     :icon="ICONS.noCountries"
     :status
     :title="`No winners by country found for ${name}`"
+    :error="`Error fetching winners by country for ${name}`"
   />
 </template>

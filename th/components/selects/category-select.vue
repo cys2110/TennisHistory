@@ -2,7 +2,7 @@
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const md = breakpoints.md
 const lgAndUp = breakpoints.greaterOrEqual("lg")
-const modelValue = defineModel<CategoryEnumType[]>()
+const modelValue = defineModel<CategoryEnum[]>()
 </script>
 
 <template>

@@ -10,9 +10,6 @@ defineProps<{ event: EventCardType }>()
       reverse
       :ui="{ root: 'h-full', description: 'text-sm flex flex-col gap-1', wrapper: 'order-last' }"
     >
-      <template #leading>
-        <country-link :country="event.venues[0].country" />
-      </template>
       <!--Need 'order-last' class for smaller screens and 'h-full' to make all cards the same height-->
       <div class="relative">
         <nuxt-img
@@ -25,6 +22,10 @@ defineProps<{ event: EventCardType }>()
           class="absolute top-3 left-3"
         />
       </div>
+
+      <template #leading>
+        <country-link :country="event.venues[0].country" />
+      </template>
 
       <template #title>
         <tournament-link

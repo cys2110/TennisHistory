@@ -2,7 +2,7 @@
 import type { TableColumn } from "@nuxt/ui"
 defineProps<{
   matches: Pick<MatchInterface, "country" | "id" | "incomplete" | "mid" | "name" | "player_incomplete" | "rank" | "round" | "sets" | "seed" | "status" | "tbs" | "winner">[]
-  year: number
+  year: string
   name: string
   tid: string
   eid: string
@@ -11,14 +11,7 @@ const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const playerName = computed(() => decodeName(paramName.value))
 
-const columns: TableColumn<Pick<MatchInterface, "country" | "id" | "incomplete" | "mid" | "name" | "player_incomplete" | "rank" | "round" | "sets" | "seed" | "status" | "tbs" | "winner">>[] = [
-  { accessorKey: "round", header: "Round" },
-  { accessorKey: "name", header: "Opponent" },
-  { accessorKey: "rank", header: "Rank" },
-  { accessorKey: "winner", header: "" },
-  { id: "score", header: "Score" },
-  { id: "h2h" }
-]
+const columns: TableColumn<Pick<MatchInterface, "country" | "id" | "incomplete" | "mid" | "name" | "player_incomplete" | "rank" | "round" | "sets" | "seed" | "status" | "tbs" | "winner">>[] = [{ accessorKey: "round", header: "Round" }, { accessorKey: "name", header: "Opponent" }, { accessorKey: "rank", header: "Rank" }, { accessorKey: "winner", header: "" }, { id: "score", header: "Score" }, { id: "h2h" }]
 </script>
 
 <template>
@@ -49,7 +42,7 @@ const columns: TableColumn<Pick<MatchInterface, "country" | "id" | "incomplete" 
         :name="name"
         :tid="tid"
         :eid="eid"
-        :year="year.toString()"
+        :year="year"
         :mid="row.original.mid"
         :sets="row.original.sets"
         :tbs="row.original.tbs"

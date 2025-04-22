@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui"
-const { seeds } = defineProps<{ seeds: SeedType[] }>()
+const { seeds } = defineProps<{ seeds: SeedType[] | null; status: string }>()
 const UButton = resolveComponent("u-button")
 const UTooltip = resolveComponent("u-tooltip")
 
@@ -76,12 +76,32 @@ const columnVisibility = ref({ withdrew: false })
 
 <template>
   <u-table
-    v-if="seeds"
-    :data="seeds"
+    :data="seeds || []"
     :columns
     :column-visibility
     class="my-5 w-fit mx-auto"
+    :loading="status === 'pending'"
   >
+    <template #empty>
+      <div
+        v-if="status === 'pending'"
+        class="flex flex-col gap-4"
+      >
+        <div
+          v-for="_ in 6"
+          :key="_"
+          class="flex gap-8"
+        >
+          <u-skeleton
+            v-for="_ in 4"
+            :key="_"
+            class="h-4 w-1/2 rounded-lg"
+          />
+        </div>
+      </div>
+      <template v-else>No seeds available</template>
+    </template>
+
     <template #seed-cell="{ row }">
       <span :class="{ 'line-through': row.getValue('withdrew') }">
         {{ row.getValue("seed") }}

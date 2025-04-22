@@ -7,7 +7,7 @@ export default defineEventHandler(async query => {
       WITH r, e
         ORDER BY r.number DESC
       CALL (r, e) {
-        MATCH (r)<-[:PLAYED]-(m:Match)<-[:SCORED]-(ws:Winner)<-[:SCORED]-(wf:Entry)<-[:ENTERED]-(wp:Player)
+        MATCH (r)<-[:PLAYED]-(m:Best3|Best5)<-[:SCORED]-(ws:Winner)<-[:SCORED]-(wf:Entry)<-[:ENTERED]-(wp:Player)
         OPTIONAL MATCH (m)<-[:SCORED]-(ls:Loser)<-[:SCORED]-(lf:Entry)<-[:ENTERED]-(lp:Player)
         OPTIONAL MATCH (u:Umpire)-[:UMPIRED]->(m)
         CALL (e, wp) {

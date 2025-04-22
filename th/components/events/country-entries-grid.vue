@@ -10,8 +10,7 @@ defineProps<{ entries: CountryEntryType[] }>()
       :title="entry.name"
       :to="{ name: 'player', params: { name: encodeName(entry.name), id: entry.id } }"
       reverse
-      variant="outline"
-      spotlight
+      highlight
       :description="`Rank: ${entry.rank ?? '—'}`"
       :ui="{ wrapper: 'items-center text-center' }"
       class="h-72"

@@ -1,24 +1,16 @@
 <script setup lang="ts">
 definePageMeta({ name: "match" })
-const toast = useToast()
 const name = useRouteParams<string>("name")
 const id = useRouteParams<string>("id")
 const year = useRouteParams<string>("year")
 const eid = useRouteParams<string>("eid")
 const mid = useRouteParams<string>("mid")
 const checked = ref(false)
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const lgAndUp = breakpoints.greaterOrEqual("lg")
 
 // API call
-const { data: match, status } = await useFetch<MatchDetailsType>("/api/match-details", {
-  query: { mid, eid },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching details for ${decodeName(name.value)} ${year.value} ${mid.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: match, status } = await useFetch<MatchDetailsType>("/api/match-details", { query: { mid, eid } })
 
 useHead({
   title: match.value ? `${match.value.p1.name} v. ${match.value.p2.name}` : `${decodeName(name.value)} ${year.value}`,
@@ -66,32 +58,17 @@ const compoundedStats = computed(() => {
       } else if (stat.label === "Service points won") {
         acc.push({
           ...stat,
-          value: [
-            match.value?.serve1[0]! + match.value?.serve2[0]!,
-            match.value?.serve1[1]! + match.value?.serve2[1]!,
-            match.value?.serve1[2]! + match.value?.serve2[2]!,
-            match.value?.serve1[3]! + match.value?.serve2[3]!
-          ]
+          value: [match.value?.serve1[0]! + match.value?.serve2[0]!, match.value?.serve1[1]! + match.value?.serve2[1]!, match.value?.serve1[2]! + match.value?.serve2[2]!, match.value?.serve1[3]! + match.value?.serve2[3]!]
         })
       } else if (stat.label === "Return points won") {
         acc.push({
           ...stat,
-          value: [
-            match.value?.ret1[0]! + match.value?.ret2[0]!,
-            match.value?.ret1[1]! + match.value?.ret2[1]!,
-            match.value?.ret1[2]! + match.value?.ret2[2]!,
-            match.value?.ret1[3]! + match.value?.ret2[3]!
-          ]
+          value: [match.value?.ret1[0]! + match.value?.ret2[0]!, match.value?.ret1[1]! + match.value?.ret2[1]!, match.value?.ret1[2]! + match.value?.ret2[2]!, match.value?.ret1[3]! + match.value?.ret2[3]!]
         })
       } else if (stat.label === "Total points won") {
         acc.push({
           ...stat,
-          value: [
-            match.value?.serve1[0]! + match.value?.serve2[0]! + match.value?.ret1[0]! + match.value?.ret2[0]!,
-            match.value?.serve1[1]! + match.value?.serve2[1]! + match.value?.ret1[1]! + match.value?.ret2[1]!,
-            match.value?.serve1[2]! + match.value?.serve2[2]! + match.value?.ret1[2]! + match.value?.ret2[2]!,
-            match.value?.serve1[3]! + match.value?.serve2[3]! + match.value?.ret1[3]! + match.value?.ret2[3]!
-          ]
+          value: [match.value?.serve1[0]! + match.value?.serve2[0]! + match.value?.ret1[0]! + match.value?.ret2[0]!, match.value?.serve1[1]! + match.value?.serve2[1]! + match.value?.ret1[1]! + match.value?.ret2[1]!, match.value?.serve1[2]! + match.value?.serve2[2]! + match.value?.ret1[2]! + match.value?.ret2[2]!, match.value?.serve1[3]! + match.value?.serve2[3]! + match.value?.ret1[3]! + match.value?.ret2[3]!]
         })
       }
       return acc
@@ -165,6 +142,7 @@ const links = computed(() => {
       </template>
       <template #right>
         <u-button
+          v-if="lgAndUp"
           v-for="link in links"
           :key="link.label"
           :to="link.to"
@@ -172,13 +150,25 @@ const links = computed(() => {
           :icon="link.icon"
           :avatar="link.avatar"
         />
+        <u-dropdown-menu
+          v-else
+          :items="links"
+        >
+          <u-button
+            :icon="ICONS.layers"
+            color="neutral"
+            variant="link"
+            size="xl"
+          />
+        </u-dropdown-menu>
       </template>
-      <template #toolbar-right>
+      <template #toolbar>
         <u-switch
           v-model="checked"
-          :checked-icon="ICONS.table"
-          :unchecked-icon="ICONS.barChart"
-          :label="checked ? 'Table view' : 'Chart view'"
+          :checked-icon="ICONS.barChart"
+          :unchecked-icon="ICONS.table"
+          :label="checked ? 'Chart' : 'Table'"
+          class="ml-auto"
         />
       </template>
 
@@ -187,9 +177,11 @@ const links = computed(() => {
         :match
       />
 
+      <match-details-loading v-else-if="status === 'pending'" />
+
       <div
         v-if="match && compoundedStats"
-        :class="checked ? 'grid grid-cols-1 md:grid-cols-2 gap-5' : 'flex flex-col'"
+        :class="checked ? 'flex flex-col' : 'grid grid-cols-1 md:grid-cols-2 gap-5'"
       >
         <match-stats-panel
           v-if="compoundedStats.serviceStats.length > 0"
@@ -231,6 +223,7 @@ const links = computed(() => {
         :icon="ICONS.noChart"
         :title="`No match stats available for ${decodeName(name)} ${year} ${mid}`"
         :status
+        :error="`Error fetching match stats for ${decodeName(name)} ${year} ${mid}`"
       />
     </nuxt-layout>
   </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { event, year } = defineProps<{ event: PlayerActivityType; year: number }>()
+const { event, year } = defineProps<{ event: PlayerActivityType; year: string }>()
 
 const earnings = {
   Seed: event.seed,
@@ -38,7 +38,7 @@ const tagColors = {
         <div>{{ event.dates }}</div>
         <div class="flex items-center gap-2">
           <div>{{ event.venues.map(location => location.city).join(" | ") }}</div>
-          <flag-icon :country="event.venues[0].country" />
+          <country-link :country="event.venues[0].country" />
         </div>
       </div>
     </template>
@@ -69,7 +69,7 @@ const tagColors = {
       <event-buttons
         :name="event.name"
         :tid="event.tid"
-        :year="year.toString()"
+        :year="year"
         :eid="event.eid"
         :drawType="event.draw_type"
       />

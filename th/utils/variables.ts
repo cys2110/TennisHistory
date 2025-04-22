@@ -1,5 +1,3 @@
-export const BASE_CATEGORIES = Object.values(BaseCategoryEnum)
-
 export const CATEGORIES = Object.values(CategoryEnum)
 
 export const CHART_COLOURS = {
@@ -93,7 +91,7 @@ export const MATCH_STATS = {
   ]
 }
 
-export const MONTH_NAMES = Object.keys(MonthsEnum).filter(key => isNaN(Number(key)) && key !== "length") as (keyof typeof MonthsEnum)[]
+export const MONTH_NAMES = Object.keys(MonthEnum).filter(key => isNaN(Number(key)) && key !== "length") as (keyof typeof MonthEnum)[]
 
 export const NAV_LINKS = [
   {
@@ -134,7 +132,7 @@ export const NAV_LINKS = [
 ]
 
 export const PLAYER_PAGES = [
-  { label: "Overview", name: "player", icon: ICONS.overview },
+  { label: "Details", name: "player", icon: ICONS.overview },
   { label: "Activity", name: "activity", icon: ICONS.event },
   { label: "Titles and Finals", name: "titles-and-finals", icon: ICONS.tournament },
   { label: "Win-Loss Index", name: "wl-index", icon: ICONS.barChart },
@@ -162,7 +160,9 @@ export const RELATED_LINKS = [
     label: "Other Links",
     children: [
       { label: "About", to: { name: "about" } },
-      { label: "About me", to: "https://www.claire-sheridan.com", target: "_blank" }
+      { label: "About me", to: "https://www.claire-sheridan.com", target: "_blank" },
+      { label: "Ranking Rules History", to: "https://openerarankings.com/Home", target: "_blank" },
+      { label: "Tennis Abstract", to: "https://www.tennisabstract.com/", target: "_blank" }
     ]
   }
 ]

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ title: string; icon?: string }>()
+defineProps<{ title?: string; icon?: string }>()
 </script>
 
 <template>
@@ -13,6 +13,7 @@ defineProps<{ title: string; icon?: string }>()
         />
         <h1 class="flex items-center gap-1.5 font-semibold text-(--ui-text-highlighted) truncate">
           {{ title }}
+          <slot name="title" />
         </h1>
       </div>
       <div class="flex items-center shrink-0 gap-1.5">

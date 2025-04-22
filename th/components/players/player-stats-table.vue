@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui"
-defineProps<{ stats: PlayerStatsInterface[] }>()
+defineProps<{ stats: PlayerStatsInterface[] | null; status: string }>()
 
 const columns: TableColumn<{ category: string; value: number; suffix?: boolean }>[] = [
   { accessorKey: "category", header: "Category", meta: { class: { th: "w-1/2", td: "w-1/3" } } },
@@ -10,10 +10,27 @@ const columns: TableColumn<{ category: string; value: number; suffix?: boolean }
 
 <template>
   <u-table
-    :data="stats"
+    :data="stats || []"
     :columns
     class="w-full md:w-3/4 lg:w-2/3 xl:w-1/2 mx-auto"
+    :loading="status === 'pending'"
   >
+    <template #empty>
+      <div
+        v-if="status === 'pending'"
+        class="flex flex-col gap-4"
+      >
+        <div
+          v-for="_ in 6"
+          :key="_"
+          class="flex gap-8"
+        >
+          <u-skeleton class="h-4 w-1/2 rounded-lg" />
+          <u-skeleton class="h-4 w-1/2 rounded-lg" />
+        </div>
+      </div>
+      <template v-else>No stats available</template>
+    </template>
     <template #value-cell="{ row }">
       <template v-if="row.original.suffix === false">{{ row.original.value }}</template>
       <u-progress

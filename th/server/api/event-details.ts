@@ -6,7 +6,7 @@ export default defineEventHandler(async query => {
       MATCH (s:Surface)<-[:ON_SURFACE]-(e:Event {id: $id})-[:TOOK_PLACE_IN]->(v:Venue)-[:LOCATED_IN]->(c:Country)
       MATCH (e)-[:EDITION_OF]->(t:Tournament)
       OPTIONAL MATCH (sup:Supervisor)-[:SUPERVISED]->(e)
-      WITH DISTINCT(e), s, t, COLLECT(DISTINCT {name: v.name, city: v.city, country: {id: c.id, name: c.name, alpha2: c.alpha2}}) AS venues, COLLECT(sup.id) as supervisors
+      WITH DISTINCT(e), s, t, COLLECT(DISTINCT {id: v.id,name: v.name, city: v.city, country: {id: c.id, name: c.name, alpha2: c.alpha2}}) AS venues, COLLECT(sup.id) as supervisors
       RETURN {
         name: t.name,
         ename: e.sponsor_name,
@@ -27,7 +27,7 @@ export default defineEventHandler(async query => {
     { id: Number(eid) }
   )
 
-  const results = records[0].toObject()
+  const results = records[0].get("event")
 
-  return results.event
+  return results
 })

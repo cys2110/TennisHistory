@@ -81,7 +81,7 @@ export default defineEventHandler(async query => {
     { eid: Number(eid), mid: Number(mid) }
   )
 
-  const match = records[0].toObject().match
+  const match = records[0].get("match")
 
   for (const [key, value] of Object.entries(match)) {
     if (Array.isArray(value)) {

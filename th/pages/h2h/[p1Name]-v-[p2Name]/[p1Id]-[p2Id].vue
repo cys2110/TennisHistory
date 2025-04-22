@@ -6,16 +6,12 @@ const p2ParamName = useRouteParams<string>("p2Name")
 const p2Name = computed(() => decodeName(p2ParamName.value))
 const p1Id = useRouteParams<string>("p1Id")
 const p2Id = useRouteParams<string>("p2Id")
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const lgAndUp = breakpoints.greaterOrEqual("lg")
 useHead({ title: `${p1Name.value} v. ${p2Name.value}`, templateParams: { subPage: "H2H" } })
 
-interface H2HCountry {
-  id: string
-  name: string
-  alpha2: string
-}
-
 // API call
-const { data: h2h, status } = await useFetch<{ p1: H2HCountry; p2: H2HCountry }>("/api/h2h-countries", { query: { p1Id, p2Id } })
+const { data: h2h, status } = await useFetch<{ p1: CountryInterface; p2: CountryInterface }>("/api/h2h-countries", { query: { p1Id, p2Id } })
 
 // Breadcrumbs
 const items = [
@@ -57,6 +53,7 @@ const links = computed(() => [
               :src="`https://www.atptour.com/-/media/alias/player-headshot/${p1Id}`"
               :icon="ICONS.player"
               class="border border-neutral-400"
+              size="sm"
             />
           </template>
           <template #players-trailing>
@@ -64,6 +61,7 @@ const links = computed(() => [
               :src="`https://www.atptour.com/-/media/alias/player-headshot/${p2Id}`"
               :icon="ICONS.player"
               class="border border-neutral-400"
+              size="sm"
             />
           </template>
         </u-breadcrumb>
@@ -71,23 +69,32 @@ const links = computed(() => [
 
       <template #right>
         <u-button
+          v-if="lgAndUp"
           v-for="link in links"
           :key="link.label"
           :to="link.to"
           :label="link.label"
           :avatar="link.avatar"
         />
+        <u-dropdown-menu
+          v-else
+          :items="links"
+        >
+          <u-button
+            :icon="ICONS.layers"
+            color="neutral"
+            variant="link"
+            size="xl"
+          />
+        </u-dropdown-menu>
       </template>
 
-      <template #toolbar-left>
+      <template #toolbar>
         <player-search
           v-if="h2h"
           :index="1"
           :country="h2h?.p1"
         />
-      </template>
-
-      <template #toolbar-right>
         <player-search
           v-if="h2h"
           :index="2"
@@ -95,21 +102,24 @@ const links = computed(() => [
         />
       </template>
 
-      <h2h-details
-        v-if="h2h"
-        :c1="h2h.p1"
-        :c2="h2h.p2"
-      />
+      <div v-if="h2h">
+        <h2h-details
+          v-if="h2h"
+          :c1="h2h.p1"
+          :c2="h2h.p2"
+        />
 
-      <match-table
-        v-if="h2h"
-        :c1="h2h.p1"
-        :c2="h2h.p2"
-      />
+        <h2h-match-table
+          v-if="h2h"
+          :c1="h2h.p1"
+          :c2="h2h.p2"
+        />
+      </div>
+
       <error-message
         v-else
         :icon="ICONS.noH2H"
-        :title="`Error fetching head to head between ${p1Name} and ${p2Name}`"
+        :title="`No head to head found between ${p1Name} and ${p2Name}`"
         :status
         :error="`Error fetching head to head between ${p1Name} and ${p2Name}`"
       />

@@ -3,7 +3,7 @@ import type { TableColumn } from "@nuxt/ui"
 defineProps<{ entries: CountryEntryType[] }>()
 const UButton = resolveComponent("u-button")
 
-const columns: TableColumn<EntryTableType>[] = [
+const columns: TableColumn<CountryEntryType>[] = [
   {
     accessorKey: "last",
     header: ({ column }) => {

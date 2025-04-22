@@ -1,37 +1,40 @@
 <script setup lang="ts">
-defineProps<{ checked: boolean }>()
 const eid = useRouteParams<string>("eid")
 const year = useRouteParams<string>("year")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const toast = useToast()
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
+const checked = ref(false)
 
 // API call
-const { data: seeds, status } = await useFetch<SeedType[]>("/api/event-seeds", {
-  query: { eid },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching seeds for ${name.value} ${year.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: seeds, status } = await useFetch<SeedType[]>("/api/event-seeds", { query: { eid } })
 </script>
 
 <template>
   <dashboard-subpanel
     title="Seeds"
     :icon="ICONS.seeds"
+    :class="checked ? 'w-full' : '!w-fit'"
   >
-    <seeds-table
+    <template #right>
+      <u-switch
+        v-if="mdAndUp"
+        v-model="checked"
+        :label="checked ? 'Chart' : 'Table'"
+        :checked-icon="ICONS.barChart"
+        :unchecked-icon="ICONS.table"
+      />
+    </template>
+    <seeds-chart
       v-if="seeds && checked"
       :seeds
     />
 
-    <seeds-chart
-      v-else-if="seeds"
+    <seeds-table
+      v-else-if="seeds || status === 'pending'"
       :seeds
+      :status
     />
 
     <error-message
@@ -39,6 +42,7 @@ const { data: seeds, status } = await useFetch<SeedType[]>("/api/event-seeds", {
       :icon="ICONS.noInfo"
       :title="`No seeds found for ${name} ${year}`"
       :status
+      :error="`Error fetching seeds for ${name} ${year}`"
     />
   </dashboard-subpanel>
 </template>

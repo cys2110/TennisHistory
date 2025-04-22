@@ -5,7 +5,7 @@ const mdAndUp = breakpoints.greaterOrEqual("md")
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const checked = ref(mdAndUp.value ? false : true)
+const checked = ref(false)
 
 const categoryColours = {
   "Match Record": "text-sky-700",
@@ -21,52 +21,48 @@ const { data: index, status } = await useFetch<WLIndexInterface[]>("/api/wl-inde
 
 <template>
   <div>
-    <ClientOnly>
-      <nuxt-layout name="player-layout">
-        <!--Legend for chart-->
-        <template
-          #toolbar-left
-          v-if="!checked"
+    <nuxt-layout name="player-layout">
+      <!--Legend for chart-->
+      <template #toolbar>
+        <div
+          v-if="checked"
+          v-for="(entry, index) in Object.entries(categoryColours)"
+          :key="index"
+          class="mx-5 flex items-center gap-2"
         >
-          <div
-            v-for="(entry, index) in Object.entries(categoryColours)"
-            :key="index"
-            class="mx-5 flex items-center gap-2"
-          >
-            <u-icon
-              name="zondicons:color-palette"
-              :class="entry[1]"
-            />
-            <div class="text-neutral-600 dark:text-neutral-400 self-center text-xs lg:text-sm">{{ entry[0] }}</div>
-          </div>
-        </template>
-        <template
-          #toolbar-right
-          v-if="mdAndUp"
-        >
-          <u-switch
-            v-model="checked"
-            :checked-icon="ICONS.table"
-            :unchecked-icon="ICONS.barChart"
-            :label="checked ? 'Table view' : 'Chart view'"
+          <u-icon
+            name="zondicons:color-palette"
+            :class="entry[1]"
           />
-        </template>
+          <div class="text-neutral-600 dark:text-neutral-400 self-center text-xs lg:text-sm">{{ entry[0] }}</div>
+        </div>
+        <u-switch
+          v-if="mdAndUp"
+          v-model="checked"
+          :checked-icon="ICONS.barChart"
+          :unchecked-icon="ICONS.table"
+          :label="checked ? 'Chart' : 'Table'"
+          class="ml-auto"
+        />
+      </template>
+      <div v-if="index || status === 'pending'">
         <wl-index-chart
-          v-if="index && !checked"
+          v-if="checked && index"
           :index
         />
         <wl-index-table
-          v-else-if="index"
-          :index
-        />
-        <error-message
           v-else
-          :icon="ICONS.noChart"
-          :title="`No win-loss index available for ${name}`"
-          :status="status"
-          :error="`Error fetching ${name}'s win-loss index`"
+          :index
+          :status
         />
-      </nuxt-layout>
-    </ClientOnly>
+      </div>
+      <error-message
+        v-else
+        :icon="ICONS.noChart"
+        :title="`No win-loss index available for ${name}`"
+        :status="status"
+        :error="`Error fetching ${name}'s win-loss index`"
+      />
+    </nuxt-layout>
   </div>
 </template>

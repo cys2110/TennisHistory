@@ -23,7 +23,7 @@ declare global {
   interface EventInterface {
     c1: CountryInterface
     c2: CountryInterface
-    category: CategoryEnumType | null
+    category: CategoryEnum
     currency: CurrencyType | null
     dates: string
     draw_type: DrawType
@@ -135,7 +135,8 @@ declare global {
     min_year: number | null
     name: string
     pm: string
-    pro: string | null
+    pro: number | null
+    retired: number | null
     rh: boolean | null
     titles: string
     wins: string
@@ -154,13 +155,13 @@ declare global {
   }
 
   interface PlayerStatsInterface {
-    category: CategoryEnumType
+    category: CategoryEnum
     value: number
     suffix?: boolean
   }
 
   interface WLIndexInterface {
-    category: CategoryEnumType
+    category: CategoryEnum
     stat: string
     wins: number
     losses: number
@@ -169,12 +170,13 @@ declare global {
   }
 
   interface PlayerStatsInterface {
-    category: CategoryEnumType
+    category: CategoryEnum
     value: string
     suffix?: boolean
   }
 
   interface H2HPlayerInterface {
+    dob: string | null
     bh: string | null
     ch: number | null
     ch_date: string | null
@@ -184,6 +186,45 @@ declare global {
     rh: boolean | null
     titles: number
     wins: number
+    pro: string | null
+  }
+
+  interface HistoricalPMInterface {
+    year: number
+    pm: number
+    R128?: number
+    R64?: number
+    R32: number
+    R16: number
+    QF: number
+    SF: number
+    F: number
+    currency: CurrencyType
+    yoy: string
+  }
+
+  interface GamesSetsLostInterface {
+    year: number
+    player: Pick<PlayerInterface, "id" | "name" | "country">
+    sets_won: number
+    sets_lost: number
+    games_won: number
+    games_lost: number
+    sets_pc: number
+    games_pc: number
+  }
+
+  interface TournamentFinalistsInterface {
+    finals: number
+    losses: number
+    player: Pick<PlayerInterface, "id" | "name" | "country">
+    wins: number
+  }
+
+  interface WinnersByAgeInterface {
+    age: string
+    player: PlayerInterface
+    year: string
   }
 }
 

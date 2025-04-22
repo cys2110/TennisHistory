@@ -52,15 +52,13 @@ const links = computed(() => {
       </template>
 
       <template #right>
-        <ClientOnly>
-          <u-button
-            v-if="coach && coach.labels.includes('Player')"
-            :icon="ICONS.player"
-            label="Player Profile"
-            :to="{ name: 'player', params: { id, name: encodeName(coach.name) } }"
-            :size="mdAndUp ? 'md' : 'sm'"
-          />
-        </ClientOnly>
+        <u-button
+          v-if="coach && coach.labels.includes('Player')"
+          :icon="ICONS.player"
+          label="Player Profile"
+          :to="{ name: 'player', params: { id, name: encodeName(coach.name) } }"
+          :size="mdAndUp ? 'md' : 'sm'"
+        />
       </template>
 
       <template #toolbar>
@@ -83,6 +81,13 @@ const links = computed(() => {
           :key="player.id"
           :id="player.id"
           :player
+        />
+      </u-page-grid>
+
+      <u-page-grid v-else-if="status === 'pending'">
+        <player-loading-card
+          v-for="_ in 10"
+          :key="_"
         />
       </u-page-grid>
 

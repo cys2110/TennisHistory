@@ -10,13 +10,12 @@ defineProps<{ entries: EntryTableType[] }>()
       :title="entry.name"
       :to="{ name: 'player', params: { name: encodeName(entry.name), id: entry.id } }"
       reverse
-      variant="outline"
-      spotlight
+      highlight
       :description="`Rank: ${entry.rank ?? '—'}`"
       :ui="{ wrapper: 'items-center text-center' }"
     >
       <template #leading>
-        <flag-icon :country="entry.country" />
+        <country-link :country="entry.country" />
       </template>
 
       <nuxt-img

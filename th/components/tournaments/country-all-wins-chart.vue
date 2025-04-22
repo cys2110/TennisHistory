@@ -40,9 +40,10 @@ const option = computed(() => {
 
 <template>
   <div class="mt-10 font-bold text-lg">Countries by Total Wins</div>
-  <v-chart
-    class="min-h-150 w-full my-auto mt-10"
-    :option
-    :autoresize="true"
-  />
+  <div class="h-[600px] w-full my-auto mt-10">
+    <v-chart
+      :option
+      :autoresize="true"
+    />
+  </div>
 </template>

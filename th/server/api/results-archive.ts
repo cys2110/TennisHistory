@@ -1,26 +1,30 @@
-import { CategoryEnumType, SurfaceEnum, MonthsEnum } from "~/utils/enums"
+import { CategoryEnum, MonthEnum, SurfaceEnum } from "~/utils/enums"
 
 export default defineEventHandler(async query => {
   interface QueryProps {
     surfaces: SurfaceEnum[]
-    categories: CategoryEnumType[]
-    months: keyof (typeof MonthsEnum)[]
+    categories: CategoryEnum[]
+    year: string
+    months: keyof (typeof MonthEnum)[][]
+    upcoming: "upcoming" | "archive"
   }
 
-  const { surfaces, categories, months } = getQuery<QueryProps>(query)
+  const { surfaces, categories, year, months, upcoming } = getQuery<QueryProps>(query)
   const monthArray = months ? (Array.isArray(months) ? months : [months]) : []
 
   // Ensure that all params are arrays
   const formattedParams = {
     surfaces: surfaces ? (Array.isArray(surfaces) ? surfaces : [surfaces]) : [],
-    months: monthArray.map(month => MonthsEnum[month]),
-    categories: categories ? (Array.isArray(categories) ? categories : [categories]) : []
+    months: monthArray.map(month => MonthEnum[month]),
+    categories: categories ? (Array.isArray(categories) ? categories : [categories]) : [],
+    year: Number(year),
+    upcoming: upcoming === "archive" ? false : true
   }
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (y:Year)<-[:IN_YEAR]-(e:Event)-[:EDITION_OF]->(t:Tournament)
-        WHERE e.end_date >= date()
+      MATCH (y:Year {id: $year})<-[:IN_YEAR]-(e:Event)-[:EDITION_OF]->(t:Tournament)
+        WHERE ($upcoming = false OR e.end_date >= date())
         AND ($months = [] OR e.start_date.month IN $months)
         AND ($categories = [] OR e.category IN $categories)
       MATCH (e)-[:ON_SURFACE]->(s:Surface) WHERE ($surfaces = [] OR s.surface IN $surfaces)

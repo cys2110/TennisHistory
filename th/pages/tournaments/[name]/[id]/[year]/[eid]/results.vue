@@ -22,7 +22,7 @@ const { data: results, status } = await useFetch<{ title: RoundType; matches: Re
         </template>
         <template #content="{ item }">
           <u-page-grid class="py-10 xl:!grid-cols-3">
-            <results-card
+            <result-card
               v-for="match in item.matches"
               :key="match.mid"
               :match="match"
