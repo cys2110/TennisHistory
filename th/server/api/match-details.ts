@@ -75,7 +75,7 @@ export default defineEventHandler(async query => {
         net: [s1.net_w, s1.net, s2.net_w, s2.net],
         max_speed: [s1.max_speed, s2.max_speed],
         avg1_speed: [s1.avg1_speed, s2.avg1_speed],
-        avg2_speed: [s1.avg1_speed, s2.avg2_speed]
+        avg2_speed: [s1.avg2_speed, s2.avg2_speed]
       } AS match
     `,
     { eid: Number(eid), mid: Number(mid) }
