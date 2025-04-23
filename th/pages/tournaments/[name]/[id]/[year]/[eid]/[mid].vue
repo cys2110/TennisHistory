@@ -58,17 +58,32 @@ const compoundedStats = computed(() => {
       } else if (stat.label === "Service points won") {
         acc.push({
           ...stat,
-          value: [match.value?.serve1[0]! + match.value?.serve2[0]!, match.value?.serve1[1]! + match.value?.serve2[1]!, match.value?.serve1[2]! + match.value?.serve2[2]!, match.value?.serve1[3]! + match.value?.serve2[3]!]
+          value: [
+            match.value?.serve1[0]! + match.value?.serve2[0]!,
+            match.value?.serve1[1]! + match.value?.serve2[1]!,
+            match.value?.serve1[2]! + match.value?.serve2[2]!,
+            match.value?.serve1[3]! + match.value?.serve2[3]!
+          ]
         })
       } else if (stat.label === "Return points won") {
         acc.push({
           ...stat,
-          value: [match.value?.ret1[0]! + match.value?.ret2[0]!, match.value?.ret1[1]! + match.value?.ret2[1]!, match.value?.ret1[2]! + match.value?.ret2[2]!, match.value?.ret1[3]! + match.value?.ret2[3]!]
+          value: [
+            match.value?.ret1[0]! + match.value?.ret2[0]!,
+            match.value?.ret1[1]! + match.value?.ret2[1]!,
+            match.value?.ret1[2]! + match.value?.ret2[2]!,
+            match.value?.ret1[3]! + match.value?.ret2[3]!
+          ]
         })
       } else if (stat.label === "Total points won") {
         acc.push({
           ...stat,
-          value: [match.value?.serve1[0]! + match.value?.serve2[0]! + match.value?.ret1[0]! + match.value?.ret2[0]!, match.value?.serve1[1]! + match.value?.serve2[1]! + match.value?.ret1[1]! + match.value?.ret2[1]!, match.value?.serve1[2]! + match.value?.serve2[2]! + match.value?.ret1[2]! + match.value?.ret2[2]!, match.value?.serve1[3]! + match.value?.serve2[3]! + match.value?.ret1[3]! + match.value?.ret2[3]!]
+          value: [
+            match.value?.serve1[0]! + match.value?.serve2[0]! + match.value?.ret1[0]! + match.value?.ret2[0]!,
+            match.value?.serve1[1]! + match.value?.serve2[1]! + match.value?.ret1[1]! + match.value?.ret2[1]!,
+            match.value?.serve1[2]! + match.value?.serve2[2]! + match.value?.ret1[2]! + match.value?.ret2[2]!,
+            match.value?.serve1[3]! + match.value?.serve2[3]! + match.value?.ret1[3]! + match.value?.ret2[3]!
+          ]
         })
       }
       return acc

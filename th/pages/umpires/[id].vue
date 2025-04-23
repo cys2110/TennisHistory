@@ -4,6 +4,9 @@ const id = useRouteParams<string>("id")
 const name = computed(() => decodeName(id.value))
 useHead({ title: name.value, templateParams: { subPage: "Umpires" } })
 
+const route = useRoute()
+const toast = useToast()
+
 const year = ref<string>(new Date().getFullYear().toString())
 
 // API calls
@@ -11,21 +14,55 @@ const year = ref<string>(new Date().getFullYear().toString())
 const {
   data: umpire,
   status,
-  execute
+  execute,
+  refresh: refreshUmpire
 } = await useFetch<{ labels: string[]; results: UmpireDetailsType[] }>("/api/umpire-details", {
   query: { id: name.value, year },
   immediate: false,
-  onResponse: response => console.log(response.response._data)
-})
-
-// When data returns, set the year to the latest year and run the first fetch
-const { data: years } = await useFetch<string[]>("/api/umpire-years", {
-  query: { id: name.value },
-  onResponse: response => {
-    year.value = response.response._data[response.response._data.length - 1]
-    execute()
+  watch: false,
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching ${name.value}'s details`,
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
   }
 })
+
+watch(
+  () => [name.value, year.value],
+  ([newName, newYear]) => {
+    if ((newYear || (newName && newName !== " ")) && route.name === "umpire") refreshUmpire()
+  },
+  { immediate: false }
+)
+
+// When data returns, set the year to the latest year and run the first fetch
+const { data: years, refresh } = await useFetch<string[]>("/api/umpire-years", {
+  query: { id: name.value },
+  watch: false,
+  onResponse: ({ response }) => {
+    year.value = response._data[response._data.length - 1]
+    execute()
+  },
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching ${name.value}'s active years`,
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
+  }
+})
+
+watch(
+  () => name.value,
+  newName => {
+    if (newName && newName !== " " && route.name === "umpire") refresh()
+  },
+  { immediate: true }
+)
 
 // Breadcrumbs
 const items = computed(() => [{ label: "Home", to: { name: "home" }, icon: ICONS.home }, { label: "Umpires", to: { name: "umpires" }, icon: ICONS.umpire }, { label: name.value }])
@@ -79,22 +116,18 @@ const links = computed(() => {
 
       <!--Event cards-->
       <u-page-columns
-        v-if="umpire"
+        v-if="umpire || ['pending', 'idle'].includes(status)"
         class="xl:columns-4 2xl:columns-4"
       >
         <umpire-event-card
+          v-if="umpire"
           v-for="event in umpire.results"
           :key="event.tid"
           :id="`event-${event.eid}`"
           :event
         />
-      </u-page-columns>
-
-      <u-page-columns
-        v-else-if="status === 'pending'"
-        class="xl:columns-4 2xl:columns-4"
-      >
         <umpire-event-loading-card
+          v-else
           v-for="_ in 10"
           :key="_"
         />
@@ -104,7 +137,7 @@ const links = computed(() => {
         v-else
         :title="`No matches umpired by ${name}`"
         :status
-        :error="`Error fetching matches umpired by ${name}`"
+        :error="`matches umpired by ${name}`"
       />
     </nuxt-layout>
   </div>

@@ -72,14 +72,14 @@ export const MATCH_STATS = {
     { key: "bps_saved", label: "Break points saved", percent: true }
   ],
   return: [
-    { key: "ret1", label: "1st serve return points won" },
-    { key: "ret2", label: "2nd serve return points won" },
-    { key: "bps_converted", label: "Break points converted" }
+    { key: "ret1", label: "1st serve return points won", percent: true },
+    { key: "ret2", label: "2nd serve return points won", percent: true },
+    { key: "bps_converted", label: "Break points converted", percent: true }
   ],
   points: [
     { key: "winners", label: "Winners" },
     { key: "ues", label: "Unforced errors" },
-    { key: "net", label: "Net points won" },
+    { key: "net", label: "Net points won", percent: true },
     { label: "Service points won", percent: true },
     { label: "Return points won", percent: true },
     { label: "Total points won", percent: true }

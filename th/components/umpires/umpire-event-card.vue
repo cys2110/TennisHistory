@@ -3,12 +3,12 @@ defineProps<{ event: UmpireDetailsType }>()
 </script>
 
 <template>
-  <u-card :ui="{ root: 'flex flex-col', footer: 'justify-center mt-auto', body: 'flex-1' }">
+  <u-card :ui="{ footer: 'justify-center mt-auto' }">
     <template #header>
       <tournament-link
         :id="event.tid"
         :name="event.name"
-        class="text-lg font-semibold"
+        class="text-base font-semibold"
       />
     </template>
 
