@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ name: "coaches" })
 useHead({ title: "Coaches", templateParams: { subPage: null } })
+const toast = useToast()
 
 interface CoachesAPIResponse {
   count: number
@@ -18,7 +19,15 @@ const pageSize = ref(25)
 
 // API call
 const { data, status } = await useFetch<CoachesAPIResponse>("/api/all-coaches", {
-  query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * pageSize.value), limit: pageSize }
+  query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * pageSize.value), limit: pageSize },
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: "Error fetching coaches",
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
+  }
 })
 
 // Breadcrumbs
@@ -37,21 +46,17 @@ const breadcrumbs = [
     :count="data?.count"
   >
     <u-page-grid
-      v-if="data && data.count > 0"
+      v-if="data?.count || ['pending', 'idle'].includes(status)"
       class="mt-10"
     >
       <coach-card
+        v-if="data"
         v-for="coach in data.coaches"
         :key="coach.id"
         :coach
       />
-    </u-page-grid>
-
-    <u-page-grid
-      v-else-if="status === 'pending'"
-      class="mt-10"
-    >
       <base-loading-card
+        v-else
         v-for="_ in 15"
         :key="_"
       />
@@ -61,7 +66,7 @@ const breadcrumbs = [
       v-else
       title="No coaches found"
       :status
-      error="Error fetching coaches"
+      error="coaches"
     />
   </paginated-overview>
 </template>

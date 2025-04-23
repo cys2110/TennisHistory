@@ -28,8 +28,9 @@ const {
 watch(
   () => id.value,
   newId => {
-    if (newId && route.name === "player") refresh()
-  }
+    if (newId && newId !== " " && route.name === "player") refresh()
+  },
+  { immediate: true }
 )
 </script>
 

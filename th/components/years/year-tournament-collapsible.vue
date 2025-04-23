@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ label: string; tournaments: Pick<TournamentInterface, "id" | "name">[]; year: string }>()
+defineProps<{ label: string; tournaments: Pick<TournamentInterface, "id" | "name">[] | undefined; year: string }>()
 </script>
 
 <template>
@@ -15,7 +15,7 @@ defineProps<{ label: string; tournaments: Pick<TournamentInterface, "id" | "name
     <template #content>
       <div class="flex flex-col gap-2 max-h-100 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent scrollbar-thumb-rounded-full">
         <tournament-link
-          v-if="tournaments.length > 0"
+          v-if="tournaments?.length"
           v-for="tournament in tournaments"
           :key="tournament.id"
           :name="tournament.name"

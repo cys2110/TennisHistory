@@ -2,6 +2,7 @@
 definePageMeta({ name: "years" })
 const id = useRouteQuery<string>("year", new Date().getFullYear().toString())
 useHead({ title: () => id.value, templateParams: { subPage: "Years" } })
+const toast = useToast()
 
 interface YearAPIResponse {
   established_tournaments: Pick<TournamentInterface, "id" | "name">[]
@@ -13,13 +14,36 @@ interface YearAPIResponse {
   hof: Pick<PlayerInterface, "id" | "name" | "country">[]
 }
 
-const { data: year, status } = await useFetch<YearAPIResponse>("/api/year-details", { query: { id } })
+const { data: year, status } = await useFetch<YearAPIResponse>("/api/year-details", {
+  query: { id },
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching year details for ${id}`,
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
+  }
+})
 
 // Breadcrumbs
 const items = [
   { label: "Home", to: { name: "home" }, icon: ICONS.home },
   { label: "Years", icon: ICONS.calendar },
   { label: id.value, icon: ICONS.year }
+]
+
+const tournamentCollapsibles = [
+  { label: "established", tournaments: year.value?.established_tournaments },
+  { label: "abolished", tournaments: year.value?.abolished_tournaments }
+]
+
+const playerCollapsibles = [
+  { label: "who turned pro", players: year.value?.pro_players },
+  { label: "who retired", players: year.value?.retired_players },
+  { label: "who were born", players: year.value?.born_players },
+  { label: "who died", players: year.value?.died_players },
+  { label: "inducted into the Hall of Fame", players: year.value?.hof }
 ]
 </script>
 
@@ -39,51 +63,18 @@ const items = [
         class="xl:grid-cols-4 2xl:grid-cols-4"
       >
         <year-tournament-collapsible
-          v-if="year.established_tournaments"
-          label="established"
-          :tournaments="year.established_tournaments"
-          :year="id"
-        />
-
-        <year-tournament-collapsible
-          v-if="year.abolished_tournaments"
-          label="abolished"
-          :tournaments="year.abolished_tournaments"
+          v-for="tournament in tournamentCollapsibles"
+          :key="tournament.label"
+          :label="tournament.label"
+          :tournaments="tournament.tournaments"
           :year="id"
         />
 
         <year-player-collapsible
-          v-if="year.pro_players"
-          label="who turned pro"
-          :players="year.pro_players"
-          :year="id"
-        />
-
-        <year-player-collapsible
-          v-if="year.retired_players"
-          label="who retired"
-          :players="year.retired_players"
-          :year="id"
-        />
-
-        <year-player-collapsible
-          v-if="year.born_players"
-          label="who were born"
-          :players="year.born_players"
-          :year="id"
-        />
-
-        <year-player-collapsible
-          v-if="year.died_players"
-          label="who died"
-          :players="year.died_players"
-          :year="id"
-        />
-
-        <year-player-collapsible
-          v-if="year.hof"
-          label="inducted into the Hall of Fame"
-          :players="year.hof"
+          v-for="player in playerCollapsibles"
+          :key="player.label"
+          :label="player.label"
+          :players="player.players"
           :year="id"
         />
       </u-page-grid>
@@ -92,8 +83,8 @@ const items = [
         v-else
         :title="`No details found for ${id}`"
         :icon="ICONS.noCalendar"
-        :status="status"
-        :error="`Error fetching year details for ${id}`"
+        :status
+        :error="`details for ${id}`"
       />
     </nuxt-layout>
   </div>

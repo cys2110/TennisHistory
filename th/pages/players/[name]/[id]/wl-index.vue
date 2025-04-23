@@ -40,8 +40,9 @@ const {
 watch(
   () => id.value,
   newId => {
-    if (newId && route.name === "wl-index") refresh()
-  }
+    if (newId && newId !== " " && route.name === "wl-index") refresh()
+  },
+  { immediate: true }
 )
 </script>
 

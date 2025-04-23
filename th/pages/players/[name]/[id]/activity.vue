@@ -32,8 +32,9 @@ const {
 watch(
   () => [id.value, year.value],
   ([newId, newYear]) => {
-    if ((newId || newYear) && route.name === "activity") refresh()
-  }
+    if (((newId && newId !== " ") || newYear) && route.name === "activity") refresh()
+  },
+  { immediate: true }
 )
 
 // Anchor links

@@ -78,6 +78,13 @@ export default defineAppConfig({
     avatar: {
       slots: {
         root: "border border-neutral-600 dark:border-neutral-400"
+      },
+      variants: {
+        size: {
+          "3xl": {
+            root: "size-20 mx-auto"
+          }
+        }
       }
     },
     button: {
@@ -85,7 +92,8 @@ export default defineAppConfig({
         {
           color: "secondary",
           variant: "subtle",
-          class: "text-secondary-700 dark:text-secondary-500 ring-secondary-600 bg-secondary-600/10 dark:bg-secondary-400/10 hover:bg-secondary-600/20 hover:shadow-sm hover:shadow-secondary-800 dark:hover:shadow-secondary-500"
+          class:
+            "text-secondary-700 dark:text-secondary-500 ring-secondary-600 bg-secondary-600/10 dark:bg-secondary-400/10 hover:bg-secondary-600/20 hover:shadow-sm hover:shadow-secondary-800 dark:hover:shadow-secondary-500"
         }
       ],
       defaultVariants: {

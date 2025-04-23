@@ -1,9 +1,12 @@
 <script setup lang="ts">
-// [FUTURE: Add coach's players' stats]
+// XXX: Add coach's players' stats
 definePageMeta({ name: "coach" })
 const id = useRouteParams<string>("id")
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const mdAndUp = breakpoints.greaterOrEqual("md")
+
+const route = useRoute()
+const toast = useToast()
 
 interface CoachAPIResponse {
   labels: string[]
@@ -12,7 +15,30 @@ interface CoachAPIResponse {
 }
 
 // API call
-const { data: coach, status } = await useFetch<CoachAPIResponse>("/api/coach-details", { query: { id } })
+const {
+  data: coach,
+  status,
+  refresh
+} = await useFetch<CoachAPIResponse>("/api/coach-details", {
+  query: { id },
+  watch: false,
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching details about ${decodeName(id.value)}`,
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
+  }
+})
+
+watch(
+  () => id.value,
+  newId => {
+    if (newId && newId !== " " && route.name === "coach") refresh()
+  },
+  { immediate: true }
+)
 
 useHead({ title: coach.value?.name ?? decodeName(id.value), templateParams: { subPage: "Coaches" } })
 
@@ -75,17 +101,16 @@ const links = computed(() => {
         </u-dropdown-menu>
       </template>
 
-      <u-page-grid v-if="coach && coach.players.length > 0">
+      <u-page-grid v-if="coach?.players.length || ['pending', 'error'].includes(status)">
         <player-card
+          v-if="coach"
           v-for="player in coach.players"
           :key="player.id"
           :id="player.id"
           :player
         />
-      </u-page-grid>
-
-      <u-page-grid v-else-if="status === 'pending'">
         <player-loading-card
+          v-else
           v-for="_ in 10"
           :key="_"
         />

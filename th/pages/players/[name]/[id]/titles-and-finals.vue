@@ -26,8 +26,9 @@ const { data, status, refresh } = await useFetch<TitlesAndFinalsType>("/api/titl
 watch(
   () => id.value,
   newId => {
-    if (newId && route.name === "titles-and-finals") refresh()
-  }
+    if (newId && newId !== " " && route.name === "titles-and-finals") refresh()
+  },
+  { immediate: true }
 )
 </script>
 

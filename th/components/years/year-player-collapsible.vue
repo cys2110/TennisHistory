@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ label: string; players: Pick<PlayerInterface, "id" | "name" | "country">[]; year: string }>()
+defineProps<{ label: string; players: Pick<PlayerInterface, "id" | "name" | "country">[] | undefined; year: string }>()
 </script>
 
 <template>
@@ -15,7 +15,7 @@ defineProps<{ label: string; players: Pick<PlayerInterface, "id" | "name" | "cou
     <template #content>
       <div class="flex flex-col gap-2 max-h-100 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent scrollbar-thumb-rounded-full">
         <player-avatar
-          v-if="players.length > 0"
+          v-if="players?.length"
           v-for="player in players"
           :key="player.id"
           :player
