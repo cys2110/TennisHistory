@@ -4,9 +4,6 @@ defineProps<{ country: CountryInterface }>()
 
 <template>
   <u-link :to="{ name: 'country', params: { id: country.id } }">
-    <u-icon
-      v-if="country.alpha2"
-      :name="`flag:${country.alpha2}-4x3`"
-    />
+    <u-icon :name="country.alpha2 ? `flag:${country.alpha2}-4x3` : `flags:${country.id}`" />
   </u-link>
 </template>

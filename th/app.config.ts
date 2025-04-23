@@ -33,7 +33,7 @@ export default defineAppConfig({
       arrowLeft: "line-md:arrow-left-circle-twotone",
       arrowRight: "line-md:arrow-right-circle-twotone",
       check: "line-md:confirm",
-      chevronDoubleLeft: "line-md:chevron-small-double-right",
+      chevronDoubleLeft: "line-md:chevron-small-double-left",
       chevronDoubleRight: "line-md:chevron-small-double-right",
       chevronDown: "line-md:chevron-small-down",
       chevronLeft: "line-md:chevron-small-left",
@@ -110,21 +110,11 @@ export default defineAppConfig({
     },
     alert: {
       slots: {
-        root: "md:w-3/4 mx-auto",
+        root: "w-fit mx-auto px-16",
         icon: "size-8",
         title: "text-lg font-semibold"
       },
-      compoundVariants: [
-        {
-          color: "info",
-          variant: "subtle",
-          class: {
-            root: "bg-info-700/25 text-info-800 dark:bg-info-300/10 dark:text-info-400"
-          }
-        }
-      ],
       defaultVariants: {
-        color: "info",
         variant: "subtle"
       }
     },
@@ -207,6 +197,15 @@ export default defineAppConfig({
       defaultVariants: {
         color: "secondary",
         size: "sm"
+      }
+    },
+    pagination: {
+      slots: {
+        item: "cursor-pointer",
+        first: "cursor-pointer",
+        last: "cursor-pointer",
+        next: "cursor-pointer",
+        prev: "cursor-pointer"
       }
     }
   },

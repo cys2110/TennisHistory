@@ -11,7 +11,7 @@ defineProps<{ detail: { id?: string; title: string; value: any; description?: st
     <template #description>
       <div v-if="detail.id === 'supervisors'">
         <supervisor-link
-          v-if="detail.value.length > 0"
+          v-if="detail.value.length"
           v-for="supervisor in detail.value"
           :key="supervisor"
           :supervisor

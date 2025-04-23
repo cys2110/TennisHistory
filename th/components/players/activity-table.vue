@@ -11,7 +11,14 @@ const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const playerName = computed(() => decodeName(paramName.value))
 
-const columns: TableColumn<Pick<MatchInterface, "country" | "id" | "incomplete" | "mid" | "name" | "player_incomplete" | "rank" | "round" | "sets" | "seed" | "status" | "tbs" | "winner">>[] = [{ accessorKey: "round", header: "Round" }, { accessorKey: "name", header: "Opponent" }, { accessorKey: "rank", header: "Rank" }, { accessorKey: "winner", header: "" }, { id: "score", header: "Score" }, { id: "h2h" }]
+const columns: TableColumn<Pick<MatchInterface, "country" | "id" | "incomplete" | "mid" | "name" | "player_incomplete" | "rank" | "round" | "sets" | "seed" | "status" | "tbs" | "winner">>[] = [
+  { accessorKey: "round", header: "Round" },
+  { accessorKey: "name", header: "Opponent" },
+  { accessorKey: "rank", header: "Rank" },
+  { accessorKey: "winner", header: "" },
+  { id: "score", header: "Score" },
+  { id: "h2h" }
+]
 </script>
 
 <template>
@@ -26,7 +33,11 @@ const columns: TableColumn<Pick<MatchInterface, "country" | "id" | "incomplete" 
         class="flex gap-2 items-center"
       >
         <player-avatar :player="{ id: row.original.id, name: row.original.name, country: row.original.country }" />
-        <small v-if="row.original.seed || row.original.status">({{ row.original.seed }}{{ row.original.status }})</small>
+        <span
+          class="text-xs"
+          v-if="row.original.seed || row.original.status"
+          >({{ row.original.seed }}{{ row.original.status }})</span
+        >
       </div>
       <template v-else>BYE</template>
     </template>
@@ -46,13 +57,15 @@ const columns: TableColumn<Pick<MatchInterface, "country" | "id" | "incomplete" 
         :mid="row.original.mid"
         :sets="row.original.sets"
         :tbs="row.original.tbs"
+        :incomplete="row.original.incomplete"
       />
     </template>
     <template #h2h-cell="{ row }">
       <u-button
         v-if="row.original.name"
-        size="sm"
+        variant="soft"
         :to="{ name: 'h2h-players', params: { p1Name: playerName, p2Name: encodeName(row.original.name), p1Id: id, p2Id: row.original.id } }"
+        :ui="{ base: 'px-2 py-1 font-semibold' }"
       >
         H2H
       </u-button>

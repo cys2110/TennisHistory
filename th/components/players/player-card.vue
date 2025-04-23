@@ -29,7 +29,7 @@ const currentYear = new Date().getFullYear()
       <nuxt-img
         :src="`https://www.atptour.com/-/media/alias/player-headshot/${player.id}`"
         :alt="player.name"
-        class="rounded-full border border-neutral-600 dark:border-neutral-400 max-h-40"
+        class="rounded-full border border-neutral-600 dark:border-neutral-400 max-h-40 mx-auto"
       />
     </u-page-card>
   </div>

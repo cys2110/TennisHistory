@@ -24,7 +24,9 @@ const sets = computed(() => {
         </div>
         <div class="flex justify-between">
           <div v-if="match.court">{{ match.court }}</div>
-          <div v-if="match.umpire">{{ match.umpire }}</div>
+          <div v-if="match.umpire">
+            <umpire-link :umpire="match.umpire" />
+          </div>
         </div>
       </div>
     </template>

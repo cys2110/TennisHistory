@@ -1,11 +1,36 @@
 <script setup lang="ts">
+defineProps<{ active: boolean }>()
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const { active } = defineProps<{ active: boolean }>()
+
+const route = useRoute()
+const toast = useToast()
 
 // API call
-const { data: player, status } = await useFetch<PlayerDetailsType>("/api/player-details", { query: { id } })
+const {
+  data: player,
+  status,
+  refresh
+} = await useFetch<PlayerDetailsType>("/api/player-details", {
+  query: { id },
+  watch: false,
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching details for ${name.value}`,
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
+  }
+})
+
+watch(
+  () => id.value,
+  newId => {
+    if (newId && route.name === "player") refresh()
+  }
+)
 </script>
 
 <template>
@@ -19,7 +44,7 @@ const { data: player, status } = await useFetch<PlayerDetailsType>("/api/player-
       :active
     />
     <u-page-columns
-      v-else-if="status === 'pending'"
+      v-else-if="['pending', 'fetching'].includes(status)"
       class="lg:columns-2 xl:columns-3 2xl:columns-3"
     >
       <details-loading-card
@@ -28,11 +53,11 @@ const { data: player, status } = await useFetch<PlayerDetailsType>("/api/player-
       />
     </u-page-columns>
     <error-message
-      v-if="!player"
+      v-else
       :icon="ICONS.noPlayer"
       :title="`No details found for ${name}`"
       :status
-      :error="`Error fetching details for ${name}`"
+      :error="`details for ${name}`"
     />
   </dashboard-subpanel>
 </template>

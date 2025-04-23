@@ -110,7 +110,7 @@ const columnVisibility = ref({ withdrew: false })
 
     <template #last-cell="{ row }">
       <div class="flex items-center gap-2">
-        <flag-icon :country="row.original.country" />
+        <country-link :country="row.original.country" />
         <u-user
           :name="row.original.name"
           :avatar="{ src: `https://www.atptour.com/-/media/alias/player-headshot/${row.original.id}`, icon: ICONS.player }"

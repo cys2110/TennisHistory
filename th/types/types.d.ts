@@ -32,11 +32,36 @@ declare global {
 
   type CountryEntryType = Pick<EntryInterface, "id" | "name" | "country" | "last" | "rank" | "withdrew">
 
-  type PlayerDetailsType = Pick<PlayerInterface, "ch" | "ch_date" | "wl" | "titles" | "pm" | "coaches" | "rh" | "bh" | "height" | "countries" | "age" | "dob" | "hof" | "dod" | "name" | "pro" | "retired">
+  type PlayerDetailsType = Pick<
+    PlayerInterface,
+    "ch" | "ch_date" | "wl" | "titles" | "pm" | "coaches" | "rh" | "bh" | "height" | "countries" | "age" | "dob" | "hof" | "dod" | "name" | "pro" | "retired"
+  >
 
-  type TitlesAndFinalsType = Pick<PlayerInterface, "finals"> & { titles: { title: string; events: Pick<EventInterface, "eid" | "tid" | "name" | "surface" | "dates" | "draw_type">[] }[] }
+  type TitlesAndFinalsType = { titles: { title: string; events: EventCardType[] }[]; finals: { title: string; events: EventCardType[] }[] }
 
-  type PlayerActivityType = Pick<EventInterface, "currency" | "dates" | "draw_type" | "eid" | "ename" | "incomplete" | "name" | "points" | "pm" | "rank" | "seed" | "status" | "winner" | "sets" | "tbs" | "player_incomplete" | "matches" | "surface" | "venues" | "tid">
+  type PlayerActivityType = Pick<
+    EventInterface,
+    | "currency"
+    | "dates"
+    | "draw_type"
+    | "eid"
+    | "ename"
+    | "incomplete"
+    | "name"
+    | "points"
+    | "pm"
+    | "rank"
+    | "seed"
+    | "status"
+    | "winner"
+    | "sets"
+    | "tbs"
+    | "player_incomplete"
+    | "matches"
+    | "surface"
+    | "venues"
+    | "tid"
+  >
 
   type PlayerActivityAPIType = {
     stats: PlayerStatsInterface[]
@@ -47,7 +72,34 @@ declare global {
 
   type MatchPlayerType = Pick<PlayerInterface, "id" | "name" | "country"> & Pick<EventInterface, "seed" | "status" | "rank" | "sets" | "tbs" | "incomplete">
 
-  type MatchDetailsType = Pick<MatchInterface, "name" | "surface" | "dates" | "date" | "court" | "umpire" | "duration" | "winner" | "round" | "p1" | "p2" | "aces" | "dfs" | "serve1" | "serve2" | "bps_saved" | "ret1" | "ret2" | "bps_converted" | "winners" | "ues" | "net" | "max_speed" | "avg1_speed" | "avg2_speed">
+  type MatchDetailsType = Pick<
+    MatchInterface,
+    | "name"
+    | "surface"
+    | "dates"
+    | "date"
+    | "court"
+    | "umpire"
+    | "duration"
+    | "winner"
+    | "round"
+    | "p1"
+    | "p2"
+    | "aces"
+    | "dfs"
+    | "serve1"
+    | "serve2"
+    | "bps_saved"
+    | "ret1"
+    | "ret2"
+    | "bps_converted"
+    | "winners"
+    | "ues"
+    | "net"
+    | "max_speed"
+    | "avg1_speed"
+    | "avg2_speed"
+  >
 
   type ResultsMatchType = Pick<MatchInterface, "mid" | "date" | "court" | "duration" | "incomplete" | "umpire" | "loser"> & { winner: MatchPlayerType }
 

@@ -20,7 +20,7 @@ const option = ref({
       `
     }
   },
-  xAxis: { type: "value", max: 100, splitLine: { lineStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.lightText : CHART_COLOURS.darkText } } },
+  xAxis: { type: "value", max: 100, splitLine: { lineStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.lightText : CHART_COLOURS.darkText } }, axisLabel: { formatter: "{value}%" } },
   yAxis: { type: "category", inverse: true },
   series: [
     {

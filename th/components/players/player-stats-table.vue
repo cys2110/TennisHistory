@@ -3,7 +3,7 @@ import type { TableColumn } from "@nuxt/ui"
 defineProps<{ stats: PlayerStatsInterface[] | null; status: string }>()
 
 const columns: TableColumn<{ category: string; value: number; suffix?: boolean }>[] = [
-  { accessorKey: "category", header: "Category", meta: { class: { th: "w-1/2", td: "w-1/3" } } },
+  { accessorKey: "category", header: "", meta: { class: { th: "w-1/2", td: "w-1/3" } } },
   { accessorKey: "value", header: "", meta: { class: { th: "w-2/3", td: "w-2/3" } } }
 ]
 </script>
@@ -13,11 +13,11 @@ const columns: TableColumn<{ category: string; value: number; suffix?: boolean }
     :data="stats || []"
     :columns
     class="w-full md:w-3/4 lg:w-2/3 xl:w-1/2 mx-auto"
-    :loading="status === 'pending'"
+    :loading="['pending', 'idle'].includes(status)"
   >
     <template #empty>
       <div
-        v-if="status === 'pending'"
+        v-if="['pending', 'idle'].includes(status)"
         class="flex flex-col gap-4"
       >
         <div

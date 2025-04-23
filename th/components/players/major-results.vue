@@ -3,8 +3,34 @@ const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 
+const route = useRoute()
+const toast = useToast()
+
 // API call
-const { data: results, status } = await useFetch<MajorResultsInterface[]>("/api/major-results", { query: { id } })
+const {
+  data: results,
+  status,
+  refresh
+} = await useFetch<MajorResultsInterface[]>("/api/major-results", {
+  query: { id },
+  default: () => [],
+  watch: false,
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching ${name.value}'s best results`,
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
+  }
+})
+
+watch(
+  () => id.value,
+  newId => {
+    if (newId && route.name === "player") refresh()
+  }
+)
 </script>
 
 <template>
@@ -13,29 +39,31 @@ const { data: results, status } = await useFetch<MajorResultsInterface[]>("/api/
     :icon="ICONS.tournament"
   >
     <u-page-columns
-      v-if="results"
+      v-if="results.length || ['pending', 'idle'].includes(status)"
       class="lg:columns-2 xl:columns-2 2xl:columns-2"
     >
+      <!--Show if player has major results-->
       <major-results-card
+        v-if="results.length"
         v-for="result in results"
         :key="result.tid"
         :result
       />
-    </u-page-columns>
-    <u-page-columns
-      v-else-if="status === 'pending'"
-      class="lg:columns-2 xl:columns-2 2xl:columns-2"
-    >
+
+      <!--Loading state-->
       <major-results-loading-card
+        v-else
         v-for="_ in 5"
         :key="_"
       />
     </u-page-columns>
+
+    <!--Error/no results state-->
     <error-message
       v-else
       :title="`No results found for ${name}`"
       :status
-      :error="`Error fetching results for ${name}`"
+      :error="`results for ${name}`"
       :icon="ICONS.noTournament"
     />
   </dashboard-subpanel>

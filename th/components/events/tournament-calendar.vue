@@ -1,8 +1,7 @@
 <script setup lang="ts">
-const { breadcrumbs, type } = defineProps<{
-  breadcrumbs: { label: string; to?: { name: string }; icon: string }[]
-  type: "upcoming" | "archive"
-}>()
+defineProps<{ breadcrumbs: { label: string; to?: { name: string }; icon: string }[] }>()
+const toast = useToast()
+const route = useRoute()
 
 // Set select values - default to all
 const year = useRouteQuery("year", new Date().getFullYear().toString())
@@ -12,7 +11,16 @@ const surfaces = ref<SurfaceEnum[] | undefined>()
 
 // API call
 const { data: events, status } = await useFetch<EventCardType[]>("/api/results-archive", {
-  query: { surfaces, months, categories, year, upcoming: type }
+  query: { surfaces, months, categories, year, upcoming: route.name === "upcoming-tournaments" ? "upcoming" : "archive" },
+  default: () => [],
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: route.name === "upcoming-tournaments" ? "Error fetching upcoming tournaments" : `Error fetching tournaments for ${year}`,
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
+  }
 })
 
 // Anchor links
@@ -43,7 +51,7 @@ const links = computed(() => {
       <!--Select menus-->
       <template #toolbar>
         <years-all-select
-          v-if="type === 'archive'"
+          v-if="route.name === 'results-archive'"
           v-model="year"
         />
         <month-select v-model="months" />
@@ -51,25 +59,31 @@ const links = computed(() => {
         <surface-select v-model="surfaces" />
       </template>
 
-      <!--Event cards-->
-      <event-grid
-        v-if="events && events.length > 0"
-        :events
-      />
+      <u-page-grid v-if="events.length || ['pending', 'idle'].includes(status)">
+        <!--Event cards-->
+        <event-card
+          v-if="events.length"
+          v-for="event in events"
+          :key="event.eid"
+          :event
+          :id="`event-${event.eid}`"
+        />
 
-      <u-page-grid v-else-if="status === 'pending'">
+        <!--Loading state-->
         <event-loading-card
+          v-else
           v-for="_ in 10"
           :key="_"
         />
       </u-page-grid>
 
+      <!--If no events are returned / error-->
       <error-message
         v-else
-        title="No upcoming tournaments"
+        :title="route.name === 'upcoming-tournaments' ? 'No upcoming tournaments' : `No tournaments took place in ${year}`"
         :icon="ICONS.noCalendar"
         :status
-        error="Error fetching upcoming tournaments"
+        :error="route.name === 'upcoming-tournaments' ? 'upcoming tournaments' : `tournaments for ${year}`"
       />
     </nuxt-layout>
   </div>

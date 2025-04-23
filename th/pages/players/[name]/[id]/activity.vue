@@ -3,12 +3,38 @@ definePageMeta({ name: "activity" })
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 const id = useRouteParams<string>("id")
+const route = useRoute()
+const toast = useToast()
+
 const playerYears = useState<string[]>("player-years")
 const currentYear = new Date().getFullYear()
 const year = useRouteQuery<string>("year", playerYears.value ? playerYears.value[playerYears.value.length - 1].toString() : currentYear.toString())
 
 // API call
-const { data: yearActivity, status } = await useFetch<PlayerActivityAPIType>("/api/player-activity", { query: { id, year } })
+const {
+  data: yearActivity,
+  status,
+  refresh
+} = await useFetch<PlayerActivityAPIType>("/api/player-activity", {
+  query: { id, year },
+  default: () => ({ stats: [], activity: [] }),
+  watch: false,
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching ${name.value}'s ${year} activity`,
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
+  }
+})
+
+watch(
+  () => [id.value, year.value],
+  ([newId, newYear]) => {
+    if ((newId || newYear) && route.name === "activity") refresh()
+  }
+)
 
 // Anchor links
 const links = computed(() => {
@@ -43,7 +69,10 @@ const links = computed(() => {
       </template>
 
       <!--Overview stats for the year-->
-      <u-page-grid class="grid-cols-3 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 2xl:w-1/2 mx-auto">
+      <u-page-grid
+        v-if="yearActivity.stats.length || ['pending', 'idle'].includes(status)"
+        class="grid-cols-3 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 2xl:w-1/2 mx-auto"
+      >
         <year-stat-card
           v-if="yearActivity"
           v-for="stat in yearActivity.stats"
@@ -58,11 +87,11 @@ const links = computed(() => {
       </u-page-grid>
 
       <u-page-list
-        v-if="(yearActivity && yearActivity.activity.length > 0) || status === 'pending'"
-        class="m-10 gap-10 w-full 2xl:w-1/2 mx-auto"
+        v-if="yearActivity.activity.length > 0 || ['pending', 'idle'].includes(status)"
+        class="m-10 gap-10 w-full xl:w-2/3 2xl:w-1/2 mx-auto"
       >
         <activity-card
-          v-if="yearActivity"
+          v-if="yearActivity.activity.length"
           v-for="event in yearActivity.activity"
           :key="event.eid"
           :id="`event-${event.eid}`"
@@ -80,7 +109,7 @@ const links = computed(() => {
         v-else
         :title="`${name} had no activity in ${year}`"
         :icon="ICONS.noCalendar"
-        :error="`Error fetching ${name}'s ${year} activity'`"
+        :error="`${name}'s ${year} activity'`"
         :status
       />
     </nuxt-layout>

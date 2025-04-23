@@ -26,11 +26,12 @@ export default defineEventHandler(async query => {
       }
       CALL (p) {
         OPTIONAL MATCH (p)<-[:COACHES]-(z:Coach)
-        RETURN COLLECT(DISTINCT {labels: labels(z), id: z.id, name: z.first_name || ' ' || z.last_name}) AS coaches
+        WITH COLLECT(DISTINCT {labels: labels(z), id: z.id, name: z.first_name || ' ' || z.last_name}) AS coaches, z
+        RETURN CASE WHEN z IS NOT NULL THEN coaches ELSE [] END AS coaches
       }
       CALL (p) {
         OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(s:Score)-[:SCORED]->(m:Match)-[:PLAYED]->(r:Round)
-WITH DISTINCT s, m, r
+        WITH DISTINCT s, m, r
         RETURN SUM(CASE WHEN s:Winner AND (m:Best3 OR m:Best5) THEN 1 ELSE 0 END) AS win, SUM(CASE WHEN s:Loser AND (m:Best3 OR m:Best5) THEN 1 ELSE 0 END) AS loss, SUM(CASE WHEN s:Winner AND r.round = 'Final' THEN 1 ELSE 0 END) AS titles
       }
       RETURN

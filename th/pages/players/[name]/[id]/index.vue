@@ -3,8 +3,11 @@ definePageMeta({ name: "player" })
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
+const route = useRoute()
+const toast = useToast()
 const playerYears = useState<string[]>("player-years")
 
+// Determine whether player is still active on tour
 const active = computed(() => {
   if (playerYears.value.length > 0) {
     const lastYear = playerYears.value[playerYears.value.length - 1]
@@ -14,7 +17,26 @@ const active = computed(() => {
 })
 
 // API call
-const { data: player } = await useFetch<Pick<PlayerInterface, "gladiator" | "country">>("/api/player-overview", { query: { id } })
+const { data: player, refresh } = await useFetch<Pick<PlayerInterface, "gladiator" | "country">>("/api/player-overview", {
+  query: { id },
+  watch: false,
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching player overview for ${name.value}`,
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
+  }
+})
+
+watch(
+  () => id.value,
+  newId => {
+    if (newId && route.name === "player") refresh()
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -22,21 +44,15 @@ const { data: player } = await useFetch<Pick<PlayerInterface, "gladiator" | "cou
     <nuxt-layout name="player-layout">
       <u-page-section
         :headline="active ? 'Active' : 'Retired'"
-        :title="name.toUpperCase()"
+        :title="name"
         orientation="horizontal"
         reverse
-        :ui="{ title: 'tracking-wider' }"
+        :ui="{ title: 'tracking-wider uppercase' }"
       >
         <nuxt-img
-          v-if="player?.gladiator"
-          :src="`https://www.atptour.com/-/media/alias/player-gladiator-headshot/${id}`"
+          :src="player?.gladiator ? `https://www.atptour.com/-/media/alias/player-gladiator-headshot/${id}` : `https://www.atptour.com/-/media/alias/player-headshot/${id}`"
           :alt="name"
-        />
-        <nuxt-img
-          v-else
-          :src="`https://www.atptour.com/-/media/alias/player-headshot/${id}`"
-          :alt="name"
-          class="border border-neutral-500 rounded-full max-h-96 max-w-96 mx-auto"
+          :class="{ 'border border-neutral-500 rounded-full max-h-96 max-w-96 mx-auto': !player?.gladiator }"
         />
 
         <template #leading>
@@ -49,8 +65,8 @@ const { data: player } = await useFetch<Pick<PlayerInterface, "gladiator" | "cou
 
         <template #description>
           <div class="text-base">Years Active at Tour Level:</div>
-          <div class="font-bold text-(--ui-text-highlighted) text-xl">{{ playerYears[0] }} — {{ active ? "present" : playerYears[playerYears.length - 1] }}</div>
-          <div class="text-base">{{ Number(playerYears[playerYears.length - 1]) - Number(playerYears[0]) }} years</div>
+          <div class="font-bold text-(--ui-text-highlighted) text-xl">{{ playerYears[0] }}{{ playerYears.length > 1 ? `— ${active ? "present" : playerYears[playerYears.length - 1]}` : undefined }}</div>
+          <div class="text-base">{{ Number(playerYears[playerYears.length - 1]) - Number(playerYears[0]) + 1 }} years</div>
         </template>
       </u-page-section>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">

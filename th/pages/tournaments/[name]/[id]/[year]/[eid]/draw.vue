@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { useVueFlow } from "@vue-flow/core"
-definePageMeta({ name: "draw" })
+definePageMeta({
+  name: "draw",
+  middleware: [
+    function (to, from) {
+      if (COUNTRY_DRAWS.includes(to.params.id as string)) {
+        return navigateTo({ name: "country-draw" })
+      } else if (to.params.id === "9210") {
+        return navigateTo({ name: "laver-cup-draw" })
+      }
+    }
+  ]
+})
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 const { fitView } = useVueFlow()

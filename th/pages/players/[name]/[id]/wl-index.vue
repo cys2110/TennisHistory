@@ -1,10 +1,14 @@
 <script setup lang="ts">
 definePageMeta({ name: "wl-index" })
-const breakpoints = useBreakpoints(breakpointsTailwind)
-const mdAndUp = breakpoints.greaterOrEqual("md")
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
+
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
+const route = useRoute()
+const toast = useToast()
+
 const checked = ref(false)
 
 const categoryColours = {
@@ -16,7 +20,29 @@ const categoryColours = {
 }
 
 // API call
-const { data: index, status } = await useFetch<WLIndexInterface[]>("/api/wl-index", { query: { id } })
+const {
+  data: index,
+  status,
+  refresh
+} = await useFetch<WLIndexInterface[]>("/api/wl-index", {
+  query: { id },
+  watch: false,
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching win-loss index for ${name.value}`,
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
+  }
+})
+
+watch(
+  () => id.value,
+  newId => {
+    if (newId && route.name === "wl-index") refresh()
+  }
+)
 </script>
 
 <template>
@@ -25,7 +51,7 @@ const { data: index, status } = await useFetch<WLIndexInterface[]>("/api/wl-inde
       <!--Legend for chart-->
       <template #toolbar>
         <div
-          v-if="checked"
+          v-if="checked && mdAndUp"
           v-for="(entry, index) in Object.entries(categoryColours)"
           :key="index"
           class="mx-5 flex items-center gap-2"
@@ -34,8 +60,10 @@ const { data: index, status } = await useFetch<WLIndexInterface[]>("/api/wl-inde
             name="zondicons:color-palette"
             :class="entry[1]"
           />
-          <div class="text-neutral-600 dark:text-neutral-400 self-center text-xs lg:text-sm">{{ entry[0] }}</div>
+          <div class="text-(--ui-text-muted) self-center text-xs lg:text-sm">{{ entry[0] }}</div>
         </div>
+
+        <!--Only show chart if medium+ screens-->
         <u-switch
           v-if="mdAndUp"
           v-model="checked"
@@ -45,9 +73,9 @@ const { data: index, status } = await useFetch<WLIndexInterface[]>("/api/wl-inde
           class="ml-auto"
         />
       </template>
-      <div v-if="index || status === 'pending'">
+      <div v-if="index || ['pending', 'idle'].includes(status)">
         <wl-index-chart
-          v-if="checked && index"
+          v-if="checked && mdAndUp && index"
           :index
         />
         <wl-index-table
@@ -61,7 +89,7 @@ const { data: index, status } = await useFetch<WLIndexInterface[]>("/api/wl-inde
         :icon="ICONS.noChart"
         :title="`No win-loss index available for ${name}`"
         :status="status"
-        :error="`Error fetching ${name}'s win-loss index`"
+        :error="`${name}'s win-loss index`"
       />
     </nuxt-layout>
   </div>

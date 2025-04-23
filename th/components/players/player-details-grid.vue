@@ -23,46 +23,49 @@ const playerDetails = [
 </script>
 
 <template>
-  <div>
-    <u-page-columns class="lg:columns-2 xl:columns-3 2xl:columns-3">
-      <!--@vue-expect-error-->
-      <details-card
-        v-for="detail in playerDetails"
-        :key="detail?.title"
-        :detail
-      />
-      <u-page-card
-        :title="player.coaches.length === 1 ? 'Coach' : 'Coaches'"
-        highlight
-      >
-        <template #description>
-          <coach-link
-            v-if="player.coaches.length > 0"
-            v-for="coach in player.coaches"
-            :key="coach.id"
-            :coach
-          />
-          <template v-else>—</template>
-        </template>
-      </u-page-card>
-    </u-page-columns>
+  <u-page-columns class="lg:columns-2 xl:columns-3 2xl:columns-3">
+    <!--@vue-expect-error-->
+    <details-card
+      v-for="detail in playerDetails"
+      :key="detail?.title"
+      :detail
+    />
     <u-page-card
-      v-if="player && player.countries.length > 0"
-      class="col-span-2"
-      title="Previous Representations"
+      :title="player.coaches.length === 1 ? 'Coach' : 'Coaches'"
       highlight
     >
       <template #description>
-        <div
-          v-for="country in player.countries"
-          :key="country.id"
-          class="grid grid-cols-3 gap-2"
-        >
-          <country-link :country />
-          <span>{{ country.name }}</span>
-          <span>{{ country.dates }}</span>
-        </div>
+        <coach-link
+          v-if="player.coaches.length"
+          v-for="coach in player.coaches"
+          :key="coach.id"
+          :coach
+        />
+        <template v-else>—</template>
       </template>
     </u-page-card>
-  </div>
+  </u-page-columns>
+  <u-page-card
+    v-if="player.countries.length"
+    class="mt-10"
+    title="Previous Representations"
+    highlight
+  >
+    <template #description>
+      <div
+        v-for="country in player.countries"
+        :key="country.id"
+        class="grid grid-cols-9 items-center my-2"
+      >
+        <country-link :country />
+        <u-link
+          class="hover-link w-fit col-span-4"
+          :to="{ name: 'country', params: { id: country.id } }"
+        >
+          {{ country.name }}
+        </u-link>
+        <span class="col-span-4">{{ country.dates }}</span>
+      </div>
+    </template>
+  </u-page-card>
 </template>

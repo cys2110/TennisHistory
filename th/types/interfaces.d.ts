@@ -141,10 +141,6 @@ declare global {
     titles: string
     wins: string
     wl: string
-    finals: {
-      title: string
-      events: Pick<EventInterface, "eid" | "tid" | "name" | "surface" | "dates" | "draw_type">[]
-    }[]
   }
 
   interface MajorResultsInterface {

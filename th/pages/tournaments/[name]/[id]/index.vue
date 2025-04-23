@@ -10,7 +10,7 @@ definePageMeta({
   ]
 })
 const breakpoints = useBreakpoints(breakpointsTailwind)
-const mdAndUp = breakpoints.greaterOrEqual("md")
+
 const xlAndUp = breakpoints.greaterOrEqual("xl")
 const lgAndUp = breakpoints.greaterOrEqual("lg")
 const paramName = useRouteParams<string>("name")

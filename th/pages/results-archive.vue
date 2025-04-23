@@ -10,8 +10,5 @@ const breadcrumbs = [
 </script>
 
 <template>
-  <tournament-calendar
-    :breadcrumbs
-    type="archive"
-  />
+  <tournament-calendar :breadcrumbs />
 </template>

@@ -6,11 +6,10 @@ export default defineEventHandler(async query => {
 
   const { id, year } = getQuery<QueryProps>(query)
 
-  // TODO: Remove WHERE t.name IS NOT NULL
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (s:Surface {id: $id})<-[:ON_SURFACE]-(e:Event)-[:IN_YEAR]->(y:Year {id: $year})
-      MATCH (e)-[:EDITION_OF]->(t:Tournament) WHERE t.name IS NOT NULL
+      MATCH (e)-[:EDITION_OF]->(t:Tournament)
       MATCH (e)-[:TOOK_PLACE_IN]->(v:Venue)-[:LOCATED_IN]->(c:Country)
       WITH y, e, t, s, v, c
         ORDER BY e.start_date

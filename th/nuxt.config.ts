@@ -60,5 +60,14 @@ export default defineNuxtConfig({
     theme: {
       colors: ["primary", "secondary", "neutral", "warning", "error", "success", "info"]
     }
+  },
+  icon: {
+    customCollections: [
+      {
+        prefix: "flags",
+        dir: "./assets/flags",
+        normalizeIconName: false
+      }
+    ]
   }
 })

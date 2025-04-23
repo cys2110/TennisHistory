@@ -8,7 +8,7 @@ defineProps<{ event: EventCardType }>()
     <u-page-card
       highlight
       reverse
-      :ui="{ root: 'h-full', description: 'text-sm flex flex-col gap-1', wrapper: 'order-last' }"
+      :ui="{ root: 'h-full', description: 'text-sm flex flex-col gap-1', wrapper: 'order-last flex flex-col items-start', body: 'flex-1' }"
     >
       <!--Need 'order-last' class for smaller screens and 'h-full' to make all cards the same height-->
       <div class="relative">
@@ -23,10 +23,12 @@ defineProps<{ event: EventCardType }>()
         />
       </div>
 
+      <!--Link to country page-->
       <template #leading>
         <country-link :country="event.venues[0].country" />
       </template>
 
+      <!--Link to tournament page-->
       <template #title>
         <tournament-link
           :name="event.name"
@@ -36,13 +38,12 @@ defineProps<{ event: EventCardType }>()
 
       <template #description>
         <div v-if="event.ename">{{ event.ename }}</div>
-        <div>
-          <venue-link
-            v-for="venue in event.venues"
-            :key="venue.id"
-            :venue
-          />
-        </div>
+        <!--Link to venue page-->
+        <venue-link
+          v-for="venue in event.venues"
+          :key="venue.id"
+          :venue
+        />
         <div>{{ event.dates }}</div>
       </template>
 
