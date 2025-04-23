@@ -4,7 +4,7 @@ defineProps<{ events: CountryEventType[] }>()
 
 <template>
   <u-page-grid>
-    <country-card
+    <country-event-card
       v-for="event in events"
       :key="event.eid"
       :event

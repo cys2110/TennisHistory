@@ -33,7 +33,7 @@ export default defineAppConfig({
       arrowLeft: "line-md:arrow-left-circle-twotone",
       arrowRight: "line-md:arrow-right-circle-twotone",
       check: "line-md:confirm",
-      chevronDoubleLeft: "line-md:chevron-small-double-right",
+      chevronDoubleLeft: "line-md:chevron-small-double-left",
       chevronDoubleRight: "line-md:chevron-small-double-right",
       chevronDown: "line-md:chevron-small-down",
       chevronLeft: "line-md:chevron-small-left",
@@ -48,47 +48,36 @@ export default defineAppConfig({
     },
     navigationMenu: {
       slots: {
-        link: "text-xs xl:text-sm",
-        linkLabel: "text-wrap"
+        root: "w-full",
+        link: "text-xs xl:text-sm"
       },
-      variants: {
-        highlightColor: {
-          secondary: "text-secondary-500"
-        }
-      },
-      compoundVariants: [
-        {
-          orientation: "horizontal",
-          highlight: true,
-          class: {
-            link: "after:-bottom-1"
-          }
-        }
-      ],
       defaultVariants: {
         color: "secondary",
         variant: "link",
         highlightColor: "secondary"
       }
     },
-    alert: {
+    breadcrumb: {
       slots: {
-        root: "md:w-3/4 mx-auto",
-        icon: "size-8 lg:size-12",
-        title: "text-lg font-semibold"
+        link: "text-xs md:text-sm",
+        linkLeadingIcon: "size-4 lg:size-5"
       },
-      compoundVariants: [
-        {
-          color: "info",
-          variant: "subtle",
-          class: {
-            root: "bg-info-700/25 text-info-800 dark:bg-info-300/10 dark:text-info-400"
+      variants: {
+        active: {
+          true: {
+            link: "text-(--ui-secondary)"
           }
         }
-      ],
-      defaultVariants: {
-        color: "info",
-        variant: "subtle"
+      }
+    },
+    dropdownMenu: {
+      slots: {
+        content: "max-h-80 border border-secondary-700 dark:border-secondary-600"
+      }
+    },
+    avatar: {
+      slots: {
+        root: "border border-neutral-600 dark:border-neutral-400"
       }
     },
     button: {
@@ -96,8 +85,7 @@ export default defineAppConfig({
         {
           color: "secondary",
           variant: "subtle",
-          class:
-            "text-secondary-700 dark:text-secondary-500 ring-secondary-600 bg-secondary-600/10 dark:bg-secondary-400/10 hover:bg-secondary-600/20 hover:shadow-sm hover:shadow-secondary-800 dark:hover:shadow-secondary-500"
+          class: "text-secondary-700 dark:text-secondary-500 ring-secondary-600 bg-secondary-600/10 dark:bg-secondary-400/10 hover:bg-secondary-600/20 hover:shadow-sm hover:shadow-secondary-800 dark:hover:shadow-secondary-500"
         }
       ],
       defaultVariants: {
@@ -107,7 +95,8 @@ export default defineAppConfig({
     },
     select: {
       slots: {
-        content: "ring-secondary-700 dark:ring-secondary-600",
+        base: "cursor-pointer",
+        content: "ring-secondary-700 dark:ring-secondary-600 cursor-pointer",
         trailingIcon: "group-data-[state=open]:rotate-180 transition-transform duration-250"
       },
       defaultVariants: {
@@ -119,26 +108,20 @@ export default defineAppConfig({
         label: "font-semibold"
       }
     },
-    dropdownMenu: {
+    alert: {
       slots: {
-        content: "max-h-80 border border-secondary-700 dark:border-secondary-600"
-      }
-    },
-    tabs: {
+        root: "w-fit mx-auto px-16",
+        icon: "size-8",
+        title: "text-lg font-semibold"
+      },
       defaultVariants: {
-        color: "secondary",
-        size: "sm"
-      }
-    },
-    table: {
-      slots: {
-        th: "text-center text-xs md:text-sm lg:text-md",
-        td: "text-center text-xs md:text-sm lg:text-md p-2"
+        variant: "subtle"
       }
     },
     radioGroup: {
       slots: {
-        fieldset: "grid grid-cols-6 sm:grid-cols-8 md:grid-cols-16 xl:flex"
+        fieldset: "grid grid-cols-6 sm:grid-cols-8 md:grid-cols-16 xl:flex",
+        base: "cursor-pointer"
       },
       variants: {
         color: {
@@ -154,7 +137,7 @@ export default defineAppConfig({
     },
     switch: {
       slots: {
-        base: "data-[state=unchecked]:bg-emerald-500 data-[state=unchecked]:dark:bg-emerald-800",
+        base: "data-[state=unchecked]:bg-emerald-500 data-[state=unchecked]:dark:bg-emerald-800 cursor-pointer",
         icon: "group-data-[state=unchecked]:text-emerald-700"
       },
       defaultVariants: {
@@ -162,9 +145,20 @@ export default defineAppConfig({
         size: "lg"
       }
     },
+    table: {
+      slots: {
+        th: "text-center text-xs md:text-sm lg:text-md",
+        td: "text-center text-xs md:text-sm lg:text-md p-2"
+      },
+      defaultVariants: {
+        loadingColor: "secondary",
+        loadingAnimation: "swing"
+      }
+    },
     stepper: {
       slots: {
-        root: "my-5"
+        root: "my-5",
+        indicator: "cursor-pointer"
       },
       variants: {
         color: {
@@ -195,6 +189,24 @@ export default defineAppConfig({
       slots: {
         content: "px-4 flex flex-col gap-2"
       }
+    },
+    tabs: {
+      slots: {
+        trigger: "cursor-pointer"
+      },
+      defaultVariants: {
+        color: "secondary",
+        size: "sm"
+      }
+    },
+    pagination: {
+      slots: {
+        item: "cursor-pointer",
+        first: "cursor-pointer",
+        last: "cursor-pointer",
+        next: "cursor-pointer",
+        prev: "cursor-pointer"
+      }
     }
   },
   uiPro: {
@@ -203,29 +215,15 @@ export default defineAppConfig({
         header: "justify-center font-cursive lg:text-lg xl:text-xl 2xl:text-2xl"
       }
     },
-    header: {
+    dashboardPanel: {
       slots: {
-        root: "bg-primary-800",
-        container: "w-screen",
-        title: "font-cursive text-2xl"
+        root: "h-screen",
+        body: "scroll-smooth"
       }
     },
-    footer: {
+    dashboardToolbar: {
       slots: {
-        root: "bg-primary-800"
-      }
-    },
-    footerColumns: {
-      slots: {
-        root: "xl:grid-cols-2 text-center",
-        label: "text-neutral-400 text-center"
-      },
-      variants: {
-        active: {
-          false: {
-            link: "hover-link"
-          }
-        }
+        root: "py-2 flex-wrap"
       }
     },
     error: {
@@ -239,41 +237,27 @@ export default defineAppConfig({
     pageGrid: {
       base: "xl:grid-cols-4 2xl:grid-cols-5"
     },
-    pageHeader: {
-      slots: {
-        root: "py-1",
-        headline: "text-secondary-600 dark:text-secondary-500",
-        description: "mb-2"
-      }
-    },
-    pageSection: {
-      slots: {
-        container: "py-4 sm:py-4 lg:py-4"
-      }
-    },
     pageCard: {
       slots: {
         root: "shadow-md shadow-primary-700 dark:shadow-primary-500 hover:shadow-lg hover:shadow-primary-700 dark:hover:shadow-primary-500",
-        wrapper: "flex flex-col items-start",
-        footer: "self-center mt-auto pt-4"
+        footer: "self-center mt-auto pt-4 flex justify-center"
       },
       variants: {
         variant: {
           outline: {
             root: "ring-primary-700, dark:ring-primary-700"
+          },
+          orientation: {
+            vertical: {
+              wrapper: "flex flex-col items-start"
+            }
           }
         }
       }
     },
-    dashboardToolbar: {
+    pageSection: {
       slots: {
-        root: "py-2 flex-wrap"
-      }
-    },
-    dashboardPanel: {
-      slots: {
-        root: "max-h-screen",
-        body: "scroll-smooth"
+        container: "py-4 sm:py-4 lg:py-4"
       }
     },
     user: {

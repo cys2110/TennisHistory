@@ -47,7 +47,10 @@ watch(
     :items="players || []"
   >
     <template #item-leading="{ item }">
-      <flag-icon :country="item.country" />
+      <u-icon
+        :name="`flag:${item.country.alpha2}-4x3`"
+        class="mr-2"
+      />
     </template>
   </u-select-menu>
 </template>

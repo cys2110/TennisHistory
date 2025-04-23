@@ -2,7 +2,6 @@
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const toast = useToast()
 const colorMode = useColorMode()
 
 interface APIResponse {
@@ -12,16 +11,7 @@ interface APIResponse {
 }
 
 // API call
-const { data: countries, status } = await useFetch<APIResponse[]>("/api/tournament-country-winners-chart", {
-  query: { id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching winners by country for ${name.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: countries, status } = await useFetch<APIResponse[]>("/api/tournament-country-winners-chart", { query: { id } })
 
 interface FormattedData {
   country: string
@@ -80,9 +70,6 @@ const formattedData = computed<FormattedData[]>(() => {
 // Get all years
 const allYears = computed(() => [...new Set(formattedData.value.map(d => d.year))].sort())
 
-// Get all countries
-const allCountries = computed(() => [...new Set(formattedData.value.map(d => d.country))])
-
 // Get unique countries
 const uniqueCountries = computed(() => [...new Set(formattedData.value.map(d => d.country))])
 
@@ -100,7 +87,7 @@ const paddedData = computed(() => {
 
   const result: FormattedData[] = []
 
-  for (const country of allCountries.value) {
+  for (const country of uniqueCountries.value) {
     const entries = countryDataMap.get(country) ?? []
     const byYear = Object.fromEntries(entries.map(e => [e.year, e]))
 
@@ -162,5 +149,6 @@ const baseOption = {
     :icon="ICONS.noCountries"
     :status
     :title="`No winners by country found for ${name}`"
+    :error="`Error fetching winners by country for ${name}`"
   />
 </template>

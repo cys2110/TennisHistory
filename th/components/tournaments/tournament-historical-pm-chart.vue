@@ -1,18 +1,5 @@
 <script setup lang="ts">
-interface APIResponse {
-  year: number
-  pm: number
-  R128?: number
-  R64?: number
-  R32: number
-  R16: number
-  QF: number
-  SF: number
-  F: number
-  currency: CurrencyType
-  yoy: string
-}
-const { pm } = defineProps<{ pm: APIResponse[] }>()
+const { pm } = defineProps<{ pm: HistoricalPMInterface[] }>()
 const colorMode = useColorMode()
 const currency: CurrencyType = pm[0].currency ?? "USD"
 
@@ -152,9 +139,10 @@ const option = ref({
 </script>
 
 <template>
-  <v-chart
-    class="min-h-150 w-full my-auto mt-10"
-    :option
-    :autoresize="true"
-  />
+  <div class="h-[600px] w-full my-auto">
+    <v-chart
+      :option
+      :autoresize="true"
+    />
+  </div>
 </template>

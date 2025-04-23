@@ -1,49 +1,76 @@
 <script setup lang="ts">
 definePageMeta({ name: "player" })
-const toast = useToast()
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const playerYears = useState<number[]>("player-years")
-const currentYear = new Date().getFullYear()
+const route = useRoute()
+const toast = useToast()
+const playerYears = useState<string[]>("player-years")
+
+// Determine whether player is still active on tour
+const active = computed(() => {
+  if (playerYears.value.length > 0) {
+    const lastYear = playerYears.value[playerYears.value.length - 1]
+    return Number(lastYear) === new Date().getFullYear()
+  }
+  return false
+})
 
 // API call
-const { data: player } = await useFetch<Pick<PlayerInterface, "gladiator" | "country">>("/api/player-overview", {
+const { data: player, refresh } = await useFetch<Pick<PlayerInterface, "gladiator" | "country">>("/api/player-overview", {
   query: { id },
-  onResponseError: () => {
+  watch: false,
+  onResponseError: ({ error }) => {
     toast.add({
-      title: `Error fetching overview for ${name.value}`,
+      title: `Error fetching player overview for ${name.value}`,
+      description: error?.message,
       icon: ICONS.error,
       color: "error"
     })
   }
 })
+
+watch(
+  () => id.value,
+  newId => {
+    if (newId && route.name === "player") refresh()
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
   <div>
     <nuxt-layout name="player-layout">
       <u-page-section
-        :headline="playerYears[playerYears.length - 1] === currentYear ? 'Active' : 'Retired'"
-        :icon="`flag:${player?.country.alpha2}-4x3`"
-        :description="`Years active: ${playerYears[0]} - ${playerYears[playerYears.length - 1] === currentYear ? 'present' : playerYears[playerYears.length - 1]}`"
+        :headline="active ? 'Active' : 'Retired'"
+        :title="name"
         orientation="horizontal"
         reverse
+        :ui="{ title: 'tracking-wider uppercase' }"
       >
         <nuxt-img
-          v-if="player?.gladiator"
-          :src="`https://www.atptour.com/-/media/alias/player-gladiator-headshot/${id}`"
+          :src="player?.gladiator ? `https://www.atptour.com/-/media/alias/player-gladiator-headshot/${id}` : `https://www.atptour.com/-/media/alias/player-headshot/${id}`"
           :alt="name"
+          :class="{ 'border border-neutral-500 rounded-full max-h-96 max-w-96 mx-auto': !player?.gladiator }"
         />
-        <nuxt-img
-          v-else
-          :src="`https://www.atptour.com/-/media/alias/player-headshot/${id}`"
-          :alt="name"
-          class="border border-neutral-500 rounded-full"
-        />
+
+        <template #leading>
+          <country-link
+            v-if="player"
+            :country="player.country"
+            class="text-2xl"
+          />
+        </template>
+
+        <template #description>
+          <div class="text-base">Years Active at Tour Level:</div>
+          <div class="font-bold text-(--ui-text-highlighted) text-xl">{{ playerYears[0] }}{{ playerYears.length > 1 ? `— ${active ? "present" : playerYears[playerYears.length - 1]}` : undefined }}</div>
+          <div class="text-base">{{ Number(playerYears[playerYears.length - 1]) - Number(playerYears[0]) + 1 }} years</div>
+        </template>
       </u-page-section>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-        <player-details />
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <player-details :active />
         <major-results />
       </div>
     </nuxt-layout>

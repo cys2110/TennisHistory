@@ -2,22 +2,9 @@
 import type { TableColumn } from "@nuxt/ui"
 const UButton = resolveComponent("u-button")
 
-interface APIResponse {
-  year: number
-  pm: number
-  R128?: number
-  R64?: number
-  R32: number
-  R16: number
-  QF: number
-  SF: number
-  F: number
-  currency: CurrencyType
-  yoy: string
-}
-defineProps<{ pm: APIResponse[] }>()
+const { pm, status } = defineProps<{ pm?: HistoricalPMInterface[] | null; status: string }>()
 
-const columns: TableColumn<APIResponse>[] = [
+const columns: TableColumn<HistoricalPMInterface>[] = [
   {
     accessorKey: "year",
     header: ({ column }) => {
@@ -38,15 +25,40 @@ const columns: TableColumn<APIResponse>[] = [
   { accessorFn: row => row.SF.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Semi-final" },
   { accessorFn: row => row.QF.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Quarter-final" },
   { accessorFn: row => row.R16.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Round of 16" },
-  { accessorFn: row => row.R32.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Round of 32" },
-  { accessorFn: row => (row.R64 ? row.R64.toLocaleString("en-US", { style: "currency", currency: row.currency }) : "—"), header: "Round of 64" },
-  { accessorFn: row => (row.R128 ? row.R128.toLocaleString("en-US", { style: "currency", currency: row.currency }) : "—"), header: "Round of 128" }
+  { accessorFn: row => row.R32.toLocaleString("en-US", { style: "currency", currency: row.currency }), header: "Round of 32" }
 ]
+if (pm?.[0].R64) {
+  columns.push({ accessorFn: row => (row.R64 ? row.R64.toLocaleString("en-US", { style: "currency", currency: row.currency }) : "—"), header: "Round of 64" })
+}
+if (pm?.[0].R128) {
+  columns.push({ accessorFn: row => (row.R128 ? row.R128.toLocaleString("en-US", { style: "currency", currency: row.currency }) : "—"), header: "Round of 128" })
+}
 </script>
 
 <template>
   <u-table
-    :data="pm"
+    :data="pm || []"
     :columns="columns"
-  />
+    :loading="status === 'pending'"
+  >
+    <template #empty>
+      <div
+        v-if="status === 'pending'"
+        class="flex flex-col gap-4"
+      >
+        <div
+          v-for="_ in 6"
+          :key="_"
+          class="flex gap-8"
+        >
+          <u-skeleton
+            v-for="_ in 8"
+            :key="_"
+            class="h-4 w-1/2 rounded-lg"
+          />
+        </div>
+      </div>
+      <template v-else>No stats available</template>
+    </template>
+  </u-table>
 </template>

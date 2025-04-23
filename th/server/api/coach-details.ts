@@ -7,7 +7,7 @@ export default defineEventHandler(async query => {
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH a=(d:Coach {id: 'b837'})-[:COACHES]->(p:Player)
+      MATCH a=(d:Coach {id: $id})-[:COACHES]->(p:Player)
       MATCH (p)-[:REPRESENTS]->(c:Country)
       OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(:Score)-[:SCORED]->(:Match)-[:PLAYED]->(:Round)-[:ROUND_OF]->(:Event)-[:IN_YEAR]->(y:Year)
       WITH DISTINCT p, c, collect(DISTINCT y.id) AS years, d

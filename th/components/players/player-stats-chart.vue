@@ -13,14 +13,14 @@ const option = ref({
   tooltip: {
     formatter: function (params: any) {
       return `
-      <div style="display: flex; justify-content: space-between">
-      <span style="font-weight: bold; margin-right: 1rem">${params.data.category}</span>
-      <span>${params.value.value}${params.data.suffix === false ? "" : "%"}</span>
-      </div>
+        <div class="flex justify-between gap-5">
+          <span class="font-semibold">${params.data.category}</span>
+          <span class="font-extrabold">${params.value.value}${params.data.suffix === false ? "" : "%"}</span>
+        </div>
       `
     }
   },
-  xAxis: { type: "value", max: 100 },
+  xAxis: { type: "value", max: 100, splitLine: { lineStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.lightText : CHART_COLOURS.darkText } }, axisLabel: { formatter: "{value}%" } },
   yAxis: { type: "category", inverse: true },
   series: [
     {
@@ -33,9 +33,10 @@ const option = ref({
 </script>
 
 <template>
-  <v-chart
-    class="h-96 w-full"
-    :option="option"
-    :autoresize="true"
-  />
+  <div class="h-200 w-full">
+    <v-chart
+      :option="option"
+      :autoresize="true"
+    />
+  </div>
 </template>

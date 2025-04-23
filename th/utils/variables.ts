@@ -1,5 +1,3 @@
-export const BASE_CATEGORIES = Object.values(BaseCategoryEnum)
-
 export const CATEGORIES = Object.values(CategoryEnum)
 
 export const CHART_COLOURS = {
@@ -42,6 +40,8 @@ export const CHART_COLOURS = {
 }
 
 export const CATEGORY_COLOURS = Object.values(CHART_COLOURS)
+
+export const COUNTRY_DRAWS = ["8888", "615", "9900"]
 
 export const CURRENCIES: Record<CurrencyType, string> = {
   AUD: "A$",
@@ -91,7 +91,7 @@ export const MATCH_STATS = {
   ]
 }
 
-export const MONTH_NAMES = Object.keys(MonthsEnum).filter(key => isNaN(Number(key)) && key !== "length") as (keyof typeof MonthsEnum)[]
+export const MONTH_NAMES = Object.keys(MonthEnum).filter(key => isNaN(Number(key)) && key !== "length") as (keyof typeof MonthEnum)[]
 
 export const NAV_LINKS = [
   {
@@ -132,7 +132,7 @@ export const NAV_LINKS = [
 ]
 
 export const PLAYER_PAGES = [
-  { label: "Overview", name: "player", icon: ICONS.overview },
+  { label: "Details", name: "player", icon: ICONS.overview },
   { label: "Activity", name: "activity", icon: ICONS.event },
   { label: "Titles and Finals", name: "titles-and-finals", icon: ICONS.tournament },
   { label: "Win-Loss Index", name: "wl-index", icon: ICONS.barChart },
@@ -160,7 +160,9 @@ export const RELATED_LINKS = [
     label: "Other Links",
     children: [
       { label: "About", to: { name: "about" } },
-      { label: "About me", to: "https://www.claire-sheridan.com", target: "_blank" }
+      { label: "About me", to: "https://www.claire-sheridan.com", target: "_blank" },
+      { label: "Ranking Rules History", to: "https://openerarankings.com/Home", target: "_blank" },
+      { label: "Tennis Abstract", to: "https://www.tennisabstract.com/", target: "_blank" }
     ]
   }
 ]
@@ -184,7 +186,9 @@ export const SHORT_ROUNDS: Record<RoundType, string> = {
   "Round of 16": "R16",
   "Round of 32": "R32",
   "Round of 64": "R64",
-  "Round of 128": "R128"
+  "Round of 128": "R128",
+  "Group Stages": "G",
+  "Round robin": "RR"
 }
 
 export const STATUSES: Record<StatusType, { longName: string; class: string }> = {

@@ -1,19 +1,9 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui"
-interface APIResponse {
-  year: number
-  player: Pick<PlayerInterface, "id" | "name" | "country">
-  sets_won: number
-  sets_lost: number
-  games_won: number
-  games_lost: number
-  sets_pc: number
-  games_pc: number
-}
-defineProps<{ scores: APIResponse[] }>()
+defineProps<{ scores: GamesSetsLostInterface[] | null; status: string }>()
 const UButton = resolveComponent("u-button")
 
-const columns: TableColumn<APIResponse>[] = [
+const columns: TableColumn<GamesSetsLostInterface>[] = [
   {
     accessorKey: "year",
     header: ({ column }) => {
@@ -120,11 +110,36 @@ const columns: TableColumn<APIResponse>[] = [
 
 <template>
   <u-table
-    :data="scores"
+    :data="scores || []"
     :columns="columns"
+    :loading="status === 'pending'"
   >
+    <template #empty>
+      <div
+        v-if="status === 'pending'"
+        class="flex flex-col gap-4"
+      >
+        <div
+          v-for="_ in 6"
+          :key="_"
+          class="flex gap-8"
+        >
+          <u-skeleton class="h-4 w-1/13 rounded-lg" />
+          <u-skeleton class="h-4 w-1/12 rounded-lg" />
+          <u-skeleton class="h-4 w-1/12 rounded-lg" />
+          <u-skeleton class="h-4 w-1/8 rounded-lg" />
+          <u-skeleton class="h-4 w-1/10 rounded-lg" />
+          <u-skeleton class="h-4 w-1/8 rounded-lg" />
+          <u-skeleton class="h-4 w-1/8 rounded-lg" />
+          <u-skeleton class="h-4 w-1/8 rounded-lg" />
+        </div>
+      </div>
+      <template v-else>No stats available</template>
+    </template>
     <template #player-cell="{ row }">
-      <player-avatar :player="row.original.player" />
+      <div class="flex justify-center">
+        <player-avatar :player="row.original.player" />
+      </div>
     </template>
   </u-table>
 </template>

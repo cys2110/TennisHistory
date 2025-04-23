@@ -1,22 +1,12 @@
 <script setup lang="ts">
 definePageMeta({ name: "country-tournament" })
-const toast = useToast()
 const tid = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 useHead({ title: name.value, templateParams: { subPage: "Tournaments" } })
 
 // API call
-const { data: tournament, status } = await useFetch<Pick<TournamentInterface, "website" | "years"> & { events: CountryEventType[] }>("/api/country-tournament-details", {
-  query: { tid },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching events for ${name.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: tournament, status } = await useFetch<Pick<TournamentInterface, "website" | "years"> & { events: CountryEventType[] }>("/api/country-tournament-details", { query: { tid } })
 
 // Breadcrumbs
 const items = computed(() => [{ label: "Home", to: { name: "home" }, icon: ICONS.home }, { label: "Tournaments", to: { name: "tournaments" }, icon: ICONS.tournament }, { label: name.value }])
@@ -66,11 +56,20 @@ const links = computed(() => {
         v-if="tournament && tournament.events.length > 0"
         :events="tournament.events"
       />
+
+      <u-page-grid v-else-if="status === 'pending'">
+        <tournament-event-loading-card
+          v-for="_ in 5"
+          :key="_"
+        />
+      </u-page-grid>
+
       <error-message
         v-else
         :icon="ICONS.noTournament"
         :title="`No events found for ${name}`"
         :status
+        :error="`Error fetching events for ${name}`"
       />
     </nuxt-layout>
   </div>

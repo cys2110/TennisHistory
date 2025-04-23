@@ -6,28 +6,20 @@ const p1ParamName = useRouteParams<string>("p1Name")
 const p2ParamName = useRouteParams<string>("p2Name")
 const p1Name = computed(() => decodeName(p1ParamName.value))
 const p2Name = computed(() => decodeName(p2ParamName.value))
-const toast = useToast()
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const lgAndUp = breakpoints.greaterOrEqual("lg")
 
 // API call
-const { data: h2h, status } = await useFetch<{ p1: H2HPlayerInterface; p2: H2HPlayerInterface; p1Wins: number; p2Wins: number }>("/api/h2h", {
-  query: { p1Id, p2Id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching player details for ${p1Name.value} v. ${p2Name.value}`,
-      description: "Please try again later",
-      color: "error"
-    })
-  }
-})
+const { data: h2h, status } = await useFetch<{ p1: H2HPlayerInterface; p2: H2HPlayerInterface; p1Wins: number; p2Wins: number }>("/api/h2h", { query: { p1Id, p2Id } })
 </script>
 
 <template>
   <div
     v-if="h2h"
-    class="flex gap-10 justify-center"
+    class="flex gap-10 justify-center mb-10"
   >
     <h2h-player-card
-      v-if="h2h"
+      v-if="h2h && lgAndUp"
       :player="h2h.p1"
       :index="1"
       :id="p1Id"
@@ -39,11 +31,15 @@ const { data: h2h, status } = await useFetch<{ p1: H2HPlayerInterface; p2: H2HPl
         :p1-wins="h2h.p1Wins"
         :p2-wins="h2h.p2Wins"
       />
-      <h2h-table :h2h />
+      <h2h-table
+        :h2h
+        :c1
+        :c2
+      />
     </div>
 
     <h2h-player-card
-      v-if="h2h"
+      v-if="h2h && lgAndUp"
       :player="h2h.p2"
       :index="2"
       :id="p2Id"
@@ -55,5 +51,6 @@ const { data: h2h, status } = await useFetch<{ p1: H2HPlayerInterface; p2: H2HPl
     :title="`No head to head found for ${p1Name} v. ${p2Name}`"
     :icon="ICONS.noH2H"
     :status
+    :error="`Error fetching head to head found for ${p1Name} v. ${p2Name}`"
   />
 </template>

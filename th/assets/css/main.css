@@ -1,5 +1,6 @@
 @import "tailwindcss" theme(static);
 @import "@nuxt/ui-pro";
+@plugin 'tailwind-scrollbar';
 
 @theme {
   --font-sans: "Fira Sans Condensed", sans-serif;

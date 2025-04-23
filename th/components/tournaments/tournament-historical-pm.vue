@@ -1,35 +1,13 @@
 <script setup lang="ts">
-defineProps<{ checked: boolean }>()
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const toast = useToast()
-
-interface APIResponse {
-  year: number
-  pm: number
-  R128?: number
-  R64?: number
-  R32: number
-  R16: number
-  QF: number
-  SF: number
-  F: number
-  currency: CurrencyType
-  yoy: string
-}
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
+const checked = ref(false)
 
 // API call
-const { data: pm, status } = await useFetch<APIResponse[]>("/api/tournament-historical-pm", {
-  query: { id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching prize money for ${name.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: pm, status } = await useFetch<HistoricalPMInterface[]>("/api/tournament-historical-pm", { query: { id } })
 </script>
 
 <template>
@@ -37,14 +15,24 @@ const { data: pm, status } = await useFetch<APIResponse[]>("/api/tournament-hist
     title="Historical Prize Money"
     :icon="ICONS.awards"
   >
-    <div v-if="pm">
-      <tournament-historical-pm-table
-        v-if="checked"
+    <template #right>
+      <u-switch
+        v-if="mdAndUp"
+        v-model="checked"
+        :label="checked ? 'Chart' : 'Table'"
+        :checked-icon="ICONS.areaChart"
+        :unchecked-icon="ICONS.table"
+      />
+    </template>
+    <div v-if="pm || status === 'pending'">
+      <tournament-historical-pm-chart
+        v-if="checked && pm"
         :pm
       />
-      <tournament-historical-pm-chart
+      <tournament-historical-pm-table
         v-else
         :pm
+        :status
       />
     </div>
     <error-message
@@ -52,6 +40,7 @@ const { data: pm, status } = await useFetch<APIResponse[]>("/api/tournament-hist
       :icon="ICONS.noAwards"
       :status
       :title="`No prize money found for ${name}`"
+      :error="`Error fetching prize money for ${name}`"
     />
   </dashboard-subpanel>
 </template>

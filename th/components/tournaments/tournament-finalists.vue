@@ -1,28 +1,13 @@
 <script setup lang="ts">
-defineProps<{ checked: boolean }>()
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const toast = useToast()
-
-interface APIResponse {
-  finals: number
-  losses: number
-  player: Pick<PlayerInterface, "id" | "name" | "country">
-  wins: number
-}
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
+const checked = ref(false)
 
 // API call
-const { data: finalists, status } = await useFetch<APIResponse[]>("/api/tournament-finalists", {
-  query: { id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching finalists for ${name.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: finalists, status } = await useFetch<TournamentFinalistsInterface[]>("/api/tournament-finalists", { query: { id } })
 </script>
 
 <template>
@@ -30,14 +15,24 @@ const { data: finalists, status } = await useFetch<APIResponse[]>("/api/tourname
     title="Players by No. of Finals"
     :icon="ICONS.upcoming"
   >
-    <div v-if="finalists">
-      <tournament-finalists-table
-        v-if="checked"
+    <template #right>
+      <u-switch
+        v-if="mdAndUp"
+        v-model="checked"
+        :label="checked ? 'Chart' : 'Table'"
+        :checked-icon="ICONS.barChart"
+        :unchecked-icon="ICONS.table"
+      />
+    </template>
+    <div v-if="finalists || status === 'pending'">
+      <tournament-finalists-chart
+        v-if="checked && finalists"
         :finalists
       />
-      <tournament-finalists-chart
+      <tournament-finalists-table
         v-else
         :finalists
+        :status
       />
     </div>
     <error-message
@@ -45,6 +40,7 @@ const { data: finalists, status } = await useFetch<APIResponse[]>("/api/tourname
       :icon="ICONS.noPlayer"
       :status
       :title="`No finalists found for ${name}`"
+      :error="`Error fetching finalists for ${name}`"
     />
   </dashboard-subpanel>
 </template>

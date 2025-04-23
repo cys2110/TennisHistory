@@ -3,19 +3,9 @@ const eid = useRouteParams<string>("eid")
 const year = useRouteParams<string>("year")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const toast = useToast()
 
 // API call
-const { data: event, status } = await useFetch<EventDetailsType>("/api/event-details", {
-  query: { eid },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching details for ${name.value} ${year.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: event, status } = await useFetch<EventDetailsType>("/api/event-details", { query: { eid } })
 
 const eventDetails = computed(() => {
   if (event.value) {
@@ -35,38 +25,22 @@ const eventDetails = computed(() => {
 
 <template>
   <u-page-grid v-if="event">
-    <u-page-card
+    <details-card
       v-for="detail in eventDetails"
       :key="detail.id"
-      :title="detail.title"
-      spotlight
-      variant="outline"
-    >
-      <template #description>
-        <div v-if="detail.id === 'supervisors'">
-          <template v-if="event.supervisors.length > 0">{{ event.supervisors.join(" | ") }}</template>
-          <template v-else>—</template>
-        </div>
-        <div v-else-if="detail.id === 'venues'">
-          <div
-            v-for="(venue, index) in event.venues"
-            :key="index"
-          >
-            {{ venue.name }}, {{ venue.city }}
-            <flag-icon
-              :country="venue.country"
-              class="ml-2"
-            />
-          </div>
-        </div>
-        <template v-else>{{ detail.value }}</template>
-      </template>
-    </u-page-card>
+      :detail
+    />
+  </u-page-grid>
+  <u-page-grid v-else-if="status === 'pending'">
+    <details-loading-card
+      v-for="_ in 10"
+      :key="_"
+    />
   </u-page-grid>
   <error-message
     v-else
-    :icon="ICONS.noInfo"
     :title="`No details found for ${name} ${year}`"
     :status
+    :error="`Error fetching details for ${name} ${year}`"
   />
 </template>

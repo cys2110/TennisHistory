@@ -33,9 +33,10 @@ const option = ref({
 </script>
 
 <template>
-  <v-chart
-    class="mb-10 h-96"
-    :option="option"
-    :autoresize="true"
-  />
+  <div class="min-h-[200px] w-full mb-10">
+    <v-chart
+      :option="option"
+      :autoresize="true"
+    />
+  </div>
 </template>

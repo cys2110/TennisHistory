@@ -1,32 +1,13 @@
 <script setup lang="ts">
-defineProps<{ checked: boolean }>()
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
-const toast = useToast()
-
-interface APIResponse {
-  year: number
-  player: Pick<PlayerInterface, "id" | "name" | "country">
-  sets_won: number
-  sets_lost: number
-  games_won: number
-  games_lost: number
-  sets_pc: number
-  games_pc: number
-}
+const checked = ref(false)
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const mdAndUp = breakpoints.greaterOrEqual("md")
 
 // API call
-const { data: scores, status } = await useFetch<APIResponse[]>("/api/tournament-scores-stats", {
-  query: { id },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching games and sets lost for ${name.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  }
-})
+const { data: scores, status } = await useFetch<GamesSetsLostInterface[]>("/api/tournament-scores-stats", { query: { id } })
 </script>
 
 <template>
@@ -34,14 +15,24 @@ const { data: scores, status } = await useFetch<APIResponse[]>("/api/tournament-
     title="Winners by Games and Sets Lost"
     :icon="ICONS.scores"
   >
-    <div v-if="scores">
-      <games-sets-lost-table
-        v-if="checked"
+    <template #right>
+      <u-switch
+        v-if="mdAndUp"
+        v-model="checked"
+        :label="checked ? 'Chart' : 'Table'"
+        :checked-icon="ICONS.scatterChart"
+        :unchecked-icon="ICONS.table"
+      />
+    </template>
+    <div v-if="scores || status === 'pending'">
+      <games-sets-lost-chart
+        v-if="checked && scores"
         :scores
       />
-      <games-sets-lost-chart
+      <games-sets-lost-table
         v-else
         :scores
+        :status
       />
     </div>
     <error-message
@@ -49,6 +40,7 @@ const { data: scores, status } = await useFetch<APIResponse[]>("/api/tournament-
       :icon="ICONS.noScores"
       :status
       :title="`No score stats found for ${name}`"
+      :error="`Error fetching score stats for ${name}`"
     />
   </dashboard-subpanel>
 </template>

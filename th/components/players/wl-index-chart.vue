@@ -14,34 +14,21 @@ const option = ref({
   textStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.darkText : CHART_COLOURS.lightText },
   grid: { containLabel: true },
   tooltip: {
-    formatter: function (params: any) {
-      const { stat, value: index, wins, losses, titles } = params.value
-      return `
-      <span style="font-weight: bold">${stat}</span>
-      <br/ >
-      <span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${
-        categoryColours[params.data.category as keyof typeof categoryColours]
-      }"></span>  ${wins}-${losses} (${index})${
-        titles !== null
-          ? `<br />
-      <span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${CHART_COLOURS.orange600}"></span>
-      ${titles} ${titles === 1 ? "title" : "titles"}`
-          : ""
-      }
-      `
-    }
+    trigger: "axis",
+    textStyle: { fontWeight: "bold" }
   },
   dataset: {
     source: index,
     dimensions: ["category", "stat", "win", "loss", "titles", "value"]
   },
   xAxis: [
-    { type: "value", name: "Index", max: 1 },
+    { type: "value", name: "Index", max: 1, splitLine: { lineStyle: { color: colorMode.value === "dark" ? CHART_COLOURS.lightText : CHART_COLOURS.darkText } } },
     { type: "value", name: "Titles", splitLine: { show: false } }
   ],
   yAxis: { type: "category", inverse: true },
   series: [
     {
+      name: "Index",
       type: "bar",
       encode: { x: "value", y: "stat" },
       itemStyle: {
@@ -62,9 +49,10 @@ const option = ref({
 </script>
 
 <template>
-  <v-chart
-    class="h-96 w-full"
-    :option="option"
-    :autoresize="true"
-  />
+  <div class="h-200 w-full">
+    <v-chart
+      :option="option"
+      :autoresize="true"
+    />
+  </div>
 </template>

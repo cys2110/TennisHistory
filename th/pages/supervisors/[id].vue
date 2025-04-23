@@ -1,29 +1,38 @@
 <script setup lang="ts">
 definePageMeta({ name: "supervisor" })
-const toast = useToast()
 const id = useRouteParams<string>("id")
 const name = computed(() => decodeName(id.value))
 useHead({ title: name.value, templateParams: { subPage: "Supervisors" } })
 
-// Breadcrumbs
-const items = computed(() => [{ label: "Home", to: { name: "home" }, icon: ICONS.home }, { label: "Supervisors", to: { name: "supervisors" }, icon: ICONS.supervisor }, { label: name.value }])
+const year = ref<string>(new Date().getFullYear().toString())
 
-// API call
-const { data: events, status } = await useFetch<EventCardType[]>("/api/supervisor-details", {
+// API calls
+// Don't run the fetch immediately - wait until the year is selected
+const {
+  data: supervisor,
+  status,
+  execute
+} = await useFetch<{ labels: string[]; results: EventCardType[] }>("/api/supervisor-details", {
+  query: { id: name.value, year },
+  immediate: false
+})
+
+// When data returns, set the year to the latest year and run the first fetch
+const { data: years } = await useFetch<string[]>("/api/supervisor-years", {
   query: { id: name.value },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching ${name.value}'s details`,
-      icon: ICONS.error,
-      color: "error"
-    })
+  onResponse: response => {
+    year.value = response.response._data[response.response._data.length - 1]
+    execute()
   }
 })
 
+// Breadcrumbs
+const items = computed(() => [{ label: "Home", to: { name: "home" }, icon: ICONS.home }, { label: "Supervisors", to: { name: "supervisors" }, icon: ICONS.supervisor }, { label: name.value }])
+
 // Anchor links
 const links = computed(() => {
-  if (events.value)
-    return events.value.map(event => ({
+  if (supervisor.value)
+    return supervisor.value.results.map(event => ({
       to: "#event-" + event.eid,
       label: event.name + " " + event.year
     }))
@@ -37,8 +46,26 @@ const links = computed(() => {
         <u-breadcrumb :items />
       </template>
 
-      <!--TOC-->
       <template #right>
+        <u-button
+          v-if="supervisor && supervisor.labels.includes('Umpire')"
+          :icon="ICONS.umpire"
+          label="Umpire Profile"
+          :to="{ name: 'umpire', params: { id } }"
+          size="xs"
+        />
+      </template>
+
+      <template #toolbar>
+        <year-select
+          v-if="years"
+          v-model="year"
+          :items="years"
+        />
+
+        <div class="text-(--ui-text-muted) text-sm font-semibold">Events supervised by {{ name }}</div>
+
+        <!--TOC-->
         <u-dropdown-menu :items="links">
           <u-button
             :icon="ICONS.toc"
@@ -49,21 +76,25 @@ const links = computed(() => {
         </u-dropdown-menu>
       </template>
 
-      <template #toolbar>
-        <div class="text-(--ui-text-muted) text-sm font-semibold">Events supervised by {{ name }}</div>
-      </template>
-
       <!--Event cards-->
       <event-grid
-        v-if="events && events.length > 0"
-        :events="events"
+        v-if="supervisor && supervisor.results.length > 0"
+        :events="supervisor.results"
       />
+
+      <u-page-grid v-else-if="status === 'pending'">
+        <event-loading-card
+          v-for="_ in 10"
+          :key="_"
+        />
+      </u-page-grid>
 
       <error-message
         v-else
         :icon="ICONS.noSupervisor"
         :title="`No events supervised by ${name}`"
         :status
+        :error="`Error fetching events supervised by ${name}`"
       />
     </nuxt-layout>
   </div>

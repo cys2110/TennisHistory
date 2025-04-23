@@ -81,7 +81,7 @@ export default defineEventHandler(async event => {
           ELSE apoc.temporal.format(e.start_date, 'dd') || ' - ' || apoc.temporal.format(e.end_date, 'dd MMMM YYYY')
         END,
         category: e.category,
-        locations: locations,
+        venues: locations,
         surface: z.id,
         seed: toString(f.seed),
         status: f.status,

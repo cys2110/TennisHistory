@@ -33,7 +33,11 @@ const columns: TableColumn<Pick<MatchInterface, "country" | "id" | "incomplete" 
         class="flex gap-2 items-center"
       >
         <player-avatar :player="{ id: row.original.id, name: row.original.name, country: row.original.country }" />
-        <small v-if="row.original.seed || row.original.status">({{ row.original.seed }}{{ row.original.status }})</small>
+        <span
+          class="text-xs"
+          v-if="row.original.seed || row.original.status"
+          >({{ row.original.seed }}{{ row.original.status }})</span
+        >
       </div>
       <template v-else>BYE</template>
     </template>
@@ -49,17 +53,19 @@ const columns: TableColumn<Pick<MatchInterface, "country" | "id" | "incomplete" 
         :name="name"
         :tid="tid"
         :eid="eid"
-        :year
+        :year="year"
         :mid="row.original.mid"
         :sets="row.original.sets"
         :tbs="row.original.tbs"
+        :incomplete="row.original.incomplete"
       />
     </template>
     <template #h2h-cell="{ row }">
       <u-button
         v-if="row.original.name"
-        size="sm"
+        variant="soft"
         :to="{ name: 'h2h-players', params: { p1Name: playerName, p2Name: encodeName(row.original.name), p1Id: id, p2Id: row.original.id } }"
+        :ui="{ base: 'px-2 py-1 font-semibold' }"
       >
         H2H
       </u-button>

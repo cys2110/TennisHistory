@@ -9,11 +9,11 @@ export default defineEventHandler(async query => {
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (u:Umpire) WHERE $letter IS NULL OR u.last_name STARTS WITH $letter
-      WITH COLLECT(u) AS all, COUNT(u) AS count
-      UNWIND all AS u
+      WITH u
       ORDER BY u.last_name
-      SKIP toInteger($skip)
-      LIMIT toInteger($limit)
+      WITH COLLECT(u) AS all, COUNT(u) AS count
+      WITH all[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS sliced, count
+      UNWIND CASE WHEN sliced = [] THEN [null] ELSE sliced END AS u
       RETURN toString(count) AS count, u.id AS umpire
     `,
     { letter: letter === "All" ? null : letter, skip, limit }

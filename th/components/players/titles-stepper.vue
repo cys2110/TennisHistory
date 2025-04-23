@@ -1,53 +1,27 @@
 <script setup lang="ts">
-defineProps<{ events: { title: string; events: Pick<EventInterface, "eid" | "tid" | "name" | "surface" | "dates" | "draw_type">[] }[] }>()
+defineProps<{ events: { title: string; events: EventCardType[] }[] }>()
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const mdAndUp = breakpoints.greaterOrEqual("md")
 </script>
 
 <template>
-  <ClientOnly>
-    <u-stepper
-      :items="events"
-      :linear="false"
-      :size="mdAndUp ? 'md' : 'xs'"
-      :orientation="mdAndUp ? 'horizontal' : 'vertical'"
-    >
-      <template #indicator="{ item }">{{ item.events.length }}</template>
-      <template #content="{ item }">
-        <u-page-grid class="2xl:grid-cols-5 mt-5">
-          <u-page-card
-            v-for="event in item.events"
-            :key="event.eid"
-            spotlight
-            variant="outline"
-            class="w-full"
-            :ui="{ description: 'text-sm' }"
-          >
-            <template #title>
-              <tournament-link
-                :name="event.name"
-                :id="event.tid"
-              />
-            </template>
-            <template #description>
-              <div>{{ event.dates }}</div>
-              <div>{{ event.surface }}</div>
-            </template>
-            <template #footer>
-              <ClientOnly>
-                <event-buttons
-                  :name="event.name"
-                  :tid="event.tid"
-                  :year="item.title"
-                  :eid="event.eid"
-                  :draw-type="event.draw_type"
-                />
-              </ClientOnly>
-            </template>
-          </u-page-card>
-        </u-page-grid>
-      </template>
-    </u-stepper>
-  </ClientOnly>
+  <u-stepper
+    :items="events"
+    :linear="false"
+    :size="mdAndUp ? 'md' : 'xs'"
+    orientation="vertical"
+    :ui="{ header: 'mr-10', separator: 'min-h-4', item: 'my-1.5' }"
+  >
+    <template #indicator="{ item }">{{ item.events.length }}</template>
+    <template #content="{ item }">
+      <u-page-grid class="lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <event-card
+          v-for="event in item.events"
+          :key="event.eid"
+          :event
+        />
+      </u-page-grid>
+    </template>
+  </u-stepper>
 </template>

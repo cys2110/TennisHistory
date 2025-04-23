@@ -18,7 +18,7 @@ export default defineEventHandler(async query => {
           ELSE {id: c.id, alpha2: c.alpha2, name: c.name}
         END AS country
       }
-      WITH CASE
+      RETURN CASE
         WHEN COUNT(f) > 0 THEN COLLECT(DISTINCT {
           id: toString(p.id),
           name: p.first_name || ' ' || p.last_name,
@@ -31,7 +31,6 @@ export default defineEventHandler(async query => {
         })
         ELSE NULL
       END AS seeds
-      RETURN seeds
     `,
     { id: Number(eid) }
   )

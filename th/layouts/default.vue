@@ -1,4 +1,8 @@
 <script setup lang="ts">
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const xlAndUp = breakpoints.greaterOrEqual("xl")
+
+// Show submenus in command palette
 const groups = computed(() => [
   {
     id: "links",
@@ -19,13 +23,18 @@ const groups = computed(() => [
       </template>
 
       <template #default="{ collapsed }">
-        <u-dashboard-search-button :collapsed />
+        <!--Open command palette-->
+        <u-dashboard-search-button
+          :collapsed
+          :size="xlAndUp ? 'sm' : 'xs'"
+        />
 
         <!--Internal links-->
         <u-navigation-menu
           :collapsed
           :items="NAV_LINKS"
           orientation="vertical"
+          highlight
         />
       </template>
 
@@ -35,7 +44,6 @@ const groups = computed(() => [
           :collapsed
           :items="RELATED_LINKS"
           orientation="vertical"
-          class="w-full"
         />
       </template>
     </u-dashboard-sidebar>
@@ -45,15 +53,18 @@ const groups = computed(() => [
           <template #leading>
             <u-dashboard-sidebar-collapse />
           </template>
+
           <template #title>
             <slot name="title" />
           </template>
+
           <template
             #trailing
             v-if="$slots.trailing"
           >
             <slot name="trailing" />
           </template>
+
           <template
             #right
             v-if="$slots.right"
@@ -61,13 +72,7 @@ const groups = computed(() => [
             <slot name="right" />
           </template>
         </u-dashboard-navbar>
-        <u-dashboard-toolbar v-if="$slots.toolbar || $slots['toolbar-left'] || $slots['toolbar-right']">
-          <template #left>
-            <slot name="toolbar-left" />
-          </template>
-          <template #right>
-            <slot name="toolbar-right" />
-          </template>
+        <u-dashboard-toolbar v-if="$slots.toolbar">
           <slot name="toolbar" />
         </u-dashboard-toolbar>
       </template>

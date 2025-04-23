@@ -4,7 +4,7 @@ defineProps<{ events: TournamentEventType[] }>()
 
 <template>
   <u-page-grid>
-    <tournament-card
+    <tournament-event-card
       v-for="event in events"
       :key="event.eid"
       :event

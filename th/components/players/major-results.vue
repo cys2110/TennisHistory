@@ -2,62 +2,69 @@
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
+
+const route = useRoute()
 const toast = useToast()
 
 // API call
-const { data: results, status } = await useFetch("/api/major-results", {
+const {
+  data: results,
+  status,
+  refresh
+} = await useFetch<MajorResultsInterface[]>("/api/major-results", {
   query: { id },
-  onResponseError: () => {
+  default: () => [],
+  watch: false,
+  onResponseError: ({ error }) => {
     toast.add({
       title: `Error fetching ${name.value}'s best results`,
+      description: error?.message,
       icon: ICONS.error,
       color: "error"
     })
   }
 })
+
+watch(
+  () => id.value,
+  newId => {
+    if (newId && route.name === "player") refresh()
+  }
+)
 </script>
 
 <template>
-  <dashboard-subpanel title="Best Results">
+  <dashboard-subpanel
+    title="Best Results"
+    :icon="ICONS.tournament"
+  >
     <u-page-columns
-      v-if="results"
-      class="lg:columns-2 2xl:columns-2"
+      v-if="results.length || ['pending', 'idle'].includes(status)"
+      class="lg:columns-2 xl:columns-2 2xl:columns-2"
     >
-      <u-page-card
+      <!--Show if player has major results-->
+      <major-results-card
+        v-if="results.length"
         v-for="result in results"
         :key="result.tid"
-        :title="result.name"
-        spotlight
-        variant="outline"
-        :ui="{ description: 'flex flex-col gap-1' }"
-      >
-        <template #title>
-          <tournament-link
-            :name="result.name"
-            :id="result.tid"
-          />
-          — {{ result.round }}
-        </template>
+        :result
+      />
 
-        <template #description>
-          <event-link
-            v-for="event in result.events"
-            :key="event.year"
-            :name="result.name"
-            :tid="result.tid"
-            :eid="event.eid"
-            :year="event.year"
-          >
-            {{ event.year }}
-          </event-link>
-        </template>
-      </u-page-card>
+      <!--Loading state-->
+      <major-results-loading-card
+        v-else
+        v-for="_ in 5"
+        :key="_"
+      />
     </u-page-columns>
+
+    <!--Error/no results state-->
     <error-message
       v-else
-      :icon="ICONS.noTournament"
       :title="`No results found for ${name}`"
       :status
+      :error="`results for ${name}`"
+      :icon="ICONS.noTournament"
     />
   </dashboard-subpanel>
 </template>

@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { SearchCard, PlayerCard } from "#components"
-
 definePageMeta({ name: "search" })
 useHead({ title: "Search", templateParams: { subPage: null } })
-const toast = useToast()
 const searchTerm = ref("")
 const selectedTab = ref("")
 
@@ -24,13 +22,6 @@ interface SearchAPIResponse {
 // API call
 const { data, status } = await useFetch<SearchAPIResponse>("/api/search-results", {
   query: { searchTerm },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching search results for ${searchTerm.value}`,
-      icon: ICONS.error,
-      color: "error"
-    })
-  },
   immediate: false
 })
 
@@ -49,7 +40,6 @@ const tabItems = computed(() => {
 watch(
   () => tabItems.value,
   () => {
-    console.log(data.value)
     if (tabItems.value) selectedTab.value = tabItems.value[0].value
   }
 )
@@ -97,6 +87,7 @@ watch(
         :icon="ICONS.noSearch"
         :title="`No search results found for ${searchTerm}`"
         :status
+        :error="`Error fetching search results for ${searchTerm}`"
       />
     </nuxt-layout>
   </div>

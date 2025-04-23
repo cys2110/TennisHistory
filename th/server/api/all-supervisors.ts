@@ -10,6 +10,8 @@ export default defineEventHandler(async query => {
     `/* cypher */
       OPTIONAL MATCH (s:Supervisor)
       WHERE $letter IS NULL OR s.last_name STARTS WITH $letter
+      WITH s
+      ORDER BY s.last_name
       WITH COLLECT(s) AS all, COUNT(s) AS count
       WITH all[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS sliced, count
       UNWIND CASE WHEN sliced = [] THEN [null] ELSE sliced END AS s

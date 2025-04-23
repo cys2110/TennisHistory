@@ -2,7 +2,7 @@
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const md = breakpoints.md
 const lgAndUp = breakpoints.greaterOrEqual("lg")
-const modelValue = defineModel<(keyof typeof MonthsEnum)[]>()
+const modelValue = defineModel<(keyof typeof MonthEnum)[]>()
 
 const shortcuts = {
   January: ["meta", "j"],

@@ -1,8 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2025-03-31",
+  compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "@nuxt/image", "@vueuse/nuxt", "nuxt-echarts", "nuxt-neo4j", "@nuxt/ui-pro"],
+  modules: ["@nuxt/eslint", "@nuxt/image", "@nuxt/ui-pro", "@vueuse/nuxt", "nuxt-echarts", "nuxt-neo4j"],
+  ssr: false,
   app: {
     layoutTransition: { name: "layout", mode: "out-in" },
     pageTransition: { name: "page", mode: "out-in" }
@@ -29,7 +30,7 @@ export default defineNuxtConfig({
     presets: [
       {
         from: "@vueuse/core",
-        imports: ["breakpointsTailwind", "useBreakpoints", "watchArray", "whenever", "useCssVar"]
+        imports: ["breakpointsTailwind", "useBreakpoints", "watchArray", "useVirtualList", "useCssVar"]
       },
       {
         from: "@vueuse/router",
@@ -59,5 +60,14 @@ export default defineNuxtConfig({
     theme: {
       colors: ["primary", "secondary", "neutral", "warning", "error", "success", "info"]
     }
+  },
+  icon: {
+    customCollections: [
+      {
+        prefix: "flags",
+        dir: "./assets/flags",
+        normalizeIconName: false
+      }
+    ]
   }
 })

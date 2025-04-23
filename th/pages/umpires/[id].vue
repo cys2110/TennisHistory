@@ -1,33 +1,29 @@
 <script setup lang="ts">
 definePageMeta({ name: "umpire" })
-const toast = useToast()
 const id = useRouteParams<string>("id")
 const name = computed(() => decodeName(id.value))
 useHead({ title: name.value, templateParams: { subPage: "Umpires" } })
 
-interface UmpireAPIResponse {
-  name: string
-  tid: string
-  events: {
-    eid: string
-    year: string
-    draw_type: DrawType
-    rounds: {
-      round: RoundType
-      matches: { mid: string; p1: string; p2: string }[]
-    }[]
-  }[]
-}
+const year = ref<string>(new Date().getFullYear().toString())
 
-// API call
-const { data: tournaments, status } = await useFetch<UmpireAPIResponse[]>("/api/umpire-details", {
-  query: { id: name },
-  onResponseError: () => {
-    toast.add({
-      title: `Error fetching ${name.value}'s details`,
-      icon: ICONS.error,
-      color: "error"
-    })
+// API calls
+// Don't run the fetch immediately - wait until the year is selected
+const {
+  data: umpire,
+  status,
+  execute
+} = await useFetch<{ labels: string[]; results: UmpireDetailsType[] }>("/api/umpire-details", {
+  query: { id: name.value, year },
+  immediate: false,
+  onResponse: response => console.log(response.response._data)
+})
+
+// When data returns, set the year to the latest year and run the first fetch
+const { data: years } = await useFetch<string[]>("/api/umpire-years", {
+  query: { id: name.value },
+  onResponse: response => {
+    year.value = response.response._data[response.response._data.length - 1]
+    execute()
   }
 })
 
@@ -36,10 +32,10 @@ const items = computed(() => [{ label: "Home", to: { name: "home" }, icon: ICONS
 
 // Anchor links
 const links = computed(() => {
-  if (tournaments.value)
-    return tournaments.value.map(tournament => ({
-      to: "#tournament-" + tournament.tid,
-      label: tournament.name
+  if (umpire.value)
+    return umpire.value.results.map(event => ({
+      to: "#event-" + event.eid,
+      label: event.name + " " + event.year
     }))
 })
 </script>
@@ -48,11 +44,29 @@ const links = computed(() => {
   <div>
     <nuxt-layout name="default">
       <template #title>
-        <u-breadcrumb :items="items" />
+        <u-breadcrumb :items />
       </template>
 
-      <!--TOC-->
       <template #right>
+        <u-button
+          v-if="umpire && umpire.labels.includes('Supervisor')"
+          :icon="ICONS.supervisor"
+          label="Supervisor Profile"
+          :to="{ name: 'supervisor', params: { id } }"
+          size="xs"
+        />
+      </template>
+
+      <template #toolbar>
+        <year-select
+          v-if="years"
+          v-model="year"
+          :items="years"
+        />
+
+        <div class="text-(--ui-text-muted) text-sm font-semibold">Matches umpired by {{ name }}</div>
+
+        <!--TOC-->
         <u-dropdown-menu :items="links">
           <u-button
             :icon="ICONS.toc"
@@ -63,71 +77,34 @@ const links = computed(() => {
         </u-dropdown-menu>
       </template>
 
-      <template #toolbar>
-        <div class="text-(--ui-text-muted) text-sm font-semibold">Matches umpired by {{ name }}</div>
-      </template>
+      <!--Event cards-->
+      <u-page-columns
+        v-if="umpire"
+        class="xl:columns-4 2xl:columns-4"
+      >
+        <umpire-event-card
+          v-for="event in umpire.results"
+          :key="event.tid"
+          :id="`event-${event.eid}`"
+          :event
+        />
+      </u-page-columns>
 
       <u-page-columns
+        v-else-if="status === 'pending'"
         class="xl:columns-4 2xl:columns-4"
-        v-if="tournaments"
       >
-        <u-card
-          v-for="tournament in tournaments"
-          :key="tournament.tid"
-          :id="`tournament-${tournament.tid}`"
-        >
-          <template #header>
-            <tournament-link
-              :id="tournament.tid"
-              :name="tournament.name"
-              class="text-lg font-semibold !w-fit"
-            />
-          </template>
-          <dashboard-subpanel
-            v-for="event in tournament.events"
-            :key="event.eid"
-            :title="event.year"
-          >
-            <u-collapsible
-              v-for="round in event.rounds"
-              :key="round.round"
-            >
-              <u-button
-                class="group my-2"
-                :label="round.round"
-                color="neutral"
-                :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-                block
-                :trailing-icon="ICONS.chevronDown"
-              />
-              <template #content>
-                <u-link
-                  v-for="match in round.matches"
-                  class="flex justify-between items-center text-sm hover-link w-fit"
-                  :to="{ name: 'match', params: { name: encodeName(tournament.name), id: tournament.tid, eid: event.eid, year: event.year, mid: match.mid } }"
-                >
-                  {{ match.p1 }} v. {{ match.p2 }}
-                </u-link>
-              </template>
-            </u-collapsible>
-            <div class="mx-auto mt-5">
-              <event-buttons
-                :name="tournament.name"
-                :tid="tournament.tid"
-                :year="event.year"
-                :eid="event.eid"
-                :draw-type="event.draw_type"
-              />
-            </div>
-          </dashboard-subpanel>
-        </u-card>
+        <umpire-event-loading-card
+          v-for="_ in 10"
+          :key="_"
+        />
       </u-page-columns>
 
       <error-message
         v-else
-        :icon="ICONS.noPlayer"
-        :title="`No details found for ${name}`"
+        :title="`No matches umpired by ${name}`"
         :status
+        :error="`Error fetching matches umpired by ${name}`"
       />
     </nuxt-layout>
   </div>

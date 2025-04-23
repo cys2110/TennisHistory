@@ -1,10 +1,5 @@
 <script setup lang="ts">
-interface APIResponse {
-  age: string
-  player: PlayerInterface
-  year: string
-}
-const { ages } = defineProps<{ ages: APIResponse[] }>()
+const { ages } = defineProps<{ ages: WinnersByAgeInterface[] }>()
 const colorMode = useColorMode()
 
 const parseAgeString = (ageStr: string): number => {
@@ -104,9 +99,10 @@ const option = ref({
       <div class="text-(--ui-text-muted) self-center text-xs lg:text-sm">{{ player[0] }}</div>
     </div>
   </div>
-  <v-chart
-    class="min-h-150 w-full my-auto mt-10"
-    :option
-    :autoresize="true"
-  />
+  <div class="h-[600px] w-full my-auto mt-10">
+    <v-chart
+      :option
+      :autoresize="true"
+    />
+  </div>
 </template>

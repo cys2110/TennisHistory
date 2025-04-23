@@ -7,9 +7,9 @@ declare global {
 
   type StatusType = "Q" | "WC" | "SE" | "PR" | "LL" | "AL"
 
-  type RoundType = "Win" | "Final" | "Semifinals" | "Quarterfinals" | "Round of 16" | "Round of 32" | "Round of 64" | "Round of 128"
+  type RoundType = "Win" | "Final" | "Semifinals" | "Quarterfinals" | "Round of 16" | "Round of 32" | "Round of 64" | "Round of 128" | "Group Stages" | "Round robin"
 
-  type EventCardType = Pick<EventInterface, "category" | "dates" | "draw_type" | "eid" | "ename" | "locations" | "name" | "start" | "surface" | "tid" | "year">
+  type EventCardType = Pick<EventInterface, "category" | "dates" | "draw_type" | "eid" | "ename" | "venues" | "name" | "start" | "surface" | "tid" | "year">
 
   type TournamentEventType = Pick<EventInterface, "eid" | "year" | "winner" | "loser" | "sets" | "tbs" | "incomplete" | "draw_type">
 
@@ -18,6 +18,8 @@ declare global {
   type CountryEventType = Pick<EventInterface, "eid" | "year" | "c1" | "c2" | "score">
 
   type EventDetailsType = Pick<EventInterface, "name" | "ename" | "category" | "surface" | "venues" | "dates" | "tfc" | "pm" | "currency" | "supervisors">
+
+  type CountryEventDetailsType = Pick<EventInterface, "name" | "surface" | "venues" | "dates" | "tfc" | "currency" | "supervisors">
 
   type SeedType = Pick<EntryInterface, "id" | "name" | "country" | "last" | "seed" | "rank" | "rank2" | "withdrew">
 
@@ -28,9 +30,14 @@ declare global {
 
   type EntryTableType = Pick<EntryInterface, "id" | "name" | "country" | "last" | "rank" | "seed" | "status" | "withdrew">
 
-  type PlayerDetailsType = Pick<PlayerInterface, "ch" | "ch_date" | "wl" | "titles" | "pm" | "coaches" | "rh" | "bh" | "height" | "countries" | "age" | "dob" | "hof" | "dod" | "name">
+  type CountryEntryType = Pick<EntryInterface, "id" | "name" | "country" | "last" | "rank" | "withdrew">
 
-  type TitlesAndFinalsType = Pick<PlayerInterface, "finals"> & { titles: { title: string; events: Pick<EventInterface, "eid" | "tid" | "name" | "surface" | "dates" | "draw_type">[] }[] }
+  type PlayerDetailsType = Pick<
+    PlayerInterface,
+    "ch" | "ch_date" | "wl" | "titles" | "pm" | "coaches" | "rh" | "bh" | "height" | "countries" | "age" | "dob" | "hof" | "dod" | "name" | "pro" | "retired"
+  >
+
+  type TitlesAndFinalsType = { titles: { title: string; events: EventCardType[] }[]; finals: { title: string; events: EventCardType[] }[] }
 
   type PlayerActivityType = Pick<
     EventInterface,
@@ -52,7 +59,7 @@ declare global {
     | "player_incomplete"
     | "matches"
     | "surface"
-    | "locations"
+    | "venues"
     | "tid"
   >
 
@@ -97,6 +104,8 @@ declare global {
   type ResultsMatchType = Pick<MatchInterface, "mid" | "date" | "court" | "duration" | "incomplete" | "umpire" | "loser"> & { winner: MatchPlayerType }
 
   type DrawMatchType = Pick<MatchInterface, "round" | "mid" | "incomplete" | "winner" | "p1" | "p2">
+
+  type UmpireDetailsType = Pick<EventInterface, "name" | "eid" | "tid" | "year" | "draw_type"> & { rounds: { round: RoundType; matches: { mid: string; p1: string; p2: string }[] }[] }
 }
 
 export {}

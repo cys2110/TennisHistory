@@ -3,28 +3,38 @@ import defaultLayout from "./default.vue"
 const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
+
 const route = useRoute()
 const toast = useToast()
 const breakpoints = useBreakpoints(breakpointsTailwind)
-const mdAndUp = breakpoints.greaterOrEqual("md")
-
+const lgAndUp = breakpoints.greaterOrEqual("lg")
 const currentPage = computed(() => PLAYER_PAGES.find(page => page.name === route.name))
 useHead({ title: currentPage.value?.label ?? "", templateParams: { subPage: name.value } })
 
 // API call
-const { data: years } = await useFetch("/api/player-years", {
+const { data: years, refresh } = await useFetch<{ years: number[]; labels: string[] }>("/api/player-years", {
   query: { id },
-  onResponseError: () => {
+  watch: false,
+  onResponseError: ({ error }) => {
     toast.add({
-      title: `Error fetching years active for ${name.value}`,
+      title: `Error fetching ${name.value}'s active years`,
+      description: error?.message,
       icon: ICONS.error,
       color: "error"
     })
   }
 })
 
+watch(
+  () => id.value,
+  newId => {
+    if (newId && ["player", "activity", "titles-and-finals", "wl-index", "stats"].includes(route.name as string)) refresh()
+  },
+  { immediate: true }
+)
+
 // Set state for other player components
-const playerYears = useState("player-years", () => years.value ?? [])
+const playerYears = useState("player-years", () => years.value?.years ?? [])
 
 // Breadcrumbs
 const items = computed(() => [
@@ -32,7 +42,7 @@ const items = computed(() => [
   { label: "Players", to: { name: "players" }, icon: ICONS.people },
   {
     label: name.value,
-    avatar: { src: `https://www.atptour.com/-/media/alias/player-headshot/${id.value}`, icon: ICONS.player, class: "border border-neutral-400" },
+    avatar: { src: `https://www.atptour.com/-/media/alias/player-headshot/${id.value}`, icon: ICONS.player },
     to: { name: "player", params: { name: paramName.value, id: id.value } }
   },
   { label: currentPage.value?.label ?? "", icon: currentPage.value?.icon }
@@ -43,45 +53,43 @@ const items = computed(() => [
   <div>
     <default-layout>
       <template #title>
-        <u-breadcrumb :items />
+        <u-breadcrumb :items="items" />
       </template>
 
+      <!--Player subpages / coach profile navigation-->
       <template #right>
-        <ClientOnly>
+        <div
+          v-if="lgAndUp"
+          class="flex items-center gap-2"
+        >
           <player-page-buttons
-            v-if="mdAndUp"
             :name="paramName"
             :id
           />
-          <u-dropdown-menu
-            v-else
-            :items="PLAYER_PAGES"
-          >
-            <u-button
-              :icon="ICONS.layers"
-              color="neutral"
-              variant="link"
-              size="xl"
-            />
-          </u-dropdown-menu>
-        </ClientOnly>
+          <u-button
+            v-if="years && years.labels.includes('Coach')"
+            :icon="ICONS.coach"
+            label="Coach Profile"
+            :to="{ name: 'coach', params: { id } }"
+            size="xs"
+          />
+        </div>
+        <u-dropdown-menu
+          v-else
+          :items="[...PLAYER_PAGES, { label: 'Coach Profile', icon: ICONS.coach, to: { name: 'coach', params: { id } } }]"
+        >
+          <u-button
+            :icon="ICONS.layers"
+            color="neutral"
+            variant="link"
+            size="xl"
+          />
+        </u-dropdown-menu>
       </template>
 
       <template
-        #toolbar-left
-        v-if="$slots['toolbar-left']"
-      >
-        <slot name="toolbar-left" />
-      </template>
-      <template
-        #toolbar-right
-        v-if="$slots['toolbar-right']"
-      >
-        <slot name="toolbar-right" />
-      </template>
-      <template
         #toolbar
-        v-if="$slots['toolbar']"
+        v-if="$slots.toolbar"
       >
         <slot name="toolbar" />
       </template>

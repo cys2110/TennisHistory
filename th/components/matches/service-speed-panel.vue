@@ -10,7 +10,7 @@ defineProps<{
 <template>
   <dashboard-subpanel title="Service Speed">
     <div
-      v-if="!checked"
+      v-if="checked"
       class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2"
     >
       <service-speed-gauge

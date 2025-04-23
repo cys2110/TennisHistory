@@ -1,17 +1,5 @@
 <script setup lang="ts">
-import { CATEGORY_COLOURS } from "~/utils/variables"
-
-interface APIResponse {
-  year: number
-  player: Pick<PlayerInterface, "id" | "name" | "country">
-  sets_won: number
-  sets_lost: number
-  games_won: number
-  games_lost: number
-  sets_pc: number
-  games_pc: number
-}
-const { scores } = defineProps<{ scores: APIResponse[] }>()
+const { scores } = defineProps<{ scores: GamesSetsLostInterface[] }>()
 const colorMode = useColorMode()
 
 const getColour = (index: number) => CATEGORY_COLOURS[index % CATEGORY_COLOURS.length]

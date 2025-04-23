@@ -1,28 +1,44 @@
 <script setup lang="ts">
 definePageMeta({ name: "activity" })
-const toast = useToast()
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 const id = useRouteParams<string>("id")
-const playerYears = useState<number[]>("player-years")
+const route = useRoute()
+const toast = useToast()
+
+const playerYears = useState<string[]>("player-years")
 const currentYear = new Date().getFullYear()
-const year = useRouteQuery<number>("year", playerYears.value && playerYears.value[playerYears.value.length - 1] === currentYear ? playerYears.value[playerYears.value.length - 1] : currentYear)
+const year = useRouteQuery<string>("year", playerYears.value ? playerYears.value[playerYears.value.length - 1].toString() : currentYear.toString())
 
 // API call
-const { data: yearActivity, status } = await useFetch<PlayerActivityAPIType>("/api/player-activity", {
+const {
+  data: yearActivity,
+  status,
+  refresh
+} = await useFetch<PlayerActivityAPIType>("/api/player-activity", {
   query: { id, year },
-  onResponseError: () => {
+  default: () => ({ stats: [], activity: [] }),
+  watch: false,
+  onResponseError: ({ error }) => {
     toast.add({
-      title: `Error fetching ${name}'s ${year.value} activity`,
+      title: `Error fetching ${name.value}'s ${year} activity`,
+      description: error?.message,
       icon: ICONS.error,
       color: "error"
     })
   }
 })
 
+watch(
+  () => [id.value, year.value],
+  ([newId, newYear]) => {
+    if ((newId || newYear) && route.name === "activity") refresh()
+  }
+)
+
 // Anchor links
 const links = computed(() => {
-  if (yearActivity.value && yearActivity.value.activity.length)
+  if (yearActivity.value)
     return yearActivity.value.activity.map(event => ({
       to: `#event-${event.eid}`,
       label: event.name
@@ -34,51 +50,66 @@ const links = computed(() => {
   <div>
     <nuxt-layout name="player-layout">
       <template #toolbar>
-        <ClientOnly>
-          <year-select
-            v-model="year"
-            :items="playerYears"
+        <year-select
+          v-model="year"
+          :items="playerYears"
+        />
+        <u-dropdown-menu
+          v-if="yearActivity"
+          :items="links"
+        >
+          <u-button
+            :icon="ICONS.toc"
+            color="neutral"
+            variant="link"
+            size="xl"
+            class="justify-self-end"
           />
-          <u-dropdown-menu
-            v-if="yearActivity"
-            :items="links"
-          >
-            <u-button
-              :icon="ICONS.toc"
-              color="neutral"
-              variant="link"
-              size="xl"
-              class="justify-self-end"
-            />
-          </u-dropdown-menu>
-        </ClientOnly>
+        </u-dropdown-menu>
       </template>
+
+      <!--Overview stats for the year-->
       <u-page-grid
-        v-if="yearActivity"
+        v-if="yearActivity.stats.length || ['pending', 'idle'].includes(status)"
         class="grid-cols-3 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 2xl:w-1/2 mx-auto"
       >
         <year-stat-card
+          v-if="yearActivity"
           v-for="stat in yearActivity.stats"
           :key="stat.category"
           :stats="stat"
         />
+        <year-stat-loading-card
+          v-else
+          v-for="_ in 3"
+          :key="_"
+        />
       </u-page-grid>
+
       <u-page-list
-        v-if="yearActivity && yearActivity.activity.length > 0"
-        class="m-10 gap-10 w-full 2xl:w-1/2 mx-auto"
+        v-if="yearActivity.activity.length > 0 || ['pending', 'idle'].includes(status)"
+        class="m-10 gap-10 w-full xl:w-2/3 2xl:w-1/2 mx-auto"
       >
         <activity-card
+          v-if="yearActivity.activity.length"
           v-for="event in yearActivity.activity"
           :key="event.eid"
           :id="`event-${event.eid}`"
           :event
           :year
         />
+        <activity-loading-card
+          v-else
+          v-for="_ in 3"
+          :key="_"
+        />
       </u-page-list>
+
       <error-message
         v-else
+        :title="`${name} had no activity in ${year}`"
         :icon="ICONS.noCalendar"
-        :title="`${name} has no activity for ${year}`"
+        :error="`${name}'s ${year} activity'`"
         :status
       />
     </nuxt-layout>

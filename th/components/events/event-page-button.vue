@@ -30,7 +30,7 @@ const showButton = (page: string) => {
       :label="page.label"
       :icon="page.icon"
       :to="{ name: page.name, params: { name, id, eid, year } }"
-      prefetch-on="interaction"
+      :ui="{ leadingIcon: page.icon === ICONS.draw ? 'rotate-90' : undefined }"
     />
   </template>
 </template>

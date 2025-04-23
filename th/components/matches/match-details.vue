@@ -9,16 +9,16 @@ const sets = computed(() => {
 <template>
   <u-container class="md:w-1/2 xl:w-1/3 2xl:w-1/4 border-2 border-primary-700 p-5 rounded-xl">
     <div class="text-xs sm:text-sm">
-      <div class="flex flex-col sm:flex-row">
+      <div class="flex flex-col sm:flex-row justify-between">
         <span class="sm:w-1/2">{{ match.date ?? match.dates }}</span>
-        <div class="flex justify-between sm:w-1/2">
-          <span>{{ match.surface }}</span>
-          <span class="justify-self-end">{{ match.duration }}</span>
-        </div>
+        <span>{{ match.surface }}</span>
+        <span>{{ match.duration ?? "00:00" }}</span>
       </div>
       <div class="flex justify-between my-1">
         <span>{{ match.court }}</span>
-        <span>{{ match.umpire }}</span>
+        <span v-if="match.umpire">
+          <umpire-link :umpire="match.umpire" />
+        </span>
       </div>
     </div>
 
