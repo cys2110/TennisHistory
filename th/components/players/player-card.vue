@@ -16,7 +16,7 @@ const currentYear = new Date().getFullYear()
     <template #leading>
       <u-icon :name="player.country.alpha2 ? `flag:${player.country.alpha2}-4x3` : `flags:${player.country.id}`" />
       <u-badge
-        v-if="player.current"
+        v-if="player.current === true || player.current === false"
         variant="soft"
       >
         {{ player.current ? "Current" : "Former" }}

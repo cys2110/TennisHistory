@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ name: "venues" })
 useHead({ title: "Venues", templateParams: { subPage: null } })
+const toast = useToast()
 
 interface VenuesAPIResponse {
   count: number
@@ -13,7 +14,15 @@ const pageSize = ref(25)
 
 // API call
 const { data, status } = await useFetch<VenuesAPIResponse>("/api/all-venues", {
-  query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * pageSize.value), limit: pageSize }
+  query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * pageSize.value), limit: pageSize },
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: "Error fetching venues",
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
+  }
 })
 
 // Breadcrumbs

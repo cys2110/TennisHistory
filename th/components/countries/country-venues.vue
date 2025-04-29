@@ -1,9 +1,33 @@
 <script setup lang="ts">
 defineProps<{ name?: string }>()
 const id = useRouteParams<string>("id")
+const route = useRoute()
+const toast = useToast()
 
 // API call
-const { data: venues, status } = await useFetch<VenueInterface[] | null>("/api/country-venues", { query: { id } })
+const {
+  data: venues,
+  status,
+  refresh
+} = await useFetch<VenueInterface[] | null>("/api/country-venues", {
+  query: { id },
+  watch: false,
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching venues located in ${name ?? id}`,
+      description: error?.message,
+      icon: ICONS.error,
+      color: "error"
+    })
+  }
+})
+
+watch(
+  () => id.value,
+  newId => {
+    if (newId && newId !== " " && route.name === "country") refresh()
+  }
+)
 </script>
 
 <template>
@@ -12,14 +36,14 @@ const { data: venues, status } = await useFetch<VenueInterface[] | null>("/api/c
     :icon="ICONS.venue"
   >
     <u-page-columns
-      v-if="venues"
-      class="xl:columns-3 2xl:columns-3"
+      v-if="venues?.length"
+      class="xl:columns-2 2xl:columns-3"
     >
       <u-page-card
         v-for="venue in venues"
         :key="venue.id"
         :title="`${venue.name}, ${venue.city}`"
-        :icon="`flag:${venue.country.alpha2}-4x3`"
+        :icon="venue.country.alpha2 ? `flag:${venue.country.alpha2}-4x3` : `flags:${venue.country.id}`"
       />
     </u-page-columns>
     <u-page-columns

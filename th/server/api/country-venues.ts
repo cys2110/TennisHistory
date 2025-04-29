@@ -19,5 +19,5 @@ export default defineEventHandler(async query => {
 
   const venues = records.map(record => record.get("venue"))
 
-  return venues
+  return venues.filter(venue => venue !== null)
 })

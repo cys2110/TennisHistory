@@ -35,7 +35,7 @@ const {
 watch(
   () => [id.value, years.value, surfaces.value],
   ([newId, newYears, newSurfaces]) => {
-    if (((newId && newId !== " ") || newYears || newSurfaces) && route.name === "stats") refresh()
+    if ((newId || newYears || newSurfaces) && newId !== " " && route.name === "stats") refresh()
   },
   { immediate: true }
 )
