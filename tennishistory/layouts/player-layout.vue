@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import defaultLayout from "./default.vue"
-const paramName = useRouteParams<string>("name")
-const name = computed(() => decodeName(paramName.value))
 
 const appConfig = useAppConfig()
 const route = useRoute()
@@ -9,6 +7,7 @@ const toast = useToast()
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const lgAndUp = breakpoints.greaterOrEqual("lg")
 const currentPage = computed(() => PLAYER_PAGES.find(page => page.name === route.name))
+const name = computed(() => decodeName(route.params.name as string))
 useHead({ title: currentPage.value?.label ?? "", templateParams: { subPage: name.value } })
 
 // API call
@@ -42,7 +41,7 @@ const items = computed(() => [
       icon: ICONS.player,
       class: "border border-neutral-600 dark:border-neutral-400"
     },
-    to: { name: "player", params: { name: paramName.value, id: route.params.id } }
+    to: { name: "player", params: { name: route.params.name, id: route.params.id } }
   },
   { label: currentPage.value?.label ?? "", icon: currentPage.value?.icon }
 ])
@@ -63,7 +62,7 @@ const items = computed(() => [
             class="flex items-center gap-2"
           >
             <player-page-buttons
-              :name="paramName"
+              :name="route.params.name as string"
               :id="route.params.id as string"
             />
             <u-button

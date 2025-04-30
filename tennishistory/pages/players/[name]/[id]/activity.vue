@@ -1,12 +1,9 @@
 <script setup lang="ts">
 definePageMeta({ name: "activity" })
-const paramName = useRouteParams<string>("name")
-const name = computed(() => decodeName(paramName.value))
-const id = useRouteParams<string>("id")
-
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
+const name = computed(() => decodeName(route.params.name as string))
 
 const playerYears = useState<string[]>("player-years")
 const currentYear = new Date().getFullYear()
@@ -23,31 +20,21 @@ interface APIResponseInterface {
 }
 
 // API call
-const {
-  data: yearActivity,
-  status,
-  refresh
-} = await useFetch<APIResponseInterface>("/api/players/activity", {
-  query: { id, year },
-  default: () => ({ stats: [], activity: [] }),
-  watch: false,
-  onResponseError: ({ error }) => {
-    toast.add({
-      title: `Error fetching ${name.value}'s ${year} activity`,
-      description: error?.message,
-      icon: appConfig.ui.icons.error,
-      color: "error"
-    })
-    showError(error!)
+const { data: yearActivity, status } = await useFetch<APIResponseInterface>(
+  "/api/players/activity",
+  {
+    query: { id: route.params.id, year },
+    default: () => ({ stats: [], activity: [] }),
+    onResponseError: ({ error }) => {
+      toast.add({
+        title: `Error fetching ${name.value}'s ${year} activity`,
+        description: error?.message,
+        icon: appConfig.ui.icons.error,
+        color: "error"
+      })
+      showError(error!)
+    }
   }
-})
-
-watch(
-  () => [id.value, year.value],
-  ([newId, newYear]) => {
-    if ((newId || newYear) && route.name === "activity") refresh()
-  },
-  { immediate: true }
 )
 
 // Anchor links

@@ -1,12 +1,10 @@
 <script setup lang="ts">
 definePageMeta({ name: "player" })
-const paramName = useRouteParams<string>("name")
-const name = computed(() => decodeName(paramName.value))
-
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
 const playerYears = useState<string[]>("player-years")
+const name = computed(() => decodeName(route.params.name as string))
 
 // Determine whether player is still active on tour
 const active = computed(() => {

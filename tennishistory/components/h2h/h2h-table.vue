@@ -4,12 +4,12 @@ const { h2h, c1, c2 } = defineProps<{
   c1: CountryInterface
   c2: CountryInterface
 }>()
-const p1Id = useRouteParams<string>("p1Id")
-const p2Id = useRouteParams<string>("p2Id")
-const p1ParamName = useRouteParams<string>("p1Name")
-const p2ParamName = useRouteParams<string>("p2Name")
-const p1Name = computed(() => decodeName(p1ParamName.value))
-const p2Name = computed(() => decodeName(p2ParamName.value))
+
+const route = useRoute()
+const p1Id = computed(() => route.params.p1Id as string)
+const p2Id = computed(() => route.params.p2Id as string)
+const p1Name = computed(() => decodeName(route.params.p1Name as string))
+const p2Name = computed(() => decodeName(route.params.p2Name as string))
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const lgAndUp = breakpoints.greaterOrEqual("lg")
@@ -102,6 +102,7 @@ const playerDetails = computed(() => [
         </div>
         <div
           v-for="detail in playerDetails"
+          :key="detail.title"
           class="grid grid-cols-3 items-center"
         >
           <div>{{ detail.p1 }}</div>

@@ -17,9 +17,9 @@ const { matches, tournament, id, year } = defineProps<{
   tournament: Pick<TournamentInterface, "id" | "name">
 }>()
 const appConfig = useAppConfig()
-const playerId = useRouteParams<string>("id")
-const paramName = useRouteParams<string>("name")
-const playerName = computed(() => decodeName(paramName.value))
+const route = useRoute()
+const playerId = computed(() => route.params.id as string)
+const playerName = computed(() => decodeName(route.params.name as string))
 
 const columns: TableColumn<
   Pick<MatchInterface, "round" | "match_no" | "incomplete" | "winner_id" | "sets" | "tbs"> & {

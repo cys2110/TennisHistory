@@ -1,10 +1,8 @@
 <script setup lang="ts">
-const paramName = useRouteParams<string>("name")
-const name = computed(() => decodeName(paramName.value))
-
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
+const name = computed(() => decodeName(route.params.name as string))
 
 // API call
 const { data: results, status } = await useFetch<MajorResultsType[]>("/api/players/major-results", {

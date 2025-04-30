@@ -5,10 +5,10 @@ const { player, index, id, country } = defineProps<{
   id: string
   country: CountryInterface
 }>()
-const p1ParamName = useRouteParams<string>("p1Name")
-const p2ParamName = useRouteParams<string>("p2Name")
-const p1Name = computed(() => decodeName(p1ParamName.value))
-const p2Name = computed(() => decodeName(p2ParamName.value))
+
+const route = useRoute()
+const p1Name = computed(() => decodeName(route.params.p1Name as string))
+const p2Name = computed(() => decodeName(route.params.p2Name as string))
 
 const playerDetails = computed(() => [
   { title: "DOB", value: player.dob ?? "Unknown" },

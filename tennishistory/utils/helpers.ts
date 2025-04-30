@@ -5,7 +5,7 @@ export const convertToFt = (height: number) => {
   return `${ft}' ${inches}"`
 }
 
-export const decodeName = (name: string) => name.replace(/_/g, " ")
+export const decodeName = (name: string) => name?.replace?.(/_/g, " ") ?? ""
 
 export const encodeName = (name: string) => name.replace(/ /g, "_")
 

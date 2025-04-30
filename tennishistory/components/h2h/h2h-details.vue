@@ -1,15 +1,13 @@
 <script setup lang="ts">
 const { c1, c2 } = defineProps<{ c1: CountryInterface; c2: CountryInterface }>()
-const p1ParamName = useRouteParams<string>("p1Name")
-const p2ParamName = useRouteParams<string>("p2Name")
-const p1Name = computed(() => decodeName(p1ParamName.value))
-const p2Name = computed(() => decodeName(p2ParamName.value))
-
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const lgAndUp = breakpoints.greaterOrEqual("lg")
+
+const p1Name = computed(() => decodeName(route.params.p1Name as string))
+const p2Name = computed(() => decodeName(route.params.p2Name as string))
 
 // API call
 const { data: h2h } = await useFetch<{
@@ -43,6 +41,7 @@ const { data: h2h } = await useFetch<{
         :index="1"
         :id="route.params.p1Id as string"
         :country="c1"
+        :key="1"
       />
     </ClientOnly>
 
@@ -65,6 +64,7 @@ const { data: h2h } = await useFetch<{
         :index="2"
         :id="route.params.p2Id as string"
         :country="c2"
+        :key="2"
       />
     </ClientOnly>
   </div>

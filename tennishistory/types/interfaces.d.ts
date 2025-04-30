@@ -84,6 +84,15 @@ declare global {
     city: string
     country: CountryInterface
   }
+
+  interface WLIndexInterface {
+    category: CategoryEnum
+    stat: string
+    wins: number
+    losses: number
+    titles: number | null
+    value: number
+  }
 }
 
 export {}

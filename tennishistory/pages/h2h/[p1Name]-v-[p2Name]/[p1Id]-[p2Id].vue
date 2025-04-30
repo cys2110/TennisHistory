@@ -1,16 +1,15 @@
 <script setup lang="ts">
 definePageMeta({ name: "h2h-players" })
-const p1ParamName = useRouteParams<string>("p1Name")
-const p1Name = computed(() => decodeName(p1ParamName.value))
-const p2ParamName = useRouteParams<string>("p2Name")
-const p2Name = computed(() => decodeName(p2ParamName.value))
-useHead({ title: `${p1Name.value} v. ${p2Name.value}`, templateParams: { subPage: "H2H" } })
 
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const lgAndUp = breakpoints.greaterOrEqual("lg")
+
+const p1Name = computed(() => decodeName(route.params.p1Name as string))
+const p2Name = computed(() => decodeName(route.params.p2Name as string))
+useHead({ title: `${p1Name.value} v. ${p2Name.value}`, templateParams: { subPage: "H2H" } })
 
 // Breadcrumbs
 const items = [
@@ -23,7 +22,7 @@ const items = [
 const links = computed(() => [
   {
     label: p1Name.value,
-    to: { name: "player", params: { name: p1ParamName.value, id: route.params.p1Id } },
+    to: { name: "player", params: { name: route.params.p1Name, id: route.params.p1Id } },
     avatar: {
       src: `https://www.atptour.com/-/media/alias/player-headshot/${route.params.p1Id}`,
       icon: ICONS.player,
@@ -32,7 +31,7 @@ const links = computed(() => [
   },
   {
     label: p2Name.value,
-    to: { name: "player", params: { name: p2ParamName.value, id: route.params.p2Id } },
+    to: { name: "player", params: { name: route.params.p2Name, id: route.params.p2Id } },
     avatar: {
       src: `https://www.atptour.com/-/media/alias/player-headshot/${route.params.p2Id}`,
       icon: ICONS.player,

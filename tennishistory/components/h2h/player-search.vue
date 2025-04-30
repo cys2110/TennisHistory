@@ -1,14 +1,12 @@
 <script setup lang="ts">
 const { index, country } = defineProps<{ index: number; country: CountryInterface }>()
-const p1ParamName = useRouteParams<string>("p1Name")
-const p2ParamName = useRouteParams<string>("p2Name")
-const p1Name = computed(() => decodeName(p1ParamName.value))
-const p2Name = computed(() => decodeName(p2ParamName.value))
-
 const appConfig = useAppConfig()
 const router = useRouter()
 const route = useRoute()
 const toast = useToast()
+
+const p1Name = computed(() => decodeName(route.params.p1Name as string))
+const p2Name = computed(() => decodeName(route.params.p2Name as string))
 
 const selectedValue = ref<{
   label: string
@@ -42,8 +40,8 @@ watch(
     router.push({
       name: "h2h-players",
       params: {
-        p1Name: index === 1 ? encodeName(selectedValue.value.label) : p1ParamName.value,
-        p2Name: index === 2 ? encodeName(selectedValue.value.label) : p2ParamName.value,
+        p1Name: index === 1 ? encodeName(selectedValue.value.label) : route.params.p1Name,
+        p2Name: index === 2 ? encodeName(selectedValue.value.label) : route.params.p2Name,
         p1Id: index === 1 ? selectedValue.value.value : route.params.p1Id,
         p2Id: index === 2 ? selectedValue.value.value : route.params.p2Id
       }
