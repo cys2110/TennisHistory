@@ -101,7 +101,7 @@ declare global {
     | "age"
   >
 
-  type PlayerYearStatsType = {
+  type PlayerStatsType = {
     category: CategoryEnum
     value: number
     suffix?: boolean

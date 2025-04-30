@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ stats: PlayerYearStatsType }>()
+defineProps<{ stats: PlayerStatsType }>()
 </script>
 
 <template>

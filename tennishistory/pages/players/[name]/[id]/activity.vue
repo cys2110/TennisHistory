@@ -15,7 +15,7 @@ const year = useRouteQuery<string>(
 )
 
 interface APIResponseInterface {
-  stats: PlayerYearStatsType[]
+  stats: PlayerStatsType[]
   activity: PlayerActivityType[]
 }
 
