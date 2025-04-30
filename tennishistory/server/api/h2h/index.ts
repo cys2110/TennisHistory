@@ -72,7 +72,9 @@ export default defineEventHandler(async query => {
       wins: Number(p1.wins),
       losses: Number(p1.losses),
       titles: Number(p1.titles),
-      ch: Number(p1.ch)
+      ch: Number(p1.ch),
+      turned_pro: p1.turned_pro ? Number(p1.turned_pro) : null,
+      retired: p1.retired ? Number(p1.retired) : null
     },
     p2: {
       ...p2,
@@ -80,7 +82,9 @@ export default defineEventHandler(async query => {
       wins: Number(p2.wins),
       losses: Number(p2.losses),
       titles: Number(p2.titles),
-      ch: Number(p2.ch)
+      ch: Number(p2.ch),
+      turned_pro: p2.turned_pro ? Number(p2.turned_pro) : null,
+      retired: p2.retired ? Number(p2.retired) : null
     },
     p1Wins: Number(p1Wins),
     p2Wins: Number(p2Wins)

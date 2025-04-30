@@ -50,6 +50,33 @@ declare global {
     "wins" | "losses" | "pm" | "rh" | "bh" | "turned_pro" | "titles" | "dob" | "height" | "ch"
   >
 
+  type MajorResultsType = {
+    tournament: Pick<TournamentInterface, "id" | "name">
+    round: RoundType
+    events: Pick<EventInterface, "id" | "year">[]
+  }
+
+  type PlayerDetailsType = Pick<
+    PlayerInterface,
+    | "ch"
+    | "ch_date"
+    | "wins"
+    | "losses"
+    | "titles"
+    | "pm"
+    | "rh"
+    | "bh"
+    | "height"
+    | "dob"
+    | "hof"
+    | "dod"
+    | "turned_pro"
+    | "retired"
+    | "coaches"
+    | "countries"
+    | "age"
+  >
+
   type UmpireDetailsType = Pick<EventInterface, "id" | "tournament" | "draw_type" | "year"> & {
     rounds: {
       round: RoundType

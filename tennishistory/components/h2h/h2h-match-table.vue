@@ -42,7 +42,8 @@ watch(
   () => [p1Id.value, p2Id.value],
   ([newP1, newP2]) => {
     if ((newP1 || newP2) && route.name === "h2h-players") refresh()
-  }
+  },
+  { immediate: true }
 )
 
 const columns: TableColumn<H2HMatchType>[] = [

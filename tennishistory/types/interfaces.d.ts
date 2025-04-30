@@ -37,11 +37,13 @@ declare global {
   }
 
   interface PlayerInterface {
+    age: string | null
     bh: string | null
     ch: number | null
     ch_date: string | null
     coaches: CoachType[]
     country: CountryInterface
+    countries: (CountryInterface & { dates: string })[]
     dob: string | null
     dod: string | null
     gladiator: boolean
@@ -53,10 +55,10 @@ declare global {
     max_year: number | null
     name: string
     pm: string
-    retired: string | null
+    retired: number | null
     rh: boolean | null
     titles: number
-    turned_pro: string | null
+    turned_pro: number | null
     wins: number
   }
 

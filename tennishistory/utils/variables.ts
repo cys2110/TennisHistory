@@ -63,6 +63,14 @@ export const NAV_LINKS = [
   { label: "Search", to: { name: "search" }, icon: appConfig.ui?.icons?.search }
 ]
 
+export const PLAYER_PAGES = [
+  { label: "Details", name: "player", icon: ICONS.overview },
+  { label: "Activity", name: "activity", icon: ICONS.event },
+  { label: "Titles and Finals", name: "titles-and-finals", icon: ICONS.tournament },
+  { label: "Win-Loss Index", name: "wl-index", icon: ICONS.barChart },
+  { label: "Stats", name: "stats", icon: ICONS.stats }
+]
+
 export const RELATED_LINKS = [
   {
     label: "Governing Bodies",
