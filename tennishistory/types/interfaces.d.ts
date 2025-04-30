@@ -15,6 +15,8 @@ declare global {
   }
 
   interface EventInterface {
+    c1: CountryInterface
+    c2: CountryInterface
     category: CategoryEnum | null
     currency: CurrencyType | null
     dates: string
@@ -25,6 +27,7 @@ declare global {
     name: string | null
     pm: string | null
     start_date: string
+    score: string
     surface: SurfaceEnum
     tfc: string | null
     tournament: Omit<TournamentInterface, "website">

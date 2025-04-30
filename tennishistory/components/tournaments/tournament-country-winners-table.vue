@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CountryLink, UButton } from "#components"
+import { CountryLink, UButton, UIcon, ULink } from "#components"
 import type { TableColumn } from "@nuxt/ui"
 
 const appConfig = useAppConfig()
@@ -36,14 +36,25 @@ const columns: TableColumn<APIResponse>[] = [
     id: "country",
     header: "Country",
     cell: ({ row }) => {
-      return h("div", { class: "grid grid-cols-2 gap-2 items-center" }, [
-        h("div", { class: "flex justify-end items-center" }, [
-          h(CountryLink, {
-            country: row.original.country
-          })
-        ]),
-        h("div", { class: "flex justify-start" }, row.original.country.name)
-      ])
+      return h(
+        ULink,
+        {
+          class: "grid grid-cols-2 gap-2 items-center",
+          to: {
+            name: "country",
+            params: { id: row.original.country.id }
+          }
+        },
+        [
+          h(UIcon, {
+            name: row.original.country.alpha2
+              ? `flag:${row.original.country.alpha2}-4x3`
+              : `flags:${row.original.country.id}`,
+            class: "ml-auto"
+          }),
+          h("div", { class: "flex justify-start hover-link w-fit" }, row.original.country.name)
+        ]
+      )
     }
   },
   {

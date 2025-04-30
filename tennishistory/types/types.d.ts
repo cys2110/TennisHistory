@@ -34,6 +34,8 @@ declare global {
   type CoachType = Pick<PlayerInterface, "id" | "name"> &
     Partial<Omit<PlayerInterface, "id" | "name">>
 
+  type CountryEventType = Pick<EventInterface, "id" | "year" | "c1" | "c2" | "score">
+
   type EventCardType = Pick<
     EventInterface,
     | "year"

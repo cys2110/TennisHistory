@@ -30,7 +30,12 @@ const features = [
 ]
 
 // Screenshots
-const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.png"]
+const screenshots = [
+  "./pages/archive.png",
+  "./pages/player.png",
+  "./pages/h2h.png",
+  ".pages/tournament.png"
+]
 </script>
 
 <template>
