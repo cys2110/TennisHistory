@@ -49,7 +49,7 @@ export default defineAppConfig({
     navigationMenu: {
       slots: {
         root: "w-full",
-        link: "text-xs xl:text-sm"
+        link: "text-xs xl:text-sm cursor-pointer"
       },
       defaultVariants: {
         color: "secondary",
@@ -88,6 +88,9 @@ export default defineAppConfig({
       }
     },
     button: {
+      slots: {
+        base: "cursor-pointer"
+      },
       compoundVariants: [
         {
           color: "secondary",
@@ -103,7 +106,7 @@ export default defineAppConfig({
     },
     select: {
       slots: {
-        base: "cursor-pointer",
+        base: "cursor-pointer w-full",
         content: "ring-secondary-700 dark:ring-secondary-600 cursor-pointer",
         trailingIcon: "group-data-[state=open]:rotate-180 transition-transform duration-250"
       },

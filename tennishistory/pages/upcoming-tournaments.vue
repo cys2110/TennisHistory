@@ -9,9 +9,5 @@ const breadcrumbs = [
 </script>
 
 <template>
-  <div>
-    <nuxt-layout name="default">
-      <tournament-calendar :breadcrumbs />
-    </nuxt-layout>
-  </div>
+  <tournament-calendar :breadcrumbs />
 </template>

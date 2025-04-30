@@ -1,5 +1,21 @@
 import appConfig from "~/app.config"
 
+export const CATEGORIES = Object.values(CategoryEnum)
+
+export const EVENT_PAGES = [
+  { label: "Details", name: "event", icon: ICONS.overview },
+  { label: "Details", name: "country-event", icon: ICONS.overview },
+  { label: "Results", name: "results", icon: ICONS.cards },
+  { label: "Draw", name: "draw", icon: ICONS.draw },
+  { label: "Draw", name: "country-draw", icon: ICONS.draw },
+  { label: "Draw", name: "round-robin-draw", icon: ICONS.draw },
+  { label: "Draw", name: "laver-cup-draw", icon: ICONS.draw }
+]
+
+export const MONTH_NAMES = Object.keys(MonthEnum).filter(
+  key => isNaN(Number(key)) && key !== "length"
+) as (keyof typeof MonthEnum)[]
+
 export const NAV_LINKS = [
   { label: "Upcoming Tournaments", to: { name: "upcoming-tournaments" }, icon: ICONS.upcoming },
   { label: "Results Archive", to: { name: "results-archive" }, icon: ICONS.event },
@@ -44,3 +60,5 @@ export const RELATED_LINKS = [
     ]
   }
 ]
+
+export const SURFACES = Object.values(SurfaceEnum)
