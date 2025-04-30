@@ -44,6 +44,8 @@ declare global {
     height: number | null
     hof: string | null
     id: string
+    min_year: number | null
+    max_year: number | null
     name: string
     pm: string
     retired: string | null

@@ -9,7 +9,11 @@ const route = useRoute()
 const toast = useToast()
 
 // API call
-const { data: events, status } = await useFetch<EventCardType[]>("/api/venues/venue-details", {
+const {
+  data: events,
+  status,
+  refresh
+} = await useFetch<EventCardType[]>("/api/venues/venue-details", {
   query: { id: name.value },
   watch: false,
   onResponseError: ({ error }) => {
@@ -22,6 +26,14 @@ const { data: events, status } = await useFetch<EventCardType[]>("/api/venues/ve
     showError(error!)
   }
 })
+
+watch(
+  () => id.value,
+  newId => {
+    if (newId && route.name === "venue") refresh()
+  },
+  { immediate: true }
+)
 
 // Breadcrumbs
 const items = computed(() => [
