@@ -1,11 +1,11 @@
 <script setup lang="ts">
-defineProps<{ surface: string }>()
+defineProps<{ type: string; id: string }>()
 </script>
 
 <template>
   <u-page-card
-    :title="surface"
-    :to="{ name: 'surface', params: { id: encodeName(surface) } }"
+    :title="id"
+    :to="{ name: type, params: { id: encodeName(id) } }"
     highlight
     :ui="{ container: 'justify-center items-center text-center' }"
   />

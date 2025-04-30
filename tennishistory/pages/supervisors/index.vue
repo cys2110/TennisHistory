@@ -52,11 +52,12 @@ const { data, status } = await useFetch<SupervisorsAPIResponse>(
       v-if="data?.count || ['pending', 'idle'].includes(status)"
       class="mt-10"
     >
-      <supervisor-card
+      <base-card
         v-if="data"
         v-for="supervisor in data.supervisors"
         :key="supervisor"
-        :supervisor
+        type="supervisor"
+        :id="supervisor"
       />
 
       <base-loading-card

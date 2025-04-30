@@ -10,6 +10,8 @@ declare global {
     | "Laver Cup"
     | "Country draw"
 
+  type IncompleteType = "B" | "R" | "Def" | "WO"
+
   // Consolidated types
 
   type CoachType = Pick<PlayerInterface, "id" | "name"> &
@@ -28,6 +30,17 @@ declare global {
     | "draw_type"
     | "tournament"
   >
+
+  type UmpireDetailsType = Pick<EventInterface, "id" | "tournament" | "draw_type" | "year"> & {
+    rounds: {
+      round: string
+      matches: {
+        match_no: string
+        p1: Pick<PlayerInterface, "id" | "name" | "country">
+        p2: Pick<PlayerInterface, "id" | "name" | "country">
+      }[]
+    }[]
+  }
 }
 
 export {}

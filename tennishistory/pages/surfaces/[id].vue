@@ -4,6 +4,7 @@ const id = useRouteParams<string>("id")
 const name = computed(() => decodeName(id.value))
 useHead({ title: name.value, templateParams: { subPage: "Surfaces" } })
 const appConfig = useAppConfig()
+const route = useRoute()
 const toast = useToast()
 
 const year = ref<string>(new Date().getFullYear().toString())
@@ -27,7 +28,8 @@ const items = computed(() => [
 const {
   data: events,
   status,
-  execute
+  execute,
+  refresh: refreshSurface
 } = await useFetch<EventCardType[]>("/api/surfaces/surface-details", {
   query: { id: name.value, year },
   immediate: false,
@@ -61,13 +63,19 @@ const { data: years, refresh } = await useFetch<string[]>("/api/surfaces/surface
 })
 
 watch(
+  () => [id.value, year.value],
+  ([newId, newYear]) => {
+    if ((newYear || newId) && route.name === "surface") refreshSurface()
+  },
+  { immediate: true }
+)
+
+watch(
   () => id.value,
   newId => {
-    if (newId) {
-      refresh()
-      execute()
-    }
-  }
+    if (newId && route.name === "surface") refresh()
+  },
+  { immediate: true }
 )
 
 // Anchor links

@@ -49,11 +49,12 @@ const { data, status } = await useFetch<SurfacesAPIResponse>("/api/surfaces/all-
       v-if="data?.count || ['pending', 'idle'].includes(status)"
       class="mt-10"
     >
-      <surface-card
+      <base-card
         v-if="data"
         v-for="surface in data.surfaces"
         :key="surface"
-        :surface
+        type="surface"
+        :id="surface"
       />
 
       <base-loading-card

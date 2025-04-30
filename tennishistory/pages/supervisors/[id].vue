@@ -4,6 +4,7 @@ const id = useRouteParams<string>("id")
 const name = computed(() => decodeName(id.value))
 useHead({ title: name.value, templateParams: { subPage: "Supervisors" } })
 const appConfig = useAppConfig()
+const route = useRoute()
 const toast = useToast()
 
 const year = ref<string>(new Date().getFullYear().toString())
@@ -20,12 +21,14 @@ const items = computed(() => [
 const {
   data: supervisor,
   status,
-  execute
+  execute,
+  refresh: refreshSupervisor
 } = await useFetch<{ labels: string[]; results: EventCardType[] }>(
   "/api/supervisors/supervisor-details",
   {
     query: { id: name.value, year },
     immediate: false,
+    watch: false,
     onResponseError: ({ error }) => {
       toast.add({
         title: `Error fetching ${name.value}'s events`,
@@ -58,13 +61,19 @@ const { data: years, refresh } = await useFetch<string[]>("/api/supervisors/supe
 })
 
 watch(
+  () => [id.value, year.value],
+  ([newId, newYear]) => {
+    if ((newId || newYear) && route.name === "supervisor") refreshSupervisor()
+  },
+  { immediate: true }
+)
+
+watch(
   () => id.value,
   newId => {
-    if (newId) {
-      refresh()
-      execute()
-    }
-  }
+    if (newId && route.name === "supervisor") refresh()
+  },
+  { immediate: true }
 )
 
 // Anchor links

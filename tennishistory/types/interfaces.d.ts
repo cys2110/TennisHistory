@@ -22,6 +22,16 @@ declare global {
     year: string
   }
 
+  interface MatchInterface {
+    court: string | null
+    date: string | null
+    duration: string | null
+    group: string | null
+    id: string
+    incomplete: IncompleteType | null
+    match_no: string
+  }
+
   interface PlayerInterface {
     bh: string | null
     ch: string | null
