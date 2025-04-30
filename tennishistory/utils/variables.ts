@@ -12,6 +12,36 @@ export const EVENT_PAGES = [
   { label: "Draw", name: "laver-cup-draw", icon: ICONS.draw }
 ]
 
+export const LETTERS = [
+  "All",
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z"
+]
+
 export const MONTH_NAMES = Object.keys(MonthEnum).filter(
   key => isNaN(Number(key)) && key !== "length"
 ) as (keyof typeof MonthEnum)[]
