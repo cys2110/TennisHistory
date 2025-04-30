@@ -2,6 +2,14 @@ import appConfig from "~/app.config"
 
 export const CATEGORIES = Object.values(CategoryEnum)
 
+export const CURRENCIES: Record<CurrencyType, string> = {
+  AUD: "A$",
+  EUR: "€",
+  FRF: "\u20A3",
+  GBP: "£",
+  USD: "US$"
+}
+
 export const EVENT_PAGES = [
   { label: "Details", name: "event", icon: ICONS.overview },
   { label: "Details", name: "country-event", icon: ICONS.overview },

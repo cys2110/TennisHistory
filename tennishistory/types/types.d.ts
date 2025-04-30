@@ -1,5 +1,5 @@
 declare global {
-  type CurrencyType = "USD" | "EUR" | "GBP" | "AUD" | "FF"
+  type CurrencyType = "USD" | "EUR" | "GBP" | "AUD" | "FRF"
 
   type DrawType =
     | "Round of 128"
@@ -56,6 +56,30 @@ declare global {
     events: Pick<EventInterface, "id" | "year">[]
   }
 
+  type PlayerActivityType = Pick<
+    EventInterface,
+    | "tournament"
+    | "id"
+    | "name"
+    | "dates"
+    | "category"
+    | "venues"
+    | "surface"
+    | "currency"
+    | "draw_type"
+  > & {
+    player: Pick<EntryInterface, "seed" | "status" | "rank" | "points" | "pm">
+    matches: (Pick<
+      MatchInterface,
+      "round" | "match_no" | "incomplete" | "winner_id" | "sets" | "tbs"
+    > & {
+      opponent: Pick<
+        EntryInterface,
+        "id" | "name" | "country" | "incomplete" | "seed" | "status" | "rank"
+      >
+    })[]
+  }
+
   type PlayerDetailsType = Pick<
     PlayerInterface,
     | "ch"
@@ -76,6 +100,12 @@ declare global {
     | "countries"
     | "age"
   >
+
+  type PlayerYearStatsType = {
+    category: CategoryEnum
+    value: number
+    suffix?: boolean
+  }
 
   type UmpireDetailsType = Pick<EventInterface, "id" | "tournament" | "draw_type" | "year"> & {
     rounds: {

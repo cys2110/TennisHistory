@@ -29,23 +29,23 @@ const mdAndUp = breakpoints.greaterOrEqual("md")
         :trailing-icon="appConfig.ui.icons.chevronDown"
       />
       <template #content>
-        <ClientOnly>
-          <match-link
-            v-for="match in round.matches"
-            :key="match.match_no"
-            :tournament="event.tournament"
-            :id="event.id"
-            :year="event.year"
-            :match_no="match.match_no"
-          >
-            <div class="flex items-center gap-2">
-              <u-icon
-                :name="
-                  match.p1.country.alpha2
-                    ? `flag:${match.p1.country.alpha2}-4x3`
-                    : `flags:${match.p1.country.id}`
-                "
-              />
+        <match-link
+          v-for="match in round.matches"
+          :key="match.match_no"
+          :tournament="event.tournament"
+          :id="event.id"
+          :year="event.year"
+          :match_no="match.match_no"
+        >
+          <div class="flex items-center gap-2">
+            <u-icon
+              :name="
+                match.p1.country.alpha2
+                  ? `flag:${match.p1.country.alpha2}-4x3`
+                  : `flags:${match.p1.country.id}`
+              "
+            />
+            <ClientOnly>
               <u-user
                 :avatar="{
                   src: `https://www.atptour.com/-/media/alias/player-headshot/${match.p1.id}`,
@@ -54,14 +54,16 @@ const mdAndUp = breakpoints.greaterOrEqual("md")
                 :name="match.p1.name"
                 :size="mdAndUp ? 'md' : 'sm'"
               />
-              v.
-              <u-icon
-                :name="
-                  match.p2.country.alpha2
-                    ? `flag:${match.p2.country.alpha2}-4x3`
-                    : `flags:${match.p2.country.id}`
-                "
-              />
+            </ClientOnly>
+            v.
+            <u-icon
+              :name="
+                match.p2.country.alpha2
+                  ? `flag:${match.p2.country.alpha2}-4x3`
+                  : `flags:${match.p2.country.id}`
+              "
+            />
+            <ClientOnly>
               <u-user
                 :avatar="{
                   src: `https://www.atptour.com/-/media/alias/player-headshot/${match.p2.id}`,
@@ -70,9 +72,9 @@ const mdAndUp = breakpoints.greaterOrEqual("md")
                 :name="match.p2.name"
                 :size="mdAndUp ? 'md' : 'sm'"
               />
-            </div>
-          </match-link>
-        </ClientOnly>
+            </ClientOnly>
+          </div>
+        </match-link>
       </template>
     </u-collapsible>
 

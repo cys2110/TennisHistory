@@ -1,12 +1,11 @@
 <script setup lang="ts">
 definePageMeta({ name: "surface" })
-const id = useRouteParams<string>("id")
-const name = computed(() => decodeName(id.value))
-useHead({ title: name.value, templateParams: { subPage: "Surfaces" } })
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
 
+const name = computed(() => decodeName(route.params.name as string))
+useHead({ title: name.value, templateParams: { subPage: "Surfaces" } })
 const year = ref<string>(new Date().getFullYear().toString())
 
 // Breadcrumbs
@@ -28,8 +27,7 @@ const items = computed(() => [
 const {
   data: events,
   status,
-  execute,
-  refresh: refreshSurface
+  execute
 } = await useFetch<EventCardType[]>("/api/surfaces/surface-details", {
   query: { id: name.value, year },
   immediate: false,
@@ -45,7 +43,7 @@ const {
 })
 
 // When data returns, set the year to the latest year and run the first fetch
-const { data: years, refresh } = await useFetch<string[]>("/api/surfaces/surface-years", {
+const { data: years } = await useFetch<string[]>("/api/surfaces/surface-years", {
   query: { id: name.value },
   onResponse: ({ response }) => {
     year.value = response._data[response._data.length - 1]
@@ -61,22 +59,6 @@ const { data: years, refresh } = await useFetch<string[]>("/api/surfaces/surface
     showError(error!)
   }
 })
-
-watch(
-  () => [id.value, year.value],
-  ([newId, newYear]) => {
-    if ((newYear || newId) && route.name === "surface") refreshSurface()
-  },
-  { immediate: true }
-)
-
-watch(
-  () => id.value,
-  newId => {
-    if (newId && route.name === "surface") refresh()
-  },
-  { immediate: true }
-)
 
 // Anchor links
 const links = computed(() => {

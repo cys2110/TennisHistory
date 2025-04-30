@@ -1,7 +1,5 @@
 <script setup lang="ts">
 const { c1, c2 } = defineProps<{ c1: CountryInterface; c2: CountryInterface }>()
-const p1Id = useRouteParams<string>("p1Id")
-const p2Id = useRouteParams<string>("p2Id")
 const p1ParamName = useRouteParams<string>("p1Name")
 const p2ParamName = useRouteParams<string>("p2Name")
 const p1Name = computed(() => decodeName(p1ParamName.value))
@@ -14,14 +12,13 @@ const breakpoints = useBreakpoints(breakpointsTailwind)
 const lgAndUp = breakpoints.greaterOrEqual("lg")
 
 // API call
-const { data: h2h, refresh } = await useFetch<{
+const { data: h2h } = await useFetch<{
   p1: H2HPlayerInterface
   p2: H2HPlayerInterface
   p1Wins: number
   p2Wins: number
 }>("/api/h2h", {
-  query: { p1Id, p2Id },
-  watch: false,
+  query: { p1Id: route.params.p1Id, p2Id: route.params.p2Id },
   onResponseError: ({ error }) => {
     toast.add({
       title: `Error fetching head to head for ${p1Name.value} v. ${p2Name.value}`,
@@ -32,14 +29,6 @@ const { data: h2h, refresh } = await useFetch<{
     showError(error!)
   }
 })
-
-watch(
-  () => [p1Id.value, p2Id.value],
-  ([newP1, newP2]) => {
-    if ((newP1 || newP2) && route.name === "h2h-players") refresh()
-  },
-  { immediate: true }
-)
 </script>
 
 <template>
@@ -52,7 +41,7 @@ watch(
         v-if="h2h && lgAndUp"
         :player="h2h.p1"
         :index="1"
-        :id="p1Id"
+        :id="route.params.p1Id as string"
         :country="c1"
       />
     </ClientOnly>
@@ -74,7 +63,7 @@ watch(
         v-if="h2h && lgAndUp"
         :player="h2h.p2"
         :index="2"
-        :id="p2Id"
+        :id="route.params.p2Id as string"
         :country="c2"
       />
     </ClientOnly>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 defineProps<{ active: boolean }>()
-const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 
@@ -9,13 +8,8 @@ const route = useRoute()
 const toast = useToast()
 
 // API call
-const {
-  data: player,
-  status,
-  refresh
-} = await useFetch<PlayerDetailsType>("/api/players/details", {
-  query: { id },
-  watch: false,
+const { data: player, status } = await useFetch<PlayerDetailsType>("/api/players/details", {
+  query: { id: route.params.id },
   onResponseError: ({ error }) => {
     toast.add({
       title: `Error fetching details for ${name.value}`,
@@ -26,14 +20,6 @@ const {
     showError(error!)
   }
 })
-
-watch(
-  () => id.value,
-  newId => {
-    if (newId && route.name === "player") refresh()
-  },
-  { immediate: true }
-)
 </script>
 
 <template>

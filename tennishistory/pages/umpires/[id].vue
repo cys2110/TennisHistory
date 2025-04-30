@@ -1,12 +1,11 @@
 <script setup lang="ts">
 definePageMeta({ name: "umpire" })
-const id = useRouteParams<string>("id")
-const name = computed(() => decodeName(id.value))
-useHead({ title: name.value, templateParams: { subPage: "Umpires" } })
-
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
+
+const name = computed(() => decodeName(route.params.name as string))
+useHead({ title: name.value, templateParams: { subPage: "Umpires" } })
 
 // Breadcrumbs
 const items = computed(() => [
@@ -22,8 +21,7 @@ const year = ref<string>(new Date().getFullYear().toString())
 const {
   data: umpire,
   status,
-  execute,
-  refresh: refreshUmpire
+  execute
 } = await useFetch<{ labels: string[]; results: UmpireDetailsType[] }>(
   "/api/umpires/umpire-details",
   {
@@ -43,7 +41,7 @@ const {
 )
 
 // When data returns, set the year to the latest year and run the first fetch
-const { data: years, refresh } = await useFetch<string[]>("/api/umpires/umpire-years", {
+const { data: years } = await useFetch<string[]>("/api/umpires/umpire-years", {
   query: { id: name.value },
   watch: false,
   onResponse: ({ response }) => {
@@ -60,22 +58,6 @@ const { data: years, refresh } = await useFetch<string[]>("/api/umpires/umpire-y
     showError(error!)
   }
 })
-
-watch(
-  () => [name.value, year.value],
-  ([newName, newYear]) => {
-    if ((newYear || newName) && route.name === "umpire") refreshUmpire()
-  },
-  { immediate: true }
-)
-
-watch(
-  () => name.value,
-  newName => {
-    if (newName && route.name === "umpire") refresh()
-  },
-  { immediate: true }
-)
 
 // Anchor links
 const links = computed(() => {
@@ -99,7 +81,7 @@ const links = computed(() => {
           v-if="umpire?.labels.includes('Supervisor')"
           :icon="ICONS.supervisor"
           label="Supervisor Profile"
-          :to="{ name: 'supervisor', params: { id } }"
+          :to="{ name: 'supervisor', params: { id: route.params.id } }"
           size="xs"
         />
       </template>

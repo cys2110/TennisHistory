@@ -5,6 +5,15 @@ declare global {
     alpha2: string | null
   }
 
+  interface EntryInterface extends Pick<PlayerInterface, "id" | "name" | "country"> {
+    incomplete: IncompleteType | null
+    pm: string | null
+    points: string | null
+    rank: string | null
+    seed: string | null
+    status: string | null
+  }
+
   interface EventInterface {
     category: CategoryEnum | null
     currency: CurrencyType | null
@@ -34,6 +43,7 @@ declare global {
     sets: string[]
     tbs: (string | null)[]
     winner: Pick<PlayerInterface, "id" | "name" | "country">
+    winner_id: string
   }
 
   interface PlayerInterface {

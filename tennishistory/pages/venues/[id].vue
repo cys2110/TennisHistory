@@ -1,19 +1,14 @@
 <script setup lang="ts">
 definePageMeta({ name: "venue" })
-const id = useRouteParams<string>("id")
-const name = computed(() => decodeName(id.value))
-useHead({ title: name.value, templateParams: { subPage: "Venues" } })
-
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
 
+const name = computed(() => decodeName(route.params.name as string))
+useHead({ title: name.value, templateParams: { subPage: "Venues" } })
+
 // API call
-const {
-  data: events,
-  status,
-  refresh
-} = await useFetch<EventCardType[]>("/api/venues/venue-details", {
+const { data: events, status } = await useFetch<EventCardType[]>("/api/venues/venue-details", {
   query: { id: name.value },
   watch: false,
   onResponseError: ({ error }) => {
@@ -26,14 +21,6 @@ const {
     showError(error!)
   }
 })
-
-watch(
-  () => id.value,
-  newId => {
-    if (newId && route.name === "venue") refresh()
-  },
-  { immediate: true }
-)
 
 // Breadcrumbs
 const items = computed(() => [

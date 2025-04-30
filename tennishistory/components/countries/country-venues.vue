@@ -1,21 +1,15 @@
 <script setup lang="ts">
 defineProps<{ name?: string }>()
-const id = useRouteParams<string>("id")
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
 
 // API call
-const {
-  data: venues,
-  status,
-  refresh
-} = await useFetch<VenueInterface[] | null>("/api/countries/venues", {
-  query: { id },
-  watch: false,
+const { data: venues, status } = await useFetch<VenueInterface[] | null>("/api/countries/venues", {
+  query: { id: route.params.id },
   onResponseError: ({ error }) => {
     toast.add({
-      title: `Error fetching venues located in ${name ?? id}`,
+      title: `Error fetching venues located in ${name ?? route.params.id}`,
       description: error?.message,
       icon: appConfig.ui.icons.error,
       color: "error"
@@ -23,14 +17,6 @@ const {
     showError(error!)
   }
 })
-
-watch(
-  () => id.value,
-  newId => {
-    if (newId && route.name === "country") refresh()
-  },
-  { immediate: true }
-)
 </script>
 
 <template>
@@ -61,7 +47,7 @@ watch(
 
     <error-message
       v-else
-      :title="`No venues located in ${name ?? id}`"
+      :title="`No venues located in ${name ?? route.params.id}`"
     />
   </dashboard-subpanel>
 </template>

@@ -3,8 +3,6 @@ import type { TableColumn } from "@nuxt/ui"
 import { BaseLink, EventLink, PlayerAvatar, ScoreItem, TournamentLink, UBadge } from "#components"
 import { Fragment } from "vue/jsx-runtime"
 
-const p1Id = useRouteParams<string>("p1Id")
-const p2Id = useRouteParams<string>("p2Id")
 const p1ParamName = useRouteParams<string>("p1Name")
 const p1Name = computed(() => decodeName(p1ParamName.value))
 const p2ParamName = useRouteParams<string>("p2Name")
@@ -24,9 +22,8 @@ const {
   status,
   refresh
 } = await useFetch<H2HMatchType[]>("/api/h2h/matches", {
-  query: { p1Id, p2Id },
+  query: { p1Id: route.params.p1Id, p2Id: route.params.p2Id },
   default: () => [],
-  watch: false,
   onResponseError: ({ error }) => {
     toast.add({
       title: `Error fetching matches for ${p1Name.value} v. ${p2Name.value}`,
@@ -37,14 +34,6 @@ const {
     showError(error!)
   }
 })
-
-watch(
-  () => [p1Id.value, p2Id.value],
-  ([newP1, newP2]) => {
-    if ((newP1 || newP2) && route.name === "h2h-players") refresh()
-  },
-  { immediate: true }
-)
 
 const columns: TableColumn<H2HMatchType>[] = [
   {
@@ -89,7 +78,7 @@ const columns: TableColumn<H2HMatchType>[] = [
       const { match, tournament, id, year } = row.original
       const { sets, tbs, match_no, incomplete } = match
       return h(Fragment, {}, [
-        h(ScoreItem, { sets, tbs, tournament, id, year, match_no }),
+        h(ScoreItem, { sets, tbs, tournament, id, year, match_no, incomplete }),
         incomplete && h(UBadge, { label: incomplete, color: "error" })
       ])
     }

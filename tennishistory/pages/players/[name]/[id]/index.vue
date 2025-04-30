@@ -1,6 +1,5 @@
 <script setup lang="ts">
 definePageMeta({ name: "player" })
-const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 
@@ -19,11 +18,10 @@ const active = computed(() => {
 })
 
 // API call
-const { data: player, refresh } = await useFetch<Pick<PlayerInterface, "gladiator" | "country">>(
+const { data: player } = await useFetch<Pick<PlayerInterface, "gladiator" | "country">>(
   "/api/players/overview",
   {
-    query: { id },
-    watch: false,
+    query: { id: route.params.id },
     onResponseError: ({ error }) => {
       toast.add({
         title: `Error fetching player overview for ${name.value}`,
@@ -34,14 +32,6 @@ const { data: player, refresh } = await useFetch<Pick<PlayerInterface, "gladiato
       showError(error!)
     }
   }
-)
-
-watch(
-  () => id.value,
-  newId => {
-    if (newId && route.name === "player") refresh()
-  },
-  { immediate: true }
 )
 </script>
 
@@ -58,8 +48,8 @@ watch(
         <nuxt-img
           :src="
             player?.gladiator
-              ? `https://www.atptour.com/-/media/alias/player-gladiator-headshot/${id}`
-              : `https://www.atptour.com/-/media/alias/player-headshot/${id}`
+              ? `https://www.atptour.com/-/media/alias/player-gladiator-headshot/${route.params.id}`
+              : `https://www.atptour.com/-/media/alias/player-headshot/${route.params.id}`
           "
           :alt="name"
           :class="{

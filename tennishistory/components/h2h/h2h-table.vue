@@ -85,29 +85,31 @@ const playerDetails = computed(() => [
 
 <template>
   <u-page-list class="w-full mt-auto">
-    <div
-      v-if="!lgAndUp"
-      class="w-full flex flex-col gap-2 mb-2"
-    >
-      <div class="flex justify-between items-center">
-        <player-avatar
-          :player="{ id: p1Id, name: p1Name, country: c1 }"
-          bold
-        />
-        <player-avatar
-          :player="{ id: p2Id, name: p2Name, country: c2 }"
-          bold
-        />
-      </div>
+    <ClientOnly>
       <div
-        v-for="detail in playerDetails"
-        class="grid grid-cols-3 items-center"
+        v-if="!lgAndUp"
+        class="w-full flex flex-col gap-2 mb-2"
       >
-        <div>{{ detail.p1 }}</div>
-        <div class="text-center font-bold">{{ detail.title }}</div>
-        <div class="text-right">{{ detail.p2 }}</div>
+        <div class="flex justify-between items-center">
+          <player-avatar
+            :player="{ id: p1Id, name: p1Name, country: c1 }"
+            bold
+          />
+          <player-avatar
+            :player="{ id: p2Id, name: p2Name, country: c2 }"
+            bold
+          />
+        </div>
+        <div
+          v-for="detail in playerDetails"
+          class="grid grid-cols-3 items-center"
+        >
+          <div>{{ detail.p1 }}</div>
+          <div class="text-center font-bold">{{ detail.title }}</div>
+          <div class="text-right">{{ detail.p2 }}</div>
+        </div>
       </div>
-    </div>
+    </ClientOnly>
     <div
       v-for="comparison in comparisons"
       :key="comparison.title"

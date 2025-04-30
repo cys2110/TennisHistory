@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import defaultLayout from "./default.vue"
-const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 
@@ -13,11 +12,10 @@ const currentPage = computed(() => PLAYER_PAGES.find(page => page.name === route
 useHead({ title: currentPage.value?.label ?? "", templateParams: { subPage: name.value } })
 
 // API call
-const { data: years, refresh } = await useFetch<{ years: number[]; labels: string[] }>(
+const { data: years } = await useFetch<{ years: number[]; labels: string[] }>(
   "/api/players/years",
   {
-    query: { id },
-    watch: false,
+    query: { id: route.params.id },
     onResponseError: ({ error }) => {
       toast.add({
         title: `Error fetching ${name.value}'s active years`,
@@ -30,20 +28,6 @@ const { data: years, refresh } = await useFetch<{ years: number[]; labels: strin
   }
 )
 
-watch(
-  () => id.value,
-  newId => {
-    if (
-      newId &&
-      ["player", "activity", "titles-and-finals", "wl-index", "stats"].includes(
-        route.name as string
-      )
-    )
-      refresh()
-  },
-  { immediate: true }
-)
-
 // Set state for other player components
 const playerYears = useState("player-years", () => years.value?.years ?? [])
 
@@ -54,11 +38,11 @@ const items = computed(() => [
   {
     label: name.value,
     avatar: {
-      src: `https://www.atptour.com/-/media/alias/player-headshot/${id.value}`,
+      src: `https://www.atptour.com/-/media/alias/player-headshot/${route.params.id}`,
       icon: ICONS.player,
       class: "border border-neutral-600 dark:border-neutral-400"
     },
-    to: { name: "player", params: { name: paramName.value, id: id.value } }
+    to: { name: "player", params: { name: paramName.value, id: route.params.id } }
   },
   { label: currentPage.value?.label ?? "", icon: currentPage.value?.icon }
 ])
@@ -80,13 +64,13 @@ const items = computed(() => [
           >
             <player-page-buttons
               :name="paramName"
-              :id
+              :id="route.params.id as string"
             />
             <u-button
               v-if="years && years.labels.includes('Coach')"
               :icon="ICONS.coach"
               label="Coach Profile"
-              :to="{ name: 'coach', params: { id } }"
+              :to="{ name: 'coach', params: { id: route.params.id } }"
               size="xs"
             />
           </div>
@@ -94,7 +78,11 @@ const items = computed(() => [
             v-else
             :items="[
               ...PLAYER_PAGES,
-              { label: 'Coach Profile', icon: ICONS.coach, to: { name: 'coach', params: { id } } }
+              {
+                label: 'Coach Profile',
+                icon: ICONS.coach,
+                to: { name: 'coach', params: { id: route.params.id } }
+              }
             ]"
           >
             <u-button

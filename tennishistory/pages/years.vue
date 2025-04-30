@@ -21,7 +21,7 @@ interface YearAPIResponse {
   hof: Pick<PlayerInterface, "id" | "name" | "country">[]
 }
 
-const { data: year, status } = await useFetch<YearAPIResponse>("/api/year-details", {
+const { data: year } = await useFetch<YearAPIResponse>("/api/year-details", {
   query: { id },
   onResponseError: ({ error }) => {
     toast.add({

@@ -4,8 +4,6 @@ const p1ParamName = useRouteParams<string>("p1Name")
 const p1Name = computed(() => decodeName(p1ParamName.value))
 const p2ParamName = useRouteParams<string>("p2Name")
 const p2Name = computed(() => decodeName(p2ParamName.value))
-const p1Id = useRouteParams<string>("p1Id")
-const p2Id = useRouteParams<string>("p2Id")
 useHead({ title: `${p1Name.value} v. ${p2Name.value}`, templateParams: { subPage: "H2H" } })
 
 const appConfig = useAppConfig()
@@ -25,18 +23,18 @@ const items = [
 const links = computed(() => [
   {
     label: p1Name.value,
-    to: { name: "player", params: { name: p1ParamName.value, id: p1Id.value } },
+    to: { name: "player", params: { name: p1ParamName.value, id: route.params.p1Id } },
     avatar: {
-      src: `https://www.atptour.com/-/media/alias/player-headshot/${p1Id.value}`,
+      src: `https://www.atptour.com/-/media/alias/player-headshot/${route.params.p1Id}`,
       icon: ICONS.player,
       class: "border border-neutral-400"
     }
   },
   {
     label: p2Name.value,
-    to: { name: "player", params: { name: p2ParamName.value, id: p2Id.value } },
+    to: { name: "player", params: { name: p2ParamName.value, id: route.params.p2Id } },
     avatar: {
-      src: `https://www.atptour.com/-/media/alias/player-headshot/${p2Id.value}`,
+      src: `https://www.atptour.com/-/media/alias/player-headshot/${route.params.p2Id}`,
       icon: ICONS.player,
       class: "border border-neutral-400"
     }
@@ -44,30 +42,20 @@ const links = computed(() => [
 ])
 
 // API call
-const {
-  data: h2h,
-  status,
-  refresh
-} = await useFetch<{ p1: CountryInterface; p2: CountryInterface }>("/api/h2h/countries", {
-  query: { p1Id, p2Id },
-  watch: false,
-  onResponseError: ({ error }) => {
-    toast.add({
-      title: `Error fetching countries for ${p1Name.value} v. ${p2Name.value}`,
-      description: error?.message,
-      icon: appConfig.ui.icons.error,
-      color: "error"
-    })
-    showError(error!)
+const { data: h2h } = await useFetch<{ p1: CountryInterface; p2: CountryInterface }>(
+  "/api/h2h/countries",
+  {
+    query: { p1Id: route.params.p1Id, p2Id: route.params.p2Id },
+    onResponseError: ({ error }) => {
+      toast.add({
+        title: `Error fetching countries for ${p1Name.value} v. ${p2Name.value}`,
+        description: error?.message,
+        icon: appConfig.ui.icons.error,
+        color: "error"
+      })
+      showError(error!)
+    }
   }
-})
-
-watch(
-  () => [p1Id.value, p2Id.value],
-  ([newP1, newP2]) => {
-    if ((newP1 || newP2) && route.name === "h2h-players") refresh()
-  },
-  { immediate: true }
 )
 </script>
 
@@ -78,7 +66,7 @@ watch(
         <u-breadcrumb :items>
           <template #players-leading>
             <u-avatar
-              :src="`https://www.atptour.com/-/media/alias/player-headshot/${p1Id}`"
+              :src="`https://www.atptour.com/-/media/alias/player-headshot/${route.params.p1Id}`"
               :icon="ICONS.player"
               class="border border-neutral-600 dark:border-neutral-400"
               size="sm"
@@ -86,7 +74,7 @@ watch(
           </template>
           <template #players-trailing>
             <u-avatar
-              :src="`https://www.atptour.com/-/media/alias/player-headshot/${p2Id}`"
+              :src="`https://www.atptour.com/-/media/alias/player-headshot/${route.params.p2Id}`"
               :icon="ICONS.player"
               class="border border-neutral-600 dark:border-neutral-400"
               size="sm"

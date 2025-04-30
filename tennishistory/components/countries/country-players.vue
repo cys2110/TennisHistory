@@ -1,6 +1,5 @@
 <script setup lang="ts">
 defineProps<{ name?: string }>()
-const id = useRouteParams<string>("id")
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
@@ -17,31 +16,24 @@ interface CountryPlayerAPIResponse {
 }
 
 // API call
-const { data, status, refresh } = await useFetch<CountryPlayerAPIResponse>(
-  "/api/countries/players",
-  {
-    query: { id, skip: computed(() => (page.value - 1) * pageSize.value), limit: pageSize.value },
-    watch: false,
-    onResponseError: ({ error }) => {
-      toast.add({
-        title: `Error fetching players who previously represented or currently represent ${
-          name ?? id
-        }`,
-        description: error?.message,
-        icon: appConfig.ui.icons.error,
-        color: "error"
-      })
-      showError(error!)
-    }
+const { data, status } = await useFetch<CountryPlayerAPIResponse>("/api/countries/players", {
+  query: {
+    id: route.params.id,
+    skip: computed(() => (page.value - 1) * pageSize.value),
+    limit: pageSize.value
+  },
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching players who previously represented or currently represent ${
+        name ?? route.params.id
+      }`,
+      description: error?.message,
+      icon: appConfig.ui.icons.error,
+      color: "error"
+    })
+    showError(error!)
   }
-)
-
-watch(
-  () => [id.value, page.value, pageSize.value],
-  ([newId, newPage, newPageSize]) => {
-    if ((newId || newPage || newPageSize) && route.name === "country") refresh()
-  }
-)
+})
 </script>
 
 <template>
@@ -83,7 +75,9 @@ watch(
 
     <error-message
       v-else
-      :title="`No players who previously represented or currently represent ${name ?? id}`"
+      :title="`No players who previously represented or currently represent ${
+        name ?? route.params.id
+      }`"
     />
 
     <pagination-component

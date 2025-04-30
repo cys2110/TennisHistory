@@ -1,35 +1,22 @@
 <script setup lang="ts">
 definePageMeta({ name: "country" })
-const id = useRouteParams<string>("id")
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
 
 // API call
-const { data: country, refresh } = await useFetch<CountryInterface>(
-  "/api/countries/country-details",
-  {
-    query: { id },
-    watch: false,
-    onResponseError: ({ error }) => {
-      toast.add({
-        title: `Error fetching details about ${id.value}`,
-        description: error?.message,
-        icon: appConfig.ui.icons.error,
-        color: "error"
-      })
-      showError(error!)
-    }
+const { data: country } = await useFetch<CountryInterface>("/api/countries/country-details", {
+  query: { id: route.params.id },
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching details about ${route.params.id}`,
+      description: error?.message,
+      icon: appConfig.ui.icons.error,
+      color: "error"
+    })
+    showError(error!)
   }
-)
-
-watch(
-  () => id.value,
-  newId => {
-    if (newId && route.name === "country") refresh()
-  },
-  { immediate: true }
-)
+})
 
 useHead({ title: country.value?.name, templateParams: { subPage: "Countries" } })
 
@@ -39,7 +26,7 @@ const items = computed(() => [
   { label: "Countries", to: { name: "countries" }, icon: ICONS.countries },
   {
     label: country.value?.name,
-    icon: country.value?.alpha2 ? `flag:${country.value?.alpha2}-4x3` : `flags:${id.value}`
+    icon: country.value?.alpha2 ? `flag:${country.value?.alpha2}-4x3` : `flags:${route.params.id}`
   }
 ])
 </script>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const id = useRouteParams<string>("id")
 const paramName = useRouteParams<string>("name")
 const name = computed(() => decodeName(paramName.value))
 
@@ -8,14 +7,9 @@ const route = useRoute()
 const toast = useToast()
 
 // API call
-const {
-  data: results,
-  status,
-  refresh
-} = await useFetch<MajorResultsType[]>("/api/players/major-results", {
-  query: { id },
+const { data: results, status } = await useFetch<MajorResultsType[]>("/api/players/major-results", {
+  query: { id: route.params.id },
   default: () => [],
-  watch: false,
   onResponseError: ({ error }) => {
     toast.add({
       title: `Error fetching ${name.value}'s best results`,
@@ -26,14 +20,6 @@ const {
     showError(error!)
   }
 })
-
-watch(
-  () => id.value,
-  newId => {
-    if (newId && route.name === "player") refresh()
-  },
-  { immediate: true }
-)
 </script>
 
 <template>

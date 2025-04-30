@@ -1,12 +1,11 @@
 <script setup lang="ts">
 definePageMeta({ name: "supervisor" })
-const id = useRouteParams<string>("id")
-const name = computed(() => decodeName(id.value))
-useHead({ title: name.value, templateParams: { subPage: "Supervisors" } })
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
 
+const name = computed(() => decodeName(route.params.id as string))
+useHead({ title: name.value, templateParams: { subPage: "Supervisors" } })
 const year = ref<string>(new Date().getFullYear().toString())
 
 // Breadcrumbs
@@ -21,14 +20,12 @@ const items = computed(() => [
 const {
   data: supervisor,
   status,
-  execute,
-  refresh: refreshSupervisor
+  execute
 } = await useFetch<{ labels: string[]; results: EventCardType[] }>(
   "/api/supervisors/supervisor-details",
   {
     query: { id: name.value, year },
     immediate: false,
-    watch: false,
     onResponseError: ({ error }) => {
       toast.add({
         title: `Error fetching ${name.value}'s events`,
@@ -42,9 +39,8 @@ const {
 )
 
 // When data returns, set the year to the latest year and run the first fetch
-const { data: years, refresh } = await useFetch<string[]>("/api/supervisors/supervisor-years", {
+const { data: years } = await useFetch<string[]>("/api/supervisors/supervisor-years", {
   query: { id: name.value },
-  watch: false,
   onResponse: ({ response }) => {
     year.value = response._data[response._data.length - 1]
     execute()
@@ -59,22 +55,6 @@ const { data: years, refresh } = await useFetch<string[]>("/api/supervisors/supe
     showError(error!)
   }
 })
-
-watch(
-  () => [id.value, year.value],
-  ([newId, newYear]) => {
-    if ((newId || newYear) && route.name === "supervisor") refreshSupervisor()
-  },
-  { immediate: true }
-)
-
-watch(
-  () => id.value,
-  newId => {
-    if (newId && route.name === "supervisor") refresh()
-  },
-  { immediate: true }
-)
 
 // Anchor links
 const links = computed(() => {
@@ -98,7 +78,7 @@ const links = computed(() => {
           v-if="supervisor?.labels.includes('Umpire')"
           :icon="ICONS.umpire"
           label="Umpire Profile"
-          :to="{ name: 'umpire', params: { id } }"
+          :to="{ name: 'umpire', params: { id: route.params.id } }"
           size="xs"
         />
       </template>
