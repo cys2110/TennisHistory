@@ -21,14 +21,41 @@ declare global {
     draw_link: string | null
     draw_type: DrawType
     id: string
-    pm: string | null
+    loser: Pick<PlayerInterface, "id" | "name" | "country"> | null
     name: string | null
+    pm: string | null
     start_date: string
     surface: SurfaceEnum
     tfc: string | null
     tournament: Omit<TournamentInterface, "website">
     venues: VenueInterface[]
+    winner: Pick<PlayerInterface, "id" | "name" | "country"> | null
     year: string
+  }
+
+  interface GamesSetsLostInterface {
+    year: number
+    player: Pick<PlayerInterface, "id" | "name" | "country">
+    sets_won: number
+    sets_lost: number
+    games_won: number
+    games_lost: number
+    sets_pc: number
+    games_pc: number
+  }
+
+  interface HistoricalPMInterface {
+    year: number
+    pm: number
+    R128?: number
+    R64?: number
+    R32: number
+    R16: number
+    QF: number
+    SF: number
+    F: number
+    currency: CurrencyType
+    yoy: string
   }
 
   interface MatchInterface {
@@ -72,6 +99,13 @@ declare global {
     wins: number
   }
 
+  interface TournamentFinalistsInterface {
+    finals: number
+    losses: number
+    player: Pick<PlayerInterface, "id" | "name" | "country">
+    wins: number
+  }
+
   interface TournamentInterface {
     id: string
     name: string
@@ -84,6 +118,12 @@ declare global {
     name: string | null
     city: string
     country: CountryInterface
+  }
+
+  interface WinnersByAgeInterface {
+    age: string
+    player: PlayerInterface
+    year: string
   }
 
   interface WLIndexInterface {

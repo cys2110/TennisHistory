@@ -2,6 +2,8 @@ import appConfig from "~/app.config"
 
 export const CATEGORIES = Object.values(CategoryEnum)
 
+export const CATEGORY_COLOURS = Object.values(COLOURS)
+
 export const COUNTRY_DRAWS = ["8888", "615", "9900"]
 
 export const CURRENCIES: Record<CurrencyType, string> = {
@@ -51,6 +53,35 @@ export const LETTERS = [
   "Y",
   "Z"
 ]
+
+export const MATCH_STATS = {
+  service: [
+    { key: "aces", label: "Aces" },
+    { key: "dfs", label: "Double faults" },
+    { label: "First serve", percent: true },
+    { key: "serve1", label: "1st serve points won", percent: true },
+    { key: "serve2", label: "2nd serve points won", percent: true },
+    { key: "bps_saved", label: "Break points saved", percent: true }
+  ],
+  return: [
+    { key: "ret1", label: "1st serve return points won", percent: true },
+    { key: "ret2", label: "2nd serve return points won", percent: true },
+    { key: "bps_converted", label: "Break points converted", percent: true }
+  ],
+  points: [
+    { key: "winners", label: "Winners" },
+    { key: "ues", label: "Unforced errors" },
+    { key: "net", label: "Net points won", percent: true },
+    { label: "Service points won", percent: true },
+    { label: "Return points won", percent: true },
+    { label: "Total points won", percent: true }
+  ],
+  service_speed: [
+    { key: "max_speed", label: "Max speed" },
+    { key: "avg1_speed", label: "1st serve average speed" },
+    { key: "avg2_speed", label: "2nd serve average speed" }
+  ]
+}
 
 export const MONTH_NAMES = Object.keys(MonthEnum).filter(
   key => isNaN(Number(key)) && key !== "length"
@@ -118,6 +149,31 @@ export const SEARCH_RESULTS = {
   Surface: { label: "Surfaces", icon: ICONS.court, value: "Surface" },
   Supervisor: { label: "Supervisors", icon: ICONS.supervisor, value: "Supervisor" },
   Umpire: { label: "Umpires", icon: ICONS.umpire, value: "Umpire" }
+}
+
+export const SHORT_ROUNDS: Record<RoundType, string> = {
+  Win: "W",
+  Final: "F",
+  Semifinals: "SF",
+  Quarterfinals: "QF",
+  "Round of 16": "R16",
+  "Round of 32": "R32",
+  "Round of 64": "R64",
+  "Round of 128": "R128",
+  "Group stages": "G",
+  "Round robin": "RR",
+  "Day 1": "D1",
+  "Day 2": "D2",
+  "Day 3": "D3"
+}
+
+export const STATUSES: Record<StatusType, { longName: string; class: string }> = {
+  Q: { longName: "Qualifier", class: "bg-emerald-300 text-green-800" },
+  WC: { longName: "Wild Card", class: "bg-blue-300 text-blue-800" },
+  LL: { longName: "Lucky Loser", class: "bg-red-300 text-red-800" },
+  AL: { longName: "Alternate", class: "bg-amber-300 text-amber-800" },
+  SE: { longName: "Special Exempt", class: "bg-fuchsia-300 text-fuchsia-800" },
+  PR: { longName: "Protected Ranking", class: "bg-yellow-300 text-yellow-800" }
 }
 
 export const SURFACES = Object.values(SurfaceEnum)

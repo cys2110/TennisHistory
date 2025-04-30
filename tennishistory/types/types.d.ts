@@ -20,11 +20,14 @@ declare global {
     | "Quarterfinals"
     | "Semifinals"
     | "Final"
+    | "Win"
     | "Round robin"
     | "Group stages"
     | "Day 1"
     | "Day 2"
     | "Day 3"
+
+  type StatusType = "Q" | "WC" | "LL" | "AL" | "SE" | "PR"
 
   // Consolidated types
 
