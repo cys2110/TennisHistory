@@ -25,7 +25,16 @@ const {
   "/api/supervisors/supervisor-details",
   {
     query: { id: name.value, year },
-    immediate: false
+    immediate: false,
+    onResponseError: ({ error }) => {
+      toast.add({
+        title: `Error fetching ${name.value}'s events`,
+        description: error?.message,
+        icon: appConfig.ui.icons.error,
+        color: "error"
+      })
+      showError(error!)
+    }
   }
 )
 
@@ -44,13 +53,17 @@ const { data: years, refresh } = await useFetch<string[]>("/api/supervisors/supe
       icon: appConfig.ui.icons.error,
       color: "error"
     })
+    showError(error!)
   }
 })
 
 watch(
   () => id.value,
   newId => {
-    if (newId) refresh()
+    if (newId) {
+      refresh()
+      execute()
+    }
   }
 )
 
@@ -108,6 +121,7 @@ const links = computed(() => {
           v-if="supervisor"
           v-for="event in supervisor?.results"
           :key="event.id"
+          :id="`event-${event.id}`"
           :event
         />
 
