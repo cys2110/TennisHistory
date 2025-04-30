@@ -220,6 +220,12 @@ export default defineAppConfig({
         next: "cursor-pointer",
         prev: "cursor-pointer"
       }
+    },
+    selectMenu: {
+      slots: {
+        base: "cursor-pointer",
+        content: "cursor-pointer"
+      }
     }
   },
   uiPro: {

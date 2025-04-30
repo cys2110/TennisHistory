@@ -42,11 +42,14 @@ defineProps<{ event: EventCardType }>()
       <template #description>
         <div v-if="event.name">{{ event.name }}</div>
         <!--Link to venue page-->
-        <venue-link
+        <base-link
           v-for="venue in event.venues"
           :key="venue.id"
-          :venue
-        />
+          :id="venue.id"
+          type="venue"
+        >
+          {{ venue.name ? `${venue.name}, ${venue.city}` : venue.city }}
+        </base-link>
         <div>{{ event.dates }}</div>
       </template>
 
