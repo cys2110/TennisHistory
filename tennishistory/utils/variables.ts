@@ -107,4 +107,15 @@ export const RELATED_LINKS = [
   }
 ]
 
+export const SEARCH_RESULTS = {
+  Player: { label: "Players", icon: ICONS.player, value: "Player" },
+  Tournament: { label: "Tournaments", icon: ICONS.tournament, value: "Tournament" },
+  Coach: { label: "Coaches", icon: ICONS.coach, value: "Coach" },
+  Country: { label: "Countries", icon: ICONS.countries, value: "Country" },
+  Venue: { label: "Venues", icon: ICONS.venue, value: "Venue" },
+  Surface: { label: "Surfaces", icon: ICONS.court, value: "Surface" },
+  Supervisor: { label: "Supervisors", icon: ICONS.supervisor, value: "Supervisor" },
+  Umpire: { label: "Umpires", icon: ICONS.umpire, value: "Umpire" }
+}
+
 export const SURFACES = Object.values(SurfaceEnum)
