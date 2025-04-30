@@ -20,25 +20,23 @@ interface SupervisorsAPIResponse {
 }
 
 // API call
-const { data, status } = await useFetch<SupervisorsAPIResponse>(
-  "/api/supervisors/all-supervisors",
-  {
-    query: {
-      letter: selectedLetter,
-      skip: computed(() => (page.value - 1) * pageSize.value),
-      limit: pageSize
-    },
-    onResponseError: ({ error }) => {
-      toast.add({
-        title: "Error fetching supervisors",
-        description: error?.message,
-        icon: appConfig.ui.icons.error,
-        color: "error"
-      })
-      showError(error!)
-    }
+const { data, status } = await useFetch<SupervisorsAPIResponse>("/api/supervisors", {
+  query: {
+    letter: selectedLetter,
+    skip: computed(() => (page.value - 1) * pageSize.value),
+    limit: pageSize
+  },
+  default: () => ({ count: 0, supervisors: [] }),
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: "Error fetching supervisors",
+      description: error?.message,
+      icon: appConfig.ui.icons.error,
+      color: "error"
+    })
+    showError(error!)
   }
-)
+})
 </script>
 
 <template>
@@ -47,13 +45,14 @@ const { data, status } = await useFetch<SupervisorsAPIResponse>(
     v-model="selectedLetter"
     v-model:page="page"
     v-model:page-size="pageSize"
+    :count="data.count"
   >
     <u-page-grid
-      v-if="data?.count || ['pending', 'idle'].includes(status)"
+      v-if="data.count || ['pending', 'idle'].includes(status)"
       class="mt-10"
     >
       <base-card
-        v-if="data"
+        v-if="data.count"
         v-for="supervisor in data.supervisors"
         :key="supervisor"
         type="supervisor"

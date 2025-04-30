@@ -19,12 +19,13 @@ interface SurfacesAPIResponse {
 }
 
 // API call
-const { data, status } = await useFetch<SurfacesAPIResponse>("/api/surfaces/all-surfaces", {
+const { data, status } = await useFetch<SurfacesAPIResponse>("/api/surfaces", {
   query: {
     letter: selectedLetter,
     skip: computed(() => (page.value - 1) * pageSize.value),
     limit: pageSize
   },
+  default: () => ({ count: 0, surfaces: [] }),
   onResponseError: ({ error }) => {
     toast.add({
       title: "Error fetching surfaces",
@@ -43,14 +44,14 @@ const { data, status } = await useFetch<SurfacesAPIResponse>("/api/surfaces/all-
     v-model="selectedLetter"
     v-model:page="page"
     v-model:page-size="pageSize"
-    :count="data?.count"
+    :count="data.count"
   >
     <u-page-grid
-      v-if="data?.count || ['pending', 'idle'].includes(status)"
+      v-if="data.count || ['pending', 'idle'].includes(status)"
       class="mt-10"
     >
       <base-card
-        v-if="data"
+        v-if="data.count"
         v-for="surface in data.surfaces"
         :key="surface"
         type="surface"

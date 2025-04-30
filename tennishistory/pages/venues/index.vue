@@ -23,12 +23,13 @@ interface VenuesAPIResponse {
 }
 
 // API call
-const { data, status } = await useFetch<VenuesAPIResponse>("/api/venues/all-venues", {
+const { data, status } = await useFetch<VenuesAPIResponse>("/api/venues", {
   query: {
     letter: selectedLetter,
     skip: computed(() => (page.value - 1) * pageSize.value),
     limit: pageSize
   },
+  default: () => ({ count: 0, cities: [] }),
   onResponseError: ({ error }) => {
     toast.add({
       title: "Error fetching venues",
@@ -47,14 +48,14 @@ const { data, status } = await useFetch<VenuesAPIResponse>("/api/venues/all-venu
     v-model="selectedLetter"
     v-model:page="page"
     v-model:page-size="pageSize"
-    :count="data?.count"
+    :count="data.count"
   >
     <u-page-grid
-      v-if="data?.count || ['pending', 'idle'].includes(status)"
+      v-if="data.count || ['pending', 'idle'].includes(status)"
       class="mt-10"
     >
       <venue-card
-        v-if="data"
+        v-if="data.count"
         v-for="city in data.cities"
         :key="city.city"
         :city

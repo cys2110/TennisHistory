@@ -19,12 +19,13 @@ interface CountriesAPIResponse {
 }
 
 // API call
-const { data, status } = await useFetch<CountriesAPIResponse>("/api/countries/all-countries", {
+const { data, status } = await useFetch<CountriesAPIResponse>("/api/countries", {
   query: {
     letter: selectedLetter,
     skip: computed(() => (page.value - 1) * pageSize.value),
     limit: pageSize
   },
+  default: () => ({ count: 0, countries: [] }),
   onResponseError: ({ error }) => {
     toast.add({
       title: "Error fetching countries",
@@ -43,14 +44,14 @@ const { data, status } = await useFetch<CountriesAPIResponse>("/api/countries/al
     v-model="selectedLetter"
     v-model:page="page"
     v-model:page-size="pageSize"
-    :count="data?.count"
+    :count="data.count"
   >
     <u-page-grid
-      v-if="data?.count || ['pending', 'idle'].includes(status)"
+      v-if="data.count || ['pending', 'idle'].includes(status)"
       class="mt-10"
     >
       <country-card
-        v-if="data"
+        v-if="data.count"
         v-for="country in data.countries"
         :key="country.id"
         :country

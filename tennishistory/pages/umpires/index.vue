@@ -19,12 +19,13 @@ interface UmpiresAPIResponse {
 }
 
 // API call
-const { data, status } = await useFetch<UmpiresAPIResponse>("/api/umpires/all-umpires", {
+const { data, status } = await useFetch<UmpiresAPIResponse>("/api/umpires", {
   query: {
     letter: selectedLetter,
     skip: computed(() => (page.value - 1) * pageSize.value),
     limit: pageSize
   },
+  default: () => ({ count: 0, umpires: [] }),
   onResponseError: ({ error }) => {
     toast.add({
       title: "Error fetching umpires",
@@ -43,14 +44,14 @@ const { data, status } = await useFetch<UmpiresAPIResponse>("/api/umpires/all-um
     v-model="selectedLetter"
     v-model:page="page"
     v-model:page-size="pageSize"
-    :count="data?.count"
+    :count="data.count"
   >
     <u-page-grid
-      v-if="data?.count || ['pending', 'idle'].includes(status)"
+      v-if="data.count || ['pending', 'idle'].includes(status)"
       class="mt-10"
     >
       <base-card
-        v-if="data"
+        v-if="data.count"
         v-for="umpire in data.umpires"
         :key="umpire"
         type="umpire"
