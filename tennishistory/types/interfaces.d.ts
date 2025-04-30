@@ -76,6 +76,7 @@ declare global {
     id: string
     name: string
     website: string | null
+    years: string
   }
 
   interface VenueInterface {

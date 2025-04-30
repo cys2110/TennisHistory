@@ -2,6 +2,8 @@ import appConfig from "~/app.config"
 
 export const CATEGORIES = Object.values(CategoryEnum)
 
+export const COUNTRY_DRAWS = ["8888", "615", "9900"]
+
 export const CURRENCIES: Record<CurrencyType, string> = {
   AUD: "A$",
   EUR: "€",
