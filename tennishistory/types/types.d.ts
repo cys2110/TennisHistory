@@ -12,6 +12,9 @@ declare global {
 
   // Consolidated types
 
+  type CoachType = Pick<PlayerInterface, "id" | "name"> &
+    Partial<Omit<PlayerInterface, "id" | "name">>
+
   type EventCardType = Pick<
     EventInterface,
     | "year"

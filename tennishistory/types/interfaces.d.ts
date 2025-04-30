@@ -5,13 +5,6 @@ declare global {
     alpha2: string | null
   }
 
-  interface VenueInterface {
-    id: string
-    name: string | null
-    city: string
-    country: CountryInterface
-  }
-
   interface EventInterface {
     category: CategoryEnum | null
     currency: CurrencyType | null
@@ -29,10 +22,36 @@ declare global {
     year: string
   }
 
+  interface PlayerInterface {
+    bh: string | null
+    ch: string | null
+    ch_date: string | null
+    coaches: CoachType[]
+    country: CountryInterface
+    dob: string | null
+    dod: string | null
+    gladiator: boolean
+    height: number | null
+    hof: string | null
+    id: string
+    name: string
+    pm: string
+    retired: string | null
+    rh: boolean | null
+    turned_pro: string | null
+  }
+
   interface TournamentInterface {
     id: string
     name: string
     website: string | null
+  }
+
+  interface VenueInterface {
+    id: string
+    name: string | null
+    city: string
+    country: CountryInterface
   }
 }
 
