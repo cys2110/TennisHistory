@@ -1,0 +1,46 @@
+import appConfig from "~/app.config"
+
+export const NAV_LINKS = [
+  { label: "Upcoming Tournaments", to: { name: "upcoming-tournaments" }, icon: ICONS.upcoming },
+  { label: "Results Archive", to: { name: "results-archive" }, icon: ICONS.event },
+  { label: "Tournaments", to: { name: "tournaments" }, icon: ICONS.tournament },
+  { label: "Players", to: { name: "players" }, icon: ICONS.player },
+  { label: "Head to Head", to: { name: "h2h" }, icon: ICONS.h2h },
+  { label: "Years", to: { name: "years" }, icon: ICONS.year },
+  { label: "Coaches", to: { name: "coaches" }, icon: ICONS.coach },
+  { label: "Umpires", to: { name: "umpires" }, icon: ICONS.umpire },
+  { label: "Countries", to: { name: "countries" }, icon: ICONS.countries },
+  { label: "Venues", to: { name: "venues" }, icon: ICONS.venue },
+  { label: "Surfaces", to: { name: "surfaces" }, icon: ICONS.court },
+  { label: "Supervisors", to: { name: "supervisors" }, icon: ICONS.supervisor },
+  { label: "Stats/Records", to: { name: "statistics-and-records" }, icon: ICONS.stats },
+  { label: "Search", to: { name: "search" }, icon: appConfig.ui?.icons?.search }
+]
+
+export const RELATED_LINKS = [
+  {
+    label: "Governing Bodies",
+    children: [
+      { label: "ATP", to: "https://www.atptour.com/", target: "_blank" },
+      { label: "ITF", to: "https://www.itftennis.com/", target: "_blank" }
+    ]
+  },
+  {
+    label: "Grand Slams",
+    children: [
+      { label: "Australian Open", to: "https://www.ausopen.com/", target: "_blank" },
+      { label: "Roland Garros", to: "https://www.rolandgarros.com/", target: "_blank" },
+      { label: "Wimbledon", to: "https://www.wimbledon.com/", target: "_blank" },
+      { label: "US Open", to: "https://www.usopen.org/", target: "_blank" }
+    ]
+  },
+  {
+    label: "Other Links",
+    children: [
+      { label: "About", to: { name: "about" } },
+      { label: "About me", to: "https://www.claire-sheridan.com", target: "_blank" },
+      { label: "Ranking Rules History", to: "https://openerarankings.com/Home", target: "_blank" },
+      { label: "Tennis Abstract", to: "https://www.tennisabstract.com/", target: "_blank" }
+    ]
+  }
+]
