@@ -12,28 +12,38 @@ definePageMeta({
     }
   ]
 })
-const paramName = useRouteParams<string>("name")
-const name = computed(() => decodeName(paramName.value))
+
+const appConfig = useAppConfig()
+const route = useRoute()
+const toast = useToast()
 const { fitView } = useVueFlow()
 const { layout } = useLayout()
-const eid = useRouteParams<string>("eid")
-const year = useRouteParams<string>("year")
+const name = computed(() => decodeName(route.params.name as string))
 
 // API call
-const { data: nodes, status } = await useFetch("/api/event-draw", {
-  query: { eid },
+const { data: nodes, status } = await useFetch("/api/events/draw", {
+  query: { eid: route.params.eid },
   transform(data: DrawMatchType[]) {
     return data.map(match => {
       return {
-        id: match.mid,
+        id: match.match_no,
         position: { x: 0, y: 0 },
         data: {
-          label: match.mid,
+          label: match.match_no,
           match
         },
         type: "draw-card"
       }
     })
+  },
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: `Error fetching draw for ${name.value} ${route.params.year}`,
+      description: error?.message,
+      icon: appConfig.ui.icons.error,
+      color: "error"
+    })
+    showError(error!)
   }
 })
 
@@ -65,30 +75,29 @@ async function layoutGraph() {
 </script>
 
 <template>
-  <event-wrapper>
-    <div
-      v-if="nodes"
-      class="h-screen w-full overflow-x-auto"
-    >
-      <VueFlow
-        :nodes
-        :edges
-        @nodes-initialized="layoutGraph()"
+  <div>
+    <nuxt-layout name="event-layout">
+      <div
+        v-if="nodes"
+        class="h-screen w-full overflow-x-auto"
       >
-        <template #node-draw-card="props">
-          <draw-card
-            :id="props.id"
-            :match="props.data.match"
-          />
-        </template>
-      </VueFlow>
-    </div>
-    <error-message
-      v-else
-      :icon="ICONS.error"
-      :title="`No draw available for ${name} ${year}`"
-      :status
-      :error="`Error fetching draw for ${name} ${year}`"
-    />
-  </event-wrapper>
+        <VueFlow
+          :nodes
+          :edges
+          @nodes-initialized="layoutGraph()"
+        >
+          <template #node-draw-card="props">
+            <draw-card
+              :id="props.id"
+              :match="props.data.match"
+            />
+          </template>
+        </VueFlow>
+      </div>
+      <error-message
+        v-else
+        :title="`No draw available for ${name} ${route.params.year}`"
+      />
+    </nuxt-layout>
+  </div>
 </template>

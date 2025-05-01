@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { Handle, Position } from "@vue-flow/core"
 defineProps<{ match: DrawMatchType }>()
-const paramName = useRouteParams<string>("name")
-const name = computed(() => decodeName(paramName.value))
-const tid = useRouteParams<string>("tid")
-const eid = useRouteParams<string>("eid")
-const year = useRouteParams<string>("year")
+
+const appConfig = useAppConfig()
+const route = useRoute()
+const name = computed(() => decodeName(route.params.name as string))
 </script>
 
 <template>
@@ -31,12 +30,20 @@ const year = useRouteParams<string>("year")
           :player="match.p2"
         />
         <div v-else>BYE</div>
-        <small>{{ match.p1?.seed || match.p1?.status ? `(${match.p1.seed ?? ""}${match.p1.status ?? ""})` : "" }}</small>
-        <small>{{ match.p2?.seed || match.p2?.status ? `(${match.p2.seed ?? ""}${match.p2.status ?? ""})` : "" }}</small>
+        <small>{{
+          match.p1?.seed || match.p1?.status
+            ? `(${match.p1.seed ?? ""}${match.p1.status ?? ""})`
+            : ""
+        }}</small>
+        <small>{{
+          match.p2?.seed || match.p2?.status
+            ? `(${match.p2.seed ?? ""}${match.p2.status ?? ""})`
+            : ""
+        }}</small>
         <div>
           <u-icon
-            v-if="match.p1?.id === match.winner"
-            :name="ICONS.success"
+            v-if="match.p1?.id === match.winner_id"
+            :name="appConfig.ui.icons.success"
             class="text-success-600 dark:text-success-300 text-lg"
           />
           <u-badge
@@ -47,8 +54,8 @@ const year = useRouteParams<string>("year")
         </div>
         <div>
           <u-icon
-            v-if="match.p2?.id === match.winner"
-            :name="ICONS.success"
+            v-if="match.p2?.id === match.winner_id"
+            :name="appConfig.ui.icons.success"
             class="text-success-600 dark:text-success-300 text-lg"
           />
           <u-badge
@@ -90,7 +97,16 @@ const year = useRouteParams<string>("year")
           color="secondary"
           :icon="ICONS.stats"
           :disabled="!!match.incomplete"
-          :to="{ name: 'match', params: { name, tid, year, eid, mid: match.mid } }"
+          :to="{
+            name: 'match',
+            params: {
+              name: route.params.name,
+              id: route.params.id,
+              year: route.params.year,
+              eid: route.params.eid,
+              mid: match.match_no
+            }
+          }"
         />
         <u-button
           label="H2H"
@@ -99,7 +115,12 @@ const year = useRouteParams<string>("year")
           :icon="ICONS.h2h"
           :to="{
             name: 'h2h-players',
-            params: { p1Name: encodeName(match.p1.name), p1Id: match.p1.id, p2Name: encodeName(match.p2.name), p2Id: match.p2.id }
+            params: {
+              p1Name: encodeName(match.p1.name),
+              p1Id: match.p1.id,
+              p2Name: encodeName(match.p2.name),
+              p2Id: match.p2.id
+            }
           }"
         />
       </u-button-group>

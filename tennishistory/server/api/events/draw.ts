@@ -29,9 +29,9 @@ export default defineEventHandler(async event => {
       }
       RETURN {
         round: r.round,
-        mid: toString(m.match_no),
+        match_no: toString(m.match_no),
         incomplete: m.incomplete,
-        winner: w.id,
+        winner_id: w.id,
         p1: {
           id: p1.id,
           name: p1.first_name || ' ' || p1.last_name,

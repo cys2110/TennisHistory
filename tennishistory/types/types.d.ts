@@ -38,6 +38,11 @@ declare global {
 
   type CountryEventType = Pick<EventInterface, "id" | "year" | "c1" | "c2" | "score">
 
+  type DrawMatchType = Pick<
+    MatchInterface,
+    "round" | "match_no" | "incomplete" | "winner_id" | "p1" | "p2"
+  >
+
   type EntryInfoType = {
     label: string
     content: Pick<EntryInterface, "id" | "name" | "country" | "status" | "reason" | "rank">[]
