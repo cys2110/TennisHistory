@@ -68,6 +68,34 @@ declare global {
     events: Pick<EventInterface, "id" | "year">[]
   }
 
+  type MatchDetailsType = Pick<EventInterface, "surface" | "dates"> & {
+    match: Pick<
+      MatchInterface,
+      | "date"
+      | "court"
+      | "umpire"
+      | "duration"
+      | "winner_id"
+      | "round"
+      | "p1"
+      | "p2"
+      | "aces"
+      | "dfs"
+      | "serve1"
+      | "serve2"
+      | "bps_saved"
+      | "ret1"
+      | "ret2"
+      | "max_speed"
+      | "avg1_speed"
+      | "avg2_speed"
+      | "bps_converted"
+      | "winners"
+      | "ues"
+      | "net"
+    >
+  }
+
   type PlayerActivityType = Pick<
     EventInterface,
     | "tournament"
