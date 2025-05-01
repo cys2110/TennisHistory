@@ -14,6 +14,8 @@ declare global {
     rank2: string | null
     reason: string | null
     seed: string | null
+    sets: string[]
+    tbs: (string | null)[]
     status: StatusType | null
     withdrew: boolean | string
   }
@@ -73,11 +75,16 @@ declare global {
     group: string | null
     id: string
     incomplete: IncompleteType | null
+    loser: Pick<
+      EntryInterface,
+      "id" | "name" | "country" | "seed" | "status" | "sets" | "tbs" | "incomplete"
+    >
     match_no: string
     round: RoundType
     sets: string[]
     tbs: (string | null)[]
-    winner: Pick<PlayerInterface, "id" | "name" | "country">
+    umpire: string | null
+    winner: Pick<EntryInterface, "id" | "name" | "country" | "seed" | "status" | "sets" | "tbs">
     winner_id: string
   }
 
