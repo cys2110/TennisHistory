@@ -146,11 +146,11 @@ const columns: TableColumn<Omit<EntryInterface, "incomplete" | "rank2" | "reason
     :data="entries"
     :columns
     class="w-fit mx-auto my-5"
-    :loading="status === 'pending'"
+    :loading="['pending', 'idle'].includes(status)"
   >
     <template #empty>
       <div
-        v-if="status === 'pending'"
+        v-if="['pending', 'idle'].includes(status)"
         class="flex flex-col gap-4"
       >
         <div

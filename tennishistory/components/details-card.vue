@@ -19,7 +19,7 @@ defineProps<{
     <template #description>
       <div
         v-if="detail.id === 'supervisors'"
-        class="flex flex-col gap-2"
+        class="flex flex-col"
       >
         <base-link
           v-if="detail.value.length"
