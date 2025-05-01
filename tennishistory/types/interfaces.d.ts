@@ -7,11 +7,15 @@ declare global {
 
   interface EntryInterface extends Pick<PlayerInterface, "id" | "name" | "country"> {
     incomplete: IncompleteType | null
+    last: string
     pm: string | null
     points: string | null
     rank: string | null
+    rank2: string | null
+    reason: string | null
     seed: string | null
-    status: string | null
+    status: StatusType | null
+    withdrew: boolean | string
   }
 
   interface EventInterface {
@@ -28,7 +32,8 @@ declare global {
     pm: string | null
     start_date: string
     score: string
-    surface: SurfaceEnum
+    supervisors: string[]
+    surface: string
     tfc: string | null
     tournament: Omit<TournamentInterface, "website">
     venues: VenueInterface[]
@@ -100,6 +105,13 @@ declare global {
     titles: number
     turned_pro: number | null
     wins: number
+  }
+
+  interface RoundInterface {
+    round: RoundType
+    currency: CurrencyType | null
+    pm: string | null
+    points: string | null
   }
 
   interface TournamentFinalistsInterface {

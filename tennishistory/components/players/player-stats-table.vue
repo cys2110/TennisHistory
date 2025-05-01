@@ -10,7 +10,7 @@ const columns: TableColumn<{ category: string; value: number; suffix?: boolean }
 
 <template>
   <u-table
-    :data="stats || []"
+    :data="stats"
     :columns
     class="w-full md:w-3/4 lg:w-2/3 xl:w-1/2 mx-auto"
     :loading="['pending', 'idle'].includes(status)"

@@ -19,7 +19,7 @@ const { data: countries } = await useFetch<APIResponse[]>(
     query: { id: route.params.id },
     onResponseError: ({ error }) => {
       toast.add({
-        title: `Error fetching country winners for ${route.params.name as string}`,
+        title: `Error fetching country winners for ${name.value}`,
         description: error?.message,
         icon: appConfig.ui.icons.error,
         color: "error"

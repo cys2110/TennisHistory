@@ -51,7 +51,7 @@ const columns: TableColumn<WLIndexInterface>[] = [
 
     <template #content>
       <u-table
-        :data="indice.stats || []"
+        :data="indice.stats"
         :columns
         sticky
         class="w-full mx-auto"

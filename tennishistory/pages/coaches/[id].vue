@@ -63,7 +63,6 @@ const links = computed(() => {
                 params: { id: route.params.id, name: encodeName(coach.name) }
               }"
               :icon="ICONS.coach"
-              class="border border-neutral-600 dark:border-neutral-400"
               size="sm"
             />
           </template>

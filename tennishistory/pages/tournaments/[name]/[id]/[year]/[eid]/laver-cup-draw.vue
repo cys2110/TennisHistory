@@ -4,8 +4,6 @@ definePageMeta({ name: "laver-cup-draw" })
 
 <template>
   <div>
-    <nuxt-layout name="event-layout"
-      >Page: tournaments/[name]/[id]/[year]/[eid]/laver-cup-draw</nuxt-layout
-    >
+    <nuxt-layout name="event-layout"> Coming soon! </nuxt-layout>
   </div>
 </template>

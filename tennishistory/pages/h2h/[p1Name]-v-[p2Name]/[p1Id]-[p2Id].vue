@@ -67,7 +67,6 @@ const { data: h2h } = await useFetch<{ p1: CountryInterface; p2: CountryInterfac
             <u-avatar
               :src="`https://www.atptour.com/-/media/alias/player-headshot/${route.params.p1Id}`"
               :icon="ICONS.player"
-              class="border border-neutral-600 dark:border-neutral-400"
               size="sm"
             />
           </template>
@@ -75,7 +74,6 @@ const { data: h2h } = await useFetch<{ p1: CountryInterface; p2: CountryInterfac
             <u-avatar
               :src="`https://www.atptour.com/-/media/alias/player-headshot/${route.params.p2Id}`"
               :icon="ICONS.player"
-              class="border border-neutral-600 dark:border-neutral-400"
               size="sm"
             />
           </template>

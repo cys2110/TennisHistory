@@ -16,7 +16,7 @@ const checked = ref(false)
 // API call
 const { data: stats, status } = await useFetch<PlayerStatsType[]>("/api/players/player-stats", {
   query: { id: route.params.id, years, surfaces },
-  watch: false,
+  default: () => [],
   onResponseError: ({ error }) => {
     toast.add({
       title: `Error fetching ${name.value}'s stats`,

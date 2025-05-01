@@ -56,7 +56,7 @@ watch(
     v-model="selectedValue"
     v-model:search-term="searchTerm"
     :icon="`flag:${selectedValue.country.alpha2}-4x3`"
-    :loading="status === 'pending'"
+    :loading="['pending', 'idle'].includes(status)"
     :trailing-icon="appConfig.ui.icons.search"
     :items="players || []"
   >

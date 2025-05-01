@@ -10,8 +10,17 @@ defineProps<{
     highlight
     :ui="{ footer: 'text-sm text-(--ui-text-dimmed) pt-2 pb-0 self-start mt-0 justify-start' }"
   >
+    <template
+      #leading
+      v-if="detail.id === 'venues'"
+    >
+      <country-link :country="detail.value[0].country" />
+    </template>
     <template #description>
-      <div v-if="detail.id === 'supervisors'">
+      <div
+        v-if="detail.id === 'supervisors'"
+        class="flex flex-col gap-2"
+      >
         <base-link
           v-if="detail.value.length"
           v-for="supervisor in detail.value"
@@ -33,7 +42,6 @@ defineProps<{
           >
             {{ venue.name ? `${venue.name}, ${venue.city}` : `${venue.city}` }}
           </base-link>
-          <country-link :country="venue.country" />
         </div>
       </div>
       <template v-else>{{ detail.value }}</template>

@@ -39,13 +39,13 @@ const columns: TableColumn<WinnersByAgeInterface>[] = [
 
 <template>
   <u-table
-    :data="ages || []"
+    :data="ages"
     :columns="columns"
-    :loading="status === 'pending'"
+    :loading="['pending', 'idle'].includes(status)"
   >
     <template #empty>
       <div
-        v-if="status === 'pending'"
+        v-if="['pending', 'idle'].includes(status)"
         class="flex flex-col gap-4"
       >
         <div

@@ -36,6 +36,11 @@ declare global {
 
   type CountryEventType = Pick<EventInterface, "id" | "year" | "c1" | "c2" | "score">
 
+  type EntryInfoType = {
+    label: string
+    content: Pick<EntryInterface, "id" | "name" | "country" | "status" | "reason" | "rank">[]
+  }
+
   type EventCardType = Pick<
     EventInterface,
     | "year"
@@ -111,6 +116,11 @@ declare global {
     value: number
     suffix?: boolean
   }
+
+  type SeedType = Pick<
+    EntryInterface,
+    "id" | "name" | "country" | "last" | "seed" | "rank" | "rank2" | "withdrew"
+  >
 
   type UmpireDetailsType = Pick<EventInterface, "id" | "tournament" | "draw_type" | "year"> & {
     rounds: {
