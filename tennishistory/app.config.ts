@@ -205,7 +205,9 @@ export default defineAppConfig({
     },
     tabs: {
       slots: {
-        trigger: "cursor-pointer"
+        trigger: "cursor-pointer",
+        label: "font-semibold",
+        content: "text-sm"
       },
       defaultVariants: {
         color: "secondary",
@@ -290,6 +292,16 @@ export default defineAppConfig({
             avatar: "group-hover/user:scale-100"
           }
         }
+      }
+    },
+    prose: {
+      field: {
+        slots: {
+          name: "text-secondary"
+        }
+      },
+      badge: {
+        base: "rounded-lg"
       }
     }
   }

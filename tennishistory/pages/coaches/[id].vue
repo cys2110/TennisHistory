@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// XXX: Add coach's players' stats
 definePageMeta({ name: "coach" })
 const appConfig = useAppConfig()
 const route = useRoute()
