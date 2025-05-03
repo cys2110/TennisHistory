@@ -1,0 +1,63 @@
+@import "tailwindcss" theme(static);
+@import "@nuxt/ui-pro";
+@plugin 'tailwind-scrollbar';
+
+@theme {
+  --font-sans: "Fira Sans Condensed", sans-serif;
+  --font-cursive: "Petit Formal Script", cursive;
+  --text-tiny: 0.625rem;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+:root {
+  --ui-primary: var(--ui-color-primary-700);
+  --ui-secondary: var(--ui-color-secondary-600);
+  --ui-bg: var(--ui-color-neutral-100);
+  --ui-text: var(--ui-color-neutral-600);
+  --ui-text-highlighted: var(--ui-color-neutral-600);
+  --ui-text-muted: var(--ui-color-neutral-500);
+  --ui-text-dimmed: var(--ui-color-neutral-500);
+  --ui-border: var(--ui-color-neutral-300);
+}
+
+.dark {
+  --ui-primary: var(--ui-color-primary-500);
+  --ui-secondary: var(--ui-color-secondary-400);
+  --ui-bg: var(--ui-color-neutral-950);
+  --ui-text: var(--ui-color-neutral-300);
+  --ui-text-highlighted: var(--ui-color-neutral-300);
+  --ui-text-muted: var(--ui-color-neutral-400);
+  --ui-text-dimmed: var(--ui-color-neutral-400);
+  --ui-border: var(--ui-color-neutral-700);
+}
+
+.hover-link {
+  @apply inline-block relative dark:after:bg-slate-300 after:bg-slate-600 after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:origin-center after:transition-all after:ease-in-out after:duration-500 hover:after:scale-x-100;
+}
+
+.gs {
+  @apply text-primary-600 dark:text-primary-400;
+}
+
+.a1000 {
+  @apply text-secondary-600 dark:text-secondary-400;
+}
+
+.a500 {
+  @apply text-success-600 dark:text-success-400;
+}
+
+.a250 {
+  @apply text-fuchsia-600 dark:text-fuchsia-400;
+}
+
+.OL {
+  @apply text-orange-600 dark:text-orange-400;
+}
+
+.aws {
+  @apply text-info-600 dark:text-info-400;
+}
