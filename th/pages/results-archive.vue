@@ -1,9 +1,13 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+useHead({ title: "Results Archive", templateParams: { subPage: null } })
+
+// Breadcrumbs
+const breadcrumbs = [
+  { label: "Home", to: { name: "home" }, icon: ICONS.home },
+  { label: "Results Archive", icon: ICONS.event }
+]
+</script>
 
 <template>
-  <div>
-    Page: results-archive
-  </div>
+  <tournament-calendar :breadcrumbs />
 </template>
-
-<style scoped></style>

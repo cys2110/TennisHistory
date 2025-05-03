@@ -274,6 +274,7 @@ export default defineAppConfig({
             root: "ring-primary-700, dark:ring-primary-700 shadow-md shadow-primary-700 dark:shadow-primary-500 hover:shadow-lg hover:shadow-primary-700 dark:hover:shadow-primary-500"
           },
           orientation: {
+            // @ts-ignore
             vertical: {
               wrapper: "flex flex-col items-start"
             }

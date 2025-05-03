@@ -1,4 +1,5 @@
 export default {
+  alert: "line-md:bell-twotone-loop",
   areaChart: "ic:round-area-chart",
   awards: "tdesign:money",
   barChart: "material-symbols:bar-chart-rounded",

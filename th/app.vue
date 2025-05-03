@@ -13,7 +13,9 @@ useHead({
     <nuxt-loading-indicator
       color="repeating-linear-gradient(to right,#cffafe 0%,#22d3ee 50%,#0891b2 100%)"
     />
-    <nuxt-page />
+    <nuxt-layout>
+      <nuxt-page />
+    </nuxt-layout>
   </u-app>
 </template>
 
