@@ -2,6 +2,7 @@
 useHead({ title: "Coaches", templateParams: { subPage: null } })
 const appConfig = useAppConfig()
 const toast = useToast()
+const { viewMode } = useViewMode()
 
 // Breadcrumbs
 const breadcrumbs = [
@@ -13,13 +14,8 @@ const selectedLetter = ref<string>("All")
 const page = ref(1)
 const pageSize = ref(25)
 
-interface CoachesAPIResponse {
-  count: number
-  coaches: (Pick<CoachType, "id" | "name" | "country"> & { labels: string[] })[]
-}
-
 // API call
-const { data, status } = await useFetch<CoachesAPIResponse>("/api/coaches", {
+const { data, status } = await useFetch<CoachesAPIResponseType>("/api/coaches", {
   query: {
     letter: selectedLetter,
     skip: computed(() => (page.value - 1) * pageSize.value),
@@ -46,26 +42,15 @@ const { data, status } = await useFetch<CoachesAPIResponse>("/api/coaches", {
     v-model:page-size="pageSize"
     :count="data.count"
   >
-    <u-page-grid
-      v-if="data.count || ['pending', 'idle'].includes(status)"
-      class="mt-10"
-    >
-      <coach-card
-        v-if="data.count"
-        v-for="coach in data.coaches"
-        :key="coach.id"
-        :coach
-      />
-      <base-loading-card
-        v-else
-        v-for="_ in 15"
-        :key="_"
-      />
-    </u-page-grid>
-
-    <error-message
+    <coaches-card-view
+      v-if="viewMode === 'cards'"
+      :results="data"
+      :status
+    />
+    <coaches-list-view
       v-else
-      title="No coaches found"
+      :results="data"
+      :status
     />
   </paginated-overview>
 </template>

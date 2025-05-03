@@ -26,8 +26,7 @@ const { data: events, status } = await useFetch<EventCardType[]>("/api/results-a
       color: "error"
     })
     showError(error!)
-  },
-  onResponse: ({ response }) => console.log(response._data)
+  }
 })
 
 // Anchor links

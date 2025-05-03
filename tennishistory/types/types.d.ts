@@ -31,6 +31,11 @@ declare global {
 
   // Consolidated types
 
+  type CoachesAPIResponseType = {
+    count: number
+    coaches: (Pick<CoachType, "id" | "name" | "country"> & { labels: string[] })[]
+  }
+
   type CoachType = Pick<PlayerInterface, "id" | "name"> &
     Partial<Omit<PlayerInterface, "id" | "name">>
 

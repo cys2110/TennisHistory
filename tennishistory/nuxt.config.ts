@@ -11,7 +11,6 @@ export default defineNuxtConfig({
     "@nuxt/ui-pro",
     "@nuxt/content"
   ],
-  ssr: false,
   // Set page transitions
   app: {
     layoutTransition: { name: "layout", mode: "out-in" },

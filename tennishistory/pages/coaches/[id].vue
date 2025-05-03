@@ -3,6 +3,7 @@ definePageMeta({ name: "coach" })
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
+const { viewMode } = useViewMode()
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const mdAndUp = breakpoints.greaterOrEqual("md")
@@ -69,15 +70,13 @@ const links = computed(() => {
       </template>
 
       <template #right>
-        <ClientOnly>
-          <u-button
-            v-if="coach && coach.labels.includes('Player')"
-            :icon="ICONS.player"
-            label="Player Profile"
-            :to="{ name: 'player', params: { id: route.params.id, name: encodeName(coach.name) } }"
-            :size="mdAndUp ? 'md' : 'sm'"
-          />
-        </ClientOnly>
+        <u-button
+          v-if="coach && coach.labels.includes('Player')"
+          :icon="ICONS.player"
+          label="Player Profile"
+          :to="{ name: 'player', params: { id: route.params.id, name: encodeName(coach.name) } }"
+          :size="mdAndUp ? 'md' : 'sm'"
+        />
       </template>
 
       <template #toolbar>
@@ -86,7 +85,10 @@ const links = computed(() => {
         </div>
 
         <!--TOC-->
-        <u-dropdown-menu :items="links">
+        <u-dropdown-menu
+          v-if="viewMode === 'cards'"
+          :items="links"
+        >
           <u-button
             :icon="ICONS.toc"
             color="neutral"

@@ -266,13 +266,12 @@ export default defineAppConfig({
     },
     pageCard: {
       slots: {
-        root: "shadow-md shadow-primary-700 dark:shadow-primary-500 hover:shadow-lg hover:shadow-primary-700 dark:hover:shadow-primary-500",
         footer: "self-center mt-auto pt-4 flex justify-center"
       },
       variants: {
         variant: {
           outline: {
-            root: "ring-primary-700, dark:ring-primary-700"
+            root: "ring-primary-700, dark:ring-primary-700 shadow-md shadow-primary-700 dark:shadow-primary-500 hover:shadow-lg hover:shadow-primary-700 dark:hover:shadow-primary-500"
           },
           orientation: {
             vertical: {
