@@ -228,6 +228,12 @@ export default defineAppConfig({
         base: "cursor-pointer",
         content: "cursor-pointer"
       }
+    },
+    commandPalette: {
+      slots: {
+        input: "[&>input]:h-10",
+        item: "cursor-pointer"
+      }
     }
   },
   uiPro: {

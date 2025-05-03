@@ -29,6 +29,13 @@ const items = [
         Tour, but for now no expansion is planned on the data. Instead new features will be
         introduced as often as possible. Suggestions are welcome!
       </div>
+
+      <div class="xl:w-1/2 mx-auto">
+        You can toggle between light and dark mode as well as between list and card view by clicking
+        the shortcuts button at the top of the sidebar or by pressing the
+        <u-kbd value="meta" /><u-kbd value="k" /> keys. Card view provides a more aesthetic view of
+        the data but list view provides a quicker overview.
+      </div>
     </nuxt-layout>
   </div>
 </template>

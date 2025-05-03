@@ -44,7 +44,10 @@ export default defineEventHandler(async query => {
       }) AS venues
       RETURN {
         year: toString(y.id),
-        surface: s.surface,
+        surface: {
+          environment: s.environment,
+          surface: s.surface
+        },
         id: toString(e.id),
         name: e.sponsor_name,
         category: e.category,

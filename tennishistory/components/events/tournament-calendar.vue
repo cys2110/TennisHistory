@@ -3,6 +3,7 @@ defineProps<{ breadcrumbs: { label: string; to?: { name: string }; icon: string 
 const route = useRoute()
 const toast = useToast()
 const appConfig = useAppConfig()
+const { viewMode } = useViewMode()
 
 // Set select values - default to all
 const year = useRouteQuery("year", new Date().getFullYear().toString())
@@ -25,7 +26,8 @@ const { data: events, status } = await useFetch<EventCardType[]>("/api/results-a
       color: "error"
     })
     showError(error!)
-  }
+  },
+  onResponse: ({ response }) => console.log(response._data)
 })
 
 // Anchor links
@@ -46,7 +48,10 @@ const links = computed(() => {
       </template>
 
       <!--TOC-->
-      <template #right>
+      <template
+        #right
+        v-if="viewMode === 'cards'"
+      >
         <u-dropdown-menu :items="links">
           <u-button
             :icon="ICONS.toc"
@@ -67,33 +72,20 @@ const links = computed(() => {
         <surface-select v-model="surfaces" />
       </template>
 
-      <u-page-grid v-if="events.length || ['pending', 'idle'].includes(status)">
-        <!--Event cards-->
-        <event-card
-          v-if="events.length"
-          v-for="event in events"
-          :key="event.id"
-          :event
-          :id="`event-${event.id}`"
-        />
+      <!--Cards mode-->
+      <event-grid
+        v-if="viewMode === 'cards'"
+        :events
+        :status
+        :year
+      />
 
-        <!--Loading state-->
-        <event-loading-card
-          v-else
-          v-for="_ in 10"
-          :key="_"
-        />
-      </u-page-grid>
-
-      <!--If no events are returned-->
-      <error-message
+      <!--List mode -->
+      <event-table
         v-else
-        :title="
-          route.name === 'upcoming-tournaments'
-            ? 'No upcoming tournaments'
-            : `No tournaments for ${year}`
-        "
-        :icon="ICONS.noCalendar"
+        :events
+        :status
+        :year
       />
     </nuxt-layout>
   </div>

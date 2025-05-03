@@ -1,10 +1,18 @@
 <script setup lang="ts">
-const { tournament, year, id, draw_type, start_date } = defineProps<{
+const {
+  tournament,
+  year,
+  id,
+  draw_type,
+  start_date,
+  orientation = "horizontal"
+} = defineProps<{
   tournament: Pick<TournamentInterface, "id" | "name">
   year: string
   id: string
   draw_type: DrawType
   start_date?: string
+  orientation?: "horizontal" | "vertical"
 }>()
 
 // Show tooltip/disabled button if event has not started yet
@@ -41,7 +49,10 @@ const showButton = (page: string) => {
     :disabled="!isDisabled"
     text="Event has not started yet"
   >
-    <u-button-group size="xs">
+    <u-button-group
+      size="xs"
+      :orientation
+    >
       <template
         v-for="page in EVENT_PAGES"
         :key="page.name"

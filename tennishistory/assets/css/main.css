@@ -5,6 +5,7 @@
 @theme {
   --font-sans: "Fira Sans Condensed", sans-serif;
   --font-cursive: "Petit Formal Script", cursive;
+  --text-tiny: 0.625rem;
 }
 
 ::-webkit-scrollbar {

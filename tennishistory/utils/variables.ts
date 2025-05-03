@@ -101,6 +101,7 @@ export const NAV_LINKS = [
   { label: "Surfaces", to: { name: "surfaces" }, icon: ICONS.court },
   { label: "Supervisors", to: { name: "supervisors" }, icon: ICONS.supervisor },
   { label: "Stats/Records", to: { name: "statistics-and-records" }, icon: ICONS.stats },
+  { label: "Ranking Rules", to: { name: "ranking-rules" }, icon: ICONS.seeds },
   { label: "Search", to: { name: "search" }, icon: appConfig.ui?.icons?.search }
 ]
 

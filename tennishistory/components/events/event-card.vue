@@ -18,8 +18,8 @@ defineProps<{ event: EventCardType }>()
       <!--Need 'order-last' class for smaller screens and 'h-full' to make all cards the same height-->
       <div class="relative">
         <nuxt-img
-          :src="`/surfaces/${event.surface}.jpg`"
-          :alt="event.surface"
+          :src="`/surfaces/${event.surface.surface}.jpg`"
+          :alt="event.surface.surface"
           class="opacity-75 rounded-lg"
         />
         <!--Category logo-->

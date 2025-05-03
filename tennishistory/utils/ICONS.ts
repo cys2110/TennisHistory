@@ -13,6 +13,7 @@ export default {
   home: "line-md:home-md-twotone",
   layers: "solar:layers-minimalistic-line-duotone",
   lineChart: "iconoir:graph-up",
+  list: "line-md:text-box-multiple-twotone-to-text-box-twotone-transition",
   noAwards: "material-symbols-light:money-off",
   noCalendar: "material-symbols:event-busy-rounded",
   noChart: "material-symbols:bar-chart-off-rounded",

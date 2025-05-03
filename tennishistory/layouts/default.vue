@@ -1,5 +1,29 @@
 <script setup lang="ts">
+const { viewMode } = useViewMode()
+
 const groups = computed(() => [
+  {
+    id: "viewMode",
+    label: "View mode",
+    items: [
+      {
+        label: "Cards",
+        suffix: "View data in cards mode",
+        icon: ICONS.cards,
+        onSelect() {
+          viewMode.value = "cards"
+        }
+      },
+      {
+        label: "List",
+        suffix: "View data in list mode",
+        icon: ICONS.list,
+        onSelect() {
+          viewMode.value = "list"
+        }
+      }
+    ]
+  },
   {
     id: "links",
     label: "Go to...",
@@ -23,6 +47,7 @@ const groups = computed(() => [
         <u-dashboard-search-button
           :collapsed
           size="xs"
+          label="Shortcuts"
         />
 
         <!--Internal links-->
