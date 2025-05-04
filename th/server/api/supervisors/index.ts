@@ -12,23 +12,19 @@ export default defineEventHandler(async query => {
         WHERE $letter IS NULL OR s.last_name STARTS WITH $letter
       WITH s
         ORDER BY s.last_name
-      WITH COLLECT(s) AS all, COUNT(s) AS count
-      WITH all[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS sliced, count
-      UNWIND CASE WHEN sliced = [] THEN [null] ELSE sliced END AS s
-      RETURN toString(count) AS count,
-      CASE
-        WHEN s IS NOT NULL THEN {last_name: s.last_name, id: s.id}
-        ELSE NULL
-      END AS supervisor
+      WITH CASE WHEN s IS NULL THEN null ELSE {id: s.id, last_name: s.last_name} END AS supervisor
+      WITH COLLECT(supervisor) AS all, COUNT(supervisor) AS count
+      WITH all[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS supervisors, count
+      RETURN toString(count) AS count, supervisors
     `,
     { letter: letter === "All" ? null : letter, skip, limit }
   )
 
   const count = records[0].get("count")
-  const supervisors = records.map((record: any) => record.get("supervisor"))
+  const supervisors = records[0].get("supervisors")
 
   return {
     count: Number(count),
-    supervisors: supervisors.filter(supervisor => supervisor !== null)
+    supervisors
   }
 })

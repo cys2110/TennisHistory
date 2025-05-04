@@ -15,23 +15,19 @@ export default defineEventHandler(async query => {
       MATCH (s:Surface)
       WITH s
         ORDER BY ${sort}
-      WITH COLLECT(s) AS all, COUNT(s) AS count
-      WITH all[toInteger($skip)..toInteger($skip) + 25] AS sliced, count
-      UNWIND CASE WHEN sliced = [] THEN [null] ELSE sliced END AS s
-      RETURN toString(count) AS count,
-      CASE
-        WHEN s IS NOT NULL THEN {id: s.id, environment: s.environment, surface: s.surface}
-        ELSE NULL
-      END AS surface
+      WITH {id: s.id, environment: s.environment, surface: s.surface} AS surface
+      WITH COLLECT(surface) AS all, COUNT(surface) AS count
+      WITH all[toInteger($skip)..toInteger($skip) + 25] AS surfaces, count
+      RETURN toString(count) AS count, surfaces
     `,
     { skip }
   )
 
   const count = records[0].get("count")
-  const surfaces = records.map(record => record.get("surface"))
+  const surfaces = records[0].get("surfaces")
 
   return {
     count: Number(count),
-    surfaces: surfaces.filter(supervisor => supervisor !== null)
+    surfaces: surfaces
   }
 })

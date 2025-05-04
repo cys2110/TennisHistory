@@ -87,15 +87,20 @@ const links = computed(() => {
             Events played on {{ name }}
           </div>
 
-          <!--TOC-->
-          <u-dropdown-menu :items="links">
-            <u-button
-              :icon="ICONS.toc"
-              color="neutral"
-              variant="link"
-              size="xl"
-            />
-          </u-dropdown-menu>
+          <ClientOnly>
+            <!--TOC-->
+            <u-dropdown-menu
+              v-if="viewMode === 'cards'"
+              :items="links"
+            >
+              <u-button
+                :icon="ICONS.toc"
+                color="neutral"
+                variant="link"
+                size="xl"
+              />
+            </u-dropdown-menu>
+          </ClientOnly>
         </u-dashboard-toolbar>
       </template>
 

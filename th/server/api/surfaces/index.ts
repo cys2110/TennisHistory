@@ -13,23 +13,22 @@ export default defineEventHandler(async query => {
         WHERE $letter IS NULL OR s.surface STARTS WITH $letter
       WITH s
         ORDER BY s.surface, s.environment
-      WITH COLLECT(s) AS all, COUNT(s) AS count
-      WITH all[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS sliced, count
-      UNWIND CASE WHEN sliced = [] THEN [null] ELSE sliced END AS s
-      RETURN toString(count) AS count,
-      CASE
-        WHEN s IS NOT NULL THEN {id: s.id, environment: s.environment, surface: s.surface}
-        ELSE NULL
+      WITH CASE
+        WHEN s IS NULL THEN null
+        ELSE {id: s.id, environment: s.environment, surface: s.surface}
       END AS surface
+      WITH COLLECT(surface) AS all, COUNT(surface) AS count
+      WITH all[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS surfaces, count
+      RETURN toString(count) AS count, surfaces
     `,
     { letter: letter === "All" ? null : letter, skip, limit }
   )
 
   const count = records[0].get("count")
-  const surfaces = records.map(record => record.get("surface"))
+  const surfaces = records[0].get("surfaces")
 
   return {
     count: Number(count),
-    surfaces: surfaces.filter(supervisor => supervisor !== null)
+    surfaces
   }
 })

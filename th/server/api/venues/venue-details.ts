@@ -11,7 +11,10 @@ export default defineEventHandler(async query => {
       WITH y, e, t, s, COLLECT({id: v.id, name: v.name, city: v.city, country: {id: c.id, name: c.name, alpha2: c.alpha2}}) AS venues
       RETURN {
         year: toString(y.id),
-        surface: s.surface,
+        surface: {
+          id: s.id,
+          surface: s.surface
+        },
         id: toString(e.id),
         name: e.sponsor_name,
         tournament: {
@@ -20,6 +23,7 @@ export default defineEventHandler(async query => {
         },
         category: e.category,
         venues: venues,
+        start_date: apoc.temporal.format(e.start_date, 'yyyy-MM-dd'),
         dates: CASE
           WHEN e.start_date.year <> e.end_date.year THEN apoc.temporal.format(e.start_date, 'dd MMMM yyyy') || ' - ' || apoc.temporal.format(e.end_date, 'dd MMMM yyyy')
           WHEN e.start_date.month <> e.end_date.month THEN apoc.temporal.format(e.start_date, 'dd MMMM') || ' - ' || apoc.temporal.format(e.end_date, 'dd MMMM yyyy')
