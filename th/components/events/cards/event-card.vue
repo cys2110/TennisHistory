@@ -18,20 +18,18 @@ defineProps<{ event: EventCardType }>()
       <!--Need 'order-last' class for smaller screens and 'h-full' to make all cards the same height-->
       <div class="relative">
         <u-tooltip
-          :text="`${event.surface.environment} ${event.surface.surface}`"
+          :text="event.surface.id"
           :ui="{ content: 'border border-primary' }"
         >
           <nuxt-img
             :src="`/surfaces/${event.surface.surface}.jpg`"
-            :alt="event.surface.surface"
+            :alt="event.surface.id"
             class="opacity-75 rounded-lg cursor-pointer"
             @click="
               () =>
                 navigateTo({
                   name: 'surface',
-                  params: {
-                    id: encodeName(event.surface.environment + '_' + event.surface.surface)
-                  }
+                  params: { id: encodeName(event.surface.id) }
                 })
             "
           />

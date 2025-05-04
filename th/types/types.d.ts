@@ -31,6 +31,14 @@ declare global {
 
   // Consolidated types
 
+  type APIStatusType = "success" | "pending" | "idle" | "error"
+
+  type BreadcrumbType = {
+    label: string
+    to?: { name: string }
+    icon?: string
+  }
+
   type CoachesAPIResponseType = {
     count: number
     coaches: (Pick<CoachType, "id" | "name" | "country"> & { labels: string[] })[]
@@ -161,6 +169,11 @@ declare global {
     EntryInterface,
     "id" | "name" | "country" | "last" | "seed" | "rank" | "rank2" | "withdrew"
   >
+
+  type SurfacesAPIResponseType = {
+    count: number
+    surfaces: SurfaceInterface[]
+  }
 
   type UmpireDetailsType = Pick<EventInterface, "id" | "tournament" | "draw_type" | "year"> & {
     rounds: {

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-defineProps<{
+const { events, status, value } = defineProps<{
   events: EventCardType[]
-  status: "success" | "pending" | "idle" | "error"
-  year: string
+  status: APIStatusType
+  value?: string
 }>()
 
 const route = useRoute()
@@ -12,12 +12,8 @@ const route = useRoute()
   <!--If no events are returned-->
   <error-message
     v-if="status === 'error' || !events.length"
-    :title="
-      route.name === 'upcoming-tournaments'
-        ? 'No upcoming tournaments'
-        : `No tournaments for ${year}`
-    "
     :icon="ICONS.noCalendar"
+    :message="route?.name === 'surface' ? `No events found on ${value}` : 'test'"
   />
 
   <u-page-grid v-else>

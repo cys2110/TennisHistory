@@ -45,7 +45,7 @@ export default defineEventHandler(async query => {
       RETURN {
         year: toString(y.id),
         surface: {
-          environment: s.environment,
+          id: s.id,
           surface: s.surface
         },
         id: toString(e.id),

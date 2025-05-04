@@ -4,8 +4,8 @@ import type { TableColumn } from "@nuxt/ui"
 
 defineProps<{
   events: EventCardType[]
-  status: "success" | "pending" | "idle" | "error"
-  year: string
+  status: APIStatusType
+  value: string
 }>()
 
 const route = useRoute()
@@ -130,7 +130,7 @@ const columns: TableColumn<EventCardType>[] = [
     },
     cell: ({ row }) => {
       return h(BaseLink, {
-        id: row.original.surface.environment + " " + row.original.surface.surface,
+        id: row.original.surface.id,
         type: "surface"
       })
     },
@@ -212,7 +212,9 @@ const columns: TableColumn<EventCardType>[] = [
       {{
         route.name === "upcoming-tournaments"
           ? "No upcoming tournaments"
-          : `No tournaments for ${year}`
+          : route.name === "surface"
+          ? `No events played on ${value}`
+          : `No tournaments for ${value}`
       }}
     </template>
   </u-table>

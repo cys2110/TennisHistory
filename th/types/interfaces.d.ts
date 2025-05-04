@@ -35,10 +35,7 @@ declare global {
     start_date: string
     score: string
     supervisors: string[]
-    surface: {
-      environment: string
-      surface: string
-    }
+    surface: SurfaceInterface
     tfc: string | null
     tournament: Omit<TournamentInterface, "website">
     venues: VenueInterface[]
@@ -144,6 +141,12 @@ declare global {
     currency: CurrencyType | null
     pm: string | null
     points: string | null
+  }
+
+  interface SurfaceInterface {
+    id: string
+    environment: "Indoor" | "Outdoor"
+    surface: SurfaceEnum
   }
 
   interface TournamentFinalistsInterface {

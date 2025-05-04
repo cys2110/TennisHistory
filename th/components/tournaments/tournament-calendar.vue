@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ breadcrumbs: { label: string; to?: { name: string }; icon: string }[] }>()
+defineProps<{ breadcrumbs: BreadcrumbType[] }>()
 const route = useRoute()
 const toast = useToast()
 const appConfig = useAppConfig()
@@ -88,14 +88,14 @@ const links = computed(() => {
             v-if="viewMode === 'cards'"
             :events
             :status
-            :year
+            :value="year"
           />
           <!--List mode -->
           <events-table
             v-else
             :events
             :status
-            :year
+            :value="year"
           />
         </ClientOnly>
       </template>
