@@ -6,8 +6,6 @@ export default defineEventHandler(async query => {
 
   const { id, year } = getQuery<QueryProps>(query)
 
-  console.log(id, year)
-
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (s:Surface {id: $id})<-[:ON_SURFACE]-(e:Event)-[:IN_YEAR]->(y:Year {id: $year})
@@ -43,7 +41,6 @@ export default defineEventHandler(async query => {
   )
 
   const results = records.map(record => record.get("event"))
-  console.log(results)
 
   return results
 })

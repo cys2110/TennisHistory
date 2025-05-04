@@ -8,16 +8,16 @@ const page = ref(1)
 const pageSize = ref(25)
 
 // API call
-const { data, status } = useFetch<SurfacesAPIResponseType>("/api/surfaces", {
+const { data, status } = useFetch<SupervisorsAPIResponseType>("/api/supervisors", {
   query: computed(() => ({
     letter: selectedLetter.value,
     skip: (page.value - 1) * pageSize.value,
     limit: pageSize.value
   })),
-  default: () => ({ count: 0, surfaces: [] }),
+  default: () => ({ count: 0, supervisors: [] }),
   onResponseError: ({ error }) => {
     toast.add({
-      title: "Error fetching surfaces",
+      title: "Error fetching supervisors",
       description: error?.message,
       icon: appConfig.ui.icons.error,
       color: "error"
@@ -52,15 +52,15 @@ const { data, status } = useFetch<SurfacesAPIResponseType>("/api/surfaces", {
       <template #body>
         <error-message
           v-if="status === 'error' || !data.count"
-          title="No surfaces found"
+          title="No supervisors found"
         />
         <u-page-grid v-else>
           <base-card
             v-if="data.count"
-            v-for="surface in data.surfaces"
-            :key="surface.id"
-            type="surface"
-            :surface
+            v-for="supervisor in data.supervisors"
+            :key="supervisor.id"
+            type="supervisor"
+            :supervisor
           />
 
           <base-loading-card
@@ -69,6 +69,7 @@ const { data, status } = useFetch<SurfacesAPIResponseType>("/api/surfaces", {
             :key="_"
           />
         </u-page-grid>
+
         <pagination-component
           v-if="data.count"
           v-model="page"

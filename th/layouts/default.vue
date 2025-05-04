@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { viewMode } = useViewMode()
+const { setViewMode } = useViewMode()
 
 const groups = computed(() => [
   {
@@ -10,13 +10,13 @@ const groups = computed(() => [
         label: "Cards",
         suffix: "View data in cards mode",
         icon: ICONS.cards,
-        onSelect: () => (viewMode.value = "cards")
+        onSelect: () => setViewMode("cards")
       },
       {
         label: "List",
         suffix: "View data in list mode",
         icon: ICONS.list,
-        onSelect: () => (viewMode.value = "list")
+        onSelect: () => setViewMode("list")
       }
     ]
   },

@@ -170,6 +170,14 @@ declare global {
     "id" | "name" | "country" | "last" | "seed" | "rank" | "rank2" | "withdrew"
   >
 
+  type SupervisorsAPIResponseType = {
+    count: number
+    supervisors: {
+      id: string
+      last_name: string
+    }[]
+  }
+
   type SurfacesAPIResponseType = {
     count: number
     surfaces: SurfaceInterface[]

@@ -27,9 +27,8 @@ const { data: events, status } = await useFetch<EventCardType[]>("/api/surfaces/
   query: { id: name, year },
   default: () => [],
   onResponseError: ({ error }) => {
-    console.error(error)
     toast.add({
-      title: `Error fetching ${name.value}'s events`,
+      title: `Error fetching events on ${name.value}`,
       description: error?.message,
       icon: appConfig.ui.icons.error,
       color: "error"

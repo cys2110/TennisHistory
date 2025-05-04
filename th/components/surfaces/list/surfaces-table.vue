@@ -2,47 +2,76 @@
 import { UButton } from "#components"
 import type { TableColumn } from "@nuxt/ui"
 
-const { surfaces, status, loadMore } = defineProps<{
-  surfaces: SurfaceInterface[]
-  status: APIStatusType
-  loadMore: () => void
-}>()
+defineProps<{ breadcrumbs: BreadcrumbType[] }>()
+const appConfig = useAppConfig()
+const toast = useToast()
+
+const skip = ref(0)
+const envSort = ref<"ASC" | "DESC" | undefined>()
+const surfaceSort = ref<"ASC" | "DESC" | undefined>("ASC")
+const surfaces = ref<SurfaceInterface[]>([]) // Initialise surfaces for infinite scroll table
+
+// API call
+const { data, status, execute } = await useFetch<SurfacesAPIResponseType>("/api/surfaces/list", {
+  query: { skip, envSort, surfaceSort },
+  default: () => ({ count: 0, surfaces: [] }),
+  lazy: true,
+  immediate: false,
+  onResponse: ({ response }) => {
+    // Concatenate surfaces for infinite scroll table
+    surfaces.value = [...surfaces.value, ...(response._data.surfaces || [])]
+  },
+  onResponseError: ({ error }) => {
+    toast.add({
+      title: "Error fetching surfaces",
+      description: error?.message,
+      icon: appConfig.ui.icons.error,
+      color: "error"
+    })
+    showError(error!)
+  }
+})
 
 const columns: TableColumn<SurfaceInterface>[] = [
   {
     accessorKey: "environment",
-    header: ({ column }) => {
-      const isSorted = column.getIsSorted()
-
+    header: () => {
       return h(UButton, {
         color: "neutral",
         variant: "link",
         label: "Environment",
-        icon: isSorted
-          ? isSorted === "asc"
+        icon:
+          envSort.value === "ASC"
             ? ICONS.sortAlphaUp
-            : ICONS.sortAlphaDown
-          : ICONS.sortAlpha,
-        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+            : envSort.value === "DESC"
+            ? ICONS.sortAlphaDown
+            : ICONS.sortAlpha,
+        onClick: () => {
+          surfaces.value = []
+          surfaceSort.value = undefined
+          envSort.value = envSort?.value === "ASC" ? "DESC" : "ASC"
+        },
         class: "-mx-2.5 font-semibold text-(--ui-text)"
       })
     }
   },
   {
     accessorKey: "surface",
-    header: ({ column }) => {
-      const isSorted = column.getIsSorted()
-
+    header: () => {
       return h(UButton, {
         color: "neutral",
         variant: "link",
         label: "Surface",
-        icon: isSorted
-          ? isSorted === "asc"
-            ? ICONS.sortAlphaUp
-            : ICONS.sortAlphaDown
-          : ICONS.sortAlpha,
-        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        icon: !surfaceSort.value
+          ? ICONS.sortAlpha
+          : surfaceSort.value === "ASC"
+          ? ICONS.sortAlphaUp
+          : ICONS.sortAlphaDown,
+        onClick: () => {
+          surfaces.value = []
+          envSort.value = undefined
+          surfaceSort.value = surfaceSort?.value === "ASC" ? "DESC" : "ASC"
+        },
         class: "-mx-2.5 font-semibold text-(--ui-text)"
       })
     }
@@ -61,40 +90,74 @@ const columns: TableColumn<SurfaceInterface>[] = [
   }
 ]
 
+execute()
+
 const table = useTemplateRef<ComponentPublicInstance>("table")
 
-onMounted(() => {
-  useInfiniteScroll(table.value?.$el, () => loadMore(), {
-    distance: 200,
-    canLoadMore: () => status !== "pending"
-  })
+const hydrated = ref(false)
+
+onMounted(async () => {
+  hydrated.value = true
+  await nextTick()
+
+  if (table.value?.$el) {
+    useInfiniteScroll(
+      table.value.$el,
+      () => {
+        skip.value += 25
+      },
+      {
+        distance: 200,
+        canLoadMore: () => status.value !== "pending" || surfaces.value.length < data.value.count
+      }
+    )
+  }
 })
 </script>
 
 <template>
-  <u-table
-    ref="table"
-    :data="surfaces"
-    :columns
-    class="max-h-175 w-fit mx-auto"
-    :loading="['pending', 'idle'].includes(status)"
-    sticky
-  >
-    <template #loading>
-      <div class="flex flex-col gap-4">
-        <div
-          v-for="_ in 6"
-          :key="_"
-          class="flex gap-8"
+  <div class="w-full">
+    <u-dashboard-panel>
+      <template #header>
+        <u-dashboard-navbar>
+          <template #leading>
+            <u-dashboard-sidebar-collapse />
+          </template>
+
+          <template #title>
+            <u-breadcrumb :items="breadcrumbs" />
+          </template>
+        </u-dashboard-navbar>
+      </template>
+
+      <template #body>
+        <u-table
+          ref="table"
+          :data="surfaces"
+          :columns="hydrated ? columns : []"
+          class="max-h-175 w-fit mx-auto"
+          :loading="['pending', 'idle'].includes(status)"
+          sticky
+          :key="`${hydrated ? 'hydrated' : 'loading'}`"
         >
-          <u-skeleton
-            v-for="_ in 2"
-            :key="_"
-            class="h-4 w-1/2 rounded-lg"
-          />
-        </div>
-      </div>
-    </template>
-    <template #empty> No surfaces found </template>
-  </u-table>
+          <template #loading>
+            <div class="flex flex-col gap-4">
+              <div
+                v-for="_ in 6"
+                :key="_"
+                class="flex gap-8"
+              >
+                <u-skeleton
+                  v-for="_ in 2"
+                  :key="_"
+                  class="h-4 w-1/2 rounded-lg"
+                />
+              </div>
+            </div>
+          </template>
+          <template #empty> No surfaces found </template>
+        </u-table>
+      </template>
+    </u-dashboard-panel>
+  </div>
 </template>

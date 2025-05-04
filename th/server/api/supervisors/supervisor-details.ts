@@ -9,7 +9,7 @@ export default defineEventHandler(async query => {
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (x:Supervisor {id: $id})-[:SUPERVISED]->(e:Event)-[:IN_YEAR]->(y:Year {id: $year})
-      MATCH (s:Surface)<-[:ON_SURFACE]-(e)-[:EDITION_OF]->(t:Tournament)
+      MATCH (s:Surface)<-[:ON_SURFACE]-(e)-[:EDITION_OF]->(t:Tournament) WHERE t.name IS NOT NULL
       MATCH (e)-[:TOOK_PLACE_IN]->(v:Venue)-[:LOCATED_IN]->(c:Country)
       WITH y, e, t, s, v, c, x
         ORDER BY e.start_date
@@ -25,11 +25,15 @@ export default defineEventHandler(async query => {
       }) AS venues
       RETURN {
         year: toString(y.id),
-        surface: s.surface,
+        surface: {
+          id: s.id,
+          surface: s.surface
+        },
         id: toString(e.id),
         name: e.sponsor_name,
         category: e.category,
         venues: venues,
+        start_date: apoc.temporal.format(e.start_date, 'yyyy-MM-dd'),
         dates: CASE
           WHEN e.start_date.year <> e.end_date.year THEN apoc.temporal.format(e.start_date, 'dd MMMM yyyy') || ' - ' || apoc.temporal.format(e.end_date, 'dd MMMM yyyy')
           WHEN e.start_date.month <> e.end_date.month THEN apoc.temporal.format(e.start_date, 'dd MMMM') || ' - ' || apoc.temporal.format(e.end_date, 'dd MMMM yyyy')

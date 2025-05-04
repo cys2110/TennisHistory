@@ -210,11 +210,15 @@ const columns: TableColumn<EventCardType>[] = [
     </template>
     <template #empty>
       {{
-        route.name === "upcoming-tournaments"
+        route?.name === "surface"
+          ? `No events found on ${value}`
+          : route?.name === "supervisor"
+          ? `No events supervised by ${value}`
+          : route?.name === "upcoming-tournaments"
           ? "No upcoming tournaments"
-          : route.name === "surface"
-          ? `No events played on ${value}`
-          : `No tournaments for ${value}`
+          : route.name === "archive-results"
+          ? `No tournaments in ${value}`
+          : "No events found"
       }}
     </template>
   </u-table>

@@ -39,6 +39,9 @@ export default defineNuxtConfig({
       features: { propsDestructure: true }
     }
   },
+  build: {
+    transpile: ["universal-cookie"]
+  },
   // Imports not required
   imports: {
     presets: [
