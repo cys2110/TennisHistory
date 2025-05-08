@@ -1,36 +1,24 @@
 <script setup lang="ts">
-import { EventsTable, EventsGrid } from "#components"
-
-definePageMeta({ name: "supervisor" })
+defineProps<{ breadcrumbs: BreadcrumbType[] }>()
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
-const { viewMode } = useViewMode()
 
 const name = computed(() => decodeName(route.params.id as string))
-useHead({ title: name.value, templateParams: { subPage: "Supervisors" } })
 const year = ref<string>(new Date().getFullYear().toString())
-
-// Breadcrumbs
-const breadcrumbs = computed(() => [
-  { label: "Home", to: { name: "home" }, icon: ICONS.home },
-  { label: "Supervisors", to: { name: "supervisors" }, icon: ICONS.supervisor },
-  { label: name.value }
-])
 
 // API calls
 const {
-  data: supervisor,
+  data: umpire,
   status,
   refresh
-} = await useFetch<{ labels: string[]; results: EventCardType[] }>(
-  "/api/supervisors/supervisor-details",
+} = await useFetch<{ labels: string[]; results: UmpireDetailsType[] }>(
+  "/api/umpires/umpire-details",
   {
     query: { id: name, year },
-    default: () => ({ labels: [], results: [] }),
     onResponseError: ({ error }) => {
       toast.add({
-        title: `Error fetching events supervised by ${name.value}`,
+        title: `Error fetching matches umpired by ${name.value}`,
         description: error?.message,
         icon: appConfig.ui.icons.error,
         color: "error"
@@ -40,7 +28,7 @@ const {
   }
 )
 
-const { data: years } = await useFetch<string[]>("/api/supervisors/supervisor-years", {
+const { data: years } = await useFetch<string[]>("/api/umpires/umpire-years", {
   query: { id: name },
   onResponse: ({ response }) => {
     year.value = response._data[response._data.length - 1]
@@ -48,7 +36,7 @@ const { data: years } = await useFetch<string[]>("/api/supervisors/supervisor-ye
   },
   onResponseError: ({ error }) => {
     toast.add({
-      title: `Error fetching ${name.value} years`,
+      title: `Error fetching ${name.value}'s years`,
       description: error?.message,
       icon: appConfig.ui.icons.error,
       color: "error"
@@ -59,12 +47,11 @@ const { data: years } = await useFetch<string[]>("/api/supervisors/supervisor-ye
 
 // Anchor links
 const links = computed(() => {
-  if (supervisor.value)
-    return supervisor.value.results.map(event => ({
+  if (umpire.value)
+    return umpire.value.results.map(event => ({
       to: "#event-" + event.id,
       label: event.tournament.name
     }))
-  return []
 })
 </script>
 
@@ -84,7 +71,7 @@ const links = computed(() => {
           <template #right>
             <ClientOnly>
               <u-button
-                v-if="supervisor?.labels.includes('Umpire')"
+                v-if="umpire?.labels.includes('Umpire')"
                 :icon="ICONS.umpire"
                 label="Umpire Profile"
                 :to="{ name: 'umpire', params: { id: route.params.id } }"
@@ -99,18 +86,16 @@ const links = computed(() => {
             v-if="years"
             v-model="year"
             :items="years"
+            class="w-fit"
           />
 
-          <div class="text-(--ui-text-muted) text-sm font-semibold">
-            Events supervised by {{ name }}
+          <div class="text-(--ui-text-muted) text-sm font-semibold text-center">
+            Matches umpired by {{ name }}
           </div>
 
           <!--TOC-->
           <ClientOnly>
-            <u-dropdown-menu
-              v-if="viewMode === 'cards'"
-              :items="links"
-            >
+            <u-dropdown-menu :items="links">
               <u-button
                 :icon="ICONS.toc"
                 color="neutral"
@@ -122,17 +107,7 @@ const links = computed(() => {
         </u-dashboard-toolbar>
       </template>
 
-      <template #body>
-        <ClientOnly>
-          <component
-            :is="viewMode === 'cards' ? EventsGrid : EventsTable"
-            :key="viewMode"
-            :events="supervisor?.results"
-            :status
-            :value="name"
-          />
-        </ClientOnly>
-      </template>
+      <template #body></template>
     </u-dashboard-panel>
   </div>
 </template>

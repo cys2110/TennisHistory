@@ -22,11 +22,7 @@ const columns: TableColumn<EventCardType>[] = [
         color: "neutral",
         variant: "link",
         label: "Tournament",
-        icon: isSorted
-          ? isSorted === "asc"
-            ? ICONS.sortAlphaUp
-            : ICONS.sortAlphaDown
-          : ICONS.sortAlpha,
+        icon: isSorted ? (isSorted === "asc" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         class: "-mx-2.5 font-semibold text-(--ui-text)"
       })
@@ -63,11 +59,7 @@ const columns: TableColumn<EventCardType>[] = [
         color: "neutral",
         variant: "link",
         label: "Category",
-        icon: isSorted
-          ? isSorted === "asc"
-            ? ICONS.sortAlphaUp
-            : ICONS.sortAlphaDown
-          : ICONS.sortAlpha,
+        icon: isSorted ? (isSorted === "asc" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         class: "-mx-2.5 font-semibold text-(--ui-text)"
       })
@@ -96,11 +88,7 @@ const columns: TableColumn<EventCardType>[] = [
         color: "neutral",
         variant: "link",
         label: "Dates",
-        icon: isSorted
-          ? isSorted === "asc"
-            ? ICONS.sortAlphaUp
-            : ICONS.sortAlphaDown
-          : ICONS.sortAlpha,
+        icon: isSorted ? (isSorted === "asc" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         class: "-mx-2.5 font-semibold text-(--ui-text)"
       })
@@ -119,11 +107,7 @@ const columns: TableColumn<EventCardType>[] = [
         color: "neutral",
         variant: "link",
         label: "Surface",
-        icon: isSorted
-          ? isSorted === "asc"
-            ? ICONS.sortAlphaUp
-            : ICONS.sortAlphaDown
-          : ICONS.sortAlpha,
+        icon: isSorted ? (isSorted === "asc" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         class: "-mx-2.5 font-semibold text-(--ui-text)"
       })
@@ -186,7 +170,7 @@ const columns: TableColumn<EventCardType>[] = [
   <u-table
     :data="events"
     :columns
-    class="max-h-175"
+    class="max-h-200"
     :loading="['pending', 'idle'].includes(status)"
     sticky
   >
@@ -202,9 +186,7 @@ const columns: TableColumn<EventCardType>[] = [
             :key="_"
             class="h-4 w-1/2 rounded-lg"
           />
-          <u-skeleton
-            class="h-4 w-1/3 rounded-lg ring-secondary-600 bg-secondary-600/10 dark:bg-secondary-400/10"
-          />
+          <u-skeleton class="h-4 w-1/3 rounded-lg ring-secondary-600 bg-secondary-600/10 dark:bg-secondary-400/10" />
         </div>
       </div>
     </template>

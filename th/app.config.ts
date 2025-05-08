@@ -175,8 +175,7 @@ export default defineAppConfig({
       variants: {
         color: {
           secondary: {
-            trigger:
-              "group-data-[state=completed]:bg-secondary-800 group-data-[state=active]:bg-secondary-600",
+            trigger: "group-data-[state=completed]:bg-secondary-800 group-data-[state=active]:bg-secondary-600",
             separator: "group-data-[state=completed]:bg-secondary-800"
           }
         }
@@ -285,6 +284,11 @@ export default defineAppConfig({
     pageSection: {
       slots: {
         container: "py-4 sm:py-4 lg:py-4"
+      }
+    },
+    pageFeature: {
+      slots: {
+        leadingIcon: "text-secondary"
       }
     },
     user: {

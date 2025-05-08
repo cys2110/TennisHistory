@@ -12,9 +12,8 @@ export default defineEventHandler(async query => {
       OPTIONAL MATCH (s:Supervisor)
       WITH s
         ORDER BY ${sortOption}
-      WITH CASE WHEN s IS NULL THEN null ELSE {id: s.id, last_name: s.last_name} END AS supervisor
-      WITH COLLECT(supervisor) AS all, COUNT(supervisor) AS count
-      WITH all[toInteger($skip)..toInteger($skip) + 25] AS supervisors, count
+      WITH COLLECT(s.id) AS supervisors, COUNT(s) AS count
+      WITH supervisors[toInteger($skip)..toInteger($skip) + 25] AS supervisors, count
       RETURN toString(count) AS count, supervisors
     `,
     { skip }

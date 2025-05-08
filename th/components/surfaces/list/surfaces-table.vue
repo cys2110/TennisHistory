@@ -135,7 +135,7 @@ onMounted(async () => {
           ref="table"
           :data="surfaces"
           :columns="hydrated ? columns : []"
-          class="max-h-175 w-fit mx-auto"
+          class="max-h-200 min-w-2/3 md:min-w-1/2 lg:min-w-1/4 mx-auto"
           :loading="['pending', 'idle'].includes(status)"
           sticky
           :key="`${hydrated ? 'hydrated' : 'loading'}`"

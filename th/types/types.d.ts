@@ -172,10 +172,7 @@ declare global {
 
   type SupervisorsAPIResponseType = {
     count: number
-    supervisors: {
-      id: string
-      last_name: string
-    }[]
+    supervisors: string[]
   }
 
   type SurfacesAPIResponseType = {

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { EventsGrid, EventsTable } from "#components"
+
 definePageMeta({ name: "venue" })
 const appConfig = useAppConfig()
 const route = useRoute()
@@ -97,15 +99,9 @@ const links = computed(() => {
 
       <template #body>
         <ClientOnly>
-          <events-grid
-            v-if="viewMode === 'cards'"
-            :events
-            :status
-            :value="`${events?.[0].venues[0].name}, ${events?.[0].venues[0].city}`"
-          />
-
-          <events-table
-            v-else
+          <component
+            :is="viewMode === 'cards' ? EventsGrid : EventsTable"
+            :key="viewMode"
             :events
             :status
             :value="`${events?.[0].venues[0].name}, ${events?.[0].venues[0].city}`"

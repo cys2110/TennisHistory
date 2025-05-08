@@ -37,53 +37,51 @@ const { data, status } = await useFetch<VenuesAPIResponse>("/api/venues", {
 </script>
 
 <template>
-  <div class="w-full">
-    <u-dashboard-panel>
-      <template #header>
-        <u-dashboard-navbar>
-          <template #leading>
-            <u-dashboard-sidebar-collapse />
-          </template>
+  <u-dashboard-panel>
+    <template #header>
+      <u-dashboard-navbar>
+        <template #leading>
+          <u-dashboard-sidebar-collapse />
+        </template>
 
-          <template #title>
-            <u-breadcrumb :items="breadcrumbs" />
-          </template>
-          <template #right>
-            <set-page-size v-model="pageSize" />
-          </template>
-        </u-dashboard-navbar>
+        <template #title>
+          <u-breadcrumb :items="breadcrumbs" />
+        </template>
+        <template #right>
+          <set-page-size v-model="pageSize" />
+        </template>
+      </u-dashboard-navbar>
 
-        <u-dashboard-toolbar>
-          <letters-radio-group v-model="selectedLetter" />
-        </u-dashboard-toolbar>
-      </template>
+      <u-dashboard-toolbar>
+        <letters-radio-group v-model="selectedLetter" />
+      </u-dashboard-toolbar>
+    </template>
 
-      <template #body>
-        <error-message
-          v-if="status === 'error' || !data.count"
-          title="No venues found"
-        />
-        <u-page-grid v-else>
-          <venue-card
-            v-if="data.count"
-            v-for="city in data.cities"
-            :key="city.city"
-            :city
-          />
-
-          <base-loading-card
-            v-else
-            v-for="_ in 15"
-            :key="_"
-          />
-        </u-page-grid>
-        <pagination-component
+    <template #body>
+      <error-message
+        v-if="status === 'error' || !data.count"
+        title="No venues found"
+      />
+      <u-page-grid v-else>
+        <venue-card
           v-if="data.count"
-          v-model="page"
-          :total="data.count"
-          :page-size="pageSize"
+          v-for="city in data.cities"
+          :key="city.city"
+          :city
         />
-      </template>
-    </u-dashboard-panel>
-  </div>
+
+        <base-loading-card
+          v-else
+          v-for="_ in 15"
+          :key="_"
+        />
+      </u-page-grid>
+      <pagination-component
+        v-if="data.count"
+        v-model="page"
+        :total="data.count"
+        :page-size="pageSize"
+      />
+    </template>
+  </u-dashboard-panel>
 </template>

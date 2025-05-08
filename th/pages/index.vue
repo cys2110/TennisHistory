@@ -13,11 +13,6 @@ const features = [
     description: "Explore tournament results starting from the Open Era"
   },
   {
-    title: "Players",
-    icon: ICONS.people,
-    description: "Discover player profiles and activity"
-  },
-  {
     title: "Head to Head",
     icon: ICONS.h2h,
     description: "Examine match ups between players"
@@ -30,12 +25,7 @@ const features = [
 ]
 
 // Screenshots
-const screenshots = [
-  "./pages/archive.png",
-  "./pages/player.png",
-  "./pages/h2h.png",
-  "./pages/tournament.png"
-]
+const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.png", "./pages/tournament.png"]
 </script>
 
 <template>
@@ -52,19 +42,11 @@ const screenshots = [
         </u-dashboard-navbar>
       </template>
       <template #body>
-        <u-page-hero
+        <u-page-section
           title="Tennis History in the Open Era"
           description="Explore the history of men's tennis since 1968"
+          :features
         />
-        <u-page-grid class="2xl:grid-cols-4 2xl:w-3/4 mx-auto">
-          <u-page-feature
-            v-for="feat in features"
-            :key="feat.title"
-            :title="feat.title"
-            :icon="feat.icon"
-            :description="feat.description"
-          />
-        </u-page-grid>
         <u-carousel
           class="my-15"
           loop

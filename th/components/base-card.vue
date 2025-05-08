@@ -1,16 +1,13 @@
 <script setup lang="ts">
-const { type, id, surface, supervisor } = defineProps<{
+const { type, id, surface } = defineProps<{
   type: string
   id?: string
   surface?: SurfaceInterface
-  supervisor?: { id: string; last_name: string }
 }>()
 
 const linkParams = computed(() => {
   if (surface) {
     return { id: encodeName(surface?.id) }
-  } else if (supervisor) {
-    return { id: encodeName(supervisor?.id) }
   } else if (id) {
     return { id: encodeName(id) }
   }
@@ -19,7 +16,7 @@ const linkParams = computed(() => {
 
 <template>
   <u-page-card
-    :title="surface?.id ?? supervisor?.id ?? id"
+    :title="surface?.id ?? id"
     :to="{ name: type, params: linkParams }"
     highlight
     reverse

@@ -8,23 +8,23 @@ const toast = useToast()
 
 const skip = ref(0)
 const sort = ref<"ASC" | "DESC">("ASC")
-const supervisors = ref<string[]>([]) // Initialise supervisors for infinite scroll table
+const umpires = ref<string[]>([]) // Initialise umpires for infinite scroll table
 
 // API call
-const { data, status, execute } = await useFetch<SupervisorsAPIResponseType>(
-  "/api/supervisors/list",
+const { data, status, execute } = await useFetch<{ count: number; umpires: string[] }>(
+  "/api/umpires/list",
   {
     query: { skip, sort },
-    default: () => ({ count: 0, supervisors: [] }),
+    default: () => ({ count: 0, umpires: [] }),
     lazy: true,
     immediate: false,
     onResponse: ({ response }) => {
-      // Concatenate supervisors for infinite scroll table
-      supervisors.value = [...supervisors.value, ...(response._data.supervisors || [])]
+      // Concatenate umpires for infinite scroll table
+      umpires.value = [...umpires.value, ...(response._data.umpires || [])]
     },
     onResponseError: ({ error }) => {
       toast.add({
-        title: "Error fetching supervisors",
+        title: "Error fetching umpires",
         description: error?.message,
         icon: appConfig.ui.icons.error,
         color: "error"
@@ -36,17 +36,17 @@ const { data, status, execute } = await useFetch<SupervisorsAPIResponseType>(
 
 const columns: TableColumn<string>[] = [
   {
-    id: "supervisor",
+    id: "umpire",
     header: ({ column }) => {
       const isSorted = column.getIsSorted()
 
       return h(UButton, {
         color: "neutral",
         variant: "link",
-        label: "Supervisors",
+        label: "Umpires",
         icon: isSorted === "asc" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown,
         onClick: () => {
-          supervisors.value = []
+          umpires.value = []
           sort.value = sort?.value === "ASC" ? "DESC" : "ASC"
         },
         class: "-mx-2.5 font-semibold text-(--ui-text)"
@@ -55,7 +55,7 @@ const columns: TableColumn<string>[] = [
     cell: ({ row }) => {
       return h(BaseLink, {
         label: row.original,
-        type: "supervisor",
+        type: "umpire",
         id: row.original
       })
     }
@@ -80,7 +80,7 @@ onMounted(async () => {
       },
       {
         distance: 200,
-        canLoadMore: () => status.value !== "pending" || supervisors.value.length < data.value.count
+        canLoadMore: () => status.value !== "pending" || umpires.value.length < data.value.count
       }
     )
   } else {
@@ -107,7 +107,7 @@ onMounted(async () => {
       <template #body>
         <u-table
           ref="table"
-          :data="supervisors"
+          :data="umpires"
           :columns="hydrated ? columns : []"
           class="max-h-200 min-w-2/3 md:min-w-1/2 lg:min-w-1/4 mx-auto"
           :loading="['pending', 'idle'].includes(status)"
@@ -125,7 +125,7 @@ onMounted(async () => {
               </div>
             </div>
           </template>
-          <template #empty> No supervisors found </template>
+          <template #empty> No umpires found </template>
         </u-table>
       </template>
     </u-dashboard-panel>

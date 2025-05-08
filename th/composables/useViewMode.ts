@@ -1,4 +1,3 @@
-// useViewMode.ts
 export function useViewMode() {
   const viewMode = useState<"cards" | "list">("viewMode", () => {
     if (process.server) {
@@ -6,7 +5,6 @@ export function useViewMode() {
       return cookie.value || "cards"
     }
 
-    // client will hydrate from SSR value
     return "cards"
   })
 

@@ -7,17 +7,22 @@ const selectedLetter = ref<string>("All")
 const page = ref(1)
 const pageSize = ref(25)
 
+interface UmpiresAPIResponse {
+  count: number
+  umpires: string[]
+}
+
 // API call
-const { data, status } = useFetch<SupervisorsAPIResponseType>("/api/supervisors", {
-  query: computed(() => ({
-    letter: selectedLetter.value,
-    skip: (page.value - 1) * pageSize.value,
-    limit: pageSize.value
-  })),
-  default: () => ({ count: 0, supervisors: [] }),
+const { data, status } = await useFetch<UmpiresAPIResponse>("/api/umpires", {
+  query: {
+    letter: selectedLetter,
+    skip: computed(() => (page.value - 1) * pageSize.value),
+    limit: pageSize
+  },
+  default: () => ({ count: 0, umpires: [] }),
   onResponseError: ({ error }) => {
     toast.add({
-      title: "Error fetching supervisors",
+      title: "Error fetching umpires",
       description: error?.message,
       icon: appConfig.ui.icons.error,
       color: "error"
@@ -52,15 +57,15 @@ const { data, status } = useFetch<SupervisorsAPIResponseType>("/api/supervisors"
       <template #body>
         <error-message
           v-if="status === 'error' || !data.count"
-          title="No supervisors found"
+          title="No umpires found"
         />
         <u-page-grid v-else>
           <base-card
             v-if="data.count"
-            v-for="supervisor in data.supervisors"
-            :key="supervisor"
-            type="supervisor"
-            :id="supervisor"
+            v-for="umpire in data.umpires"
+            :key="umpire"
+            type="umpire"
+            :id="umpire"
           />
 
           <base-loading-card
@@ -69,7 +74,6 @@ const { data, status } = useFetch<SupervisorsAPIResponseType>("/api/supervisors"
             :key="_"
           />
         </u-page-grid>
-
         <pagination-component
           v-if="data.count"
           v-model="page"
