@@ -10,9 +10,7 @@ useHead({
     :tooltip="{ delayDuration: 100 }"
     :toaster="{ position: 'top-center' }"
   >
-    <nuxt-loading-indicator
-      color="repeating-linear-gradient(to right,#cffafe 0%,#22d3ee 50%,#0891b2 100%)"
-    />
+    <nuxt-loading-indicator color="repeating-linear-gradient(to right,#cffafe 0%,#22d3ee 50%,#0891b2 100%)" />
     <nuxt-layout>
       <nuxt-page />
     </nuxt-layout>

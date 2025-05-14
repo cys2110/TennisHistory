@@ -1,15 +1,15 @@
 export default defineEventHandler(async query => {
-  const { eid } = getQuery<{ eid: string }>(query)
+  const { id } = getQuery<{ id: string }>(query)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (e:Event {id: $eid})
+      MATCH (e:Event {id: $id})
       RETURN e.draw_type AS draw_type
     `,
-    { eid: Number(eid) }
+    { id: Number(id) }
   )
 
-  const results = records[0].get("draw_type")
+  const results = records[0]?.get("draw_type") ?? null
 
   return results
 })

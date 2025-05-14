@@ -20,7 +20,7 @@ export default defineEventHandler(async query => {
           },
           name: e.sponsor_name,
           category: e.category,
-          surface: s.surface,
+          surface: {id: s.id, surface: s.surface},
           venues: venues,
           dates: CASE
             WHEN e.start_date.year <> e.end_date.year THEN apoc.temporal.format(e.start_date, 'dd MMMM yyyy') + ' - ' + apoc.temporal.format(e.end_date, 'dd MMMM yyyy')
@@ -40,7 +40,7 @@ export default defineEventHandler(async query => {
           },
           name: e.sponsor_name,
           category: e.category,
-          surface: s.surface,
+          surface: {id: s.id, surface: s.surface},
           venues: venues,
           dates: CASE
             WHEN e.start_date.year <> e.end_date.year THEN apoc.temporal.format(e.start_date, 'dd MMMM yyyy') + ' - ' + apoc.temporal.format(e.end_date, 'dd MMMM yyyy')

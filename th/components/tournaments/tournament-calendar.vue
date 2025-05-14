@@ -1,27 +1,53 @@
 <script setup lang="ts">
+import { EventsGrid, EventsTable } from "#components"
+
 defineProps<{ breadcrumbs: BreadcrumbType[] }>()
 const route = useRoute()
 const toast = useToast()
 const appConfig = useAppConfig()
 const { viewMode } = useViewMode()
 
-// Set select values - default to all
+const skip = ref(0)
+const events = ref<EventCardType[]>([])
+const tournamentSort = ref<"ASC" | "DESC" | undefined>(undefined)
+const categorySort = ref<"ASC" | "DESC" | undefined>(undefined)
+const dateSort = ref<"ASC" | "DESC" | undefined>(undefined)
+const surfaceSort = ref<"ASC" | "DESC" | undefined>(undefined)
+
+// Set select values
 const year = useRouteQuery("year", new Date().getFullYear().toString())
 const months = ref<(keyof typeof MonthEnum)[] | undefined>()
 const categories = ref<CategoryEnum[] | undefined>()
 const surfaces = ref<SurfaceEnum[] | undefined>()
+const environment = ref<("Indoor" | "Outdoor")[] | undefined>()
+
+interface APIResponseType {
+  count: number
+  events: EventCardType[]
+}
 
 // API call
-const { data: events, status } = await useFetch<EventCardType[]>("/api/results-archive", {
-  query: { surfaces, months, categories, year, upcoming: route.name === "upcoming-tournaments" },
-  default: () => [],
+const { data, status, execute } = await useFetch<APIResponseType>("/api/results-archive", {
+  query: {
+    surfaces,
+    months,
+    categories,
+    year,
+    environment,
+    upcoming: route.name === "upcoming-tournaments",
+    skip,
+    tournamentSort,
+    categorySort,
+    dateSort,
+    surfaceSort
+  },
+  default: () => ({ count: 0, events: [] }),
+  lazy: true,
+  immediate: false,
+  onResponse: ({ response }) => (events.value = [...events.value, ...(response._data.events || [])]),
   onResponseError: ({ error }) => {
     toast.add({
-      title:
-        route.name === "upcoming-tournaments"
-          ? "Error fetching upcoming tournaments"
-          : `Error fetching tournaments for ${year}`,
-      description: error?.message,
+      title: route.name === "upcoming-tournaments" ? "Error fetching upcoming tournaments" : `Error fetching tournaments for ${year}`,
       icon: appConfig.ui.icons.error,
       color: "error"
     })
@@ -29,13 +55,11 @@ const { data: events, status } = await useFetch<EventCardType[]>("/api/results-a
   }
 })
 
-// Anchor links
-const links = computed(() => {
-  if (events.value)
-    return events.value.map(event => ({
-      to: "#event-" + event.id,
-      label: event.tournament.name
-    }))
+execute()
+
+watch([surfaces, months, categories, environment, year, tournamentSort, categorySort, dateSort, surfaceSort], () => {
+  skip.value = 0
+  events.value = []
 })
 </script>
 
@@ -51,25 +75,8 @@ const links = computed(() => {
           <template #title>
             <u-breadcrumb :items="breadcrumbs" />
           </template>
-
-          <!--TOC-->
-          <template #right>
-            <ClientOnly>
-              <u-dropdown-menu
-                v-if="viewMode === 'cards'"
-                :items="links"
-              >
-                <u-button
-                  :icon="ICONS.toc"
-                  color="neutral"
-                  variant="link"
-                />
-              </u-dropdown-menu>
-            </ClientOnly>
-          </template>
         </u-dashboard-navbar>
 
-        <!--Select menus-->
         <u-dashboard-toolbar>
           <all-years-select
             v-if="route.name === 'results-archive'"
@@ -77,27 +84,27 @@ const links = computed(() => {
           />
           <month-select v-model="months" />
           <category-select v-model="categories" />
-          <surface-select v-model="surfaces" />
+          <surface-select
+            v-model="surfaces"
+            v-model:env="environment"
+          />
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
-        <ClientOnly>
-          <!--Cards mode-->
-          <events-grid
-            v-if="viewMode === 'cards'"
-            :events
-            :status
-            :value="year"
-          />
-          <!--List mode -->
-          <events-table
-            v-else
-            :events
-            :status
-            :value="year"
-          />
-        </ClientOnly>
+        <component
+          :is="viewMode === 'cards' ? EventsGrid : EventsTable"
+          :key="viewMode"
+          v-model="skip"
+          v-model:tournament-sort="tournamentSort"
+          v-model:category-sort="categorySort"
+          v-model:date-sort="dateSort"
+          v-model:surface-sort="surfaceSort"
+          :events
+          :status
+          :count="data?.count ?? 0"
+          :value="year"
+        />
       </template>
     </u-dashboard-panel>
   </div>

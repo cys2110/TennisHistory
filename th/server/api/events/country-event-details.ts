@@ -1,5 +1,5 @@
 export default defineEventHandler(async query => {
-  const { eid } = getQuery<{ eid: string }>(query)
+  const { id } = getQuery<{ id: string }>(query)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
@@ -8,7 +8,7 @@ export default defineEventHandler(async query => {
       OPTIONAL MATCH (sup:Supervisor)-[:SUPERVISED]->(e)
       WITH DISTINCT(e), s, t, COLLECT(DISTINCT {id: v.id, name: v.name, city: v.city, country: {id: c.id, name: c.name, alpha2: c.alpha2}}) AS venues, COLLECT(DISTINCT sup.id) as supervisors
       RETURN {
-        surface: s.id,
+        surface: {id: s.id, surface: s.surface},
         venues: venues,
         dates: CASE
           WHEN e.start_date.year <> e.end_date.year THEN apoc.temporal.format(e.start_date, 'dd MMMM yyyy') || ' - ' || apoc.temporal.format(e.end_date, 'dd MMMM yyyy')
@@ -20,7 +20,7 @@ export default defineEventHandler(async query => {
         supervisors: supervisors
       } AS event
     `,
-    { id: Number(eid) }
+    { id: Number(id) }
   )
 
   const results = records[0].get("event")

@@ -6,13 +6,12 @@ export default defineEventHandler(async query => {
       MATCH (p:Player {id: $id})-[:ENTERED]->(:Entry)-[:SCORED]->(:Score)-[:SCORED]->(:Match)-[:PLAYED]->(:Round)-[:ROUND_OF]->(:Event)-[:IN_YEAR]->(y:Year)
       WITH y, p
       ORDER BY y.id
-      RETURN COLLECT(DISTINCT toString(y.id)) AS years, labels(p) AS labels
+      RETURN COLLECT(DISTINCT toString(y.id)) AS years, labels(p) AS labels, p.atp_link AS atp_link, p.wiki_link AS wiki_link
     `,
     { id }
   )
 
-  const years = records[0].get("years")
-  const labels = records[0].get("labels")
+  const results = records[0].toObject()
 
-  return { years, labels }
+  return results
 })

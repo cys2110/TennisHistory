@@ -45,10 +45,7 @@ export default defineEventHandler(async query => {
       wins: Number(stat.wins),
       losses: Number(stat.losses),
       titles: stat.titles ? Number(stat.titles) : null,
-      value:
-        Number(stat.losses) === 0
-          ? 0
-          : Number((Number(stat.wins) / (Number(stat.wins) + Number(stat.losses))).toFixed(3))
+      value: Number(stat.losses) === 0 ? 0 : Number((Number(stat.wins) / (Number(stat.wins) + Number(stat.losses))).toFixed(3))
     }
   })
 

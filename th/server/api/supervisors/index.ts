@@ -2,28 +2,27 @@ export default defineEventHandler(async query => {
   interface QueryProps {
     letter: string
     skip: string
-    limit: string
+    sort: "ASC" | "DESC"
   }
-  const { letter, skip, limit } = getQuery<QueryProps>(query)
+  const { letter, skip, sort } = getQuery<QueryProps>(query)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       OPTIONAL MATCH (s:Supervisor)
-        WHERE $letter IS NULL OR s.last_name STARTS WITH $letter
+      WHERE $letter IS NULL OR s.last_name STARTS WITH $letter
       WITH s
-        ORDER BY s.last_name
+      ORDER BY ${sort}
       WITH COLLECT(s.id) AS supervisors, COUNT(s) AS count
-      WITH supervisors[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS supervisors, count
+      WITH supervisors[toInteger($skip)..toInteger($skip) + 25] AS supervisors, count
       RETURN toString(count) AS count, supervisors
     `,
-    { letter: letter === "All" ? null : letter, skip, limit }
+    { letter: letter === "All" ? null : letter, skip }
   )
 
-  const count = records[0].get("count")
-  const supervisors = records[0].get("supervisors")
+  const results = records[0].toObject()
 
   return {
-    count: Number(count),
-    supervisors
+    count: Number(results.count),
+    supervisors: results.supervisors.filter(Boolean)
   }
 })

@@ -3,18 +3,18 @@ export default defineEventHandler(async query => {
     id: string
     letter: string
     skip: string
-    limit: string
+    sort: "ASC" | "DESC"
   }
-  const { letter, skip, limit, id } = getQuery<QueryProps>(query)
+  const { letter, skip, sort, id } = getQuery<QueryProps>(query)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      OPTIONAL MATCH (p:Player)-[:REPRESENTS|REPRESENTED]->(c:Country {id: $id})
+      OPTIONAL MATCH (p:Player)-[:REPRESENTS|REPRESENTED]->(c:Country {id: $id}) WHERE $letter IS NULL OR p.last_name STARTS WITH $letter
       WITH p
-        ORDER BY p.last_name
-      WITH COLLECT(p) AS all, COUNT(p) AS count
-      WITH all[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS sliced, count
-      UNWIND CASE WHEN sliced = [] THEN [null] ELSE sliced END AS p
+        ORDER BY p.last_name ${sort}
+      WITH COLLECT(p) AS players, COUNT(p) AS count
+      WITH players[toInteger($skip)..toInteger($skip) + 25] AS players, count
+      UNWIND CASE WHEN players = [] THEN [null] ELSE players END AS p
       MATCH (p)-[:REPRESENTS]->(c:Country)
       OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(:Score)-[:SCORED]->(:Match)-[:PLAYED]->(:Round)-[:ROUND_OF]->(:Event)-[:IN_YEAR]->(y:Year)
       WITH p, c, min(y.id) AS min_year, max(y.id) AS max_year, count
@@ -31,7 +31,7 @@ export default defineEventHandler(async query => {
         max_year: toString(max_year)
       } AS player, toString(count) AS count
     `,
-    { id, letter: letter === "All" ? null : letter, skip, limit }
+    { id, letter: letter === "All" ? null : letter, skip, sort }
   )
 
   const playerObjects = records.map(record => record.get("player"))

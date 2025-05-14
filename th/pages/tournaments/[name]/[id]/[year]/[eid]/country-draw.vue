@@ -1,7 +1,12 @@
 <script setup lang="ts">
-definePageMeta({ name: "country-draw" })
+definePageMeta({ name: "country-draw", layout: "event" })
 </script>
 
 <template>
-  <div> Page: tournaments/[name]/[id]/[year]/[eid]/country-draw </div>
+  <u-alert
+    color="success"
+    title="Coming soon!"
+    :icon="ICONS.alert"
+    class="my-auto"
+  />
 </template>

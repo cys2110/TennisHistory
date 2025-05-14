@@ -1,166 +1,167 @@
 <script setup lang="ts">
-import { BaseLink, CountryLink, EventButtons, UButton } from "#components"
+import { BaseLink, UButton } from "#components"
 import type { TableColumn } from "@nuxt/ui"
 
-defineProps<{
+const { events, count, status } = defineProps<{
   events: EventCardType[]
   status: APIStatusType
   value: string
+  count: number
 }>()
 
+const appConfig = useAppConfig()
 const route = useRoute()
-const breakpoints = useBreakpoints(breakpointsTailwind)
-const xlAndUp = breakpoints.greaterOrEqual("xl")
+const skip = defineModel<number>({ default: 0 })
+const tournamentSort = defineModel<"ASC" | "DESC" | undefined>("tournament-sort", { default: undefined })
+const categorySort = defineModel<"ASC" | "DESC" | undefined>("category-sort", { default: undefined })
+const dateSort = defineModel<"ASC" | "DESC" | undefined>("date-sort", { default: "ASC" })
+const surfaceSort = defineModel<"ASC" | "DESC" | undefined>("surface-sort", { default: undefined })
+
+const table = useTemplateRef<ComponentPublicInstance>("table")
+
+onMounted(async () => {
+  useInfiniteScroll(
+    table.value?.$el,
+    () => {
+      skip.value += 25
+    },
+    {
+      distance: 150,
+      canLoadMore: () => status !== "pending" && events.length < count
+    }
+  )
+})
 
 const columns: TableColumn<EventCardType>[] = [
   {
-    accessorKey: "tournament",
-    header: ({ column }) => {
-      const isSorted = column.getIsSorted()
-
-      return h(UButton, {
+    id: "expand",
+    cell: ({ row }) =>
+      h(UButton, {
+        color: "neutral",
+        variant: "link",
+        size: "sm",
+        class: "w-fit",
+        icon: appConfig.ui.icons.chevronDown,
+        onClick: () => row.toggleExpanded()
+      })
+  },
+  {
+    accessorKey: "tournament.name",
+    header: () =>
+      h(UButton, {
         color: "neutral",
         variant: "link",
         label: "Tournament",
-        icon: isSorted ? (isSorted === "asc" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
-        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        icon: tournamentSort.value ? (tournamentSort.value === "ASC" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
+        onClick: () => {
+          dateSort.value = undefined
+          surfaceSort.value = undefined
+          categorySort.value = undefined
+          tournamentSort.value = tournamentSort.value === "ASC" ? "DESC" : "ASC"
+        },
         class: "-mx-2.5 font-semibold text-(--ui-text)"
-      })
-    },
+      }),
     cell: ({ row }) => {
       const tournament = row.original.tournament
-      return h(
-        BaseLink,
-        {
-          type: "tournament",
-          tournament,
-          class: "md:text-xs lg:text-sm"
-        },
-        () => tournament.name
-      )
+      return h(BaseLink, {
+        type: "tournament",
+        tournament,
+        class: "md:text-xs lg:text-sm"
+      })
     },
-    meta: {
-      class: { td: "max-w-20 xl:max-w-fit whitespace-normal break-words" }
-    }
-  },
-  {
-    accessorKey: "name",
-    header: "Sponsor Name",
-    meta: {
-      class: { td: "max-w-20 xl:max-w-fit whitespace-normal break-words md:text-xs lg:text-sm" }
-    }
+    meta: { class: { td: "max-w-20 xl:max-w-fit whitespace-normal break-words" } }
   },
   {
     accessorKey: "category",
-    header: ({ column }) => {
-      const isSorted = column.getIsSorted()
-
-      return h(UButton, {
-        color: "neutral",
-        variant: "link",
-        label: "Category",
-        icon: isSorted ? (isSorted === "asc" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
-        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
-      })
+    header: () => {
+      if (route.name !== "category") {
+        return h(UButton, {
+          color: "neutral",
+          variant: "link",
+          label: "Category",
+          icon: categorySort.value ? (categorySort.value === "ASC" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
+          onClick: () => {
+            dateSort.value = undefined
+            surfaceSort.value = undefined
+            tournamentSort.value = undefined
+            categorySort.value = categorySort.value === "ASC" ? "DESC" : "ASC"
+          },
+          class: "-mx-2.5 font-semibold text-(--ui-text)"
+        })
+      } else {
+        return "Category"
+      }
     },
     cell: ({ row }) => {
-      return h(
-        BaseLink,
-        {
+      if (route.name !== "category") {
+        return h(BaseLink, {
           id: row.original.category as string,
           type: "category",
           class: "md:text-xs lg:text-sm"
-        },
-        () => row.getValue("category")
-      )
+        })
+      } else {
+        return row.getValue("category")
+      }
     },
-    meta: {
-      class: { td: "md:text-xs lg:text-sm" }
-    }
+    meta: { class: { td: "md:text-xs lg:text-sm" } }
   },
   {
-    accessorKey: "start_date",
-    header: ({ column }) => {
-      const isSorted = column.getIsSorted()
-
-      return h(UButton, {
+    accessorKey: "dates",
+    header: () =>
+      h(UButton, {
         color: "neutral",
         variant: "link",
         label: "Dates",
-        icon: isSorted ? (isSorted === "asc" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
-        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        icon: dateSort.value ? (dateSort.value === "ASC" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
+        onClick: () => {
+          tournamentSort.value = undefined
+          surfaceSort.value = undefined
+          categorySort.value = undefined
+          dateSort.value = dateSort.value === "ASC" ? "DESC" : "ASC"
+        },
         class: "-mx-2.5 font-semibold text-(--ui-text)"
-      })
-    },
-    cell: ({ row }) => row.original.dates,
-    meta: {
-      class: { td: "md:text-xs lg:text-sm" }
-    }
+      }),
+    meta: { class: { td: "md:text-xs lg:text-sm" } }
   },
   {
-    accessorKey: "surface",
-    header: ({ column }) => {
-      const isSorted = column.getIsSorted()
-
-      return h(UButton, {
-        color: "neutral",
-        variant: "link",
-        label: "Surface",
-        icon: isSorted ? (isSorted === "asc" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
-        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
-      })
+    id: "surface",
+    header: () => {
+      if (route.name !== "surface") {
+        return h(UButton, {
+          color: "neutral",
+          variant: "link",
+          label: "Surface",
+          icon: surfaceSort.value ? (surfaceSort.value === "ASC" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
+          onClick: () => {
+            tournamentSort.value = undefined
+            dateSort.value = undefined
+            categorySort.value = undefined
+            surfaceSort.value = surfaceSort.value === "ASC" ? "DESC" : "ASC"
+          },
+          class: "-mx-2.5 font-semibold text-(--ui-text)"
+        })
+      } else {
+        return "Surface"
+      }
     },
     cell: ({ row }) => {
-      return h(BaseLink, {
-        id: row.original.surface.id,
-        type: "surface"
-      })
+      if (route.name !== "surface") {
+        return h(BaseLink, {
+          id: row.original.surface.id,
+          type: "surface"
+        })
+      } else {
+        return row.original.surface.id
+      }
     },
-    meta: {
-      class: { td: "md:text-xs lg:text-sm" }
-    }
+    meta: { class: { td: "md:text-xs lg:text-sm" } }
   },
   {
     accessorKey: "venues",
-    header: "Venues",
+    header: "Country",
     cell: ({ row }) => {
       const venues = row.original.venues
-      return venues.map(venue => {
-        return h(
-          "div",
-          {
-            class: "flex gap-2 items-center w-fit mx-auto md:text-xs lg:text-sm"
-          },
-          [
-            h(
-              BaseLink,
-              {
-                id: venue.id,
-                type: "venue",
-                class: "max-w-20 xl:max-w-fit whitespace-normal break-words"
-              },
-              () => (venue.name ? `${venue.name}, ${venue.city}` : venue.city)
-            ),
-            h(CountryLink, { country: venue.country })
-          ]
-        )
-      })
-    }
-  },
-  {
-    id: "navigation",
-    header: "Go to...",
-    cell: ({ row }) => {
-      return h(EventButtons, {
-        orientation: xlAndUp.value ? "horizontal" : "vertical",
-        tournament: row.original.tournament,
-        year: row.original.year,
-        id: row.original.id,
-        start_date: row.original.start_date,
-        draw_type: row.original.draw_type
-      })
+      return h(BaseLink, { country: venues[0].country, type: "country", class: "mx-auto" })
     }
   }
 ]
@@ -168,26 +169,24 @@ const columns: TableColumn<EventCardType>[] = [
 
 <template>
   <u-table
+    ref="table"
     :data="events"
     :columns
-    class="max-h-200"
+    class="max-h-200 mx-5"
     :loading="['pending', 'idle'].includes(status)"
     sticky
   >
     <template #loading>
-      <div class="flex flex-col gap-4">
-        <div
-          v-for="_ in 6"
+      <div
+        v-for="_ in 6"
+        :key="_"
+        class="flex gap-8"
+      >
+        <u-skeleton
+          v-for="_ in 5"
           :key="_"
-          class="flex gap-8"
-        >
-          <u-skeleton
-            v-for="_ in 6"
-            :key="_"
-            class="h-4 w-1/2 rounded-lg"
-          />
-          <u-skeleton class="h-4 w-1/3 rounded-lg ring-secondary-600 bg-secondary-600/10 dark:bg-secondary-400/10" />
-        </div>
+          class="h-4 rounded-lg"
+        />
       </div>
     </template>
     <template #empty>
@@ -204,6 +203,41 @@ const columns: TableColumn<EventCardType>[] = [
           ? `No events took place at ${value}`
           : "No events found"
       }}
+    </template>
+    <template #expanded="{ row }">
+      <div class="w-full flex flex-row-reverse justify-between gap-4 items-center">
+        <div class="flex flex-col gap-1 items-end">
+          <u-badge
+            v-for="venue in row.original.venues"
+            :key="venue.id"
+            variant="outline"
+            class="w-fit"
+          >
+            <base-link
+              v-if="route.name !== 'venue'"
+              type="venue"
+              :id="venue.id"
+              class="text-primary-600 dark:text-primary-300 hover:text-primary-500 dark:hover:text-primary-400 after:!bg-primary-500 after:dark:!bg-primary-400"
+            >
+              {{ venue.name ? `${venue.name}, ${venue.city}` : venue.city }}
+            </base-link>
+            <template v-else>{{ venue.name ? `${venue.name}, ${venue.city}` : venue.city }}</template>
+          </u-badge>
+        </div>
+        <u-badge
+          v-if="row.original.name"
+          variant="outline"
+        >
+          {{ row.original.name }}
+        </u-badge>
+        <event-buttons
+          :tournament="row.original.tournament"
+          :year="row.original.year"
+          :id="row.original.id"
+          :draw_type="row.original.draw_type"
+          :start_date="row.original.start_date"
+        />
+      </div>
     </template>
   </u-table>
 </template>

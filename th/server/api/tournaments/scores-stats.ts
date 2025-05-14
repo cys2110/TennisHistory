@@ -1,4 +1,4 @@
-import { percentage } from "~/utils/helpers"
+import { percentage } from "../../../utils/helpers"
 
 export default defineEventHandler(async query => {
   const { id } = getQuery<{ id: string }>(query)
@@ -12,6 +12,7 @@ export default defineEventHandler(async query => {
       WITH
         p, c,
         y.id AS year,
+        e.id AS eid,
         SUM(
           coalesce(s.s1, 0) +
           coalesce(s.s2, 0) +
@@ -45,16 +46,18 @@ export default defineEventHandler(async query => {
         year,
         p,
         c,
+        eid,
         games_won,
         games_lost, sets_won, sets_lost
       ORDER BY sets_lost
       RETURN {
-      year: year,
-      player: {id: p.id, name: p.first_name || ' ' || p.last_name, country: {id: c.id, name: c.name, alpha2: c.alpha2}},
-      sets_won: sets_won,
-      sets_lost: sets_lost,
-      games_won: games_won,
-      games_lost: games_lost
+        year: year,
+        id: eid,
+        player: {id: p.id, name: p.first_name || ' ' || p.last_name, country: {id: c.id, name: c.name, alpha2: c.alpha2}},
+        sets_won: sets_won,
+        sets_lost: sets_lost,
+        games_won: games_won,
+        games_lost: games_lost
       } AS scores_stats
     `,
     { id: Number(id) }

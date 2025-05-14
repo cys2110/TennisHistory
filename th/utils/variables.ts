@@ -1,5 +1,3 @@
-import appConfig from "~/app.config"
-
 export const CATEGORIES = Object.values(CategoryEnum)
 
 export const CATEGORY_COLOURS = Object.values(COLOURS)
@@ -54,56 +52,28 @@ export const LETTERS = [
   "Z"
 ]
 
-export const MATCH_STATS = {
-  service: [
-    { key: "aces", label: "Aces" },
-    { key: "dfs", label: "Double faults" },
-    { label: "First serve", percent: true },
-    { key: "serve1", label: "1st serve points won", percent: true },
-    { key: "serve2", label: "2nd serve points won", percent: true },
-    { key: "bps_saved", label: "Break points saved", percent: true }
-  ],
-  return: [
-    { key: "ret1", label: "1st serve return points won", percent: true },
-    { key: "ret2", label: "2nd serve return points won", percent: true },
-    { key: "bps_converted", label: "Break points converted", percent: true }
-  ],
-  points: [
-    { key: "winners", label: "Winners" },
-    { key: "ues", label: "Unforced errors" },
-    { key: "net", label: "Net points won", percent: true },
-    { label: "Service points won", percent: true },
-    { label: "Return points won", percent: true },
-    { label: "Total points won", percent: true }
-  ],
-  service_speed: [
-    { key: "max_speed", label: "Max speed" },
-    { key: "avg1_speed", label: "1st serve average speed" },
-    { key: "avg2_speed", label: "2nd serve average speed" }
-  ]
-}
-
-export const MONTH_NAMES = Object.keys(MonthEnum).filter(
-  key => isNaN(Number(key)) && key !== "length"
-) as (keyof typeof MonthEnum)[]
-
-export const NAV_LINKS = [
-  { label: "Upcoming Tournaments", to: { name: "upcoming-tournaments" }, icon: ICONS.upcoming },
-  { label: "Results Archive", to: { name: "results-archive" }, icon: ICONS.event },
-  { label: "Tournaments", to: { name: "tournaments" }, icon: ICONS.tournament },
-  { label: "Players", to: { name: "players" }, icon: ICONS.player },
-  { label: "Head to Head", to: { name: "h2h" }, icon: ICONS.h2h },
-  { label: "Years", to: { name: "years" }, icon: ICONS.year },
-  { label: "Coaches", to: { name: "coaches" }, icon: ICONS.coach },
-  { label: "Umpires", to: { name: "umpires" }, icon: ICONS.umpire },
-  { label: "Countries", to: { name: "countries" }, icon: ICONS.countries },
-  { label: "Venues", to: { name: "venues" }, icon: ICONS.venue },
-  { label: "Surfaces", to: { name: "surfaces" }, icon: ICONS.court },
-  { label: "Supervisors", to: { name: "supervisors" }, icon: ICONS.supervisor },
-  { label: "Stats/Records", to: { name: "statistics-and-records" }, icon: ICONS.stats },
-  { label: "Ranking Rules", to: { name: "ranking-rules" }, icon: ICONS.seeds },
-  { label: "Search", to: { name: "search" }, icon: appConfig.ui?.icons?.search }
+export const MATCH_STATS = [
+  { key: "aces", label: "Aces", category: "Service Stats" },
+  { key: "dfs", label: "Double faults", category: "Service Stats" },
+  { label: "First serve", percent: true, category: "Service Stats" },
+  { key: "serve1", label: "1st serve points won", percent: true, category: "Service Stats" },
+  { key: "serve2", label: "2nd serve points won", percent: true, category: "Service Stats" },
+  { key: "bps_saved", label: "Break points saved", percent: true, category: "Service Stats" },
+  { key: "ret1", label: "1st serve return points won", percent: true, category: "Return Stats" },
+  { key: "ret2", label: "2nd serve return points won", percent: true, category: "Return Stats" },
+  { key: "bps_converted", label: "Break points converted", percent: true, category: "Return Stats" },
+  { key: "winners", label: "Winners", category: "Points Stats" },
+  { key: "ues", label: "Unforced errors", category: "Points Stats" },
+  { key: "net", label: "Net points won", percent: true, category: "Points Stats" },
+  { label: "Service points won", percent: true, category: "Points Stats" },
+  { label: "Return points won", percent: true, category: "Points Stats" },
+  { label: "Total points won", percent: true, category: "Points Stats" },
+  { key: "max_speed", label: "Max speed", category: "Service Speed" },
+  { key: "avg1_speed", label: "1st serve average speed", category: "Service Speed" },
+  { key: "avg2_speed", label: "2nd serve average speed", category: "Service Speed" }
 ]
+
+export const MONTH_NAMES = Object.keys(MonthEnum).filter(key => isNaN(Number(key)) && key !== "length") as (keyof typeof MonthEnum)[]
 
 export const PLAYER_PAGES = [
   { label: "Details", name: "player", icon: ICONS.overview },
@@ -111,34 +81,6 @@ export const PLAYER_PAGES = [
   { label: "Titles and Finals", name: "titles-and-finals", icon: ICONS.tournament },
   { label: "Win-Loss Index", name: "wl-index", icon: ICONS.barChart },
   { label: "Stats", name: "stats", icon: ICONS.stats }
-]
-
-export const RELATED_LINKS = [
-  {
-    label: "Governing Bodies",
-    children: [
-      { label: "ATP", to: "https://www.atptour.com/", target: "_blank" },
-      { label: "ITF", to: "https://www.itftennis.com/", target: "_blank" }
-    ]
-  },
-  {
-    label: "Grand Slams",
-    children: [
-      { label: "Australian Open", to: "https://www.ausopen.com/", target: "_blank" },
-      { label: "Roland Garros", to: "https://www.rolandgarros.com/", target: "_blank" },
-      { label: "Wimbledon", to: "https://www.wimbledon.com/", target: "_blank" },
-      { label: "US Open", to: "https://www.usopen.org/", target: "_blank" }
-    ]
-  },
-  {
-    label: "Other Links",
-    children: [
-      { label: "About", to: { name: "about" } },
-      { label: "About me", to: "https://www.claire-sheridan.com", target: "_blank" },
-      { label: "Ranking Rules History", to: "https://openerarankings.com/Home", target: "_blank" },
-      { label: "Tennis Abstract", to: "https://www.tennisabstract.com/", target: "_blank" }
-    ]
-  }
 ]
 
 export const SEARCH_RESULTS = {

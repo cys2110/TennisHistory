@@ -1,5 +1,5 @@
 export default defineEventHandler(async event => {
-  const { eid } = getQuery<{ eid: string }>(event)
+  const { id } = getQuery<{ id: string }>(event)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
@@ -32,7 +32,7 @@ export default defineEventHandler(async event => {
         match_no: toString(m.match_no),
         incomplete: m.incomplete,
         winner_id: w.id,
-        p1: {
+        p1: CASE WHEN p1 IS NOT NULL THEN {
           id: p1.id,
           name: p1.first_name || ' ' || p1.last_name,
           country: p1c,
@@ -41,8 +41,8 @@ export default defineEventHandler(async event => {
           incomplete: p1s.incomplete,
           sets: [toString(p1s.s1), toString(p1s.s2), toString(p1s.s3), toString(p1s.s4), toString(p1s.s5)],
           tbs: [toString(p1s.t1), toString(p1s.t2), toString(p1s.t3), toString(p1s.t4), toString(p1s.t5)]
-        },
-        p2: {
+        } ELSE NULL END,
+        p2: CASE WHEN p2 IS NOT NULL THEN {
           id: p2.id,
           name: p2.first_name + ' ' + p2.last_name,
           country: p2c,
@@ -51,10 +51,10 @@ export default defineEventHandler(async event => {
           incomplete: p2s.incomplete,
           sets: [toString(p2s.s1), toString(p2s.s2), toString(p2s.s3), toString(p2s.s4), toString(p2s.s5)],
           tbs: [toString(p2s.t1), toString(p2s.t2), toString(p2s.t3), toString(p2s.t4), toString(p2s.t5)]
-        }
+        } ELSE NULL END
       } AS match
     `,
-    { id: Number(eid) }
+    { id: Number(id) }
   )
 
   const matches = records.map(record => record.get("match"))

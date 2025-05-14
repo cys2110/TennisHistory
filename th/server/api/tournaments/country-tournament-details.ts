@@ -1,5 +1,5 @@
 export default defineEventHandler(async query => {
-  const { tid } = getQuery<{ tid: string }>(query)
+  const { id } = getQuery<{ id: string }>(query)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
@@ -23,7 +23,7 @@ export default defineEventHandler(async query => {
         ELSE toString(b.id) || ' — ' || toString(a.id)
       END AS years
     `,
-    { id: Number(tid) }
+    { id: Number(id) }
   )
 
   const results = records.map(record => record.get("event"))

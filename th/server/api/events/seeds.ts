@@ -1,10 +1,10 @@
 export default defineEventHandler(async query => {
-  const { eid } = getQuery<{ eid: string }>(query)
+  const { id } = getQuery<{ id: string }>(query)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       OPTIONAL MATCH (e:Event {id: $id})<-[t:SEEDED]-(f:Entry)<-[:ENTERED]-(p:Player)
-      WITH p, f, t, e
+      WITH *
         ORDER BY f.seed
       CALL (f, e) {
         OPTIONAL MATCH (f)-[u:WITHDREW]->(e)
@@ -32,10 +32,10 @@ export default defineEventHandler(async query => {
         ELSE []
       END AS seeds
     `,
-    { id: Number(eid) }
+    { id: Number(id) }
   )
 
-  const results = records[0].toObject()
+  const results = records[0].get("seeds")
 
-  return results.seeds
+  return results
 })

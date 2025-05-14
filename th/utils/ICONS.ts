@@ -5,11 +5,14 @@ export default {
   barChart: "material-symbols:bar-chart-rounded",
   calendar: "solar:calendar-bold-duotone",
   cards: "clarity:view-cards-line",
+  categories: "lineicons:sort-high-to-low",
   coach: "iconoir:learning",
+  colours: "zondicons:color-palette",
   countries: "solar:earth-bold-duotone",
   court: "game-icons:tennis-court",
   draw: "mdi:family-tree",
   event: "solar:calendar-mark-bold-duotone",
+  gauge: "line-md:gauge-twotone-loop",
   h2h: "pepicons-print:swords-circle-filled",
   home: "line-md:home-md-twotone",
   layers: "solar:layers-minimalistic-line-duotone",
@@ -33,6 +36,7 @@ export default {
   scatterChart: "ph:chart-scatter-duotone",
   scores: "ic:twotone-scoreboard",
   seeds: "solar:ranking-line-duotone",
+  settings: "line-md:cog-loop",
   sortAlpha: "material-symbols:sort-by-alpha-outline-rounded",
   sortAlphaDown: "prime:sort-alpha-down",
   sortAlphaUp: "prime:sort-alpha-up",
@@ -49,5 +53,7 @@ export default {
   upcoming: "ph:racquet-light",
   venue: "ic:twotone-stadium",
   website: "line-md:external-link-rounded",
-  year: "solar:calendar-search-bold-duotone"
+  year: "solar:calendar-search-bold-duotone",
+  zoomIn: "material-symbols:zoom-in-map-rounded",
+  zoomOut: "material-symbols:zoom-out-map-rounded"
 }

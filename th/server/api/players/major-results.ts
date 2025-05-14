@@ -33,7 +33,7 @@ export default defineEventHandler(async query => {
     { id }
   )
 
-  const player = records[0].toObject()
+  const player = records[0].get("results")
 
-  return player.results
+  return player
 })

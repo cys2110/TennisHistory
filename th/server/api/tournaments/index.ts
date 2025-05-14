@@ -2,21 +2,18 @@ export default defineEventHandler(async query => {
   interface QueryProps {
     letter: string
     skip: string
-    limit: string
+    sort: "ASC" | "DESC"
   }
-  const { letter, skip, limit } = getQuery<QueryProps>(query)
+  const { letter, skip, sort } = getQuery<QueryProps>(query)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (t:Tournament) WHERE $letter IS NULL OR t.name STARTS WITH $letter
-      WITH t
-      ORDER BY t.name
-      WITH COLLECT(t) AS all, COUNT(t) AS count
-      WITH all[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS sliced, count
-      UNWIND CASE WHEN sliced = [] THEN [null] ELSE sliced END AS t
       MATCH (t)-[:ESTABLISHED]-(e:Year)
       OPTIONAL MATCH (t)-[:ABOLISHED]-(a:Year)
-      RETURN toString(count) AS count, {
+      WITH *
+      ORDER BY t.name ${sort}
+      WITH COLLECT({
         id: toString(t.id),
         name: t.name,
         years: CASE
@@ -24,13 +21,17 @@ export default defineEventHandler(async query => {
           WHEN a.id = e.id THEN toString(e.id)
           ELSE toString(e.id) || ' — ' || toString(a.id)
         END
-      } AS tournament
+      }) AS tournaments
+      WITH tournaments[toInteger($skip)..toInteger($skip) + 25] AS tournaments, SIZE(tournaments) AS count
+      RETURN toString(count) AS count, tournaments
     `,
-    { letter: letter === "All" ? null : letter, skip, limit }
+    { letter: letter === "All" ? null : letter, skip }
   )
 
-  const count = records[0].get("count")
-  const tournaments = records.map(record => record.get("tournament"))
+  const results = records[0].toObject()
 
-  return { count: Number(count), tournaments }
+  return {
+    count: Number(results.count),
+    tournaments: results.tournaments.filter(Boolean)
+  }
 })

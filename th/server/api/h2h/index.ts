@@ -4,12 +4,11 @@ export default defineEventHandler(async query => {
   const { records: p1Details } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (p:Player {id: $id})
-      MATCH (p)-[:REPRESENTS]->(c)
       OPTIONAL MATCH (p)-[:TURNED_PRO]->(y:Year)
       OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(:Winner)-[:SCORED]->(t:Match)-[:PLAYED]->(:Round {round: 'Final'})
       OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(:Winner)-[:SCORED]->(w:Best3 | Best5)
       OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(:Loser)-[:SCORED]->(l:Best3 | Best5)
-      WITH p, y, c, COUNT(DISTINCT(t)) AS titles, COUNT(DISTINCT(w)) AS wins, COUNT(DISTINCT(l)) AS losses
+      WITH p, y, COUNT(DISTINCT(t)) AS titles, COUNT(DISTINCT(w)) AS wins, COUNT(DISTINCT(l)) AS losses
       RETURN {
         wins: toString(wins),
         losses: toString(losses),
@@ -29,12 +28,11 @@ export default defineEventHandler(async query => {
   const { records: p2Details } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (p:Player {id: $id})
-      MATCH (p)-[:REPRESENTS]->(c)
       OPTIONAL MATCH (p)-[:TURNED_PRO]->(y:Year)
       OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(:Winner)-[:SCORED]->(t:Match)-[:PLAYED]->(:Round {round: 'Final'})
       OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(:Winner)-[:SCORED]->(w:Best3 | Best5)
       OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(:Loser)-[:SCORED]->(l:Best3 | Best5)
-      WITH p, y, c, COUNT(DISTINCT(t)) AS titles, COUNT(DISTINCT(w)) AS wins, COUNT(DISTINCT(l)) AS losses
+      WITH p, y, COUNT(DISTINCT(t)) AS titles, COUNT(DISTINCT(w)) AS wins, COUNT(DISTINCT(l)) AS losses
       RETURN {
         wins: toString(wins),
         losses: toString(losses),

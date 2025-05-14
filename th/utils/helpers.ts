@@ -9,7 +9,6 @@ export const decodeName = (name: string) => name?.replace?.(/_/g, " ") ?? ""
 
 export const encodeName = (name: string) => name.replace(/ /g, "_")
 
-export const handedness = (handedness: boolean) =>
-  handedness === true ? "Right-Handed" : handedness === false ? "Left-Handed" : "Unknown"
+export const handedness = (handedness: boolean) => (handedness === true ? "Right-Handed" : handedness === false ? "Left-Handed" : "Unknown")
 
 export const percentage = (value1: number, value2: number) => Math.round((value1 / value2) * 100)

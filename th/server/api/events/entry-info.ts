@@ -1,5 +1,5 @@
 export default defineEventHandler(async query => {
-  const { eid } = getQuery<{ eid: string }>(query)
+  const { id } = getQuery<{ id: string }>(query)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
@@ -141,7 +141,7 @@ export default defineEventHandler(async query => {
       ] as result
       RETURN [entry in result WHERE entry.content <> []] as entryInfo
     `,
-    { id: parseInt(eid) }
+    { id: parseInt(id) }
   )
 
   const results = records[0].toObject()

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ message?: string; icon?: string }>()
+defineProps<{ message: string; icon?: string }>()
 
 const appConfig = useAppConfig()
 </script>

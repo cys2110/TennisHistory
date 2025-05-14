@@ -29,14 +29,7 @@ const matchedDraws: Record<string, DrawType[]> = {
   "laver-cup-draw": ["Laver Cup"],
   event: ["Round of 128", "Round of 64", "Round of 32", "Round robin", "Laver Cup"],
   "country-event": ["Country draw"],
-  results: [
-    "Round of 128",
-    "Round of 64",
-    "Round of 32",
-    "Round robin",
-    "Laver Cup",
-    "Country draw"
-  ]
+  results: ["Round of 128", "Round of 64", "Round of 32", "Round robin", "Laver Cup", "Country draw"]
 }
 
 const showButton = (page: string) => {

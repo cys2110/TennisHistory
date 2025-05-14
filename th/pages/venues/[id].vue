@@ -7,11 +7,27 @@ const route = useRoute()
 const toast = useToast()
 const { viewMode } = useViewMode()
 const name = computed(() => decodeName(route.params.id as string))
+const venueName = ref<string>("")
+
+const skip = ref(0)
+const events = ref<EventCardType[]>([])
+const dateSort = ref<"ASC" | "DESC">("ASC")
+
+interface APIResponseType {
+  count: number
+  events: EventCardType[]
+}
 
 // API call
-const { data: events, status } = await useFetch<EventCardType[]>("/api/venues/venue-details", {
-  query: { id: name },
-  default: () => [],
+const { data, status, execute } = await useFetch<APIResponseType>("/api/venues/details", {
+  query: { id: name, skip, dateSort },
+  default: () => ({ count: 0, events: [] }),
+  lazy: true,
+  immediate: false,
+  onResponse: ({ response }) => {
+    events.value = [...events.value, ...(response._data.events || [])]
+    venueName.value = response._data.events[0].venues[0].name
+  },
   onResponseError: ({ error }) => {
     toast.add({
       title: `Error fetching events which took place at ${name.value}`,
@@ -23,34 +39,33 @@ const { data: events, status } = await useFetch<EventCardType[]>("/api/venues/ve
   }
 })
 
-useHead({ title: events.value[0].venues[0].name, templateParams: { subPage: "Venues" } })
+useHead({ title: () => venueName.value, templateParams: { subPage: "Venues" } })
 
 // Breadcrumbs
-const breadcrumbs = computed(() => [
-  { label: "Home", to: { name: "home" }, icon: ICONS.home },
-  { label: "Venues", to: { name: "venues" }, icon: ICONS.venue },
-  {
-    label: events.value?.[0].venues[0].country.name ?? "Loading...",
-    to: { name: "country", params: { id: events.value?.[0].venues[0].country.alpha2 } },
-    icon: events.value?.[0].venues[0].country.alpha2
-      ? `flag:${events.value?.[0].venues[0].country.alpha2}-4x3`
-      : `flags:${events.value?.[0].venues[0].country.id}`
-  },
-  {
-    label: events.value?.[0].venues[0].city ?? "Loading..."
-  },
-  {
-    label: events.value?.[0].venues[0].name ?? name.value
-  }
-])
+const breadcrumbs = computed(() => {
+  if (data.value.events[0]) {
+    const venue = data.value?.events[0]?.venues[0]
 
-// Anchor links
-const links = computed(() => {
-  if (events.value)
-    return events.value.map(event => ({
-      to: "#event-" + event.id,
-      label: event.tournament.name + " " + event.year
-    }))
+    return [
+      { label: "Home", to: { name: "home" }, icon: ICONS.home },
+      { label: "Venues", to: { name: "venues" }, icon: ICONS.venue },
+      {
+        label: venue.country.name ?? "Loading...",
+        to: { name: "country", params: { id: venue.country.alpha2 } },
+        icon: venue.country.alpha2 ? `flag:${venue.country.alpha2}-4x3` : `flags:${venue.country.id}`
+      },
+      { label: venue.city ?? "Loading..." },
+      { label: venue.name ?? name.value }
+    ]
+  }
+  return []
+})
+
+execute()
+
+watch([dateSort], () => {
+  skip.value = 0
+  events.value = []
 })
 </script>
 
@@ -66,47 +81,29 @@ const links = computed(() => {
           <template #title>
             <u-breadcrumb :items="breadcrumbs" />
           </template>
-
-          <template #right>
-            <!--TOC-->
-            <ClientOnly>
-              <u-dropdown-menu
-                v-if="viewMode === 'cards'"
-                :items="links"
-              >
-                <u-button
-                  :icon="ICONS.toc"
-                  color="neutral"
-                  variant="link"
-                  size="xl"
-                />
-              </u-dropdown-menu>
-            </ClientOnly>
-          </template>
         </u-dashboard-navbar>
 
         <u-dashboard-toolbar>
-          <div class="text-(--ui-text-muted) text-sm font-semibold">
+          <div class="text-(--ui-text-muted) text-sm font-semibold mx-auto">
             Events which took place at
-            {{
-              events?.[0].venues[0].name
-                ? `${events?.[0].venues[0].name}, ${events?.[0].venues[0].city}`
-                : events?.[0].venues[0].city
-            }}
+            {{ venueName ? `${venueName}, ${events?.[0]?.venues[0].city}` : events?.[0]?.venues[0].city }}
           </div>
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
-        <ClientOnly>
-          <component
-            :is="viewMode === 'cards' ? EventsGrid : EventsTable"
-            :key="viewMode"
-            :events
-            :status
-            :value="`${events?.[0].venues[0].name}, ${events?.[0].venues[0].city}`"
-          />
-        </ClientOnly>
+        <component
+          :is="viewMode === 'cards' ? EventsGrid : EventsTable"
+          :key="viewMode"
+          v-model="skip"
+          v-model:date-sort="dateSort"
+          :events
+          :status
+          :count="data?.count ?? 0"
+          :value="
+            events?.[0]?.venues[0].name ? `${events?.[0]?.venues[0].name}, ${events?.[0]?.venues[0].city}` : events?.[0]?.venues[0].city ?? name
+          "
+        />
       </template>
     </u-dashboard-panel>
   </div>

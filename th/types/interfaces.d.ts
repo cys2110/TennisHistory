@@ -44,7 +44,9 @@ declare global {
   }
 
   interface GamesSetsLostInterface {
+    id: string
     year: number
+    draw_type: DrawType
     player: Pick<PlayerInterface, "id" | "name" | "country">
     sets_won: number
     sets_lost: number
@@ -56,6 +58,7 @@ declare global {
 
   interface HistoricalPMInterface {
     year: number
+    id: number
     pm: number
     R128?: number
     R64?: number
@@ -64,6 +67,7 @@ declare global {
     QF: number
     SF: number
     F: number
+    W: number
     currency: CurrencyType
     yoy: string
   }
@@ -81,21 +85,12 @@ declare global {
     group: string | null
     id: string
     incomplete: IncompleteType | null
-    loser: Pick<
-      EntryInterface,
-      "id" | "name" | "country" | "seed" | "status" | "sets" | "tbs" | "incomplete"
-    >
+    loser: Pick<EntryInterface, "id" | "name" | "country" | "seed" | "status" | "sets" | "tbs" | "incomplete">
     match_no: string
     max_speed: number[]
     net: number[]
-    p1: Pick<
-      EntryInterface,
-      "id" | "name" | "country" | "seed" | "status" | "rank" | "sets" | "tbs" | "incomplete"
-    >
-    p2: Pick<
-      EntryInterface,
-      "id" | "name" | "country" | "seed" | "status" | "rank" | "sets" | "tbs" | "incomplete"
-    >
+    p1: Pick<EntryInterface, "id" | "name" | "country" | "seed" | "status" | "rank" | "sets" | "tbs" | "incomplete">
+    p2: Pick<EntryInterface, "id" | "name" | "country" | "seed" | "status" | "rank" | "sets" | "tbs" | "incomplete">
     ret1: number[]
     ret2: number[]
     round: RoundType
@@ -120,10 +115,12 @@ declare global {
     countries: (CountryInterface & { dates: string })[]
     dob: string | null
     dod: string | null
+    first_name: string
     gladiator: boolean
     height: number | null
     hof: string | null
     id: string
+    last_name: string
     losses: number
     min_year: number | null
     max_year: number | null
@@ -174,10 +171,11 @@ declare global {
     age: string
     player: PlayerInterface
     year: string
+    id: string
   }
 
   interface WLIndexInterface {
-    category: CategoryEnum
+    category: string
     stat: string
     wins: number
     losses: number

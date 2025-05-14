@@ -23,7 +23,7 @@ export default defineAppConfig({
       copy: "i-lucide-copy",
       copyCheck: "i-lucide-copy-check",
       dark: "line-md:moon-rising-twotone-alt-loop",
-      ellipsis: "i-lucide-ellipsis",
+      ellipsis: "ion:ellipsis-vertical-circle-outline",
       error: "line-md:close-circle-twotone",
       external: "line-md:external-link-rounded",
       eye: "line-md:watch-twotone",
@@ -93,6 +93,12 @@ export default defineAppConfig({
       },
       compoundVariants: [
         {
+          color: "primary",
+          variant: "subtle",
+          class:
+            "dark:ring-primary-400/50 dark:hover:bg-primary-400/15 dark:text-primary-400 hover:shadow-sm hover:shadow-primary-800 dark:hover:shadow-primary-500"
+        },
+        {
           color: "secondary",
           variant: "subtle",
           class:
@@ -102,6 +108,17 @@ export default defineAppConfig({
       defaultVariants: {
         color: "secondary",
         variant: "subtle"
+      }
+    },
+    checkboxGroup: {
+      slots: {
+        legend: "font-semibold",
+        item: "cursor-pointer"
+      }
+    },
+    checkbox: {
+      slots: {
+        base: "cursor-pointer"
       }
     },
     select: {
@@ -149,8 +166,8 @@ export default defineAppConfig({
     },
     switch: {
       slots: {
-        base: "data-[state=unchecked]:bg-emerald-500 data-[state=unchecked]:dark:bg-emerald-800 cursor-pointer",
-        icon: "group-data-[state=unchecked]:text-emerald-700"
+        base: "data-[state=checked]:bg-cyan-300 data-[state=unchecked]:dark:bg-cyan-600 cursor-pointer",
+        icon: "group-data-[state=unchecked]:text-cyan-300"
       },
       defaultVariants: {
         color: "secondary",
@@ -160,7 +177,8 @@ export default defineAppConfig({
     table: {
       slots: {
         th: "text-center text-xs md:text-sm lg:text-md",
-        td: "text-center text-xs md:text-sm lg:text-md p-2"
+        td: "text-center text-xs md:text-sm lg:text-md p-2",
+        loading: "flex flex-col gap-4"
       },
       defaultVariants: {
         loadingColor: "secondary",
@@ -233,6 +251,15 @@ export default defineAppConfig({
         input: "[&>input]:h-10",
         item: "cursor-pointer"
       }
+    },
+    badge: {
+      compoundVariants: [
+        {
+          color: "primary",
+          variant: "outline",
+          class: "text-primary-600 dark:text-primary-300 ring-primary-600/50 dark:ring-primary-400/50"
+        }
+      ]
     }
   },
   uiPro: {
@@ -249,7 +276,7 @@ export default defineAppConfig({
     },
     dashboardToolbar: {
       slots: {
-        root: "py-2 flex-wrap"
+        root: "py-2 flex-wrap gap-x-6 xl:gap-x-2"
       }
     },
     error: {
@@ -305,11 +332,6 @@ export default defineAppConfig({
       }
     },
     prose: {
-      field: {
-        slots: {
-          name: "text-secondary"
-        }
-      },
       badge: {
         base: "rounded-lg"
       }

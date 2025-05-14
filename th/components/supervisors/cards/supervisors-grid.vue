@@ -1,82 +1,50 @@
 <script setup lang="ts">
-defineProps<{ breadcrumbs: BreadcrumbType[] }>()
-const appConfig = useAppConfig()
-const toast = useToast()
+const { supervisors, count, status } = defineProps<{
+  supervisors: string[]
+  status: APIStatusType
+  count: number
+}>()
 
-const selectedLetter = ref<string>("All")
-const page = ref(1)
-const pageSize = ref(25)
+const skip = defineModel<number>({ default: 0 })
 
-// API call
-const { data, status } = useFetch<SupervisorsAPIResponseType>("/api/supervisors", {
-  query: computed(() => ({
-    letter: selectedLetter.value,
-    skip: (page.value - 1) * pageSize.value,
-    limit: pageSize.value
-  })),
-  default: () => ({ count: 0, supervisors: [] }),
-  onResponseError: ({ error }) => {
-    toast.add({
-      title: "Error fetching supervisors",
-      description: error?.message,
-      icon: appConfig.ui.icons.error,
-      color: "error"
-    })
-    showError(error!)
-  }
+const grid = useTemplateRef<ComponentPublicInstance>("grid")
+
+onMounted(async () => {
+  useInfiniteScroll(
+    grid.value?.$el,
+    () => {
+      skip.value += 25
+    },
+    {
+      distance: 90,
+      canLoadMore: () => status !== "pending" && supervisors.length < count
+    }
+  )
 })
 </script>
 
 <template>
-  <div class="w-full">
-    <u-dashboard-panel>
-      <template #header>
-        <u-dashboard-navbar>
-          <template #leading>
-            <u-dashboard-sidebar-collapse />
-          </template>
+  <u-page-grid
+    v-if="supervisors.length || ['pending', 'idle'].includes(status)"
+    ref="grid"
+    class="max-h-155 overflow-y-auto pt-10 px-4 pb-2"
+  >
+    <base-card
+      v-if="supervisors.length"
+      v-for="supervisor in supervisors"
+      :key="supervisor"
+      type="supervisor"
+      :id="supervisor"
+    />
 
-          <template #title>
-            <u-breadcrumb :items="breadcrumbs" />
-          </template>
-          <template #right>
-            <set-page-size v-model="pageSize" />
-          </template>
-        </u-dashboard-navbar>
-
-        <u-dashboard-toolbar>
-          <letters-radio-group v-model="selectedLetter" />
-        </u-dashboard-toolbar>
-      </template>
-
-      <template #body>
-        <error-message
-          v-if="status === 'error' || !data.count"
-          title="No supervisors found"
-        />
-        <u-page-grid v-else>
-          <base-card
-            v-if="data.count"
-            v-for="supervisor in data.supervisors"
-            :key="supervisor"
-            type="supervisor"
-            :id="supervisor"
-          />
-
-          <base-loading-card
-            v-else
-            v-for="_ in 15"
-            :key="_"
-          />
-        </u-page-grid>
-
-        <pagination-component
-          v-if="data.count"
-          v-model="page"
-          :total="data.count"
-          :page-size="pageSize"
-        />
-      </template>
-    </u-dashboard-panel>
-  </div>
+    <base-loading-card
+      v-else
+      v-for="_ in 15"
+      :key="_"
+    />
+  </u-page-grid>
+  <error-message
+    v-else
+    message="No supervisors found"
+  />
 </template>

@@ -2,132 +2,71 @@
 import { BaseLink, UButton } from "#components"
 import type { TableColumn } from "@nuxt/ui"
 
-defineProps<{ breadcrumbs: BreadcrumbType[] }>()
-const appConfig = useAppConfig()
-const toast = useToast()
+const { supervisors, count, status } = defineProps<{
+  supervisors: string[]
+  status: APIStatusType
+  count: number
+}>()
 
-const skip = ref(0)
-const sort = ref<"ASC" | "DESC">("ASC")
-const supervisors = ref<string[]>([]) // Initialise supervisors for infinite scroll table
+const skip = defineModel<number>({ default: 0 })
+const sort = defineModel<"ASC" | "DESC" | undefined>("sort", { default: undefined })
 
-// API call
-const { data, status, execute } = await useFetch<SupervisorsAPIResponseType>(
-  "/api/supervisors/list",
-  {
-    query: { skip, sort },
-    default: () => ({ count: 0, supervisors: [] }),
-    lazy: true,
-    immediate: false,
-    onResponse: ({ response }) => {
-      // Concatenate supervisors for infinite scroll table
-      supervisors.value = [...supervisors.value, ...(response._data.supervisors || [])]
+const table = useTemplateRef<ComponentPublicInstance>("table")
+
+onMounted(async () => {
+  useInfiniteScroll(
+    table.value?.$el,
+    () => {
+      skip.value += 25
     },
-    onResponseError: ({ error }) => {
-      toast.add({
-        title: "Error fetching supervisors",
-        description: error?.message,
-        icon: appConfig.ui.icons.error,
-        color: "error"
-      })
-      showError(error!)
+    {
+      distance: 150,
+      canLoadMore: () => status !== "pending" && supervisors.length < count
     }
-  }
-)
+  )
+})
 
 const columns: TableColumn<string>[] = [
   {
     id: "supervisor",
-    header: ({ column }) => {
-      const isSorted = column.getIsSorted()
-
-      return h(UButton, {
+    header: () =>
+      h(UButton, {
         color: "neutral",
         variant: "link",
         label: "Supervisors",
-        icon: isSorted === "asc" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown,
+        icon: sort.value ? (sort.value === "ASC" ? ICONS.sortAlphaUp : ICONS.sortAlphaDown) : ICONS.sortAlpha,
         onClick: () => {
-          supervisors.value = []
           sort.value = sort?.value === "ASC" ? "DESC" : "ASC"
         },
         class: "-mx-2.5 font-semibold text-(--ui-text)"
-      })
-    },
-    cell: ({ row }) => {
-      return h(BaseLink, {
-        label: row.original,
+      }),
+    cell: ({ row }) =>
+      h(BaseLink, {
         type: "supervisor",
         id: row.original
       })
-    }
   }
 ]
-
-execute()
-
-const table = useTemplateRef<ComponentPublicInstance>("table")
-
-const hydrated = ref(false)
-
-onMounted(async () => {
-  hydrated.value = true
-  await nextTick()
-
-  if (table.value?.$el) {
-    useInfiniteScroll(
-      table.value.$el,
-      () => {
-        skip.value += 25
-      },
-      {
-        distance: 200,
-        canLoadMore: () => status.value !== "pending" || supervisors.value.length < data.value.count
-      }
-    )
-  } else {
-    console.warn("Table element not ready for infinite scroll")
-  }
-})
 </script>
 
 <template>
-  <div class="w-full">
-    <u-dashboard-panel>
-      <template #header>
-        <u-dashboard-navbar>
-          <template #leading>
-            <u-dashboard-sidebar-collapse />
-          </template>
-
-          <template #title>
-            <u-breadcrumb :items="breadcrumbs" />
-          </template>
-        </u-dashboard-navbar>
-      </template>
-
-      <template #body>
-        <u-table
-          ref="table"
-          :data="supervisors"
-          :columns="hydrated ? columns : []"
-          class="max-h-200 min-w-2/3 md:min-w-1/2 lg:min-w-1/4 mx-auto"
-          :loading="['pending', 'idle'].includes(status)"
-          sticky
-          :key="`${hydrated ? 'hydrated' : 'loading'}`"
-        >
-          <template #loading>
-            <div class="flex flex-col gap-4">
-              <div
-                v-for="_ in 6"
-                :key="_"
-                class="flex gap-8"
-              >
-                <u-skeleton class="h-4 w-full rounded-lg" />
-              </div>
-            </div>
-          </template>
-          <template #empty> No supervisors found </template>
-        </u-table>
-      </template>
-    </u-dashboard-panel>
-  </div>
+  <u-table
+    ref="table"
+    :data="supervisors"
+    :columns
+    class="max-h-200 min-w-2/3 md:min-w-1/2 lg:min-w-1/4 mx-auto"
+    :loading="['pending', 'idle'].includes(status)"
+    sticky
+  >
+    <template #loading>
+      <div
+        v-for="_ in 6"
+        :key="_"
+        class="flex gap-8"
+      >
+        <u-skeleton class="h-4 w-full rounded-lg" />
+      </div>
+    </template>
+    <template #empty> No supervisors found </template>
+  </u-table>
 </template>

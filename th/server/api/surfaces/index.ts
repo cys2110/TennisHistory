@@ -1,34 +1,34 @@
 export default defineEventHandler(async query => {
   interface QueryProps {
-    letter: string
+    envSort: "ASC" | "DESC" | undefined
     skip: string
-    limit: string
+    surfaceSort: "ASC" | "DESC" | undefined
   }
 
-  const { letter, skip, limit } = getQuery<QueryProps>(query)
+  const { envSort, skip, surfaceSort } = getQuery<QueryProps>(query)
+
+  const sort = envSort ? `s.environment ${envSort}, s.surface` : `s.surface ${surfaceSort}, s.environment`
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (s:Surface)
-        WHERE $letter IS NULL OR s.surface STARTS WITH $letter
       WITH s
-        ORDER BY s.surface, s.environment
+        ORDER BY ${sort}
       WITH CASE
-        WHEN s IS NULL THEN null
+        WHEN s IS NULL THEN NULL
         ELSE {id: s.id, environment: s.environment, surface: s.surface}
       END AS surface
-      WITH COLLECT(surface) AS all, COUNT(surface) AS count
-      WITH all[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS surfaces, count
+      WITH COLLECT(surface) AS surfaces, COUNT(surface) AS count
+      WITH surfaces[toInteger($skip)..toInteger($skip) + 25] AS surfaces, count
       RETURN toString(count) AS count, surfaces
     `,
-    { letter: letter === "All" ? null : letter, skip, limit }
+    { skip }
   )
 
-  const count = records[0].get("count")
-  const surfaces = records[0].get("surfaces")
+  const results = records[0].toObject()
 
   return {
-    count: Number(count),
-    surfaces
+    count: Number(results.count),
+    surfaces: results.surfaces.filter(Boolean)
   }
 })

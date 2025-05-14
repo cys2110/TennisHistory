@@ -1,24 +1,27 @@
 <script setup lang="ts">
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
 const md = breakpoints.md
-const lgAndUp = breakpoints.greaterOrEqual("lg")
+const xlAndUp = breakpoints.greaterOrEqual("xl")
 const modelValue = defineModel<SurfaceEnum[]>()
+const environment = defineModel<("Indoor" | "Outdoor")[]>("env")
 </script>
 
 <template>
   <u-form-field
-    label="Surfaces"
-    :size="lgAndUp ? 'md' : md ? 'sm' : 'xs'"
+    label="Environment"
+    :size="xlAndUp ? 'md' : md ? 'sm' : 'xs'"
   >
-    <template
-      #hint
-      v-if="lgAndUp"
-    >
-      <u-kbd value="meta" />
-      <u-kbd value="shift" />
-      <u-kbd value="s" />
-    </template>
-
+    <u-select
+      v-model="environment"
+      multiple
+      :items="['Indoor', 'Outdoor']"
+      placeholder="Select environment"
+    />
+  </u-form-field>
+  <u-form-field
+    label="Surfaces"
+    :size="xlAndUp ? 'md' : md ? 'sm' : 'xs'"
+  >
     <u-select
       v-model="modelValue"
       multiple

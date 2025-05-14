@@ -1,35 +1,60 @@
 <script setup lang="ts">
-defineProps<{
-  city: { city: string; country: CountryInterface; venues: Pick<VenueInterface, "id" | "name">[] }
-}>()
+type CountryType = {
+  country: CountryInterface
+  cities: {
+    city: string
+    venues: Pick<VenueInterface, "id" | "name">[]
+  }[]
+}
+
+const { venue } = defineProps<{ venue: CountryType }>()
 </script>
 
 <template>
   <u-page-card
     highlight
-    :ui="{ description: 'flex flex-col gap-1 text-sm', title: 'flex items-center gap-2' }"
+    :icon="venue.country.alpha2 ? `flag:${venue.country.alpha2}-4x3` : `flags:${venue.country.id}`"
+    :ui="{ body: 'w-full' }"
   >
-    <template #leading>
-      <country-link :country="city.country" />
-    </template>
     <template #title>
       <base-link
-        v-if="city.venues.some(venue => !venue.name)"
-        class="hover-link w-fit"
-        :id="city.city"
-        type="venue"
-      />
-      <template v-else>{{ city.city }}</template>
+        type="country"
+        :id="venue.country.id"
+      >
+        {{ venue.country.name }}
+      </base-link>
     </template>
     <template #description>
-      <base-link
-        v-for="venue in city.venues"
-        :key="venue.id"
-        type="venue"
-        :id="venue.id"
-      >
-        {{ venue.name }}
-      </base-link>
+      <u-page-columns class="w-full">
+        <u-page-feature
+          v-for="city in venue.cities"
+          :key="city.city"
+          :ui="{ title: 'text-sm' }"
+        >
+          <template #title>
+            <base-link
+              v-if="city.venues.some(venue => !venue.name)"
+              type="venue"
+              :id="city.city"
+            />
+            <template v-else>{{ city.city }}</template>
+          </template>
+
+          <template #description>
+            <div class="flex flex-col gap-1">
+              <base-link
+                v-for="venue in city.venues"
+                :key="venue.id"
+                type="venue"
+                :id="venue.id"
+                class="text-sm"
+              >
+                {{ venue.name }}
+              </base-link>
+            </div>
+          </template>
+        </u-page-feature>
+      </u-page-columns>
     </template>
   </u-page-card>
 </template>

@@ -2,42 +2,52 @@ export default defineEventHandler(async query => {
   interface QueryProps {
     letter: string
     skip: string
-    limit: string
+    sort: "ASC" | "DESC"
   }
-  const { letter, skip, limit } = getQuery<QueryProps>(query)
+  const { letter, skip, sort } = getQuery<QueryProps>(query)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (v:Venue)
-        WHERE $letter IS NULL OR v.city STARTS WITH $letter
-      WITH v
-        ORDER BY v.city
-      WITH COLLECT(DISTINCT v.city) AS cities, COUNT(DISTINCT v.city) AS count
-      WITH cities[toInteger($skip)..toInteger($skip) + toInteger($limit)] AS sliced, count
-      UNWIND CASE WHEN sliced = [] THEN [] ELSE sliced END AS c
-      MATCH (v:Venue {city: c})-[:LOCATED_IN]->(x:Country)
-      WITH v, x, c, count
-        ORDER BY v.name
-      WITH c, x, COLLECT({name: v.name, id: v.id}) AS venues, count
-      RETURN toString(count) AS count,
+    MATCH (v:Venue)-[:LOCATED_IN]->(c:Country)
+    WHERE $letter IS NULL OR c.name STARTS WITH $letter
+    WITH DISTINCT c
+    ORDER BY c.name ${sort}
+    WITH COLLECT(c) AS countries, COUNT(c) AS count
+    WITH countries[toInteger($skip)..toInteger($skip) + 25] AS countries, count
+    UNWIND
       CASE
-        WHEN c IS NOT NULL THEN {
-          city: c,
-          venues: venues,
-          country: {
-            id: x.id,
-            name: x.name,
-            alpha2: x.alpha2
-          }
-        }
-        ELSE NULL
-      END AS city
+        WHEN countries = [] THEN [null]
+        ELSE countries
+      END AS country
+    MATCH (v:Venue)-[:LOCATED_IN]->(country)
+    WITH v, country, count
+    ORDER BY country.name ${sort}, v.city, v.name
+    WITH country, v.city AS city, COLLECT({name: v.name, id: v.id}) AS venues, count
+    WITH country, COLLECT({
+      city: city,
+      venues: venues
+    }) AS cities, count
+    RETURN
+      toString(count) AS count,
+      CASE
+        WHEN
+          country IS NOT NULL
+          THEN
+            {
+              country: {id: country.id, name: country.name, alpha2: country.alpha2},
+              cities: cities
+            }
+        ELSE null
+      END AS country
     `,
-    { letter: letter === "All" ? null : letter, skip, limit }
+    { letter: letter === "All" ? null : letter, skip }
   )
 
   const count = records[0].get("count")
-  const cities = records.map(record => record.get("city"))
+  const countries = records.map(record => record.get("country"))
 
-  return { count: Number(count), cities: cities.filter(city => city !== null) }
+  return {
+    count: Number(count),
+    countries: countries.filter(Boolean)
+  }
 })

@@ -15,8 +15,7 @@ export default defineEventHandler(async query => {
     { id }
   )
 
-  return {
-    gladiator: records[0].get("gladiator"),
-    country: records[0].get("country")
-  }
+  const results = records[0].toObject()
+
+  return results
 })

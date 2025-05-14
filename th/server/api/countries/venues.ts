@@ -1,20 +1,35 @@
 export default defineEventHandler(async query => {
-  const { id } = getQuery<{ id: string }>(query)
+  interface QueryProps {
+    id: string
+    skip: string
+    sort: "ASC" | "DESC"
+  }
+
+  const { id, sort, skip } = getQuery<QueryProps>(query)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       OPTIONAL MATCH (c:Country {id: $id})<-[:LOCATED_IN]-(v:Venue)
-      WITH v, c
-      ORDER BY v.city
-      RETURN CASE
-        WHEN v IS NOT NULL THEN {id: v.id, name: v.name, city: v.city, country: {id: c.id, name: c.name, alpha2: c.alpha2}}
+      WITH *
+      ORDER BY v.city ${sort}
+      WITH CASE
+        WHEN
+          v IS NOT NULL
+          THEN {id: v.id, name: v.name, city: v.city, country: {id: c.id, name: c.name, alpha2: c.alpha2}}
         ELSE NULL
       END AS venue
+      WITH COLLECT(venue) AS venues, COUNT(venue) AS count
+      WITH venues[toInteger($skip)..toInteger($skip) + 25] AS venues, count
+      RETURN toString(count) AS count, venues
+
     `,
-    { id }
+    { id, skip }
   )
 
-  const venues = records.map(record => record.get("venue"))
+  const results = records[0].toObject()
 
-  return venues.filter(venue => venue !== null)
+  return {
+    count: Number(results.count),
+    venues: results.venues.filter(Boolean)
+  }
 })

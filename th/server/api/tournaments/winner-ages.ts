@@ -8,7 +8,7 @@ export default defineEventHandler(async query => {
       WITH p, y, e, c, duration.between(p.dob, e.end_date) AS age
       ORDER BY age
 
-      RETURN {age: apoc.temporal.format(age, "y 'years,' M 'months,' d 'days'"), player: {id: p.id, name: p.first_name || ' ' || p.last_name, country: {id: c.id, name: c.name, alpha2: c.alpha2}}, year: toString(y.id)} AS winner
+      RETURN {age: apoc.temporal.format(age, "y 'years,' M 'months,' d 'days'"), player: {id: p.id, name: p.first_name || ' ' || p.last_name, country: {id: c.id, name: c.name, alpha2: c.alpha2}}, year: toString(y.id), id: toString(e.id)} AS winner
     `,
     { id: Number(id) }
   )

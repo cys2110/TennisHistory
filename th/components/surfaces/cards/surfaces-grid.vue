@@ -1,81 +1,50 @@
 <script setup lang="ts">
-defineProps<{ breadcrumbs: BreadcrumbType[] }>()
-const appConfig = useAppConfig()
-const toast = useToast()
+const { surfaces, count, status } = defineProps<{
+  surfaces: SurfaceInterface[]
+  status: APIStatusType
+  count: number
+}>()
 
-const selectedLetter = ref<string>("All")
-const page = ref(1)
-const pageSize = ref(25)
+const skip = defineModel<number>({ default: 0 })
 
-// API call
-const { data, status } = useFetch<SurfacesAPIResponseType>("/api/surfaces", {
-  query: computed(() => ({
-    letter: selectedLetter.value,
-    skip: (page.value - 1) * pageSize.value,
-    limit: pageSize.value
-  })),
-  default: () => ({ count: 0, surfaces: [] }),
-  onResponseError: ({ error }) => {
-    toast.add({
-      title: "Error fetching surfaces",
-      description: error?.message,
-      icon: appConfig.ui.icons.error,
-      color: "error"
-    })
-    showError(error!)
-  }
+const grid = useTemplateRef<ComponentPublicInstance>("grid")
+
+onMounted(async () => {
+  useInfiniteScroll(
+    grid.value?.$el,
+    () => {
+      skip.value += 25
+    },
+    {
+      distance: 90,
+      canLoadMore: () => status !== "pending" && surfaces.length < count
+    }
+  )
 })
 </script>
 
 <template>
-  <div class="w-full">
-    <u-dashboard-panel>
-      <template #header>
-        <u-dashboard-navbar>
-          <template #leading>
-            <u-dashboard-sidebar-collapse />
-          </template>
+  <error-message
+    v-if="status === 'error' || !count"
+    message="No surfaces found"
+  />
+  <u-page-grid
+    v-else
+    ref="grid"
+    class="max-h-155 overflow-y-auto pt-10 px-4 pb-2"
+  >
+    <base-card
+      v-if="count"
+      v-for="surface in surfaces"
+      :key="surface.id"
+      type="surface"
+      :surface
+    />
 
-          <template #title>
-            <u-breadcrumb :items="breadcrumbs" />
-          </template>
-          <template #right>
-            <set-page-size v-model="pageSize" />
-          </template>
-        </u-dashboard-navbar>
-
-        <u-dashboard-toolbar>
-          <letters-radio-group v-model="selectedLetter" />
-        </u-dashboard-toolbar>
-      </template>
-
-      <template #body>
-        <error-message
-          v-if="status === 'error' || !data.count"
-          title="No surfaces found"
-        />
-        <u-page-grid v-else>
-          <base-card
-            v-if="data.count"
-            v-for="surface in data.surfaces"
-            :key="surface.id"
-            type="surface"
-            :surface
-          />
-
-          <base-loading-card
-            v-else
-            v-for="_ in 15"
-            :key="_"
-          />
-        </u-page-grid>
-        <pagination-component
-          v-if="data.count"
-          v-model="page"
-          :total="data.count"
-          :page-size="pageSize"
-        />
-      </template>
-    </u-dashboard-panel>
-  </div>
+    <base-loading-card
+      v-else
+      v-for="_ in 15"
+      :key="_"
+    />
+  </u-page-grid>
 </template>

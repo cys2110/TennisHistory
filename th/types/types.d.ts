@@ -1,14 +1,15 @@
 declare global {
+  type APIStatusType = "success" | "pending" | "idle" | "error"
+
+  type BreadcrumbType = {
+    label: string
+    to?: { name: string }
+    icon?: string
+  }
+
   type CurrencyType = "USD" | "EUR" | "GBP" | "AUD" | "FRF"
 
-  type DrawType =
-    | "Round of 128"
-    | "Round of 64"
-    | "Round of 32"
-    | "Round of 16"
-    | "Round robin"
-    | "Laver Cup"
-    | "Country draw"
+  type DrawType = "Round of 128" | "Round of 64" | "Round of 32" | "Round of 16" | "Round robin" | "Laver Cup" | "Country draw"
 
   type IncompleteType = "B" | "R" | "Def" | "WO"
 
@@ -31,30 +32,13 @@ declare global {
 
   // Consolidated types
 
-  type APIStatusType = "success" | "pending" | "idle" | "error"
-
-  type BreadcrumbType = {
-    label: string
-    to?: { name: string }
-    icon?: string
-  }
-
-  type CoachesAPIResponseType = {
-    count: number
-    coaches: (Pick<CoachType, "id" | "name" | "country"> & { labels: string[] })[]
-  }
-
-  type CoachType = Pick<PlayerInterface, "id" | "name"> &
-    Partial<Omit<PlayerInterface, "id" | "name">>
+  type CoachType = Pick<PlayerInterface, "id" | "name" | "first_name" | "last_name"> & Partial<Omit<PlayerInterface, "id" | "name">>
 
   type CountryEntryType = Pick<EntryInterface, "id" | "name" | "last" | "country" | "rank">
 
   type CountryEventType = Pick<EventInterface, "id" | "year" | "c1" | "c2" | "score">
 
-  type DrawMatchType = Pick<
-    MatchInterface,
-    "round" | "match_no" | "incomplete" | "winner_id" | "p1" | "p2"
-  >
+  type DrawMatchType = Pick<MatchInterface, "round" | "match_no" | "incomplete" | "winner_id" | "p1" | "p2">
 
   type EntryInfoType = {
     label: string
@@ -63,22 +47,10 @@ declare global {
 
   type EventCardType = Pick<
     EventInterface,
-    | "year"
-    | "surface"
-    | "id"
-    | "name"
-    | "category"
-    | "venues"
-    | "start_date"
-    | "dates"
-    | "draw_type"
-    | "tournament"
+    "year" | "surface" | "id" | "name" | "category" | "venues" | "start_date" | "dates" | "draw_type" | "tournament"
   >
 
-  type H2HPlayerInterface = Pick<
-    PlayerInterface,
-    "wins" | "losses" | "pm" | "rh" | "bh" | "turned_pro" | "titles" | "dob" | "height" | "ch"
-  >
+  type H2HPlayerInterface = Pick<PlayerInterface, "wins" | "losses" | "pm" | "rh" | "bh" | "turned_pro" | "titles" | "dob" | "height" | "ch">
 
   type MajorResultsType = {
     tournament: Pick<TournamentInterface, "id" | "name">
@@ -116,25 +88,11 @@ declare global {
 
   type PlayerActivityType = Pick<
     EventInterface,
-    | "tournament"
-    | "id"
-    | "name"
-    | "dates"
-    | "category"
-    | "venues"
-    | "surface"
-    | "currency"
-    | "draw_type"
+    "tournament" | "id" | "name" | "dates" | "category" | "venues" | "surface" | "currency" | "draw_type"
   > & {
     player: Pick<EntryInterface, "seed" | "status" | "rank" | "points" | "pm">
-    matches: (Pick<
-      MatchInterface,
-      "round" | "match_no" | "incomplete" | "winner_id" | "sets" | "tbs"
-    > & {
-      opponent: Pick<
-        EntryInterface,
-        "id" | "name" | "country" | "incomplete" | "seed" | "status" | "rank"
-      >
+    matches: (Pick<MatchInterface, "round" | "match_no" | "incomplete" | "winner_id" | "sets" | "tbs"> & {
+      opponent: Pick<EntryInterface, "id" | "name" | "country" | "incomplete" | "seed" | "status" | "rank">
     })[]
   }
 
@@ -165,31 +123,15 @@ declare global {
     suffix?: boolean
   }
 
-  type SeedType = Pick<
-    EntryInterface,
-    "id" | "name" | "country" | "last" | "seed" | "rank" | "rank2" | "withdrew"
-  >
+  type SeedType = Pick<EntryInterface, "id" | "name" | "country" | "last" | "seed" | "rank" | "rank2" | "withdrew">
 
-  type SupervisorsAPIResponseType = {
-    count: number
-    supervisors: string[]
-  }
-
-  type SurfacesAPIResponseType = {
-    count: number
-    surfaces: SurfaceInterface[]
-  }
-
-  type UmpireDetailsType = Pick<EventInterface, "id" | "tournament" | "draw_type" | "year"> & {
-    rounds: {
-      round: RoundType
-      matches: {
-        match_no: string
-        p1: Pick<PlayerInterface, "id" | "name" | "country">
-        p2: Pick<PlayerInterface, "id" | "name" | "country">
-      }[]
+  type TitlesAndFinalsType = Record<
+    "titles" | "finals",
+    {
+      title: string
+      events: EventCardType[]
     }[]
-  }
+  >
 }
 
 export {}

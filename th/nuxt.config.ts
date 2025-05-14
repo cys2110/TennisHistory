@@ -1,16 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
-  devtools: { enabled: false },
-  modules: [
-    "@nuxt/image",
-    "@nuxt/eslint",
-    "nuxt-echarts",
-    "@vueuse/nuxt",
-    "nuxt-neo4j",
-    "@nuxt/ui-pro",
-    "@nuxt/content"
-  ],
+  devtools: { enabled: true },
+  modules: ["@nuxt/eslint", "@nuxt/image", "@vueuse/nuxt", "nuxt-echarts", "nuxt-neo4j", "@nuxt/ui-pro", "@nuxt/content"],
   // Set page transitions
   app: {
     layoutTransition: { name: "layout", mode: "out-in" },
@@ -39,15 +31,12 @@ export default defineNuxtConfig({
       features: { propsDestructure: true }
     }
   },
-  build: {
-    transpile: ["universal-cookie"]
-  },
   // Imports not required
   imports: {
     presets: [
       {
         from: "@vueuse/core",
-        imports: ["breakpointsTailwind", "useBreakpoints", "useInfiniteScroll"]
+        imports: ["breakpointsTailwind", "useBreakpoints", "useInfiniteScroll", "useResizeObserver"]
       },
       {
         from: "@vueuse/router",
@@ -72,14 +61,7 @@ export default defineNuxtConfig({
   echarts: {
     renderer: "canvas",
     charts: ["ScatterChart", "LineChart", "BarChart", "TreeChart", "GaugeChart", "PieChart"],
-    components: [
-      "DatasetComponent",
-      "GridComponent",
-      "TooltipComponent",
-      "LegendComponent",
-      "PolarComponent",
-      "TransformComponent"
-    ],
+    components: ["DatasetComponent", "GridComponent", "TooltipComponent", "LegendComponent", "PolarComponent", "TransformComponent"],
     features: ["UniversalTransition", "LabelLayout"]
   },
   // Nuxt ui configuration

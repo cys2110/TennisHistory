@@ -75,10 +75,7 @@ export default defineEventHandler(async event => {
       }
       WITH e, t, z, f, COLLECT(DISTINCT match) AS matches, locations
       RETURN {
-        tournament: {
-          name: t.name,
-          id: toString(t.id)
-        },
+        tournament: {name: t.name, id: toString(t.id)},
         id: toString(e.id),
         name: e.sponsor_name,
         dates: CASE
@@ -88,7 +85,7 @@ export default defineEventHandler(async event => {
         END,
         category: e.category,
         venues: locations,
-        surface: z.id,
+        surface: {id: z.id, surface: z.surface},
         currency: e.currency,
         matches: matches,
         draw_type: e.draw_type,
