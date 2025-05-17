@@ -1,7 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
   name: "event",
-  layout: "event",
   middleware: [
     function (to, from) {
       if (COUNTRY_DRAWS.includes(to.params.id as string)) return navigateTo({ name: "country-event" })
@@ -12,7 +11,7 @@ const { viewMode } = useViewMode()
 </script>
 
 <template>
-  <div>
+  <event-wrapper>
     <div
       v-if="viewMode === 'cards'"
       class="flex gap-5 flex-col"
@@ -32,5 +31,5 @@ const { viewMode } = useViewMode()
       <entry-info />
     </u-page-columns>
     <entries />
-  </div>
+  </event-wrapper>
 </template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { TitlesStepper, TitlesTable } from "#components"
 
-definePageMeta({ name: "titles-and-finals", layout: false })
+definePageMeta({ name: "titles-and-finals" })
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
@@ -27,25 +27,23 @@ const { data, status } = await useFetch<TitlesAndFinalsType>("/api/players/title
 </script>
 
 <template>
-  <div>
-    <nuxt-layout name="player">
-      <template #toolbar>
-        <u-switch
-          v-model="checked"
-          :checked-icon="ICONS.noTournament"
-          :unchecked-icon="ICONS.tournament"
-          :label="checked ? 'Finals' : 'Titles'"
-          class="ml-auto"
-        />
-      </template>
-
-      <component
-        :is="viewMode === 'cards' ? TitlesStepper : TitlesTable"
-        :key="`${viewMode}-${checked}`"
-        :events="checked ? data.finals : data.titles"
-        :status
-        :checked
+  <player-wrapper>
+    <template #toolbar>
+      <u-switch
+        v-model="checked"
+        :checked-icon="ICONS.noTournament"
+        :unchecked-icon="ICONS.tournament"
+        :label="checked ? 'Finals' : 'Titles'"
+        class="ml-auto"
       />
-    </nuxt-layout>
-  </div>
+    </template>
+
+    <component
+      :is="viewMode === 'cards' ? TitlesStepper : TitlesTable"
+      :key="`${viewMode}-${checked}`"
+      :events="checked ? data.finals : data.titles"
+      :status
+      :checked
+    />
+  </player-wrapper>
 </template>

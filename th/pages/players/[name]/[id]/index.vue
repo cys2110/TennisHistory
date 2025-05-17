@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ name: "player", layout: "player" })
+definePageMeta({ name: "player" })
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
@@ -31,7 +31,7 @@ const { data: player } = await useFetch<Pick<PlayerInterface, "gladiator" | "cou
 </script>
 
 <template>
-  <div>
+  <player-wrapper>
     <u-page-section
       :headline="active ? 'Active' : 'Retired'"
       :title="name"
@@ -75,5 +75,5 @@ const { data: player } = await useFetch<Pick<PlayerInterface, "gladiator" | "cou
       <player-details :active />
       <major-results />
     </div>
-  </div>
+  </player-wrapper>
 </template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { WlIndexGrid, WlIndexTable } from "#components"
 
-definePageMeta({ name: "wl-index", layout: false })
+definePageMeta({ name: "wl-index" })
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
@@ -28,22 +28,20 @@ const { data: index, status } = await useFetch<WLIndexInterface[]>("/api/players
 </script>
 
 <template>
-  <div>
-    <nuxt-layout name="player">
-      <template #toolbar>
-        <wl-index-chart
-          v-if="mdAndUp"
-          :index
-          class="ml-auto"
-        />
-      </template>
-
-      <component
-        :is="viewMode === 'cards' ? WlIndexGrid : WlIndexTable"
-        :key="viewMode"
+  <player-wrapper>
+    <template #toolbar>
+      <wl-index-chart
+        v-if="mdAndUp"
         :index
-        :status
+        class="ml-auto"
       />
-    </nuxt-layout>
-  </div>
+    </template>
+
+    <component
+      :is="viewMode === 'cards' ? WlIndexGrid : WlIndexTable"
+      :key="viewMode"
+      :index
+      :status
+    />
+  </player-wrapper>
 </template>

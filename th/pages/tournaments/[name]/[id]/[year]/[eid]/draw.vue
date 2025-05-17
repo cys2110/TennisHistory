@@ -3,7 +3,6 @@ import { DrawDiagram, DrawTable } from "#components"
 
 definePageMeta({
   name: "draw",
-  layout: "event",
   middleware: [
     function (to, from) {
       if (COUNTRY_DRAWS.includes(to.params.id as string)) {
@@ -18,10 +17,10 @@ const { viewMode } = useViewMode()
 </script>
 
 <template>
-  <div>
+  <event-wrapper>
     <component
       :is="viewMode === 'cards' ? DrawDiagram : DrawTable"
       :key="viewMode"
     />
-  </div>
+  </event-wrapper>
 </template>

@@ -1,12 +1,14 @@
 <script setup lang="ts">
-definePageMeta({ name: "country-draw", layout: "event" })
+definePageMeta({ name: "country-draw" })
 </script>
 
 <template>
-  <u-alert
-    color="success"
-    title="Coming soon!"
-    :icon="ICONS.alert"
-    class="my-auto"
-  />
+  <event-wrapper>
+    <u-alert
+      color="success"
+      title="Coming soon!"
+      :icon="ICONS.alert"
+      class="my-auto"
+    />
+  </event-wrapper>
 </template>

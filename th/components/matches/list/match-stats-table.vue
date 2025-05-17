@@ -34,6 +34,8 @@ const isBold = (row: MatchStatsType, player: string) => {
       } else if (bpsStats.includes(row.label)) {
         if (row.p1_pc === 0 && row.p2_pc !== 0) {
           return true
+        } else if (row.p2_pc === 0) {
+          return false
         } else {
           return row.p1_pc > row.p2_pc
         }
@@ -46,11 +48,13 @@ const isBold = (row: MatchStatsType, player: string) => {
       } else if (bpsStats.includes(row.label)) {
         if (row.p2_pc === 0 && row.p1_pc !== 0) {
           return true
+        } else if (row.p1_pc === 0) {
+          return false
         } else {
           return row.p2_pc > row.p1_pc
         }
       } else {
-        row.p2_pc > row.p1_pc
+        return row.p2_pc > row.p1_pc
       }
   }
 }

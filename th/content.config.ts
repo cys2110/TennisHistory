@@ -17,6 +17,14 @@ export default defineContentConfig({
         title: z.string(),
         years: z.array(z.number())
       })
+    }),
+    events: defineCollection({
+      source: "events/*.md",
+      type: "page"
+    }),
+    players: defineCollection({
+      source: "players/*.md",
+      type: "page"
     })
   }
 })
