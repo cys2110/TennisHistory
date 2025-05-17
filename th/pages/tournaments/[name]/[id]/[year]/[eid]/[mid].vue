@@ -74,9 +74,23 @@ const compoundedStats = computed(() => {
           category: stat.category,
           label: stat.label,
           p1: keyExists.length === 2 ? keyExists[0] : `${keyExists[0]}/${keyExists[1]}`,
-          p1_pc: keyExists.length === 2 ? percentage(keyExists[0], keyExists[0] + keyExists[1]) : percentage(keyExists[0], keyExists[1]),
+          p1_pc:
+            keyExists.length === 2
+              ? keyExists[0] + keyExists[1] === 0
+                ? 0
+                : percentage(keyExists[0], keyExists[0] + keyExists[1])
+              : keyExists[1] === 0
+              ? 0
+              : percentage(keyExists[0], keyExists[1]),
           p2: keyExists.length === 2 ? keyExists[1] : `${keyExists[2]}/${keyExists[3]}`,
-          p2_pc: keyExists.length === 2 ? percentage(keyExists[1], keyExists[0] + keyExists[1]) : percentage(keyExists[2], keyExists[3])
+          p2_pc:
+            keyExists.length === 2
+              ? keyExists[0] + keyExists[1] === 0
+                ? 0
+                : percentage(keyExists[1], keyExists[0] + keyExists[1])
+              : keyExists[3] === 0
+              ? 0
+              : percentage(keyExists[2], keyExists[3])
         }
       } else if (stat.label === "First serve") {
         return {
