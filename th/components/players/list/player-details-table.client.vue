@@ -2,11 +2,11 @@
 import type { TableColumn } from "@nuxt/ui"
 
 const { playerDetails, status, coaches, countries } = defineProps<{
-  playerDetails: ({
+  playerDetails: {
     title: string
     value: any
-    description?: string | null
-  } | null)[]
+    description?: string
+  }[]
   status: APIStatusType
   coaches: PlayerDetailsType["coaches"] | undefined
   countries: PlayerDetailsType["countries"] | undefined
@@ -16,8 +16,8 @@ const route = useRoute()
 const name = computed(() => decodeName(route.params.name as string))
 
 const formattedData = computed(() => {
-  const newArray = playerDetails
   if (playerDetails.length) {
+    const newArray = [...playerDetails]
     if (coaches?.length) newArray.push({ title: coaches.length === 1 ? "Coach" : "Coaches", value: coaches })
     if (countries?.length) newArray.push({ title: "Previous Representations", value: countries })
     return newArray
@@ -26,14 +26,8 @@ const formattedData = computed(() => {
 })
 
 const columns: TableColumn<{ title: string; value: any; description?: string | null } | null>[] = [
-  {
-    accessorKey: "title",
-    header: ""
-  },
-  {
-    id: "value",
-    meta: { class: { td: "font-semibold" } }
-  }
+  { accessorKey: "title", header: "" },
+  { id: "value", meta: { class: { td: "font-semibold" } } }
 ]
 </script>
 

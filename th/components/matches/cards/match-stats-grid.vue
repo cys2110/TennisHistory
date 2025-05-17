@@ -55,7 +55,7 @@ const isBold = (stat: MatchStatsType, player: string, label: string) => {
           return stat.p2_pc > stat.p1_pc
         }
       } else {
-        stat.p2_pc > stat.p1_pc
+        return stat.p2_pc > stat.p1_pc
       }
   }
 }

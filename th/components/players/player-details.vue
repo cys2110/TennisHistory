@@ -59,7 +59,7 @@ const playerDetails = computed(() => {
       { title: "Plays", value: player.value.rh ? handedness(player.value.rh) : "Unknown" },
       { title: "Backhand", value: player.value.bh ? `${player.value.bh}-Handed` : "Unknown" },
       player.value.hof ? { title: "Hall of Fame Induction", value: player.value.hof } : null
-    ].filter(Boolean)
+    ].filter(Boolean) as { title: string; value: any; description?: string }[]
   }
   return []
 })

@@ -49,52 +49,60 @@ const columns: TableColumn<DrawMatchType>[] = [
     accessorKey: "p1",
     header: "Player 1",
     cell: ({ row }) => {
-      if (!row.getIsGrouped() && row.original.p1)
-        return h(
-          "div",
-          {
-            class: "flex items-center gap-2 justify-center"
-          },
-          [
-            h(PlayerAvatar, {
-              player: row.original.p1,
-              bold: row.original.p1.id === row.original.winner_id
-            }),
-            h(
-              "span",
-              {
-                class: "text-xs"
-              },
-              [row.original.p1.seed || row.original.p1.status ? `(${row.original.p1.seed ?? ""}${row.original.p1.status ?? ""})` : ""]
-            )
-          ]
-        )
+      if (!row.getIsGrouped())
+        if (row.original.p1) {
+          return h(
+            "div",
+            {
+              class: "flex items-center gap-2 justify-center"
+            },
+            [
+              h(PlayerAvatar, {
+                player: row.original.p1,
+                bold: row.original.p1.id === row.original.winner_id
+              }),
+              h(
+                "span",
+                {
+                  class: "text-xs"
+                },
+                [row.original.p1.seed || row.original.p1.status ? `(${row.original.p1.seed ?? ""}${row.original.p1.status ?? ""})` : ""]
+              )
+            ]
+          )
+        } else {
+          return "BYE"
+        }
     }
   },
   {
     accessorKey: "p2",
     header: "Player 2",
     cell: ({ row }) => {
-      if (!row.getIsGrouped() && row.original.p2)
-        return h(
-          "div",
-          {
-            class: "flex items-center gap-2 justify-center"
-          },
-          [
-            h(PlayerAvatar, {
-              player: row.original.p2,
-              bold: row.original.p2.id === row.original.winner_id
-            }),
-            h(
-              "span",
-              {
-                class: "text-xs"
-              },
-              [row.original.p2.seed || row.original.p2.status ? `(${row.original.p2.seed ?? ""}${row.original.p2.status ?? ""})` : ""]
-            )
-          ]
-        )
+      if (!row.getIsGrouped())
+        if (row.original.p2) {
+          return h(
+            "div",
+            {
+              class: "flex items-center gap-2 justify-center"
+            },
+            [
+              h(PlayerAvatar, {
+                player: row.original.p2,
+                bold: row.original.p2.id === row.original.winner_id
+              }),
+              h(
+                "span",
+                {
+                  class: "text-xs"
+                },
+                [row.original.p2.seed || row.original.p2.status ? `(${row.original.p2.seed ?? ""}${row.original.p2.status ?? ""})` : ""]
+              )
+            ]
+          )
+        } else {
+          return "BYE"
+        }
     }
   },
   {

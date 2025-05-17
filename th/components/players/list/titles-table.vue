@@ -5,6 +5,8 @@ import { getGroupedRowModel, type GroupingOptions } from "@tanstack/vue-table"
 
 const { events, status, checked } = defineProps<{ events: { title: string; events: EventCardType[] }[]; status: APIStatusType; checked: boolean }>()
 const appConfig = useAppConfig()
+const route = useRoute()
+const name = computed(() => decodeName(route.params.name as string))
 
 const formattedEvents = computed(() => {
   const newArray: EventCardType[] = []
@@ -114,7 +116,7 @@ const grouping_options = ref<GroupingOptions>({
       </div>
     </template>
 
-    <template #empty> No index available </template>
+    <template #empty> {{ name }} has not {{ checked ? "played any finals" : "won any titles" }} </template>
 
     <template #expand-cell="{ row }">
       <div

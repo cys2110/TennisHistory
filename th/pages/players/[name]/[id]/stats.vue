@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PlayerStatsGrid, PlayerStatsTable } from "#components"
 
-definePageMeta({ name: "stats", layout: false })
+definePageMeta({ name: "stats" })
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
@@ -29,29 +29,27 @@ const { data: stats, status } = await useFetch<PlayerStatsType[]>("/api/players/
 </script>
 
 <template>
-  <div>
-    <nuxt-layout name="player">
-      <template #toolbar>
-        <years-select
-          v-if="playerYears.length"
-          v-model="years"
-          :items="playerYears"
-        />
-        <surface-select v-model="surfaces" />
-        <player-stats-chart
-          v-if="stats.length"
-          :stats
-          :key="JSON.stringify(stats) + 'chart'"
-        />
-      </template>
-
-      <component
-        :is="viewMode === 'cards' ? PlayerStatsGrid : PlayerStatsTable"
-        :key="viewMode"
-        :stats
-        :status
-        :years
+  <player-wrapper>
+    <template #toolbar>
+      <years-select
+        v-if="playerYears.length"
+        v-model="years"
+        :items="playerYears"
       />
-    </nuxt-layout>
-  </div>
+      <surface-select v-model="surfaces" />
+      <player-stats-chart
+        v-if="stats.length"
+        :stats
+        :key="JSON.stringify(stats) + 'chart'"
+      />
+    </template>
+
+    <component
+      :is="viewMode === 'cards' ? PlayerStatsGrid : PlayerStatsTable"
+      :key="viewMode"
+      :stats
+      :status
+      :years
+    />
+  </player-wrapper>
 </template>

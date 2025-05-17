@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import defaultLayout from "./default.vue"
-
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
@@ -20,8 +18,7 @@ type APIResponseType = {
 }
 
 // API call
-const { data: player } = await useFetch<APIResponseType>("/api/players/years", {
-  query: { id: route.params.id },
+const { data: player, execute } = await useFetch<APIResponseType>(() => `/api/players/years?id=${route.params.id}`, {
   onResponseError: ({ error }) => {
     toast.add({
       title: `Error fetching ${name.value}'s overview`,
@@ -75,61 +72,59 @@ const additionalButtons = computed(() => {
 
 <template>
   <div class="w-full">
-    <default-layout>
-      <u-dashboard-panel>
-        <template #header>
-          <u-dashboard-navbar>
-            <template #leading>
-              <u-dashboard-sidebar-collapse />
-            </template>
+    <u-dashboard-panel>
+      <template #header>
+        <u-dashboard-navbar>
+          <template #leading>
+            <u-dashboard-sidebar-collapse />
+          </template>
 
-            <template #title>
-              <u-breadcrumb :items="breadcrumbs" />
-            </template>
+          <template #title>
+            <u-breadcrumb :items="breadcrumbs" />
+          </template>
 
-            <!--Player subpages / coach profile navigation-->
-            <template #right>
-              <div
-                v-if="lgAndUp"
-                class="flex items-center gap-2"
-              >
-                <player-page-buttons
-                  :name
-                  :id
-                />
-                <u-button
-                  v-for="button in additionalButtons"
-                  :key="button.label"
-                  :icon="button.icon ?? appConfig.ui.icons.external"
-                  :label="button.label"
-                  :to="button.to"
-                  size="xs"
-                  :color="button.label === 'Coach Profile' ? 'secondary' : 'primary'"
-                />
-              </div>
-              <u-dropdown-menu
-                v-else
-                :items="[...PLAYER_PAGES, ...additionalButtons]"
-              >
-                <u-button
-                  :icon="ICONS.layers"
-                  color="neutral"
-                  variant="link"
-                  size="xl"
-                />
-              </u-dropdown-menu>
-            </template>
-          </u-dashboard-navbar>
+          <!--Player subpages / coach profile navigation-->
+          <template #right>
+            <div
+              v-if="lgAndUp"
+              class="flex items-center gap-2"
+            >
+              <player-page-buttons
+                :name
+                :id
+              />
+              <u-button
+                v-for="button in additionalButtons"
+                :key="button.label"
+                :icon="button.icon ?? appConfig.ui.icons.external"
+                :label="button.label"
+                :to="button.to"
+                size="xs"
+                :color="button.label === 'Coach Profile' ? 'secondary' : 'primary'"
+              />
+            </div>
+            <u-dropdown-menu
+              v-else
+              :items="[...PLAYER_PAGES, ...additionalButtons]"
+            >
+              <u-button
+                :icon="ICONS.layers"
+                color="neutral"
+                variant="link"
+                size="xl"
+              />
+            </u-dropdown-menu>
+          </template>
+        </u-dashboard-navbar>
 
-          <u-dashboard-toolbar v-if="$slots.toolbar">
-            <slot name="toolbar" />
-          </u-dashboard-toolbar>
-        </template>
+        <u-dashboard-toolbar v-if="$slots.toolbar">
+          <slot name="toolbar" />
+        </u-dashboard-toolbar>
+      </template>
 
-        <template #body>
-          <slot />
-        </template>
-      </u-dashboard-panel>
-    </default-layout>
+      <template #body>
+        <slot />
+      </template>
+    </u-dashboard-panel>
   </div>
 </template>

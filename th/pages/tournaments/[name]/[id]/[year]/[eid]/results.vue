@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ResultsGrid, ResultsTable } from "#components"
 
-definePageMeta({ name: "results", layout: "event" })
+definePageMeta({ name: "results" })
 const appConfig = useAppConfig()
 const route = useRoute()
 const toast = useToast()
@@ -31,10 +31,12 @@ const { data: results, status } = await useFetch<ResultsType[]>("/api/events/res
 </script>
 
 <template>
-  <component
-    :is="viewMode === 'cards' ? ResultsGrid : ResultsTable"
-    :key="viewMode"
-    :rounds="results"
-    :status
-  />
+  <event-wrapper>
+    <component
+      :is="viewMode === 'cards' ? ResultsGrid : ResultsTable"
+      :key="viewMode"
+      :rounds="results"
+      :status
+    />
+  </event-wrapper>
 </template>
