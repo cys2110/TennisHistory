@@ -27,7 +27,13 @@ const categoryColours = {
   "Service Speed": "ring-emerald-700 dark:ring-emerald-300"
 }
 
-const categories = ["Service Stats", "Return Stats", "Points Stats", "Service Speed"]
+const categories = computed(() => {
+  const baseCategories = ["Service Stats", "Return Stats", "Points Stats"]
+  if (stats.some(stat => stat.category === "Service Speed")) {
+    baseCategories.push("Service Speed")
+  }
+  return baseCategories
+})
 
 const isBold = (stat: MatchStatsType, player: string, label: string) => {
   const lowStats = ["Double faults", "Unforced errors"]
@@ -64,7 +70,7 @@ const isBold = (stat: MatchStatsType, player: string, label: string) => {
 <template>
   <dashboard-subpanel
     v-if="stats.length || ['pending', 'idle'].includes(status)"
-    v-for="category in categories"
+    v-for="category in categories.filter(Boolean)"
     :title="category"
     :key="category"
   >

@@ -121,7 +121,7 @@ const columns: TableColumn<Omit<EntryInterface, "incomplete" | "rank2" | "reason
   <u-table
     :data="entries"
     :columns
-    class="my-5"
+    class="my-5 w-fit mx-auto"
     :loading="['pending', 'idle'].includes(status)"
   >
     <template #loading>

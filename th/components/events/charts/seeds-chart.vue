@@ -63,7 +63,7 @@ const option = ref({
 
 <template>
   <u-modal
-    :title="`${route.params.name} ${route.params.year}`"
+    :title="`${decodeName(route.params.name)} ${route.params.year}`"
     description="Seeds"
     fullscreen
   >
