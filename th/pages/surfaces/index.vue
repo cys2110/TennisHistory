@@ -1,15 +1,22 @@
 <script setup lang="ts">
+import { SurfaceGrid, SurfaceTable } from "#components"
+
 useHead({ title: "Surfaces", templateParams: { subPage: null } })
-const { icons } = useAppConfig()
+const { viewMode } = useViewMode()
+
+// API call
+const { data: surfaces, status } = await useFetch<SurfaceInterface[]>("/api/surfaces", {
+  default: () => []
+})
 </script>
 
 <template>
   <page-wrapper>
-    <u-alert
-      variant="subtle"
-      :icon="icons.alert"
-      title="Coming soon!"
-      color="success"
+    <component
+      :is="viewMode === 'list' ? SurfaceTable : SurfaceGrid"
+      :key="viewMode"
+      :surfaces
+      :status
     />
   </page-wrapper>
 </template>
