@@ -28,7 +28,7 @@ export default defineEventHandler(async event => {
       (:Round)-[:ROUND_OF]->
       (e:Event)-[:IN_YEAR]->
       (y:Year)
-      WITH p, c, min(y.id) AS min_year, max(y.id) AS max_year
+    WITH p, c, min(y.id) AS min_year, max(y.id) AS max_year
     ORDER BY ${sortBy}
     WITH CASE
       WHEN p IS NULL

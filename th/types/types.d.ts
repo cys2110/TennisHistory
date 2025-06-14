@@ -99,6 +99,17 @@ declare global {
     count: number
     tournaments: Pick<TournamentInterface, "id" | "name" | "established" | "abolished" | "tours">[]
   }
+
+  type APIVenuesResponseType = {
+    count: number
+    countries: {
+      country: CountryInterface
+      cities: {
+        city: string
+        venues: Pick<VenueInterface, "id" | "name">[]
+      }[]
+    }[]
+  }
 }
 
 export {}
