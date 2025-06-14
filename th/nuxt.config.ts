@@ -1,36 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2024-11-01",
+  compatibilityDate: "2025-05-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "@nuxt/image", "@vueuse/nuxt", "nuxt-echarts", "nuxt-neo4j", "@nuxt/ui-pro", "@nuxt/content"],
+  modules: ["@nuxt/eslint", "@nuxt/image", "nuxt-neo4j", "@vueuse/nuxt", "nuxt-echarts", "@nuxt/ui-pro", "@nuxt/content"],
   // Set page transitions
-  app: {
-    layoutTransition: { name: "layout", mode: "out-in" },
-    pageTransition: { name: "page", mode: "out-in" }
-  },
+  app: { pageTransition: { name: "page", mode: "out-in" } },
   // Set scroll behaviour
-  router: {
-    options: { scrollBehaviorType: "smooth" }
-  },
-  // Route rules
-  routeRules: {
-    "/h2h": { redirect: "/h2h/Jannik_Sinner-v-Alexander_Zverev/s0ag-z355" }
-  },
-  // Enable non-prefixed components
-  components: [
-    {
-      path: "~/components",
-      pathPrefix: false
-    }
-  ],
-  // Css path
+  router: { options: { scrollBehaviorType: "smooth" } },
+  // CSS path
   css: ["~/assets/css/main.css"],
   // Enable props destructuring
-  vite: {
-    vue: {
-      features: { propsDestructure: true }
-    }
-  },
+  vite: { vue: { features: { propsDestructure: true } } },
   // Imports not required
   imports: {
     presets: [
@@ -64,10 +44,10 @@ export default defineNuxtConfig({
     components: ["DatasetComponent", "GridComponent", "TooltipComponent", "LegendComponent", "PolarComponent", "TransformComponent"],
     features: ["UniversalTransition", "LabelLayout"]
   },
-  // Nuxt ui configuration
+  // Nuxt UI configuration
   ui: {
     theme: {
-      colors: ["primary", "secondary", "neutral", "warning", "error", "success", "info"]
+      colors: ["primary", "secondary", "neutral", "warning", "error", "success", "atp", "wta", "info", "singles", "doubles", "active"]
     }
   },
   // Custom icons
