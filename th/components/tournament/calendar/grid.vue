@@ -31,7 +31,8 @@ const { name, query } = useRoute()
     v-else
     :message="
       name === 'upcoming-tournaments' ? 'No upcoming tournaments'
-      : name === 'category' ? `No events of category ${value}`
+      : name === 'category' ? `No events of category ${value} in ${query.year}`
+      : name === 'surface' ? `No events took place on ${value} in ${query.year}`
       : `No events in ${query.year}`
     "
     :icon="icons.noCalendar"

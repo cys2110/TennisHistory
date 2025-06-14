@@ -173,7 +173,7 @@ export default defineEventHandler(async query => {
   const results = records.map(record => record.get("event")).filter(Boolean)
 
   // Convert Neo4j types to standard JavaScript types
-  const events = results.map(event => ({
+  const events = results.filter(Boolean).map(event => ({
     ...event,
     tours: event.tours.filter((tour: string) => tour !== "Event"),
     id: event.id.low,
@@ -185,5 +185,5 @@ export default defineEventHandler(async query => {
     }
   }))
 
-  return events.filter(Boolean)
+  return events
 })

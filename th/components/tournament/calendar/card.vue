@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { event, value } = defineProps<{ event: EventCardType; value?: string }>()
 const { icons } = useAppConfig()
+const { name } = useRoute()
 </script>
 
 <template>
@@ -19,7 +20,7 @@ const { icons } = useAppConfig()
 
     <!--Surface-->
     <u-link
-      v-if="event.surface"
+      v-if="event.surface && name !== 'surface'"
       :to="{ name: 'surface', params: { id: encodeName(event.surface.id) } }"
     >
       <nuxt-img
@@ -28,6 +29,12 @@ const { icons } = useAppConfig()
         class="opacity-75 rounded-lg"
       />
     </u-link>
+    <nuxt-img
+      v-else-if="event.surface"
+      :src="`/surfaces/${event.surface.surface}.jpg`"
+      :alt="event.surface"
+      class="opacity-75 rounded-lg"
+    />
     <nuxt-img
       v-else
       src="/surfaces/Court.png"

@@ -190,17 +190,21 @@ const columns: TableColumn<EventCardType>[] = [
     cell: ({ row }) => {
       const surface = row.original.surface
       if (surface) {
-        return h(
-          ULink,
-          {
-            to: {
-              name: "surface",
-              params: { id: encodeName(surface.id) }
+        if (value === surface.id) {
+          return surface.surface
+        } else {
+          return h(
+            ULink,
+            {
+              to: {
+                name: "surface",
+                params: { id: encodeName(surface.id) }
+              },
+              class: "hover-link"
             },
-            class: "hover-link"
-          },
-          () => row.getValue("surface")
-        )
+            () => row.getValue("surface")
+          )
+        }
       } else {
         return "Various"
       }
@@ -259,7 +263,8 @@ const columns: TableColumn<EventCardType>[] = [
     <template #empty>
       {{
         name === "upcoming-tournaments" ? "No upcoming tournaments"
-        : name === "category" ? `No events of category ${value}`
+        : name === "category" ? `No events of category ${value} in ${query.year}`
+        : name === "surface" ? `No events took place on ${value} in ${query.year}`
         : `No events found in ${query.year}`
       }}
     </template>
