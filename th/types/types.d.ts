@@ -90,6 +90,14 @@ declare global {
 
   // API Response Types
 
+  type APICoachesResponseType = {
+    count: number
+    coaches: {
+      id: string
+      name: string
+    }[]
+  }
+
   type APICountriesResponseType = {
     count: number
     countries: CountryInterface[]
