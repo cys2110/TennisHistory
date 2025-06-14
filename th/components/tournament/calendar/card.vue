@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { event, value } = defineProps<{ event: EventCardType; value?: string }>()
 const { icons } = useAppConfig()
-const { name } = useRoute()
+const { name, params } = useRoute()
 </script>
 
 <template>
@@ -32,7 +32,7 @@ const { name } = useRoute()
     <nuxt-img
       v-else-if="event.surface"
       :src="`/surfaces/${event.surface.surface}.jpg`"
-      :alt="event.surface"
+      :alt="event.surface.surface"
       class="opacity-75 rounded-lg"
     />
     <nuxt-img
@@ -153,9 +153,15 @@ const { name } = useRoute()
           :key="venue.id"
           class="flex flex-wrap gap-1 items-center"
         >
-          <u-link :to="{ name: 'venue', params: { id: encodeName(venue.id) } }">
+          <u-link
+            v-if="params.id && decodeName(params.id as string) !== venue.id"
+            :to="{ name: 'venue', params: { id: encodeName(venue.id) } }"
+          >
             {{ venue.name ? `${venue.name}, ${venue.city}` : venue.city }}
           </u-link>
+          <template v-else>
+            {{ venue.name ? `${venue.name}, ${venue.city}` : venue.city }}
+          </template>
           <u-separator
             v-if="index < event.venues.length - 1"
             class="h-4"

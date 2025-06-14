@@ -1,18 +1,28 @@
 <script setup lang="ts">
+import { TournamentCalendarGrid, TournamentCalendarTable } from "#components"
+
 definePageMeta({ name: "venue" })
+const { viewMode } = useViewMode()
 const { params } = useRoute()
 const name = computed(() => decodeName(params.id as string))
-useHead({ title: () => name.value, templateParams: { subPage: "Venues" } })
-const { icons } = useAppConfig()
+
+// API call
+const { data, status } = await useFetch<APIVenueResponseType>("/api/venues/details", {
+  query: { id: name },
+  default: () => ({ events: [], name: "", city: "" })
+})
+
+useHead({ title: () => `${data.value?.name} | ${data.value?.city}`, templateParams: { subPage: "Venues" } })
 </script>
 
 <template>
   <page-wrapper>
-    <u-alert
-      variant="subtle"
-      :icon="icons.alert"
-      title="Coming soon!"
-      color="success"
+    <component
+      :is="viewMode === 'list' ? TournamentCalendarTable : TournamentCalendarGrid"
+      :key="viewMode"
+      :events="data.events"
+      :status
+      :value="data.name ? `${data.name}, ${data.city}` : (data.city ?? name)"
     />
   </page-wrapper>
 </template>

@@ -33,6 +33,7 @@ const { name, query } = useRoute()
       name === 'upcoming-tournaments' ? 'No upcoming tournaments'
       : name === 'category' ? `No events of category ${value} in ${query.year}`
       : name === 'surface' ? `No events took place on ${value} in ${query.year}`
+      : name === 'venue' ? `No events took place at ${value} in ${query.year}`
       : `No events in ${query.year}`
     "
     :icon="icons.noCalendar"

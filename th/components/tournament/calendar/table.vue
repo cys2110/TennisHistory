@@ -10,7 +10,7 @@ const {
   icons,
   ui: { icons: appIcons }
 } = useAppConfig()
-const { name, query } = useRoute()
+const { name, query, params } = useRoute()
 
 const columns: TableColumn<EventCardType>[] = [
   {
@@ -265,6 +265,7 @@ const columns: TableColumn<EventCardType>[] = [
         name === "upcoming-tournaments" ? "No upcoming tournaments"
         : name === "category" ? `No events of category ${value} in ${query.year}`
         : name === "surface" ? `No events took place on ${value} in ${query.year}`
+        : name === "venue" ? `No events took place at ${value} in ${query.year}`
         : `No events found in ${query.year}`
       }}
     </template>
@@ -280,11 +281,13 @@ const columns: TableColumn<EventCardType>[] = [
             :color="getTourColours(row.original.tours).cardColour"
           >
             <u-link
+              v-if="params.id && decodeName(params.id as string) !== venue.id"
               :to="{ name: 'venue', params: { id: encodeName(venue.id) } }"
               :class="getTourColours(row.original.tours).hoverClass"
             >
               {{ venue.name ? `${venue.name}, ${venue.city}` : venue.city }}
             </u-link>
+            <template v-else>{{ venue.name ? `${venue.name}, ${venue.city}` : venue.city }}</template>
           </u-badge>
         </div>
 

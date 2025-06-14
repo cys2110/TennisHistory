@@ -134,6 +134,12 @@ declare global {
     }[]
   }
 
+  type APIVenueResponseType = {
+    name: string | null
+    city: string
+    events: EventCardType[]
+  }
+
   type APIVenuesResponseType = {
     count: number
     countries: {
