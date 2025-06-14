@@ -55,6 +55,26 @@ declare global {
 
   type MonthType = "January" | "February" | "March" | "April" | "May" | "June" | "July" | "August" | "September" | "October" | "November" | "December"
 
+  type RoundType =
+    | "Round of 128"
+    | "Round of 64"
+    | "Round of 32"
+    | "Round of 24"
+    | "Round of 16"
+    | "Quarterfinals"
+    | "Semifinals"
+    | "Final"
+    | "Win"
+    | "Round robin"
+    | "Group stages"
+    | "Day 1"
+    | "Day 2"
+    | "Day 3"
+    | "Qualifier"
+    | "Qualifying round 1"
+    | "Qualifying round 2"
+    | "Qualifying round 3"
+
   type SortType = "ASC" | "DESC" | undefined
 
   type StatusType = "Q" | "WC" | "LL" | "AL" | "SE" | "PR"
@@ -65,6 +85,8 @@ declare global {
   type TourType = "ATP" | "WTA" | "ITF" | "ITF - Men's" | "ITF - Women's" | "Men" | "Women"
 
   // Base types
+
+  type PlayerType = Pick<PlayerInterface, "id" | "name" | "country" | "tour">
 
   type TournamentType = Pick<TournamentInterface, "id" | "name" | "tours">
 
@@ -124,6 +146,21 @@ declare global {
   type APITournamentsResponseType = {
     count: number
     tournaments: Pick<TournamentInterface, "id" | "name" | "established" | "abolished" | "tours">[]
+  }
+
+  type APIUmpireEventType = Pick<
+    EventInterface,
+    "id" | "tournament" | "year" | "surface" | "category" | "venues" | "dates" | "tours" | "atp_dates" | "wta_dates" | "atp_category" | "wta_category"
+  > & {
+    rounds: {
+      round: RoundType
+      matches: Pick<MatchInterface, "match_no" | "p1" | "p2" | "date" | "type">[]
+    }[]
+  }
+
+  type APIUmpireResponseType = {
+    labels: string[]
+    events: EventType[]
   }
 
   type APIUmpiresResponseType = {

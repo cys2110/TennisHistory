@@ -43,6 +43,7 @@ const { data, status } = await useFetch<APISupervisorResponseType>("/api/supervi
         :size="mdAndDown ? 'xs' : 'sm'"
       />
       <u-slideover
+        v-if="mdAndDown"
         :title="name"
         class="ml-auto"
       >

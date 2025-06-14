@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { icons } = useAppConfig()
 const page = ref(1)
 const selectedLetter = defineModel<string>()
 
@@ -39,6 +40,7 @@ watch(selectedLetter, () => (page.value = 1))
   <error-message
     v-else
     message="No supervisors found"
+    :icon="icons.noSupervisor"
   />
   <u-pagination
     v-if="data && data.count"
