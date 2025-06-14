@@ -47,7 +47,23 @@ export default defineNuxtConfig({
   // Nuxt UI configuration
   ui: {
     theme: {
-      colors: ["primary", "secondary", "neutral", "warning", "error", "success", "atp", "wta", "info", "singles", "doubles", "active"]
+      colors: [
+        "primary",
+        "joint",
+        "neutral",
+        "warning",
+        "error",
+        "success",
+        "atp",
+        "wta",
+        "men",
+        "women",
+        "info",
+        "singles",
+        "doubles",
+        "active",
+        "inactive"
+      ]
     }
   },
   // Custom icons

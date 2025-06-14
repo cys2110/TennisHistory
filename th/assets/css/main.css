@@ -14,7 +14,6 @@
 
 :root {
   --ui-primary: var(--ui-color-primary-600);
-  --ui-secondary: var(--ui-color-secondary-700);
   --ui-atp: var(--ui-color-atp-600);
   --ui-wta: var(--ui-color-wta-600);
   --ui-bg: var(--ui-color-neutral-100);
@@ -27,7 +26,6 @@
 
 .dark {
   --ui-primary: var(--ui-color-primary-500);
-  --ui-secondary: var(--ui-color-secondary-600);
   --ui-atp: var(--ui-color-atp-400);
   --ui-wta: var(--ui-color-wta-500);
   --ui-bg: var(--ui-color-neutral-950);
@@ -39,7 +37,7 @@
 }
 
 .hover-link {
-  @apply inline-block relative dark:after:bg-slate-300 after:bg-slate-600 after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:origin-center after:transition-all after:ease-in-out after:duration-500 hover:after:scale-x-100;
+  @apply inline-block relative dark:after:bg-neutral-300 after:bg-neutral-600 after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:origin-center after:transition-all after:ease-in-out after:duration-500 hover:after:scale-x-100;
 }
 
 .gs {
@@ -47,7 +45,7 @@
 }
 
 .a1000 {
-  @apply text-secondary-600 dark:text-secondary-400;
+  @apply text-joint-600 dark:text-joint-400;
 }
 
 .a500 {
@@ -55,13 +53,13 @@
 }
 
 .a250 {
-  @apply text-fuchsia-600 dark:text-fuchsia-400;
+  @apply text-wta-600 dark:text-wta-400;
 }
 
 .OL {
-  @apply text-orange-600 dark:text-orange-400;
+  @apply text-warning-600 dark:text-warning-400;
 }
 
 .aws {
-  @apply text-indigo-600 dark:text-indigo-400;
+  @apply text-doubles-600 dark:text-doubles-400;
 }
