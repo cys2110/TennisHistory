@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { UButton, UIcon, ULink } from "#components"
 import type { TableColumn } from "@nuxt/ui"
-const { events, status } = defineProps<{
+const { events, status, value } = defineProps<{
   events: EventCardType[]
   status: APIStatusType
+  value?: string
 }>()
 const {
   icons,
@@ -60,45 +61,67 @@ const columns: TableColumn<EventCardType>[] = [
   {
     accessorKey: "category",
     header: "Category",
-    cell: ({ row }) =>
-      row.original.category ?
-        h(
-          ULink,
-          {
-            to: {
-              name: "category",
-              params: { id: encodeName(row.original.category) }
-            },
-            class: getTourColours(row.original.tours).hoverClass
-          },
-          () => row.original.category
-        )
-      : row.original.atp_category && row.original.wta_category ?
-        h("div", { class: "flex flex-col gap-1 items-center" }, [
-          h(
-            ULink,
+    cell: ({ row }) => {
+      const { category, atp_category, wta_category, tours } = row.original
+      if (category) {
+        if (value === category) {
+          return h(
+            "span",
             {
-              to: {
-                name: "category",
-                params: { id: encodeName(row.original.atp_category!) }
-              },
-              class: atpClass
+              class:
+                tours.includes("ATP") ? "text-atp"
+                : tours.includes("WTA") ? "text-wta"
+                : tours.includes("Men") ? "men"
+                : "women"
             },
-            () => row.original.atp_category
-          ),
-          h(
-            ULink,
-            {
-              to: {
-                name: "category",
-                params: { id: encodeName(row.original.wta_category!) }
-              },
-              class: wtaClass
-            },
-            () => row.original.wta_category
+            category
           )
+        } else {
+          return h(
+            ULink,
+            {
+              to: {
+                name: "category",
+                params: { id: encodeName(category) }
+              },
+              class: getTourColours(tours).hoverClass
+            },
+            () => category
+          )
+        }
+      } else if (atp_category && wta_category) {
+        return h("div", { class: "flex flex-col gap-1 items-center" }, [
+          value === atp_category ?
+            h("span", { class: "text-atp" }, atp_category)
+          : h(
+              ULink,
+              {
+                to: {
+                  name: "category",
+                  params: { id: encodeName(atp_category!) }
+                },
+                class: atpClass
+              },
+              () => atp_category
+            ),
+          value === wta_category ?
+            h("span", { class: "text-wta" }, wta_category)
+          : h(
+              ULink,
+              {
+                to: {
+                  name: "category",
+                  params: { id: encodeName(wta_category!) }
+                },
+                class: wtaClass
+              },
+              () => wta_category
+            )
         ])
-      : "—"
+      } else {
+        return "—"
+      }
+    }
   },
   {
     accessorKey: "start_date",
@@ -234,7 +257,11 @@ const columns: TableColumn<EventCardType>[] = [
     class="max-h-200 min-h-150 md:min-h-165 xl:min-h-170 2xl:min-h-180 my-5 w-fit min-w-full xl:min-w-2/3 mx-auto"
   >
     <template #empty>
-      {{ name === "upcoming-tournaments" ? "No upcoming tournaments" : `No events found in ${query.year}` }}
+      {{
+        name === "upcoming-tournaments" ? "No upcoming tournaments"
+        : name === "category" ? `No events of category ${value}`
+        : `No events found in ${query.year}`
+      }}
     </template>
 
     <template #expanded="{ row }">

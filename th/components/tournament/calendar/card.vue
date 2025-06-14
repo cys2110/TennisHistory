@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { event } = defineProps<{ event: EventCardType }>()
+const { event, value } = defineProps<{ event: EventCardType; value?: string }>()
 const { icons } = useAppConfig()
 </script>
 
@@ -68,7 +68,7 @@ const { icons } = useAppConfig()
 
       <!--Category-->
       <u-link
-        v-if="event.category"
+        v-if="event.category && value !== event.category"
         :to="{ name: 'category', params: { id: encodeName(event.category) } }"
         :class="getTourColours(event.tours).hoverClass"
         class="w-fit"
@@ -76,25 +76,51 @@ const { icons } = useAppConfig()
         {{ event.category }}
       </u-link>
       <div
-        v-else
+        v-else-if="event.category"
+        :class="
+          event.tours.includes('ATP') ? 'text-atp'
+          : event.tours.includes('WTA') ? 'text-wta'
+          : event.tours.includes('Men') ? 'text-men'
+          : 'text-women'
+        "
+      >
+        {{ event.category }}
+      </div>
+      <div
+        v-else-if="event.atp_category && event.wta_category"
         class="flex flex-wrap items-center gap-1"
       >
         <u-link
+          v-if="value !== event.atp_category"
           :class="atpClass"
           :to="{ name: 'category', params: { id: encodeName(event.atp_category!) } }"
           >{{ event.atp_category }}</u-link
         >
+        <span
+          v-else
+          class="text-atp"
+        >
+          {{ event.atp_category }}
+        </span>
         <u-separator
           class="h-4"
           orientation="vertical"
         />
         <u-link
+          v-if="value !== event.wta_category"
           :class="wtaClass"
           :to="{ name: 'category', params: { id: encodeName(event.wta_category!) } }"
         >
           {{ event.wta_category }}
         </u-link>
+        <span
+          v-else
+          class="text-wta"
+        >
+          {{ event.wta_category }}
+        </span>
       </div>
+      <div v-else>—</div>
 
       <!--Dates-->
       <div v-if="event.dates">{{ event.dates }}</div>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-const { events, status } = defineProps<{
+const { events, status, value } = defineProps<{
   events: EventCardType[]
   status: APIStatusType
+  value?: string
 }>()
 const { icons } = useAppConfig()
 const { name, query } = useRoute()
@@ -17,16 +18,22 @@ const { name, query } = useRoute()
       v-for="event in events"
       :key="event.id"
       :event
+      :value
     />
 
     <loading-event
+      v-else
       v-for="_ in 10"
       :key="_"
     />
   </u-page-grid>
   <error-message
     v-else
-    :message="name === 'upcoming-tournaments' ? 'No upcoming tournaments' : `No events in ${query.year}`"
+    :message="
+      name === 'upcoming-tournaments' ? 'No upcoming tournaments'
+      : name === 'category' ? `No events of category ${value}`
+      : `No events in ${query.year}`
+    "
     :icon="icons.noCalendar"
   />
 </template>
