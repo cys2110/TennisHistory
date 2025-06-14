@@ -50,7 +50,8 @@ const columns: TableColumn<{ id: string; name: string }>[] = [
           to: {
             name: "umpire",
             params: { id: encodeName(row.original.id) }
-          }
+          },
+          class: "hover-link"
         },
         () => row.original.name
       )
