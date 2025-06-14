@@ -1,15 +1,44 @@
 <script setup lang="ts">
+import { PlayerGrid, PlayerTable } from "#components"
+
 useHead({ title: "Players", templateParams: { subPage: null } })
+const { viewMode } = useViewMode()
 const { icons } = useAppConfig()
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
+const mdAndDown = breakpoints.smallerOrEqual("md")
+const selectedLetter = ref<string>("A")
 </script>
 
 <template>
   <page-wrapper>
-    <u-alert
-      variant="subtle"
-      :icon="icons.alert"
-      title="Coming soon!"
-      color="success"
+    <template
+      #nav-right
+      v-if="mdAndDown"
+    >
+      <u-slideover
+        title="Filters"
+        class="ml-auto"
+      >
+        <u-button
+          :icon="icons.filter"
+          size="xs"
+        />
+        <template #body>
+          <select-letters v-model="selectedLetter" />
+        </template>
+      </u-slideover>
+    </template>
+    <template
+      #toolbar
+      v-else
+    >
+      <select-letters v-model="selectedLetter" />
+    </template>
+
+    <component
+      :is="viewMode === 'cards' ? PlayerGrid : PlayerTable"
+      :key="viewMode"
+      v-model="selectedLetter"
     />
   </page-wrapper>
 </template>

@@ -17,7 +17,7 @@ export default defineAppConfig({
     gauge: "line-md:gauge-twotone-loop",
     h2h: "pepicons-print:swords-circle-filled",
     home: "line-md:home-md-twotone",
-    hybrid: "fluent:apps-list-detail-20-regular",
+    hybrid: "solar:server-minimalistic-bold-duotone",
     layers: "solar:layers-minimalistic-line-duotone",
     lineChart: "iconoir:graph-up",
     list: "line-md:text-box-multiple-twotone-to-text-box-twotone-transition",

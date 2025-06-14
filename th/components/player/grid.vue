@@ -4,7 +4,7 @@ const page = ref(1)
 const selectedLetter = defineModel<string>()
 
 // API call
-const { data, status } = await useFetch<APITournamentsResponseType>("/api/tournaments", {
+const { data, status } = await useFetch<APIPlayersResponseType>("/api/players", {
   query: { letter: selectedLetter, skip: computed(() => (page.value - 1) * 40) }
 })
 
@@ -17,21 +17,13 @@ watch(selectedLetter, () => (page.value = 1))
     v-if="(data && data.count) || ['pending', 'idle'].includes(status)"
     class="my-5"
   >
-    <u-page-card
+    <player-card
       v-if="data?.count"
-      v-for="tournament in data.tournaments"
-      :key="tournament.id"
-      :title="tournament.name"
-      :to="{ name: 'tournament', params: { id: tournament.id, name: encodeName(tournament.name) } }"
-      highlight
-      :highlight-color="getTourColours(tournament.tours).cardColour"
-      :ui="{
-        body: 'mx-auto w-full',
-        title: 'text-center flex items-center gap-2 justify-center',
-        container: 'items-center'
-      }"
+      v-for="player in data.players"
+      :key="player.id"
+      :player
     />
-    <loading-base
+    <loading-player
       v-else
       v-for="_ in 15"
       :key="_"
@@ -39,8 +31,8 @@ watch(selectedLetter, () => (page.value = 1))
   </u-page-grid>
   <error-message
     v-else
-    :icon="icons.noTournament"
-    message="No tournaments found"
+    :icon="icons.noPlayer"
+    message="No players found"
   />
   <u-pagination
     v-if="data && data.count"

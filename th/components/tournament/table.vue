@@ -56,7 +56,7 @@ const columns: TableColumn<Pick<TournamentInterface, "id" | "name" | "establishe
       h(UButton, {
         color: "neutral",
         variant: "link",
-        label: "Tournaments",
+        label: "Tournament",
         icon:
           nameSort.value ?
             nameSort.value === "ASC" ?
@@ -152,7 +152,7 @@ onMounted(() => {
 <template>
   <u-table
     ref="table"
-    :data="data.tournaments"
+    :data="tournaments"
     :columns
     class="max-h-200 min-w-2/3 md:min-w-1/2 lg:min-w-1/4 mx-auto"
     :loading="['pending', 'idle'].includes(status)"

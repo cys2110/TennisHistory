@@ -28,6 +28,10 @@ declare global {
   interface PlayerInterface {
     atp_link: string | null
     country: CountryInterface
+    id: string
+    max_year: number | null
+    min_year: number | null
+    name: string
     official_link: string | null
     tour: TourType
     wiki_link: string | null

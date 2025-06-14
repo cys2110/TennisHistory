@@ -35,7 +35,7 @@ export default defineEventHandler(async event => {
       END AS tournament
     WITH COLLECT(tournament) AS all_tournaments
     WITH all_tournaments[toInteger($skip)..toInteger($skip) + 40] AS tournaments, SIZE(all_tournaments) AS count
-    RETURN tournaments, count, toInteger($skip) AS skip
+    RETURN tournaments, count
     `,
     { letter, skip }
   )

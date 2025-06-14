@@ -90,6 +90,11 @@ declare global {
 
   // API Response Types
 
+  type APIPlayersResponseType = {
+    count: number
+    players: Pick<PlayerInterface, "id" | "name" | "min_year" | "max_year" | "tour" | "country">[]
+  }
+
   type APITournamentsResponseType = {
     count: number
     tournaments: Pick<TournamentInterface, "id" | "name" | "established" | "abolished" | "tours">[]
