@@ -62,7 +62,7 @@ declare global {
   type EnvironmentType = "Indoor" | "Outdoor"
   type SurfaceType = "Clay" | "Grass" | "Hard" | "Carpet"
 
-  type TourType = "ATP" | "WTA" | "ITF" | "ITF - Men's" | "ITF - Women's"
+  type TourType = "ATP" | "WTA" | "ITF" | "ITF - Men's" | "ITF - Women's" | "Men" | "Women"
 
   // Base types
 
@@ -87,6 +87,13 @@ declare global {
     | "atp_dates"
     | "wta_dates"
   >
+
+  // API Response Types
+
+  type APITournamentsResponseType = {
+    count: number
+    tournaments: Pick<TournamentInterface, "id" | "name" | "established" | "abolished" | "tours">[]
+  }
 }
 
 export {}

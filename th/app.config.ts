@@ -233,6 +233,20 @@ export default defineAppConfig({
         }
       ],
       defaultVariants: { variant: "outline" }
+    },
+    radioGroup: {
+      slots: {
+        fieldset: "md:grid md:grid-cols-16 xl:flex",
+        base: "cursor-pointer"
+      },
+      variants: {
+        color: {
+          primary: {
+            base: "focus-visible:outline-primary ring-primary",
+            indicator: "bg-primary-600 dark:bg-primary-400"
+          }
+        }
+      }
     }
   },
   uiPro: {

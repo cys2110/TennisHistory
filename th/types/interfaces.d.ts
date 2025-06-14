@@ -41,6 +41,8 @@ declare global {
   }
 
   interface TournamentInterface {
+    abolished: number | null
+    established: number | null
     id: number
     name: string
     tours: TourType[]
