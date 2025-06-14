@@ -95,6 +95,14 @@ declare global {
     players: Pick<PlayerInterface, "id" | "name" | "min_year" | "max_year" | "tour" | "country">[]
   }
 
+  type APISupervisorsResponseType = {
+    count: number
+    supervisors: {
+      id: string
+      name: string
+    }[]
+  }
+
   type APITournamentsResponseType = {
     count: number
     tournaments: Pick<TournamentInterface, "id" | "name" | "established" | "abolished" | "tours">[]

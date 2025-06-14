@@ -6,22 +6,22 @@ const skip = ref(0)
 const selectedLetter = defineModel<string>()
 const sort = ref<SortType | undefined>()
 
-const umpires = ref<APIUmpiresResponseType["umpires"]>([])
+const supervisors = ref<APISupervisorsResponseType["supervisors"]>([])
 
-const { data, status, execute } = await useFetch<APIUmpiresResponseType>("/api/umpires", {
+const { data, status, execute } = await useFetch<APISupervisorsResponseType>("/api/supervisors", {
   query: { letter: selectedLetter, skip, sort },
-  default: () => ({ count: 0, umpires: [] }),
+  default: () => ({ count: 0, supervisors: [] }),
   lazy: true,
   immediate: false,
-  onResponse: ({ response }) => (umpires.value = [...umpires.value, ...(response._data.umpires || [])])
+  onResponse: ({ response }) => (supervisors.value = [...supervisors.value, ...(response._data.supervisors || [])])
 })
 
 execute()
 
-// Reset skip and umpires when the selected letter or sort options change
+// Reset skip and supervisors when the selected letter or sort options change
 watch([sort, selectedLetter], () => {
   skip.value = 0
-  umpires.value = []
+  supervisors.value = []
 })
 
 const columns: TableColumn<{ id: string; name: string }>[] = [
@@ -31,7 +31,7 @@ const columns: TableColumn<{ id: string; name: string }>[] = [
       h(UButton, {
         color: "neutral",
         variant: "link",
-        label: "Umpire",
+        label: "Supervisor",
         icon:
           sort.value ?
             sort.value === "ASC" ?
@@ -48,7 +48,7 @@ const columns: TableColumn<{ id: string; name: string }>[] = [
         ULink,
         {
           to: {
-            name: "umpire",
+            name: "supervisor",
             params: { id: encodeName(row.original.id) }
           }
         },
@@ -68,7 +68,7 @@ onMounted(() => {
     {
       distance: 200,
       canLoadMore: () => {
-        return status.value !== "pending" && data.value?.count > umpires.value.length
+        return status.value !== "pending" && data.value?.count > supervisors.value.length
       }
     }
   )
@@ -78,11 +78,11 @@ onMounted(() => {
 <template>
   <u-table
     ref="table"
-    :data="umpires"
+    :data="supervisors"
     :columns
     class="max-h-200 min-w-2/3 md:min-w-1/2 lg:min-w-1/4 mx-auto"
     :loading="['pending', 'idle'].includes(status)"
     sticky
-    empty="No umpires found"
+    empty="No supervisors found"
   />
 </template>
