@@ -1,5 +1,48 @@
 import appConfig from "~/app.config"
 
+export const ATP_CATEGORIES: CategoryType[] = [
+  "Grand Slam",
+  "ATP Finals",
+  "ATP Masters 1000",
+  "ATP 500",
+  "ATP 250",
+  "Next Gen Finals",
+  "Laver Cup",
+  "ATP 125",
+  "ATP Cup",
+  "ATP Masters Series",
+  "ATP International Series Gold",
+  "ATP International Series",
+  "ATP World Series",
+  "ATP Super 9",
+  "ATP Championship Series",
+  "ATP Championship Series, Single Week",
+  "ILTF",
+  "NTL",
+  "Grand Prix"
+]
+
+export const WTA_CATEGORIES: CategoryType[] = [
+  "Grand Slam",
+  "WTA Finals",
+  "WTA 1000",
+  "WTA 500",
+  "WTA 250",
+  "WTA 125",
+  "ATP Cup",
+  "WTA Elite Trophy",
+  "WTA Premier Mandatory",
+  "WTA Premier Five",
+  "WTA Premier",
+  "WTA International Tournaments",
+  "ILTF",
+  "NTL"
+]
+
+export const ITF_MEN_CATEGORIES: CategoryType[] = ["Davis Cup", "Olympics", "ITF M25", "ITF"]
+
+export const ITF_WOMEN_CATEGORIES: CategoryType[] = ["Billie Jean King Cup", "Olympics", "ITF"]
+
 export const EVENT_PAGES = [
   {
     label: "Details",
@@ -70,3 +113,5 @@ export const PLAYER_PAGES = [
   { label: "Stats", name: "stats", icon: appConfig.icons.stats },
   { label: "Record", name: "record", icon: appConfig.icons.seeds }
 ]
+
+export const SURFACES: SurfaceType[] = ["Clay", "Grass", "Hard", "Carpet"]

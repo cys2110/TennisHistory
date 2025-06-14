@@ -1,16 +1,16 @@
 export function useViewMode() {
-  const viewMode = useState<"cards" | "list">("viewMode", () => {
+  const viewMode = useState<"cards" | "list" | "hybrid">("viewMode", () => {
     if (process.server) {
-      const cookie = useCookie<"cards" | "list">("viewMode")
-      return cookie.value || "cards"
+      const cookie = useCookie<"cards" | "list" | "hybrid">("viewMode")
+      return cookie.value || "hybrid"
     }
 
-    return "cards"
+    return "hybrid"
   })
 
-  const setViewMode = (mode: "cards" | "list") => {
+  const setViewMode = (mode: "cards" | "list" | "hybrid") => {
     viewMode.value = mode
-    const cookie = useCookie<"cards" | "list">("viewMode")
+    const cookie = useCookie<"cards" | "list" | "hybrid">("viewMode")
     cookie.value = mode
   }
 

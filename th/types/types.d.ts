@@ -1,4 +1,6 @@
 declare global {
+  type APIStatusType = "success" | "pending" | "idle" | "error"
+
   type BreadcrumbType = {
     label: string
     to?: { name: string }
@@ -10,7 +12,42 @@ declare global {
     slot?: string
   }
 
-  type StatusType = "success" | "pending" | "idle" | "error"
+  type CategoryType =
+    | "ATP 250"
+    | "ATP 500"
+    | "ATP Masters 1000"
+    | "Grand Slam"
+    | "ATP Finals"
+    | "Next Gen Finals"
+    | "Laver Cup"
+    | "United Cup"
+    | "Davis Cup"
+    | "Billie Jean King Cup"
+    | "Olympics"
+    | "ATP Cup"
+    | "ATP International Series"
+    | "ATP International Series Gold"
+    | "ATP Masters Series"
+    | "ATP World Series"
+    | "ATP Championship Series"
+    | "ATP Championship Series, Single Week"
+    | "ATP Super 9"
+    | "ITF"
+    | "ILTF"
+    | "NTL"
+    | "Grand Prix"
+    | "WTA 1000"
+    | "WTA 500"
+    | "WTA 250"
+    | "WTA Finals"
+    | "WTA Elite Trophy"
+    | "WTA Premier Mandatory"
+    | "WTA Premier Five"
+    | "WTA Premier"
+    | "WTA International Tournaments"
+    | "ITF M25"
+    | "ATP 125"
+    | "WTA 125"
 
   type CurrencyType = "USD" | "EUR" | "GBP" | "AUD" | "FRF"
 
@@ -30,6 +67,26 @@ declare global {
   // Base types
 
   type TournamentType = Pick<TournamentInterface, "id" | "name" | "tours">
+
+  // Consolidated types
+
+  type EventCardType = Pick<
+    EventInterface,
+    | "year"
+    | "surface"
+    | "id"
+    | "name"
+    | "category"
+    | "venues"
+    | "start_date"
+    | "dates"
+    | "tournament"
+    | "tours"
+    | "atp_category"
+    | "wta_category"
+    | "atp_dates"
+    | "wta_dates"
+  >
 }
 
 export {}

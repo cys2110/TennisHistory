@@ -33,16 +33,22 @@ let textClass =
   "inline-block relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:origin-center after:transition-all after:ease-in-out after:duration-500 hover:after:scale-x-100 "
 export const wtaClass = textClass + "text-wta hover:text-wta-700 dark:hover:text-wta-300 after:bg-wta-700 dark:after:bg-wta-300"
 export const atpClass = textClass + "text-atp hover:text-atp-800 dark:hover:text-atp-300 after:bg-atp-800 dark:after:bg-atp-300"
+export const itfMenClass = textClass + "text-men hover:text-men-700 dark:hover:text-men-300 after:bg-men-700 dark:after:bg-men-300"
+export const itfWomenClass = textClass + "text-women hover:text-women-700 dark:hover:text-women-300 after:bg-women-700 dark:after:bg-women-300"
 const combinedClass =
-  textClass + "text-primary dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 after:bg-primary-800 dark:after:bg-primary-300"
+  textClass + "text-joint dark:text-joint-400 hover:text-joint-800 dark:hover:text-joint-300 after:bg-joint-800 dark:after:bg-joint-300"
 
 export const getTourColours = (tours: string[]) => {
   const hoverClass =
-    tours.length === 2 ? combinedClass
+    tours.includes("Men") ? itfMenClass
+    : tours.includes("Women") ? itfWomenClass
+    : tours.length === 2 ? combinedClass
     : tours.includes("ATP") ? atpClass
     : wtaClass
-  const cardColour: "atp" | "wta" | "primary" =
-    tours.length === 2 ? "primary"
+  const cardColour: "atp" | "wta" | "joint" | "men" | "women" =
+    tours.includes("Men") ? "men"
+    : tours.includes("Women") ? "women"
+    : tours.length === 2 ? "joint"
     : tours.includes("ATP") ? "atp"
     : "wta"
   return { hoverClass, cardColour }

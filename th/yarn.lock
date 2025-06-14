@@ -707,6 +707,13 @@
   dependencies:
     "@iconify/types" "*"
 
+"@iconify-json/fluent@^1.2.23":
+  version "1.2.23"
+  resolved "https://registry.yarnpkg.com/@iconify-json/fluent/-/fluent-1.2.23.tgz#0e156614b00d3022aff4d9812bbc9ec217aea6d8"
+  integrity sha512-xSN0Qmg1YiHXhnF64+ghINT32SA8mNsoryjgG86jDmcmEePCdsx55Z4qNDnfzNGECfSx1M88h3y4DEA1og/oNg==
+  dependencies:
+    "@iconify/types" "*"
+
 "@iconify-json/game-icons@^1.2.3":
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/@iconify-json/game-icons/-/game-icons-1.2.3.tgz#b715c278bf6c17fad794c609efe40d570c3c4419"

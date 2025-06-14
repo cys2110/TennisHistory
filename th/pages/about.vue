@@ -19,7 +19,8 @@ useHead({ title: "About", templateParams: { subPage: null } })
         You can toggle between light and dark mode as well as between list and card view by clicking the settings button at the top of the sidebar or
         by pressing the
         <u-kbd value="meta" /><u-kbd value="k" /> keys. Card view provides a more aesthetic view of the data but list view provides a quicker
-        overview.
+        overview. You can also choose the hybrid view which prioritises the card view, but defaults to list view for pages which are more suited to
+        the list view.
       </div>
     </u-container>
   </page-wrapper>

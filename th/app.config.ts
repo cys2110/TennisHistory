@@ -17,6 +17,7 @@ export default defineAppConfig({
     gauge: "line-md:gauge-twotone-loop",
     h2h: "pepicons-print:swords-circle-filled",
     home: "line-md:home-md-twotone",
+    hybrid: "fluent:apps-list-detail-20-regular",
     layers: "solar:layers-minimalistic-line-duotone",
     lineChart: "iconoir:graph-up",
     list: "line-md:text-box-multiple-twotone-to-text-box-twotone-transition",
@@ -104,7 +105,7 @@ export default defineAppConfig({
       atp: "sky",
       wta: "fuchsia",
       men: "cyan",
-      women: "rose",
+      women: "pink",
       active: "emerald",
       inactive: "zinc",
       singles: "orange",
@@ -163,9 +164,7 @@ export default defineAppConfig({
         root: "w-full",
         link: "text-xs xl:text-sm cursor-pointer"
       },
-      defaultVariants: {
-        variant: "link"
-      }
+      defaultVariants: { variant: "link" }
     },
     breadcrumb: {
       slots: {
@@ -183,7 +182,7 @@ export default defineAppConfig({
     select: {
       slots: {
         base: "cursor-pointer w-full",
-        content: "ring-secondary cursor-pointer",
+        content: "ring-primary cursor-pointer w-full",
         trailingIcon: "group-data-[state=open]:rotate-180 transition-transform duration-250"
       },
       defaultVariants: { variant: "none" }
@@ -222,9 +221,18 @@ export default defineAppConfig({
           class: "dark:ring-atp-400/50 dark:bg-atp-300/15 dark:hover:bg-atp-300/30"
         }
       ],
-      defaultVariants: {
-        variant: "subtle"
-      }
+      defaultVariants: { variant: "subtle" }
+    },
+    slideover: { slots: { body: "flex flex-col gap-5" } },
+    badge: {
+      compoundVariants: [
+        {
+          color: "joint",
+          variant: "outline",
+          class: "text-joint-600 dark:text-joint-300 ring-joint-600/50 dark:ring-joint-400/50"
+        }
+      ],
+      defaultVariants: { variant: "outline" }
     }
   },
   uiPro: {
@@ -256,6 +264,43 @@ export default defineAppConfig({
         }
       }
     },
-    prose: { badge: { base: "rounded-lg" } }
+    prose: { badge: { base: "rounded-lg" } },
+    pageCard: {
+      slots: { footer: "self-center mt-auto pt-4 flex justify-center" },
+      variants: {
+        variant: {
+          outline: {
+            root: "shadow-md hover:shadow-lg"
+          }
+        }
+      },
+      compoundVariants: [
+        {
+          variant: "outline",
+          highlightColor: "atp",
+          class: { root: "shadow-atp hover:shadow-atp" }
+        },
+        {
+          variant: "outline",
+          highlightColor: "wta",
+          class: { root: "shadow-wta hover:shadow-wta" }
+        },
+        {
+          variant: "outline",
+          highlightColor: "joint",
+          class: { root: "shadow-joint hover:shadow-joint" }
+        },
+        {
+          variant: "outline",
+          highlightColor: "men",
+          class: { root: "shadow-men hover:shadow-men" }
+        },
+        {
+          variant: "outline",
+          highlightColor: "women",
+          class: { root: "shadow-women hover:shadow-women" }
+        }
+      ]
+    }
   }
 })

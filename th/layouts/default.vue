@@ -88,6 +88,12 @@ const groups = computed(() => [
         suffix: "View data in list mode",
         icon: icons.list,
         onSelect: () => setViewMode("list")
+      },
+      {
+        label: "Hybrid",
+        suffix: "View data in hybrid mode",
+        icon: icons.hybrid,
+        onSelect: () => setViewMode("hybrid")
       }
     ]
   }
