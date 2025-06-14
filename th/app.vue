@@ -10,7 +10,7 @@ useHead({
     :tooltip="{ delayDuration: 100 }"
     :toaster="{ position: 'top-center' }"
   >
-    <nuxt-loading-indicator color="repeating-linear-gradient(to right,#cffafe 0%,#22d3ee 50%,#0891b2 100%)" />
+    <nuxt-loading-indicator color="repeating-linear-gradient(to right,#99f6e4 0%,#14b8a6 50%,#0f766e 100%)" />
     <nuxt-layout>
       <nuxt-page />
     </nuxt-layout>
@@ -18,15 +18,9 @@ useHead({
 </template>
 
 <style>
-.layout-enter-active,
-.layout-leave-active,
 .page-enter-active,
 .page-leave-active {
   transition: all 0.4s;
-}
-.layout-enter-from,
-.layout-leave-to {
-  transform: translateX(-100%);
 }
 
 .page-enter-from,
