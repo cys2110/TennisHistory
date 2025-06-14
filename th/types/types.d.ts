@@ -90,6 +90,11 @@ declare global {
 
   // API Response Types
 
+  type APICountriesResponseType = {
+    count: number
+    countries: CountryInterface[]
+  }
+
   type APIPlayersResponseType = {
     count: number
     players: Pick<PlayerInterface, "id" | "name" | "min_year" | "max_year" | "tour" | "country">[]
