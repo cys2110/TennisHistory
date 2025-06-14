@@ -42,6 +42,6 @@ export default defineEventHandler(async event => {
 
   return {
     count: results.count.low,
-    venues: results.venues
+    venues: results.venues.filter(Boolean)
   }
 })

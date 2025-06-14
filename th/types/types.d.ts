@@ -100,6 +100,14 @@ declare global {
     tournaments: Pick<TournamentInterface, "id" | "name" | "established" | "abolished" | "tours">[]
   }
 
+  type APIUmpiresResponseType = {
+    count: number
+    umpires: {
+      id: string
+      name: string
+    }[]
+  }
+
   type APIVenuesResponseType = {
     count: number
     countries: {
