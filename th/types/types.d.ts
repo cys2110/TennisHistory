@@ -146,6 +146,12 @@ declare global {
     "first_name" | "last_name" | "tour" | "country" | "official_link" | "atp_link" | "wta_link" | "wiki_link"
   >
 
+  type PlayerStatsType = {
+    category: CategoryType
+    value: number
+    suffix?: boolean
+  }
+
   // API Response Types
 
   type APICoachesResponseType = {
