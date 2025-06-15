@@ -16,7 +16,7 @@ export default defineNuxtConfig({
     presets: [
       {
         from: "@vueuse/core",
-        imports: ["breakpointsTailwind", "useBreakpoints", "useInfiniteScroll", "useResizeObserver"]
+        imports: ["breakpointsTailwind", "useBreakpoints", "useInfiniteScroll", "useResizeObserver", "useArrayUnique"]
       },
       {
         from: "@vueuse/router",

@@ -160,6 +160,17 @@ declare global {
     city: string
     country: CountryInterface
   }
+
+  interface WLIndexInterface {
+    category: string
+    stat: string
+    level: "Tour" | "Challenger" | "ITF"
+    type: "Main" | "Qualifying"
+    wins: number
+    losses: number
+    titles: number | null
+    value: number
+  }
 }
 
 export {}

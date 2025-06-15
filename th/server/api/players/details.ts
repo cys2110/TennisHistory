@@ -207,8 +207,8 @@ export default defineEventHandler(async query => {
           WHEN
             s:Winner AND
             m:Singles AND
-            m:Best3|Best5 AND
-            e:ATP AND
+            m:Best3|Best5 AND NOT
+            e:ITF AND
             m:Main AND
             (e.category IS NULL OR NOT e.category IN challenger) AND
             (NOT m:ATP OR
@@ -225,8 +225,8 @@ export default defineEventHandler(async query => {
           WHEN
             s:Loser AND
             m:Singles AND
-            m:Best3|Best5 AND
-            e:ATP AND
+            m:Best3|Best5 AND NOT
+            e:ITF AND
             m:Main AND
             (e.category IS NULL OR NOT e.category IN challenger) AND
             (NOT m:ATP OR
@@ -243,8 +243,8 @@ export default defineEventHandler(async query => {
           WHEN
             s:Winner AND
             m:Singles AND
-            r.round = 'Final' AND
-            e:ATP AND
+            r.round = 'Final' AND NOT
+            e:ITF AND
             m:Main AND
             (e.category IS NULL OR NOT e.category IN challenger) AND
             (NOT m:ATP OR
@@ -261,8 +261,8 @@ export default defineEventHandler(async query => {
           WHEN
             s:Winner AND
             m:Singles AND
-            m:Best3|Best5 AND
-            e:ATP AND
+            m:Best3|Best5 AND NOT
+            e:ITF AND
             m:Qualifying AND
             (e.category IS NULL OR NOT e.category IN challenger) AND
             (NOT m:ATP OR
@@ -279,8 +279,8 @@ export default defineEventHandler(async query => {
           WHEN
             s:Loser AND
             m:Singles AND
-            m:Best3|Best5 AND
-            e:ATP AND
+            m:Best3|Best5 AND NOT
+            e:ITF AND
             m:Qualifying AND
             (e.category IS NULL OR NOT e.category IN challenger) AND
             (NOT m:ATP OR
@@ -383,8 +383,8 @@ export default defineEventHandler(async query => {
           WHEN
             s:Winner AND
             m:Doubles AND
-            m:Best3|Best5 AND
-            e:ATP AND
+            m:Best3|Best5 AND NOT
+            e:ITF AND
             m:Main AND
             (e.category IS NULL OR NOT e.category IN challenger) AND
             (NOT m:ATP OR
@@ -401,8 +401,8 @@ export default defineEventHandler(async query => {
           WHEN
             s:Loser AND
             m:Doubles AND
-            m:Best3|Best5 AND
-            e:ATP AND
+            m:Best3|Best5 AND NOT
+            e:ITF AND
             m:Main AND
             (e.category IS NULL OR NOT e.category IN challenger) AND
             (NOT m:ATP OR
@@ -419,8 +419,8 @@ export default defineEventHandler(async query => {
           WHEN
             s:Winner AND
             m:Doubles AND
-            m:Best3|Best5 AND
-            e:ATP AND
+            m:Best3|Best5 AND NOT
+            e:ITF AND
             m:Qualifying AND
             (e.category IS NULL OR NOT e.category IN challenger) AND
             (NOT m:ATP OR
@@ -437,8 +437,8 @@ export default defineEventHandler(async query => {
           WHEN
             s:Loser AND
             m:Doubles AND
-            m:Best3|Best5 AND
-            e:ATP AND
+            m:Best3|Best5 AND NOT
+            e:ITF AND
             m:Qualifying AND
             (e.category IS NULL OR NOT e.category IN challenger) AND
             (NOT m:ATP OR
@@ -455,8 +455,8 @@ export default defineEventHandler(async query => {
           WHEN
             s:Winner AND
             m:Doubles AND
-            r.round = 'Final' AND
-            e:ATP AND
+            r.round = 'Final' AND NOT
+            e:ITF AND
             m:Main AND
             (e.category IS NULL OR NOT e.category IN challenger) AND
             (NOT m:ATP OR
