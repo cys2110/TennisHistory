@@ -7,20 +7,6 @@ const { events, status } = defineProps<{
 const { icons } = useAppConfig()
 const { params } = useRoute()
 const name = computed(() => decodeName(params.name as string))
-
-const getRingColour = (tours: string[]) => {
-  if (tours.includes("Men")) {
-    return "ring-men dark:ring-men"
-  } else if (tours.includes("Women")) {
-    return "ring-women dark:ring-women"
-  } else if (tours.length === 2) {
-    return "ring-joint dark:ring-joint"
-  } else if (tours.includes("ATP")) {
-    return "ring-atp dark:ring-atp"
-  } else if (tours.includes("WTA")) {
-    return "ring-wta dark:ring-wta"
-  }
-}
 </script>
 
 <template>
@@ -32,7 +18,7 @@ const getRingColour = (tours: string[]) => {
       v-if="events.length"
       v-for="event in events"
       :key="event.id"
-      :class="getRingColour(event.tours)"
+      :class="getTourColours(event.tours).ringColour"
       :ui="{ header: 'flex flex-row justify-between items-center font-semibold w-full' }"
     >
       <template #header>

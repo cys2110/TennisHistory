@@ -51,7 +51,13 @@ export const getTourColours = (tours: string[]) => {
     : tours.length === 2 ? "joint"
     : tours.includes("ATP") ? "atp"
     : "wta"
-  return { hoverClass, cardColour }
+  const ringColour =
+    tours.includes("Men") ? "ring-men dark:ring-men"
+    : tours.includes("Women") ? "ring-women dark:ring-women"
+    : tours.length === 2 ? "ring-joint dark:ring-joint"
+    : tours.includes("ATP") ? "ring-atp dark:ring-atp"
+    : "ring-wta dark:ring-wta"
+  return { hoverClass, cardColour, ringColour }
 }
 
 export const handedness = (handedness: boolean) =>

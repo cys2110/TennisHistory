@@ -92,6 +92,8 @@ declare global {
 
   // Consolidated types
 
+  type CoachType = Pick<PlayerInterface, "id" | "name" | "last_name"> & Partial<Omit<PlayerInterface, "id" | "name">>
+
   interface CountryBigTitlesAPIResponseType
     extends Pick<PlayerInterface, "id" | "name" | "country" | "tour" | "last_name" | "max_year" | "min_year"> {
     gs: Pick<EventInterface, "id" | "year" | "category" | "tournament" | "atp_category" | "wta_category" | "tours">[]
@@ -111,6 +113,16 @@ declare global {
     >[]
   }
 
+  type DetailsCardType = {
+    title: string
+    value?: any
+    description?: string | null
+    singles?: string | number
+    doubles?: string | number
+    singles_description?: string
+    doubles_description?: string
+  }
+
   type EventCardType = Pick<
     EventInterface,
     | "year"
@@ -127,6 +139,11 @@ declare global {
     | "wta_category"
     | "atp_dates"
     | "wta_dates"
+  >
+
+  type PlayerDetailsType = Omit<
+    PlayerInterface,
+    "first_name" | "last_name" | "tour" | "country" | "official_link" | "atp_link" | "wta_link" | "wiki_link"
   >
 
   // API Response Types
