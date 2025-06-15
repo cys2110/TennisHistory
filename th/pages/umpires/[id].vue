@@ -69,6 +69,7 @@ watch([year, months, categories, surfaces, environment, tour], () => {
           size="xs"
         />
         <template #body>
+          <player-search v-model="player" />
           <select-year
             v-if="years"
             v-model="year"

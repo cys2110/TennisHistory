@@ -146,6 +146,13 @@ declare global {
     "first_name" | "last_name" | "tour" | "country" | "official_link" | "atp_link" | "wta_link" | "wiki_link"
   >
 
+  type PlayerRecordType = {
+    tournament: Omit<TournamentType, "tours">
+    round: RoundType
+    id: number
+    year: number
+  }
+
   type PlayerStatsType = {
     category: CategoryType
     value: number
@@ -165,6 +172,11 @@ declare global {
   type APICountriesResponseType = {
     count: number
     countries: CountryInterface[]
+  }
+
+  type APIPlayerRecordType = {
+    singles: Record<string, PlayerRecordType[]>
+    doubles: Record<string, PlayerRecordType[]>
   }
 
   type APIPlayersResponseType = {

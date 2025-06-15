@@ -49,8 +49,8 @@ const otherLinks = computed(() => {
         class="flex items-center gap-2"
       >
         <player-buttons
-          :id
-          :name
+          :id="id as string"
+          :name="name as string"
         />
         <u-button
           v-for="button in otherLinks"

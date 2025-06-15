@@ -245,6 +245,15 @@ export default defineAppConfig({
           }
         }
       }
+    },
+    pagination: {
+      slots: {
+        item: "cursor-pointer",
+        first: "cursor-pointer",
+        last: "cursor-pointer",
+        next: "cursor-pointer",
+        prev: "cursor-pointer"
+      }
     }
   },
   uiPro: {

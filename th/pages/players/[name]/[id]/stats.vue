@@ -2,8 +2,10 @@
 import { PlayerStatsGrid, PlayerStatsTable } from "#components"
 
 definePageMeta({ name: "stats" })
-const { icons } = useAppConfig()
 const { viewMode } = useViewMode()
+const { icons } = useAppConfig()
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
+const mdAndDown = breakpoints.smallerOrEqual("md")
 
 const { name, params } = useRoute()
 const playerName = computed(() => decodeName(params.name as string))
@@ -27,23 +29,54 @@ const { data: stats, status } = await useFetch<PlayerStatsType[]>("/api/players/
 <template>
   <player-wrapper>
     <template #toolbar="{ tour }">
-      <select-years
-        v-if="playerYears.length"
-        v-model="years"
-        :items="playerYears"
-      />
-      <select-surface
-        v-model="surfaces"
-        v-model:environment="environment"
-      />
-      <select-draw v-model="draw" />
-      <select-level v-model="level" />
-      <player-stats-chart
-        v-if="stats.length"
-        :stats
-        :key="JSON.stringify(years) + 'chart'"
-        :tour
-      />
+      <u-slideover
+        v-if="mdAndDown"
+        :title="playerName"
+        class="ml-auto"
+      >
+        <u-button
+          :icon="icons.filter"
+          size="xs"
+        />
+        <template #body>
+          <select-years
+            v-if="playerYears.length"
+            v-model="years"
+            :items="playerYears"
+          />
+          <select-surface
+            v-model="surfaces"
+            v-model:environment="environment"
+          />
+          <select-draw v-model="draw" />
+          <select-level v-model="level" />
+          <player-stats-chart
+            v-if="stats.length"
+            :stats
+            :key="JSON.stringify(years) + 'chart'"
+            :tour
+          />
+        </template>
+      </u-slideover>
+      <template v-else>
+        <select-years
+          v-if="playerYears.length"
+          v-model="years"
+          :items="playerYears"
+        />
+        <select-surface
+          v-model="surfaces"
+          v-model:environment="environment"
+        />
+        <select-draw v-model="draw" />
+        <select-level v-model="level" />
+        <player-stats-chart
+          v-if="stats.length"
+          :stats
+          :key="JSON.stringify(years) + 'chart'"
+          :tour
+        />
+      </template>
     </template>
 
     <template #default="{ tour }">

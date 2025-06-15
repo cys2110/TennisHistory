@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { stats, tour } = defineProps<{ stats: PlayerStatsType[]; tour: "ATP" | "WTA" }>()
+const { stats, tour } = defineProps<{ stats: PlayerStatsType[]; tour: TourType }>()
 const { icons, colours } = useAppConfig()
 const route = useRoute()
 const colorMode = useColorMode()
