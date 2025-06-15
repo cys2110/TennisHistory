@@ -12,6 +12,8 @@ const apiRoute = computed(() => {
     case "coach":
       return `/api/coaches/overview`
     case "country":
+    case "country-players":
+    case "country-events":
       return `/api/countries/overview`
     case "venue":
       return `/api/venues/overview`
@@ -43,6 +45,18 @@ const breadcrumbs = computed(() => {
         ...crumbs,
         { label: "Countries", icon: icons.countries, to: { name: "countries" } },
         { label: data.value?.name ?? "Loading...", icon: getFlagCode(data.value) }
+      ]
+    case "country-players":
+    case "country-events":
+      return [
+        ...crumbs,
+        { label: "Countries", icon: icons.countries, to: { name: "countries" } },
+        {
+          label: data.value?.name ?? "Loading...",
+          icon: getFlagCode(data.value),
+          to: { name: "country", params: { id: params.id ?? "", name: params.name ?? "" } }
+        },
+        { label: name === "country-players" ? "Players" : "Events", icon: name === "country-players" ? icons.player : icons.event }
       ]
     case "event":
     case "results":

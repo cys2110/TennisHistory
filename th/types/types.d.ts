@@ -92,6 +92,25 @@ declare global {
 
   // Consolidated types
 
+  interface CountryBigTitlesAPIResponseType
+    extends Pick<PlayerInterface, "id" | "name" | "country" | "tour" | "last_name" | "max_year" | "min_year"> {
+    gs: Pick<EventInterface, "id" | "year" | "category" | "tournament" | "atp_category" | "wta_category" | "tours">[]
+    a1000: Pick<EventInterface, "id" | "year" | "category" | "tournament" | "atp_category" | "wta_category" | "tours">[]
+    olympics: Pick<EventInterface, "id" | "year" | "category" | "tournament" | "atp_category" | "wta_category" | "tours">[]
+    finals: Pick<EventInterface, "id" | "year" | "category" | "tournament" | "atp_category" | "wta_category" | "tours">[]
+  }
+
+  type CountryNumberOneAPIResponseType = {
+    singles_players: Pick<
+      PlayerInterface,
+      "id" | "name" | "country" | "singles_ch_date" | "doubles_ch_date" | "tour" | "min_year" | "max_year" | "last_name"
+    >[]
+    doubles_players: Pick<
+      PlayerInterface,
+      "id" | "name" | "country" | "doubles_ch_date" | "doubles_ch_date" | "tour" | "min_year" | "max_year" | "last_name"
+    >[]
+  }
+
   type EventCardType = Pick<
     EventInterface,
     | "year"

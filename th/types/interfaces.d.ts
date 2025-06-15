@@ -80,6 +80,7 @@ declare global {
     atp_link: string | null
     country: CountryInterface
     id: string
+    last_name: string
     max_year: number | null
     min_year: number | null
     name: string
