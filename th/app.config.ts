@@ -170,7 +170,7 @@ export default defineAppConfig({
         linkLeadingIcon: "size-4 lg:size-5",
         linkLeadingAvatar: "border border-neutral-600 dark:border-neutral-400"
       },
-      variants: { active: { true: { link: "text-(--ui-primary)" } } }
+      variants: { active: { true: { link: "text-primary" } } }
     },
     collapsible: { slots: { content: "px-4 flex flex-col gap-2" } },
     avatar: {
@@ -253,6 +253,13 @@ export default defineAppConfig({
         last: "cursor-pointer",
         next: "cursor-pointer",
         prev: "cursor-pointer"
+      }
+    },
+    tabs: {
+      slots: {
+        trigger: "cursor-pointer",
+        label: "font-semibold",
+        content: "text-sm"
       }
     }
   },

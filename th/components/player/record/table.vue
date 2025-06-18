@@ -101,9 +101,9 @@ const columns: TableColumn<flattenedResultsType>[] = [
           ULink,
           {
             to: { name: "event", params: { id: 580, name: "Australian_Open", year: row.original.year, eid: `580${row.original.year}` } },
-            class: "hover-link"
+            class: "hover-link " + (row.original["580"] === "Win" ? "text-success" : "")
           },
-          () => row.original["580"] ?? "—"
+          () => (row.original["580"] === "Win" ? "WIN" : (row.original["580"] ?? "—"))
         )
       }
     }
@@ -125,9 +125,9 @@ const columns: TableColumn<flattenedResultsType>[] = [
           ULink,
           {
             to: { name: "event", params: { id: 520, name: "French_Open", year: row.original.year, eid: `520${row.original.year}` } },
-            class: "hover-link"
+            class: "hover-link " + (row.original["520"] === "Win" ? "text-success" : "")
           },
-          () => row.original["520"] ?? "—"
+          () => (row.original["520"] === "Win" ? "WIN" : (row.original["520"] ?? "—"))
         )
       }
     }
@@ -149,9 +149,9 @@ const columns: TableColumn<flattenedResultsType>[] = [
           ULink,
           {
             to: { name: "event", params: { id: 540, name: "Wimbledon", year: row.original.year, eid: `540${row.original.year}` } },
-            class: "hover-link"
+            class: "hover-link " + (row.original["540"] === "Win" ? "text-success" : "")
           },
-          () => row.original["540"] ?? "—"
+          () => (row.original["540"] === "Win" ? "WIN" : (row.original["540"] ?? "—"))
         )
       }
     }
@@ -173,9 +173,9 @@ const columns: TableColumn<flattenedResultsType>[] = [
           ULink,
           {
             to: { name: "event", params: { id: 560, name: "US_Open", year: row.original.year, eid: `560${row.original.year}` } },
-            class: "hover-link"
+            class: "hover-link " + (row.original["560"] === "Win" ? "text-success" : "")
           },
-          () => row.original["560"] ?? "—"
+          () => (row.original["560"] === "Win" ? "WIN" : (row.original["560"] ?? "—"))
         )
       }
     }
@@ -205,9 +205,9 @@ const columns: TableColumn<flattenedResultsType>[] = [
                 eid: `${tour === "ATP" ? 605 : 10}${row.original.year}`
               }
             },
-            class: "hover-link"
+            class: "hover-link " + (row.original[tour === "ATP" ? "605" : "10"] === "Win" ? "text-success" : "")
           },
-          () => row.original[tour === "ATP" ? "605" : "10"] ?? "—"
+          () => (row.original[tour === "ATP" ? "605" : "10"] === "Win" ? "WIN" : (row.original[tour === "ATP" ? "605" : "10"] ?? "—"))
         )
       }
     }
@@ -229,9 +229,9 @@ const columns: TableColumn<flattenedResultsType>[] = [
           ULink,
           {
             to: { name: "event", params: { id: 96, name: "Olympics", year: row.original.year, eid: `96${row.original.year}` } },
-            class: "hover-link"
+            class: "hover-link " + (row.original["96"] === "Win" ? "text-success" : "")
           },
-          () => row.original["96"] ?? "—"
+          () => (row.original["96"] === "Win" ? "WIN" : (row.original["96"] ?? "—"))
         )
       }
     }

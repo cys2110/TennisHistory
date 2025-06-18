@@ -27,6 +27,7 @@ declare global {
     atp_dates: string | null
     atp_link: string | null
     category: CategoryType | null
+    currency: CurrencyType
     dates: string | null
     id: number
     name: string | null
@@ -152,6 +153,7 @@ declare global {
     name: string
     tours: TourType[]
     website: string | null
+    years: string | null
   }
 
   interface VenueInterface {

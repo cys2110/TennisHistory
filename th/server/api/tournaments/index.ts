@@ -42,6 +42,7 @@ export default defineEventHandler(async event => {
 
   const results = records[0].toObject()
 
+  // TODO: Remove "Update"
   return {
     count: results.count.low,
     tournaments: results.tournaments.filter(Boolean).map((tournament: any) => ({
@@ -49,7 +50,7 @@ export default defineEventHandler(async event => {
       id: tournament.id.low,
       established: tournament.established?.low,
       abolished: tournament.abolished?.low,
-      tours: tournament.tours.filter((tour: string) => tour !== "Tournament")
+      tours: tournament.tours.filter((tour: string) => tour !== "Tournament" && tour !== "Update")
     }))
   }
 })

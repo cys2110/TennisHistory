@@ -115,7 +115,7 @@ const getEventType = (type: string) => {
         :class="getEventType(type).class"
         :ui="{
           root: 'w-full',
-          header: 'text-lg font-semibold text-(--ui-text-muted)',
+          header: 'text-lg font-semibold text-muted',
           body: 'text-center font-extrabold text-2xl'
         }"
       >

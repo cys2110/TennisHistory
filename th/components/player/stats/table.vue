@@ -27,7 +27,7 @@ const columns: TableColumn<{ category: string; value: number; suffix?: boolean }
         :ui="{
           base: tour === 'ATP' ? 'bg-atp-300 dark:bg-atp-950' : 'bg-wta-300 dark:bg-wta-950',
           indicator: tour === 'ATP' ? 'bg-atp-600' : 'bg-wta-600',
-          status: '!w-full text-(--ui-text-muted)'
+          status: '!w-full text-muted'
         }"
       >
         <template #status="{ percent }">{{ percent }}%</template>

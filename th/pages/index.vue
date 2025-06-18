@@ -33,11 +33,11 @@ const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.p
       description="Explore the history of men's tennis since 1968"
       :features
     />
-    <!--TODO: Add screenshots-->
-    <!-- <u-carousel
+    <u-carousel
       class="my-15 max-h-50"
       loop
       auto-scroll
+      auto-height
       :items="screenshots"
       v-slot="{ item }"
     >
@@ -45,6 +45,6 @@ const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.p
         :src="item as string"
         class="rounded-lg calc(100vw - 20rem) mx-auto"
       />
-    </u-carousel> -->
+    </u-carousel>
   </page-wrapper>
 </template>

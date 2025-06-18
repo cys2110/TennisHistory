@@ -56,7 +56,7 @@ const columns: TableColumn<Pick<PlayerInterface, "id" | "name" | "country" | "mi
           nameSort.value = undefined
           countrySort.value = countrySort.value === "ASC" ? "DESC" : "ASC"
         },
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => {
       const country = row.original.country
@@ -95,7 +95,7 @@ const columns: TableColumn<Pick<PlayerInterface, "id" | "name" | "country" | "mi
           countrySort.value = undefined
           nameSort.value = nameSort.value === "ASC" ? "DESC" : "ASC"
         },
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => {
       const player = row.original
@@ -140,7 +140,7 @@ const columns: TableColumn<Pick<PlayerInterface, "id" | "name" | "country" | "mi
           countrySort.value = undefined
           startSort.value = startSort.value === "ASC" ? "DESC" : "ASC"
         },
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => row.original.min_year ?? "—"
   },
@@ -163,7 +163,7 @@ const columns: TableColumn<Pick<PlayerInterface, "id" | "name" | "country" | "mi
           countrySort.value = undefined
           endSort.value = endSort.value === "ASC" ? "DESC" : "ASC"
         },
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => row.original.max_year ?? "—"
   }

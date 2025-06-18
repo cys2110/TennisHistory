@@ -22,7 +22,7 @@ defineProps<{ detail: DetailsCardType; tour?: TourType }>()
       <div class="font-extrabold">{{ detail.value }}</div>
       <div
         v-if="detail.description"
-        class="text-sm font-semibold text-(--ui-text-dimmed)"
+        class="text-sm font-semibold text-dimmed"
       >
         {{ detail.description }}
       </div>
@@ -35,21 +35,21 @@ defineProps<{ detail: DetailsCardType; tour?: TourType }>()
         <div class="font-extrabold">{{ detail.singles }}</div>
         <div
           v-if="detail.singles_description"
-          class="text-sm font-semibold text-(--ui-text-dimmed)"
+          class="text-sm font-semibold text-dimmed"
         >
           {{ detail.singles_description }}
         </div>
-        <div class="text-sm text-(--ui-text-dimmed)">Singles</div>
+        <div class="text-sm text-dimmed">Singles</div>
       </div>
       <div>
         <div class="font-extrabold">{{ detail.doubles }}</div>
         <div
           v-if="detail.doubles_description"
-          class="text-sm font-semibold text-(--ui-text-dimmed)"
+          class="text-sm font-semibold text-dimmed"
         >
           {{ detail.doubles_description }}
         </div>
-        <div class="text-sm text-(--ui-text-dimmed)">Doubles</div>
+        <div class="text-sm text-dimmed">Doubles</div>
       </div>
     </div>
   </u-card>

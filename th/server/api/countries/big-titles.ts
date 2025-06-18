@@ -59,7 +59,7 @@ export default defineEventHandler(async query => {
         .filter((t: any) => t.category === "Grand Slam")
         .map((t: any) => ({
           ...t,
-          tours: t.tours.filter((tour: string) => tour !== "Event"),
+          tours: t.tours.filter((tour: string) => tour !== "Event" && tour !== "Update"),
           id: t.id.low,
           year: t.year.low,
           tournament: {
@@ -71,7 +71,7 @@ export default defineEventHandler(async query => {
         .filter((t: any) => t.category === "Olympics")
         .map((t: any) => ({
           ...t,
-          tours: t.tours.filter((tour: string) => tour !== "Event"),
+          tours: t.tours.filter((tour: string) => tour !== "Event" && tour !== "Update"),
           id: t.id.low,
           year: t.year.low,
           tournament: {
@@ -83,7 +83,7 @@ export default defineEventHandler(async query => {
         .filter((t: any) => t.category === "ATP Finals" || t.category === "WTA Finals")
         .map((t: any) => ({
           ...t,
-          tours: t.tours.filter((tour: string) => tour !== "Event"),
+          tours: t.tours.filter((tour: string) => tour !== "Event" && tour !== "Update"),
           id: t.id.low,
           year: t.year.low,
           tournament: {
@@ -95,7 +95,7 @@ export default defineEventHandler(async query => {
         .filter((t: any) => !["Grand Slam", "Olympics", "ATP Finals", "WTA Finals"].includes(t.category))
         .map((t: any) => ({
           ...t,
-          tours: t.tours.filter((tour: string) => tour !== "Event"),
+          tours: t.tours.filter((tour: string) => tour !== "Event" && tour !== "Update"),
           id: t.id.low,
           year: t.year.low,
           tournament: {
@@ -116,7 +116,7 @@ export default defineEventHandler(async query => {
         .filter((t: any) => t.category === "Grand Slam")
         .map((t: any) => ({
           ...t,
-          tours: t.tours.filter((tour: string) => tour !== "Event"),
+          tours: t.tours.filter((tour: string) => tour !== "Event" && tour !== "Update"),
           id: t.id.low,
           year: t.year.low,
           tournament: {
@@ -128,7 +128,7 @@ export default defineEventHandler(async query => {
         .filter((t: any) => t.category === "Olympics")
         .map((t: any) => ({
           ...t,
-          tours: t.tours.filter((tour: string) => tour !== "Event"),
+          tours: t.tours.filter((tour: string) => tour !== "Event" && tour !== "Update"),
           id: t.id.low,
           year: t.year.low,
           tournament: {
@@ -140,7 +140,7 @@ export default defineEventHandler(async query => {
         .filter((t: any) => t.category === "ATP Finals" || t.category === "WTA Finals")
         .map((t: any) => ({
           ...t,
-          tours: t.tours.filter((tour: string) => tour !== "Event"),
+          tours: t.tours.filter((tour: string) => tour !== "Event" && tour !== "Update"),
           id: t.id.low,
           year: t.year.low,
           tournament: {
@@ -152,7 +152,7 @@ export default defineEventHandler(async query => {
         .filter((t: any) => !["Grand Slam", "Olympics", "ATP Finals", "WTA Finals"].includes(t.category))
         .map((t: any) => ({
           ...t,
-          tours: t.tours.filter((tour: string) => tour !== "Event"),
+          tours: t.tours.filter((tour: string) => tour !== "Event" && tour !== "Update"),
           id: t.id.low,
           year: t.year.low,
           tournament: {

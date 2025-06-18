@@ -22,7 +22,7 @@ const columns: TableColumn<SurfaceInterface>[] = [
             : icons.sortAlphaDown
           : icons.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       })
   },
   {
@@ -39,7 +39,7 @@ const columns: TableColumn<SurfaceInterface>[] = [
             : icons.sortAlphaDown
           : icons.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       })
   },
   {

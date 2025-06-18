@@ -111,7 +111,7 @@ const formattedIndex = computed(() => {
       >
         <template #description>
           <div
-            class="grid text-sm text-(--ui-text-dimmed) text-center font-medium"
+            class="grid text-sm text-dimmed text-center font-medium"
             :class="['Match Record', 'Environment'].includes(category.category) ? 'grid-cols-8' : 'grid-cols-7'"
           >
             <span></span>
@@ -120,7 +120,7 @@ const formattedIndex = computed(() => {
             <span class="col-span-2">TOTAL</span>
           </div>
           <div
-            class="grid text-sm text-(--ui-text-dimmed) text-center"
+            class="grid text-sm text-dimmed text-center"
             :class="['Match Record', 'Environment'].includes(category.category) ? 'grid-cols-8' : 'grid-cols-7'"
           >
             <span>Level</span>
@@ -135,10 +135,10 @@ const formattedIndex = computed(() => {
           <div
             v-for="level in stat.levels"
             :key="level.level"
-            class="grid text-(--ui-text) text-sm font-extrabold text-center"
+            class="grid text-default text-sm font-extrabold text-center"
             :class="['Match Record', 'Environment'].includes(category.category) ? 'grid-cols-8' : 'grid-cols-7'"
           >
-            <div class="font-semibold text-(--ui-text-dimmed)">
+            <div class="font-semibold text-dimmed">
               {{ level.level }}
             </div>
             <div> {{ level.types.Main?.wins }}-{{ level.types.Main?.losses }} </div>
@@ -171,10 +171,10 @@ const formattedIndex = computed(() => {
             </div>
           </div>
           <div
-            class="grid text-(--ui-text) text-sm font-extrabold text-center"
+            class="grid text-default text-sm font-extrabold text-center"
             :class="['Match Record', 'Environment'].includes(category.category) ? 'grid-cols-8' : 'grid-cols-7'"
           >
-            <div class="text-sm font-semibold text-(--ui-text-dimmed)"> Total </div>
+            <div class="text-sm font-semibold text-dimmed"> Total </div>
             <div>
               {{ stat.levels.reduce((a, b) => a + (b.types.Main?.wins ?? 0), 0) }}-{{
                 stat.levels.reduce((a, b) => a + (b.types.Main?.losses ?? 0), 0)

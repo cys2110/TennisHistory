@@ -41,7 +41,7 @@ const columns: TableColumn<{ id: string; name: string }>[] = [
         onClick: () => {
           sort.value = sort.value === "ASC" ? "DESC" : "ASC"
         },
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) =>
       h(

@@ -43,6 +43,16 @@ export const ITF_MEN_CATEGORIES: CategoryType[] = ["Davis Cup", "Olympics", "ITF
 
 export const ITF_WOMEN_CATEGORIES: CategoryType[] = ["Billie Jean King Cup", "Olympics", "ITF"]
 
+export const COUNTRY_DRAWS = ["8888", "615", "9900"]
+
+export const CURRENCIES: Record<CurrencyType, string> = {
+  AUD: "A$",
+  EUR: "€",
+  FRF: "\u20A3",
+  GBP: "£",
+  USD: "US$"
+}
+
 export const EVENT_PAGES = [
   {
     label: "Details",

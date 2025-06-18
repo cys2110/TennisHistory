@@ -45,7 +45,7 @@ const columns: TableColumn<VenueInterface>[] = [
           variant: "link",
           icon: row.getIsExpanded() ? appIcons.minus : appIcons.plus,
           onClick: () => row.toggleExpanded(),
-          class: "-mx-2.5 font-semibold text-(--ui-text)"
+          class: "-mx-2.5 font-semibold text-default"
         })
     }
   },
@@ -68,7 +68,7 @@ const columns: TableColumn<VenueInterface>[] = [
           nameSort.value = undefined
           countrySort.value = countrySort.value === "ASC" ? "DESC" : "ASC"
         },
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => {
       const country = row.original.country
@@ -112,7 +112,7 @@ const columns: TableColumn<VenueInterface>[] = [
           nameSort.value = undefined
           citySort.value = citySort.value === "ASC" ? "DESC" : "ASC"
         },
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => {
       if (row.getIsGrouped()) {
@@ -149,7 +149,7 @@ const columns: TableColumn<VenueInterface>[] = [
           countrySort.value = undefined
           nameSort.value = nameSort.value === "ASC" ? "DESC" : "ASC"
         },
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => {
       if (row.getIsGrouped()) {

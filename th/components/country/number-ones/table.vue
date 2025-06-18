@@ -57,7 +57,7 @@ const columns: TableColumn<
             : icons.sortAlphaDown
           : icons.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => {
       const { id, name, country, tour } = row.original
@@ -122,7 +122,7 @@ const columns: TableColumn<
             : icons.sortNumberDown
           : icons.sortNumber,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => row.original.ch_date
   },

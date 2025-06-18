@@ -141,6 +141,30 @@ declare global {
     | "wta_dates"
   >
 
+  type PlayerActivityType = Pick<
+    EventInterface,
+    | "tours"
+    | "tournament"
+    | "id"
+    | "name"
+    | "dates"
+    | "atp_category"
+    | "wta_category"
+    | "atp_dates"
+    | "wta_dates"
+    | "category"
+    | "venues"
+    | "surface"
+    | "currency"
+  > & {
+    player: Pick<EntryInterface, "seed" | "status" | "rank" | "points" | "pm" | "q_seed" | "q_status">
+    partner: Pick<EntryInterface, "id" | "name" | "country" | "rank">
+    matches: (Pick<MatchInterface, "round" | "match_no" | "incomplete" | "winner_id" | "sets" | "tbs"> & {
+      opponent: Pick<EntryInterface, "id" | "name" | "country" | "incomplete" | "seed" | "status" | "rank" | "q_seed" | "q_status">
+      opponents: Pick<EntryInterface, "id" | "name" | "country" | "incomplete" | "seed" | "status" | "rank" | "q_seed" | "q_status">[]
+    })[]
+  }
+
   type PlayerDetailsType = Omit<
     PlayerInterface,
     "first_name" | "last_name" | "tour" | "country" | "official_link" | "atp_link" | "wta_link" | "wiki_link"
@@ -159,6 +183,40 @@ declare global {
     suffix?: boolean
   }
 
+  type TournamentWinnerPlayerType = Pick<PlayerInterface, "id" | "name" | "country">
+
+  type TournamentWinnerType = Pick<EventInterface, "id" | "year" | "tours"> &
+    Record<
+      "md" | "ld",
+      | {
+          winner: TournamentWinnerPlayerType[]
+          loser: TournamentWinnerPlayerType[]
+          sets: MatchInterface["sets"]
+          tbs: MatchInterface["tbs"]
+          incomplete: IncompleteType | null
+        }
+      | string
+      | null
+    > &
+    Record<
+      "ms" | "ls",
+      | {
+          winner: TournamentWinnerPlayerType
+          loser: TournamentWinnerPlayerType
+          sets: MatchInterface["sets"]
+          tbs: MatchInterface["tbs"]
+          incomplete: IncompleteType | null
+        }
+      | string
+      | null
+    > & {
+      country: {
+        c1: CountryInterface
+        c2: CountryInterface
+        score: string
+      }
+    }
+
   // API Response Types
 
   type APICoachesResponseType = {
@@ -172,6 +230,11 @@ declare global {
   type APICountriesResponseType = {
     count: number
     countries: CountryInterface[]
+  }
+
+  type APIPlayerActivityResponseType = {
+    stats: PlayerStatsType[]
+    activity: PlayerActivityType[]
   }
 
   type APIPlayerRecordType = {

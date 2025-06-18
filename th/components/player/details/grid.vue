@@ -150,7 +150,7 @@ const consolidatedTitles = computed(() => {
             v-if="detail.title === 'Titles'"
             class="flex flex-col gap-1"
           >
-            <div class="grid grid-cols-3 text-sm text-(--ui-text-dimmed)">
+            <div class="grid grid-cols-3 text-sm text-dimmed">
               <span>Level</span>
               <span>Singles</span>
               <span>Doubles</span>
@@ -160,7 +160,7 @@ const consolidatedTitles = computed(() => {
               :key="title.level"
               class="grid grid-cols-3"
             >
-              <div class="text-sm font-semibold text-(--ui-text-dimmed)">
+              <div class="text-sm font-semibold text-dimmed">
                 {{ title.level }}
               </div>
               <div class="text-sm font-extrabold">
@@ -175,12 +175,12 @@ const consolidatedTitles = computed(() => {
             v-else-if="detail.title === 'Win-Loss'"
             class="flex flex-col gap-1"
           >
-            <div class="grid grid-cols-5 text-sm text-(--ui-text-dimmed)">
+            <div class="grid grid-cols-5 text-sm text-dimmed">
               <span></span>
               <span class="col-span-2">SINGLES</span>
               <span class="col-span-2">DOUBLES</span>
             </div>
-            <div class="grid grid-cols-5 text-sm text-(--ui-text-dimmed)">
+            <div class="grid grid-cols-5 text-sm text-dimmed">
               <span>Level</span>
               <span>Main</span>
               <span>Qualifying</span>
@@ -192,7 +192,7 @@ const consolidatedTitles = computed(() => {
               :key="wl.level"
               class="grid grid-cols-5"
             >
-              <div class="text-sm font-semibold text-(--ui-text-dimmed)">
+              <div class="text-sm font-semibold text-dimmed">
                 {{ wl.level }}
               </div>
               <div class="text-sm font-extrabold"> {{ wl.singles_wins }}-{{ wl.singles_losses }} </div>

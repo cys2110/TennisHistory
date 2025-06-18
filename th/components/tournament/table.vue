@@ -68,7 +68,7 @@ const columns: TableColumn<Pick<TournamentInterface, "id" | "name" | "establishe
           abolishedSort.value = undefined
           nameSort.value = nameSort.value === "ASC" ? "DESC" : "ASC"
         },
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => {
       const tournament = row.original
@@ -103,7 +103,7 @@ const columns: TableColumn<Pick<TournamentInterface, "id" | "name" | "establishe
           abolishedSort.value = undefined
           establishedSort.value = establishedSort.value === "ASC" ? "DESC" : "ASC"
         },
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => row.original.established ?? "—"
   },
@@ -125,7 +125,7 @@ const columns: TableColumn<Pick<TournamentInterface, "id" | "name" | "establishe
           establishedSort.value = undefined
           abolishedSort.value = abolishedSort.value === "ASC" ? "DESC" : "ASC"
         },
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => row.original.abolished ?? "—"
   }

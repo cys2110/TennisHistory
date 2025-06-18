@@ -38,7 +38,7 @@ const columns: TableColumn<EventCardType>[] = [
             : icons.sortAlphaDown
           : icons.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => {
       const tournament = row.original.tournament
@@ -137,7 +137,7 @@ const columns: TableColumn<EventCardType>[] = [
             : icons.sortAlphaDown
           : icons.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       })
     },
     cell: ({ row }) =>
@@ -165,7 +165,7 @@ const columns: TableColumn<EventCardType>[] = [
             : icons.sortAlphaDown
           : icons.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       })
     }
   },
@@ -184,7 +184,7 @@ const columns: TableColumn<EventCardType>[] = [
             : icons.sortAlphaDown
           : icons.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       })
     },
     cell: ({ row }) => {
@@ -225,7 +225,7 @@ const columns: TableColumn<EventCardType>[] = [
             : icons.sortAlphaDown
           : icons.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       })
     },
     cell: ({ row }) =>

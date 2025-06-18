@@ -31,7 +31,7 @@ const columns: TableColumn<VenueInterface>[] = [
           : icons.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         label: "City",
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => {
       if (row.getIsGrouped())

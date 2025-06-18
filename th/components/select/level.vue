@@ -26,7 +26,7 @@ const modelValue = defineModel<"Tour" | "Challenger" | "ITF" | undefined>()
           @click="modelValue = undefined"
           label="Clear"
           block
-          class="border-t rounded-t-none border-(--ui-border-muted)"
+          class="border-t rounded-t-none border-muted"
         />
       </template>
     </u-select>

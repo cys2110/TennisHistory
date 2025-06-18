@@ -29,7 +29,7 @@ const environment = defineModel<EnvironmentType>("environment")
           @click="environment = undefined"
           label="Clear"
           block
-          class="border-t rounded-t-none border-(--ui-border-muted)"
+          class="border-t rounded-t-none border-muted"
         />
       </template>
     </u-select>
@@ -54,7 +54,7 @@ const environment = defineModel<EnvironmentType>("environment")
           @click="modelValue = undefined"
           label="Clear"
           block
-          class="border-t rounded-t-none border-(--ui-border-muted)"
+          class="border-t rounded-t-none border-muted"
         />
       </template>
     </u-select>

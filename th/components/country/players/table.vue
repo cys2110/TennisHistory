@@ -33,7 +33,7 @@ const columns: TableColumn<Pick<PlayerInterface, "id" | "name" | "min_year" | "m
             : icons.sortAlphaDown
           : icons.sortAlpha,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => {
       const player = row.original
@@ -73,7 +73,7 @@ const columns: TableColumn<Pick<PlayerInterface, "id" | "name" | "min_year" | "m
             : icons.sortNumberDown
           : icons.sortNumber,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => row.original.min_year ?? "—"
   },
@@ -91,7 +91,7 @@ const columns: TableColumn<Pick<PlayerInterface, "id" | "name" | "min_year" | "m
             : icons.sortNumberDown
           : icons.sortNumber,
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        class: "-mx-2.5 font-semibold text-(--ui-text)"
+        class: "-mx-2.5 font-semibold text-default"
       }),
     cell: ({ row }) => row.original.max_year ?? "—"
   }

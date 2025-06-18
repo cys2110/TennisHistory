@@ -176,7 +176,7 @@ export default defineEventHandler(async query => {
   return {
     events: results.filter(Boolean).map(event => ({
       ...event,
-      tours: event.tours.filter((tour: string) => tour !== "Event"),
+      tours: event.tours.filter((tour: string) => tour !== "Event" && tour !== "Update"),
       id: event.id.low,
       year: event.year.low,
       venues: event.venues.filter(Boolean),
