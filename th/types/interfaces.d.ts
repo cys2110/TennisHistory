@@ -12,6 +12,7 @@ declare global {
     points: number | null
     q_seed: number | null
     q_status: string | null
+    q_withdrew: boolean | string
     rank: number | null
     rank2: number | null
     reason: string | null
@@ -26,13 +27,18 @@ declare global {
     atp_category: CategoryType | null
     atp_dates: string | null
     atp_link: string | null
+    atp_pm: string | null
+    atp_tfc: string | null
     category: CategoryType | null
     currency: CurrencyType
     dates: string | null
     id: number
     name: string | null
+    pm: string | null
     start_date: string
+    supervisors: string[]
     surface: SurfaceInterface
+    tfc: string | null
     tournament: Pick<TournamentInterface, "id" | "name">
     tours: TourType[]
     venues: VenueInterface[]
@@ -40,6 +46,7 @@ declare global {
     wta_category: CategoryType | null
     wta_dates: string | null
     wta_link: string | null
+    wta_tfc: string | null
     year: number
   }
 
@@ -138,6 +145,14 @@ declare global {
     turned_pro: number | null
     wiki_link: string | null
     wta_link: string | null
+  }
+
+  interface RoundInterface {
+    labels: (TourType | "Singles" | "Doubles" | "Main" | "Qualifying")[]
+    round: RoundType
+    currency: CurrencyType | null
+    pm: string | null
+    points: string | null
   }
 
   interface SurfaceInterface {

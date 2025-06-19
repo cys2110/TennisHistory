@@ -65,7 +65,7 @@ const { data: player, status } = await useFetch<PlayerDetailsType>("/api/players
     <component
       :is="viewMode === 'list' ? PlayerDetailsTable : PlayerDetailsGrid"
       :key="viewMode"
-      :player
+      :player="player!"
       :status
       :active="activeYears.active"
       :tour

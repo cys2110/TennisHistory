@@ -282,7 +282,6 @@ const grouping_options = ref<GroupingOptions>({
         </div>
         <u-badge
           v-else-if="row.groupingColumnId === 'level'"
-          variant="outline"
           class="font-semibold"
           :label="row.original.level"
           :color="getLevelColour(row.original.level)"

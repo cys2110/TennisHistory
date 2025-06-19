@@ -19,6 +19,6 @@ export default defineEventHandler(async query => {
 
   return {
     ...results,
-    tours: results.tours.filter((t: string) => t !== "Event")
+    tours: results.tours.filter((t: string) => !["Event", "Update", "ITF"].includes(t))
   }
 })

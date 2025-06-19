@@ -141,6 +141,55 @@ declare global {
     | "wta_dates"
   >
 
+  type EventDetailsType = Pick<
+    EventInterface,
+    | "name"
+    | "category"
+    | "atp_category"
+    | "wta_category"
+    | "surface"
+    | "venues"
+    | "dates"
+    | "atp_dates"
+    | "wta_dates"
+    | "pm"
+    | "tfc"
+    | "currency"
+    | "atp_pm"
+    | "atp_tfc"
+    | "wta_pm"
+    | "wta_tfc"
+    | "supervisors"
+  >
+
+  type MatchDetailsType = Pick<EventInterface, "surface" | "dates"> & {
+    match: Pick<
+      MatchInterface,
+      | "date"
+      | "court"
+      | "umpire"
+      | "duration"
+      | "winner_id"
+      | "round"
+      | "p1"
+      | "p2"
+      | "aces"
+      | "dfs"
+      | "serve1"
+      | "serve2"
+      | "bps_saved"
+      | "ret1"
+      | "ret2"
+      | "max_speed"
+      | "avg1_speed"
+      | "avg2_speed"
+      | "bps_converted"
+      | "winners"
+      | "ues"
+      | "net"
+    >
+  }
+
   type PlayerActivityType = Pick<
     EventInterface,
     | "tours"
@@ -181,6 +230,15 @@ declare global {
     category: CategoryType
     value: number
     suffix?: boolean
+  }
+
+  type ResultsType = {
+    title: RoundType
+    matches: Pick<MatchInterface, "match_no" | "date" | "court" | "duration" | "incomplete" | "umpire" | "winner" | "loser">[]
+  }
+
+  type SeedType = Pick<EntryInterface, "id" | "name" | "country" | "last" | "seed" | "rank" | "rank2" | "withdrew" | "tour"> & {
+    type: "Singles" | "Doubles"
   }
 
   type TournamentWinnerPlayerType = Pick<PlayerInterface, "id" | "name" | "country">
@@ -245,6 +303,11 @@ declare global {
   type APIPlayersResponseType = {
     count: number
     players: Pick<PlayerInterface, "id" | "name" | "min_year" | "max_year" | "tour" | "country">[]
+  }
+
+  type APISeedsResponseType = {
+    mainSeeds: SeedType[]
+    qualSeeds: SeedType[]
   }
 
   type APISupervisorResponseType = {
