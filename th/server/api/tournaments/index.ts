@@ -2,55 +2,54 @@ export default defineEventHandler(async event => {
   interface QueryProps {
     letter: string
     skip: string
+    page: string
     nameSort: SortType
     establishedSort: SortType
     abolishedSort: SortType
   }
 
-  const { letter, skip, nameSort, establishedSort, abolishedSort } = getQuery<QueryProps>(event)
+  const { letter, skip, nameSort, establishedSort, abolishedSort, page } = getQuery<QueryProps>(event)
 
   const sortBy =
-    establishedSort ? `e.id ${establishedSort}, t.name`
-    : abolishedSort ? `a.id ${abolishedSort}, t.name`
-    : `t.name ${nameSort ?? "ASC"}`
+    establishedSort ? `e.id ${establishedSort}, toLower(t.name)`
+    : abolishedSort ? `a.id ${abolishedSort}, toLower(t.name)`
+    : `toLower(t.name) ${nameSort ?? "ASC"}`
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-    MATCH (t:Tournament) WHERE t.name STARTS WITH $letter
+    MATCH (t:Tournament)
+    WHERE ($letter IS NULL OR toLower(t.name) STARTS WITH toLower($letter)) AND t.name IS NOT NULL
     OPTIONAL MATCH (t)-[:ESTABLISHED]->(e:Year)
     OPTIONAL MATCH (t)-[:ABOLISHED]->(a:Year)
     WITH *
     ORDER BY ${sortBy}
-    WITH CASE
-      WHEN t IS NULL
-        THEN null
-      ELSE
-        {
-          id: t.id,
-          name: t.name,
-          tours: labels(t),
-          established: e.id,
-          abolished: a.id
-        }
-      END AS tournament
+    WITH
+      apoc.map.clean(
+        apoc.map.merge(
+          apoc.any.properties(t),
+          {established: e.id, abolished: a.id, tours: [x IN labels(t) WHERE NOT x IN ['Tournament', 'Update']]}
+        ),
+        [],
+        [null]
+      ) AS tournament
     WITH COLLECT(tournament) AS all_tournaments
-    WITH all_tournaments[toInteger($skip)..toInteger($skip) + 40] AS tournaments, SIZE(all_tournaments) AS count
+    WITH
+      all_tournaments[(toInteger($page) - 1) * toInteger($skip) .. (toInteger($page) * toInteger($skip)) - 1] AS tournaments,
+      SIZE(all_tournaments) AS count
     RETURN tournaments, count
     `,
-    { letter, skip }
+    { letter: letter ?? null, skip, page }
   )
 
   const results = records[0].toObject()
 
-  // TODO: Remove "Update"
   return {
-    count: results.count.low,
-    tournaments: results.tournaments.filter(Boolean).map((tournament: any) => ({
+    count: results.count.toInt(),
+    tournaments: results.tournaments.map((tournament: any) => ({
       ...tournament,
-      id: tournament.id.low,
-      established: tournament.established?.low,
-      abolished: tournament.abolished?.low,
-      tours: tournament.tours.filter((tour: string) => tour !== "Tournament" && tour !== "Update")
+      id: tournament.id.toInt(),
+      established: tournament.established?.toInt(),
+      abolished: tournament.abolished?.toInt()
     }))
   }
 })

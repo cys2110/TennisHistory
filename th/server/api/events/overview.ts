@@ -3,13 +3,17 @@ export default defineEventHandler(async query => {
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (e:Event {id: toInteger($id)})
+      MATCH (e:Event {id: toInteger($id)})-[:EDITION_OF]->(t:Tournament)
+      WITH e, [x in labels(e) WHERE NOT x IN ['Event', 'Update']] AS tours, t.name AS tournament
       RETURN
       {
-        tours: labels(e),
+        tournament: tournament,
+        tours: tours,
         atp_link: e.atp_link,
         wiki_link: e.wiki_link,
-        wta_link: e.wta_link
+        wta_link: e.wta_link,
+        men_link: e.men_link,
+        women_link: e.women_link
       } AS event
     `,
     { id }
@@ -17,8 +21,5 @@ export default defineEventHandler(async query => {
 
   const results = records[0].get("event")
 
-  return {
-    ...results,
-    tours: results.tours.filter((t: string) => !["Event", "Update", "ITF"].includes(t))
-  }
+  return results
 })

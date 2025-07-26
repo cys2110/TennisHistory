@@ -3,28 +3,43 @@ export default defineEventHandler(async query => {
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (p:Player {id: $id})-[:REPRESENTS]->(c:Country)
-      OPTIONAL MATCH (p)-[:ENTERED]->(:Entry)-[:SCORED]->(:Score)-[:SCORED]->(:Singles|Doubles)-[:PLAYED]->(:Round)-[:ROUND_OF]->(:Event)-[:IN_YEAR]->(y:Year)
+      MATCH (p:Player {id: $id})-[z:REPRESENTS]->(c:Country)
+      OPTIONAL MATCH
+        (p)-[:ENTERED]->
+        (:Entry)-[:SCORED]->
+        (:Score)-[:SCORED]->
+        (:Singles|Doubles)-[:PLAYED]->
+        (:Round)-[:ROUND_OF]->
+        (:Event)-[:IN_YEAR]->
+        (y:Year)
       WITH *
       ORDER BY y.id
       RETURN
-        {
-          id: c.id,
-          name: c.name,
-          alpha2: c.alpha2
-        } AS country,
-        COLLECT(DISTINCT(y.id)) AS years,
-        labels(p) AS tour, p.atp_link AS atp_link, p.wiki_link AS wiki_link, p.official_link AS official_link, p.wta_link AS wta_link
+        apoc.map.merge(apoc.any.properties(c), apoc.any.properties(z)) AS country,
+        COLLECT(DISTINCT (y.id)) AS years,
+        [x IN labels(p) WHERE NOT x IN ['Update', 'Coach', 'Player']][0] AS tour,
+        p.atp_link AS atp_link,
+        p.wiki_link AS wiki_link,
+        p.official_link AS official_link,
+        p.wta_link AS wta_link,
+        p.first_name AS first_name,
+        p.last_name AS last_name,
+        CASE WHEN 'Coach' IN labels(p) THEN true ELSE false END AS coach
     `,
     { id }
   )
 
   const results = records[0].toObject()
+  if (results.country.start_date) {
+    results.country.start_date = {
+      day: results.country.start_date.day.toInt(),
+      month: results.country.start_date.month.toInt(),
+      year: results.country.start_date.year.toInt()
+    }
+  }
 
   return {
     ...results,
-    tour: results.tour.includes("ATP") ? "ATP" : "WTA",
-    coach: results.tour.includes("Coach"),
-    years: results.years.map((y: any) => y.low)
+    years: results.years.map((year: any) => year.toInt())
   }
 })

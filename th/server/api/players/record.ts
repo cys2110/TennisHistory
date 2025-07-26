@@ -23,16 +23,19 @@ export default defineEventHandler(async query => {
           WHEN e IS NOT NULL THEN {
             id: e.id,
             tournament: {id: t.id, name: t.name},
-            tid: tid,
             year: y.id,
             round: CASE
               WHEN best_match.score:Winner AND best_match.round.round = 'Final' THEN 'Win'
               ELSE best_match.round.round
+            END,
+            number: CASE
+              WHEN best_match.score:Winner AND best_match.round.round = 'Final' THEN 0
+              ELSE best_match.round.number
             END
           }
         END
       ) AS resultsPerTid
-      RETURN apoc.map.fromPairs(collect([tid, [x IN resultsPerTid WHERE x IS NOT NULL][0..]])) AS results
+      RETURN resultsPerTid, tid
     `,
     { id }
   )
@@ -47,57 +50,62 @@ export default defineEventHandler(async query => {
       OPTIONAL MATCH (e)-[:IN_YEAR]->(y:Year)
       WITH *
         ORDER BY e.start_date
-      WITH tid, t, e, y,
+      WITH tid, t, e, y.id as year,
           collect({round: r, score: s}) AS match_data
-      WITH tid, t, e, y,
+      WITH tid, t, e, year,
           reduce(minNum = 999, x IN match_data | CASE WHEN x.round.number IS NOT NULL AND x.round.number < minNum THEN x.round.number ELSE minNum END) AS min_round,
           match_data
-      WITH tid, t, y, e, min_round,
+      WITH tid, t, year, e, min_round,
           head([x IN match_data WHERE x.round.number = min_round]) AS best_match
       WITH tid, COLLECT(
         CASE
           WHEN e IS NOT NULL THEN {
             id: e.id,
             tournament: {id: t.id, name: t.name},
-            tid: tid,
-            year: y.id,
+            year: year,
             round: CASE
               WHEN best_match.score:Winner AND best_match.round.round = 'Final' THEN 'Win'
               ELSE best_match.round.round
+            END,
+            number: CASE
+              WHEN best_match.score:Winner AND best_match.round.round = 'Final' THEN 0
+              ELSE best_match.round.number
             END
           }
         END
       ) AS resultsPerTid
-      RETURN apoc.map.fromPairs(collect([tid, [x IN resultsPerTid WHERE x IS NOT NULL][0..]])) AS results
+      RETURN resultsPerTid, tid
     `,
     { id }
   )
 
-  const singlesResults = singlesRecords[0].get("results")
-  const doublesResults = doublesRecords[0].get("results")
+  const singlesResults = singlesRecords.map(record => record.toObject())
+  const doublesResults = doublesRecords.map(record => record.toObject())
 
-  for (const [key, value] of Object.entries(singlesResults)) {
-    singlesResults[key] = (value as any[]).map(result => ({
-      ...result,
-      id: result.id?.low ?? null,
-      year: result.year?.low ?? null,
-      tournament: {
-        ...result.tournament,
-        id: result.tournament?.id?.low ?? null
+  for (const result of singlesResults) {
+    for (const event of result.resultsPerTid) {
+      event["id"] = event.id.toInt()
+      event["year"] = event.year?.toInt()
+      event["tournament"] = {
+        ...event.tournament,
+        id: event.tournament.id?.toInt()
       }
-    }))
+      event["number"] = event.number?.toInt()
+    }
+    result["tid"] = result.tid.toInt()
   }
 
-  for (const [key, value] of Object.entries(doublesResults)) {
-    doublesResults[key] = (value as any[]).map(result => ({
-      ...result,
-      id: result.id?.low ?? null,
-      year: result.year?.low ?? null,
-      tournament: {
-        ...result.tournament,
-        id: result.tournament?.id?.low ?? null
+  for (const result of doublesResults) {
+    for (const event of result.resultsPerTid) {
+      event["id"] = event.id.toInt()
+      event["year"] = event.year?.toInt()
+      event["tournament"] = {
+        ...event.tournament,
+        id: event.tournament.id?.toInt()
       }
-    }))
+      event["number"] = event.number?.toInt()
+    }
+    result["tid"] = result.tid.toInt()
   }
 
   return { singles: singlesResults, doubles: doublesResults }

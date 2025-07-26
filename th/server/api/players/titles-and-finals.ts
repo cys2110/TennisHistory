@@ -3,95 +3,102 @@ export default defineEventHandler(async query => {
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (p:Player {id: $id})
-      CALL (p) {
-        OPTIONAL MATCH
-          (p)-[:ENTERED]->
-          (:Entry)-[:SCORED]->
-          (:Winner)-[:SCORED]->
-          (m:Singles)-[:PLAYED]->
-          (:Round {round: 'Final'})-[:ROUND_OF]->
-          (e:Event)-[:IN_YEAR]->
-          (y:Year)
-        OPTIONAL MATCH (e)-[:EDITION_OF]->(t:Tournament)
-        WITH *
-        ORDER BY e.start_date
-        WITH
-          CASE
-            WHEN e IS NULL THEN null
-            ELSE
-              {
-                id: e.id,
-                tournament: {id: t.id, name: t.name},
-                category:
-                  CASE
-                    WHEN e.category IS NOT NULL THEN e.category
-                    WHEN m:ATP THEN e.atp_category
-                    ELSE e.wta_category
-                  END,
-                year: y.id,
-                date:
-                  CASE
-                    WHEN e.end_date IS NOT NULL THEN apoc.temporal.format(e.end_date, 'yyyy-MM-dd')
-                    WHEN m:ATP THEN apoc.temporal.format(e.atp_end_date, 'yyyy-MM-dd')
-                    ELSE apoc.temporal.format(e.wta_end_date, 'yyyy-MM-dd')
-                  END
-              }
-          END AS tournament
-        RETURN COLLECT(tournament) AS singles_tournaments
-      }
-      CALL (p) {
-        OPTIONAL MATCH
-          (p)-[:ENTERED]->
-          (:Entry)-[:SCORED]->
-          (:Winner)-[:SCORED]->
-          (m:Doubles)-[:PLAYED]->
-          (:Round {round: 'Final'})-[:ROUND_OF]->
-          (e:Event)-[:IN_YEAR]->
-          (y:Year)
-        OPTIONAL MATCH (e)-[:EDITION_OF]->(t:Tournament)
-        WITH *
-        ORDER BY e.start_date
-        WITH
-          CASE
-            WHEN e IS NULL THEN null
-            ELSE
-              {
-                id: e.id,
-                tournament: {id: t.id, name: t.name},
-                category:
-                  CASE
-                    WHEN e.category IS NOT NULL THEN e.category
-                    WHEN m:ATP THEN e.atp_category
-                    ELSE e.wta_category
-                  END,
-                year: y.id,
-                date:
-                  CASE
-                    WHEN e.end_date IS NOT NULL THEN apoc.temporal.format(e.end_date, 'yyyy-MM-dd')
-                    WHEN m:ATP THEN apoc.temporal.format(e.atp_end_date, 'yyyy-MM-dd')
-                    ELSE apoc.temporal.format(e.wta_end_date, 'yyyy-MM-dd')
-                  END
-              }
-          END AS tournament
-        RETURN COLLECT(tournament) AS doubles_tournaments
-      }
-      RETURN singles_tournaments, doubles_tournaments
+      MATCH
+        (p:Player {id: $id})-[:ENTERED]->
+        (:Entry)-[:SCORED]->
+        (s:Score)-[:SCORED]->
+        (m:Match)-[:PLAYED]->
+        (:Round {round: 'Final'})-[:ROUND_OF]->
+        (e:Event)-[:EDITION_OF]->
+        (t:Tournament)
+      MATCH (e)-[:IN_YEAR]->(y:Year)
+      OPTIONAL MATCH (e)-[:ON_SURFACE]->(s1:Surface)
+      OPTIONAL MATCH (m)-[:PLAYED]->(:Tie)-[:ON_SURFACE]->(s2:Surface)
+      WITH
+        *,
+        CASE
+          WHEN e.start_date IS NOT NULL THEN e.start_date
+          WHEN p:ATP AND e.atp_start_date IS NOT NULL THEN e.atp_start_date
+          WHEN p:ATP THEN e.men_start_date
+          WHEN p:WTA AND p.wta_start_date IS NOT NULL THEN e.wta_start_date
+          ELSE e.women_start_date
+        END AS start_date
+      ORDER BY start_date
+      OPTIONAL MATCH (p1:Player)-[:ENTERED]->(:Entry)-[:SCORED]->(s)
+      WHERE p1.id <> p.id
+      RETURN
+        apoc.map.merge(
+          apoc.any.properties(e),
+          {
+            year: y.id,
+            tournament: apoc.any.properties(t),
+            level:
+              CASE
+                WHEN e:Women OR e:Men THEN 'ITF'
+                WHEN
+                  (e:ATP AND e.atp_category IN $challenger) OR
+                  (e:WTA AND e.wta_category IN $challenger)
+                  THEN 'Challenger'
+                ELSE 'Tour'
+              END,
+            type:
+              CASE
+                WHEN e.draw_type = 'Country draw' THEN 'Team'
+                WHEN m:Singles THEN 'Singles'
+                ELSE 'Doubles'
+              END,
+            partner: apoc.any.properties(p1),
+            titles:
+              CASE
+                WHEN s:Winner THEN 'Titles'
+                ELSE 'Finals'
+              END,
+            surface:
+              CASE
+                WHEN s1 IS NULL THEN s2.id
+                ELSE s1.id
+              END
+          }
+        ) AS event
     `,
-    { id }
+    { id, challenger: CHALLENGER_CATEGORIES }
   )
 
-  const results = records[0].toObject()
+  const results = records.map(record => {
+    const event = record.get("event")
+    const dateKeys = [
+      "start_date",
+      "end_date",
+      "atp_start_date",
+      "atp_end_date",
+      "wta_start_date",
+      "wta_end_date",
+      "men_start_date",
+      "men_end_date",
+      "women_start_date",
+      "women_end_date"
+    ]
 
-  return {
-    singles: results.singles_tournaments.map((t: any) => ({
-      ...t,
-      year: t.year.low,
-      id: t.id,
-      tournament: {
-        ...t.tournament,
-        id: t.tournament.id
+    for (const key of dateKeys) {
+      if (event[key]) {
+        event[key] = {
+          year: event[key].year?.toInt(),
+          month: event[key].month?.toInt(),
+          day: event[key].day?.toInt()
+        }
       }
-    }))
-  }
+    }
+
+    return {
+      ...event,
+      id: event.id.toInt(),
+      year: event.year.toInt(),
+      tournament: {
+        ...event.tournament,
+        id: event.tournament.id.toInt()
+      }
+    }
+  })
+
+  return results
 })

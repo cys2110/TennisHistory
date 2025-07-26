@@ -1,31 +1,14 @@
-export default defineEventHandler(async query => {
-  const { year } = getQuery<{ year: string }>(query)
+export default defineEventHandler(async event => {
+  const { year } = getQuery<{ year: string }>(event)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       OPTIONAL MATCH (y:Year {id: $year})<-[:IN_YEAR]-(e:Event)
-      OPTIONAL MATCH (y)<-[:IN_YEAR]-(w:WTA:Event)
-      OPTIONAL MATCH (y)<-[:IN_YEAR]-(a:ATP:Event)
-      OPTIONAL MATCH (y)<-[:IN_YEAR]-(im:ITF:Men:Event)
-      OPTIONAL MATCH (y)<-[:IN_YEAR]-(iw:ITF:Women:Event)
-      RETURN {
-        wta: COUNT(DISTINCT w),
-        atp: COUNT(DISTINCT a),
-        itf_men: COUNT(DISTINCT im),
-        itf_women: COUNT(DISTINCT iw),
-        total: COUNT(DISTINCT e)
-      } AS counts
+      WITH labels(e) AS tours, [e.category, e.atp_category, e.wta_category, e.men_category, e.women_category] AS categories
+      RETURN [x IN tours WHERE NOT x IN ['Update', 'Event']] AS tours, [x IN categories WHERE x IS NOT NULL] AS categories
     `,
     { year: Number(year) }
   )
 
-  const results = records[0].get("counts")
-
-  return {
-    wta: results.wta.low,
-    atp: results.atp.low,
-    itf_men: results.itf_men.low,
-    itf_women: results.itf_women.low,
-    total: results.total.low
-  }
+  return records.map(record => record.toObject())
 })

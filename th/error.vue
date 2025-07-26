@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { NuxtError } from "#app"
 
-const appConfig = useAppConfig()
+const {
+  ui: { icons }
+} = useAppConfig()
 defineProps<{ error: NuxtError }>()
 </script>
 
@@ -14,10 +16,9 @@ defineProps<{ error: NuxtError }>()
       message: error.message
     }"
     :clear="{
-      color: 'secondary',
       size: 'xl',
       variant: 'subtle',
-      icon: appConfig.ui.icons.arrowLeft
+      icon: icons.arrowLeft
     }"
   />
 </template>

@@ -1,30 +1,55 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2025-05-15",
+  compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "@nuxt/image", "nuxt-neo4j", "@vueuse/nuxt", "nuxt-echarts", "@nuxt/ui-pro", "@nuxt/content"],
+  modules: ["@nuxt/eslint", "@nuxt/image", "@vueuse/nuxt", "nuxt-echarts", "nuxt-neo4j", "@nuxt/ui-pro", "@nuxt/content"],
   // Set page transitions
   app: { pageTransition: { name: "page", mode: "out-in" } },
   // Set scroll behaviour
   router: { options: { scrollBehaviorType: "smooth" } },
   // CSS path
   css: ["~/assets/css/main.css"],
-  // Enable props destructuring
-  vite: { vue: { features: { propsDestructure: true } } },
+  // Turn on typed router
+  experimental: { typedPages: true },
   // Imports not required
   imports: {
     presets: [
       {
         from: "@vueuse/core",
-        imports: ["breakpointsTailwind", "useBreakpoints", "useInfiniteScroll", "useResizeObserver", "useArrayUnique"]
+        imports: [
+          "breakpointsTailwind",
+          "useBreakpoints",
+          "useInfiniteScroll",
+          "useResizeObserver",
+          "useArrayUnique",
+          "useDateFormat",
+          "isDefined",
+          "useSorted",
+          "get",
+          "set",
+          "useArrayFilter",
+          "useArrayMap"
+        ]
       },
       {
         from: "@vueuse/router",
         imports: ["useRouteQuery"]
       },
       {
+        from: "@vueuse/math",
+        imports: ["useAverage"]
+      },
+      {
         from: "convert",
         imports: ["convert"]
+      },
+      {
+        from: "change-case",
+        imports: ["kebabCase", "capitalCase", "sentenceCase"]
+      },
+      {
+        from: "kmh-to-mph",
+        imports: [{ name: "default", as: "kmhToMph" }]
       }
     ]
   },
@@ -62,7 +87,12 @@ export default defineNuxtConfig({
         "singles",
         "doubles",
         "active",
-        "inactive"
+        "inactive",
+        "tour",
+        "challenger",
+        "itf",
+        "main",
+        "qualifying"
       ]
     }
   },
