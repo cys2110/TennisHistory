@@ -1,11 +1,11 @@
 <script setup lang="ts">
-const { setViewMode } = useViewMode()
-const { setItemsPerPage } = useDefaultItems()
-const { setTableMode } = useDefaultTable()
+const { setViewMode, setTableMode, setItemsPerPage } = useDefaults()
 const {
   icons,
   ui: { icons: appIcons }
 } = useAppConfig()
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
+const lgAndUp = breakpoints.greaterOrEqual("lg")
 
 // Internal navigation links
 const NAV_LINKS = [
@@ -14,21 +14,14 @@ const NAV_LINKS = [
     icon: icons.tournament,
     to: { name: "tournaments" },
     defaultOpen: true,
-    children: [
-      { label: "Alphabetical List", to: { name: "tournaments" }, icon: icons.tournament },
-      { label: "Upcoming Tournaments", to: { name: "upcoming-tournaments" }, icon: icons.upcoming },
-      { label: "Results Archive", to: { name: "results-archive" }, icon: icons.event }
-    ]
+    children: [{ label: "Results Archive", to: { name: "results-archive" }, icon: icons.event }]
   },
   {
     label: "Players",
     icon: icons.player,
     to: { name: "players" },
     defaultOpen: true,
-    children: [
-      { label: "Alphabetical List", to: { name: "players" }, icon: icons.player },
-      { label: "Head to Head", to: { name: "h2h" }, icon: icons.h2h }
-    ]
+    children: [{ label: "Head to Head", to: { name: "h2h" }, icon: icons.h2h }]
   },
   { label: "Stats/Records", to: { name: "statistics-and-records" }, icon: icons.stats },
   { label: "Ranking Rules", to: { name: "ranking-rules" }, icon: icons.seeds },
@@ -47,7 +40,8 @@ const NAV_LINKS = [
     ]
   },
   { label: "Search", to: { name: "search" }, icon: appIcons.search },
-  { label: "About", to: { name: "about" }, icon: appIcons.info }
+  { label: "About", to: { name: "about" }, icon: appIcons.info },
+  { label: "Settings", to: { name: "settings" }, icon: icons.settings }
 ]
 
 const RELATED_LINKS = [
@@ -157,7 +151,7 @@ const groups = computed(() => [
     <!--Command palette-->
     <u-dashboard-search :groups />
 
-    <u-dashboard-sidebar collapsible>
+    <u-dashboard-sidebar>
       <template #header="{ collapsed }">
         {{ collapsed ? "TH" : "TennisHistory" }}
       </template>
@@ -165,9 +159,10 @@ const groups = computed(() => [
       <template #default="{ collapsed }">
         <!--Open command palette-->
         <u-dashboard-search-button
+          v-if="lgAndUp"
           :collapsed
           size="xs"
-          label="Settings"
+          label="Shortcuts"
           :icon="icons.settings"
         />
 

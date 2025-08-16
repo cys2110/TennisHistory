@@ -28,7 +28,8 @@ export default defineNuxtConfig({
           "get",
           "set",
           "useArrayFilter",
-          "useArrayMap"
+          "useArrayMap",
+          "useArrayJoin"
         ]
       },
       {

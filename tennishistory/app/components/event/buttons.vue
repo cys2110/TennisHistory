@@ -12,7 +12,6 @@ const {
   start_date?: DateType
   size?: "xs" | "sm" | "md" | "lg" | "xl"
 }>()
-const { icons } = useAppConfig()
 
 // Show tooltip/disabled button if event has not started yet
 const startDate = computed(() => (start_date ? getDate(start_date) : new Date(1968, 0, 1)))

@@ -1,5 +1,20 @@
 import appConfig from "~/app.config"
 
+export const constructMid = (match_no: number, labels: string[]) => {
+  const genderPrefix =
+    labels.includes("WTA") ? "l"
+    : labels.includes("ATP") ? "g"
+    : labels.includes("Men") ? "m"
+    : "w"
+  const typePrefix = labels.includes("Singles") ? "s" : "d"
+  const drawTypePrefix = labels.includes("Main") ? "m" : "q"
+  const suffix =
+    match_no < 10 ? `00${match_no}`
+    : match_no < 100 ? `0${match_no}`
+    : match_no
+  return `${drawTypePrefix}${genderPrefix}${typePrefix}${suffix}`
+}
+
 export const dateTimeFormat = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "long",
@@ -14,7 +29,9 @@ export const getFlagCode = (country: CountryInterface) => {
     GBR: "united-kingdom",
     TCH: "czechia",
     FRG: "germany",
-    CIV: "cote-divoire"
+    CIV: "cote-divoire",
+    CGO: "congo-brazzaville",
+    COD: "congo-kinshasa"
   }
 
   if (countryMapping[country.id]) {
@@ -28,6 +45,8 @@ export const getFlagCode = (country: CountryInterface) => {
   }
 }
 
+export const percentage = (value1: number, value2: number) => Math.round((value1 / value2) * 100)
+
 export const shortDateFormat = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "numeric",
@@ -36,7 +55,7 @@ export const shortDateFormat = new Intl.DateTimeFormat("en-GB", {
 
 export const getTourColor = (tours: TourType[]) => {
   if (tours.length === 1) {
-    return tours[0]?.toLowerCase() as keyof typeof appConfig.ui.colors
+    return tours[0]?.replace("ITF (M)", "men").replace("ITF (W)", "women").toLowerCase() as keyof typeof appConfig.ui.colors
   }
   return "joint"
 }

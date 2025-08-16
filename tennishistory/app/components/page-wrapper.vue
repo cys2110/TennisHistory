@@ -3,10 +3,6 @@
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar>
-          <template #leading>
-            <u-dashboard-sidebar-collapse />
-          </template>
-
           <template #title>
             <page-title />
           </template>
@@ -18,7 +14,6 @@
             <slot name="nav-right" />
           </template>
         </u-dashboard-navbar>
-
         <u-dashboard-toolbar v-if="$slots.toolbar">
           <slot name="toolbar" />
         </u-dashboard-toolbar>

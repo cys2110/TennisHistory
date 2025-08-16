@@ -1,9 +1,9 @@
 <script setup lang="ts" generic="T">
 import type { Column } from "@tanstack/vue-table"
 
-const { column, type } = defineProps<{
+const { column, label, type } = defineProps<{
   column: Column<T>
-  label: string
+  label?: string
   type: "alpha" | "number"
 }>()
 const { icons } = useAppConfig()
@@ -41,13 +41,15 @@ const sortOptions = computed(() => {
 </script>
 
 <template>
-  <u-dropdown-menu :items="sortOptions">
-    <u-button
-      color="neutral"
-      variant="ghost"
-      :label
-      :icon="getIcon"
-      class="-mx-2.5 data-[state=open]:bg-elevated"
-    />
-  </u-dropdown-menu>
+  <div class="w-full flex justify-center items-center gap-1">
+    <u-dropdown-menu :items="sortOptions">
+      <u-button
+        color="neutral"
+        variant="ghost"
+        :label="label"
+        :icon="getIcon"
+        class="-mx-2.5 data-[state=open]:bg-elevated"
+      />
+    </u-dropdown-menu>
+  </div>
 </template>

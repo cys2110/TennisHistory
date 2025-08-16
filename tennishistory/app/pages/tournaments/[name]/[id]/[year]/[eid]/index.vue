@@ -1,7 +1,20 @@
 <script setup lang="ts">
 definePageMeta({ name: "event" })
+const {
+  params: { id }
+} = useRoute()
 </script>
 
 <template>
-  <div> Page: tournaments/[name]/[id]/[year]/[eid]/index </div>
+  <event-wrapper v-slot="{ tours, tournament }">
+    <event-overview-country
+      v-if="COUNTRY_DRAWS.includes(id as string)"
+      :tournament
+    />
+    <event-overview
+      v-else
+      :tours
+      :tournament
+    />
+  </event-wrapper>
 </template>

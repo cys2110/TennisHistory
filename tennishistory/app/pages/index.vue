@@ -1,6 +1,6 @@
 <script setup lang="ts">
-definePageMeta({ name: "home" })
 useHead({ title: "Home" })
+definePageMeta({ name: "home" })
 const { icons } = useAppConfig()
 
 // Features
@@ -30,7 +30,7 @@ const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.p
   <page-wrapper>
     <u-page-section
       title="Tennis History in the Open Era"
-      description="Explore the history of men's tennis since 1968"
+      description="Explore tennis since 1968"
       :features
     />
     <div class="relative w-full h-[400px] overflow-hidden">

@@ -1,19 +1,22 @@
 export default defineEventHandler(async event => {
-  interface QueryProps {
-    year: string
-    upcoming: string
-  }
-
-  const { year, upcoming } = getQuery<QueryProps>(event)
-
-  const params = {
-    year: Number(year),
-    upcoming: upcoming === "false" ? false : true
-  }
+  const { year } = getQuery<{ year: string }>(event)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (y:Year {id: $year})<-[:IN_YEAR]-(e:Event)-[:EDITION_OF]->(t:Tournament)
+      MATCH
+        (y:Year {id: $year})<-[:IN_YEAR]-
+        (e:Event
+          WHERE
+          coalesce(
+            e.start_date,
+            e.atp_start_date,
+            e.wta_start_date,
+            e.men_start_date,
+            e.women_start_date
+          ) IS
+          NOT
+          NULL)-
+        [:EDITION_OF]->(t:Tournament)
       OPTIONAL MATCH (e)-[:ON_SURFACE]->(s:Surface)
       OPTIONAL MATCH (e)-[:TOOK_PLACE_IN]->(v:Venue)-[:LOCATED_IN]->(c:Country)
       WITH DISTINCT
@@ -27,16 +30,6 @@ export default defineEventHandler(async event => {
             e.women_start_date
           ]
         ) AS start_date
-      WHERE
-        coalesce(
-          e.start_date,
-          e.atp_start_date,
-          e.wta_start_date,
-          e.men_start_date,
-          e.women_start_date
-        ) IS
-        NOT
-        NULL
       ORDER BY start_date
       WITH
         CASE
@@ -60,13 +53,13 @@ export default defineEventHandler(async event => {
           }
         ) AS event
     `,
-    params
+    { year: year ? Number(year) : null }
   )
 
   // Convert Neo4j types to standard JavaScript types
   const events = records.map(record => {
-    const event: EventInterface = record.get("event")
-    const dateKeys: (keyof EventInterface)[] = [
+    const event: any = record.get("event")
+    const dateKeys: (keyof typeof event)[] = [
       "start_date",
       "end_date",
       "atp_start_date",
@@ -78,7 +71,7 @@ export default defineEventHandler(async event => {
       "women_start_date",
       "women_end_date"
     ]
-    const numberKeys: (keyof EventInterface)[] = [
+    const numberKeys: (keyof typeof event)[] = [
       "id",
       "tfc",
       "pm",

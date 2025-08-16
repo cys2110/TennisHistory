@@ -1,9 +1,15 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { TournamentAlphabeticalGrid, TournamentAlphabeticalTable } from "#components"
+
+useHead({ title: "Tournaments" })
+const { viewMode } = useDefaults()
+</script>
 
 <template>
-  <div>
-    Page: tournaments/index
+  <div class="w-full">
+    <component
+      :is="viewMode === 'list' ? TournamentAlphabeticalTable : TournamentAlphabeticalGrid"
+      :key="viewMode"
+    />
   </div>
 </template>
-
-<style scoped></style>
