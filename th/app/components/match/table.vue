@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui"
-const { stats, p1, p2 } = defineProps<{
-  stats: MatchStatsType[]
+const { match } = defineProps<{
+  match: (MatchInterface & { tournament: string }) | undefined
   status: APIStatusType
-  p1: PlayerInterface[] | undefined
-  p2: PlayerInterface[] | undefined
 }>()
+
 const { params } = useRoute()
 const { name, year, mid } = params as {
   name?: string
@@ -13,20 +12,20 @@ const { name, year, mid } = params as {
   mid?: string
 }
 
-const isBold = (row: MatchStatsType, player: string) => {
+const isBold = (row: MatchStatsInterface, player: string) => {
   const lowStats = ["Double faults", "Unforced errors"]
   switch (player) {
     case "p1":
       if (lowStats.includes(row.label)) {
         return row.p1_pc < row.p2_pc
       } else if (
-        (row.label === "Break points saved" && row.p1.endsWith("/0") && !row.p2.endsWith("/0")) ||
-        (row.label === "Break points converted" && !row.p1.endsWith("/0") && row.p2.endsWith("/0"))
+        (row.label === "Break points saved" && (row.p1 as string).endsWith("/0") && !(row.p2 as string).endsWith("/0")) ||
+        (row.label === "Break points converted" && !(row.p1 as string).endsWith("/0") && (row.p2 as string).endsWith("/0"))
       ) {
         return true
       } else if (
-        (row.label === "Break points saved" && !row.p1.endsWith("/0") && row.p2.endsWith("/0")) ||
-        (row.label === "Break points converted" && row.p1.endsWith("/0") && !row.p2.endsWith("/0"))
+        (row.label === "Break points saved" && !(row.p1 as string).endsWith("/0") && (row.p2 as string).endsWith("/0")) ||
+        (row.label === "Break points converted" && (row.p1 as string).endsWith("/0") && !(row.p2 as string).endsWith("/0"))
       ) {
         return false
       } else {
@@ -36,13 +35,13 @@ const isBold = (row: MatchStatsType, player: string) => {
       if (lowStats.includes(row.label)) {
         return row.p2_pc < row.p1_pc
       } else if (
-        (row.label === "Break points saved" && !row.p1.endsWith("/0") && row.p2.endsWith("/0")) ||
-        (row.label === "Break points converted" && row.p1.endsWith("/0") && !row.p2.endsWith("/0"))
+        (row.label === "Break points saved" && !(row.p1 as string).endsWith("/0") && (row.p2 as string).endsWith("/0")) ||
+        (row.label === "Break points converted" && (row.p1 as string).endsWith("/0") && !(row.p2 as string).endsWith("/0"))
       ) {
         return true
       } else if (
-        (row.label === "Break points saved" && row.p1.endsWith("/0") && !row.p2.endsWith("/0")) ||
-        (row.label === "Break points converted" && !row.p1.endsWith("/0") && row.p2.endsWith("/0"))
+        (row.label === "Break points saved" && (row.p1 as string).endsWith("/0") && !(row.p2 as string).endsWith("/0")) ||
+        (row.label === "Break points converted" && !(row.p1 as string).endsWith("/0") && (row.p2 as string).endsWith("/0"))
       ) {
         return false
       } else {
@@ -51,7 +50,7 @@ const isBold = (row: MatchStatsType, player: string) => {
   }
 }
 
-const columns: TableColumn<MatchStatsType>[] = [
+const columns: TableColumn<MatchStatsInterface>[] = [
   {
     accessorKey: "p1_pc",
     meta: { class: { td: "w-2/5" } }
@@ -70,7 +69,7 @@ const columns: TableColumn<MatchStatsType>[] = [
 
 <template>
   <u-table
-    :data="stats"
+    :data="match?.match_stats"
     :columns
     sticky
     class="max-h-200 min-h-fit"
@@ -79,19 +78,29 @@ const columns: TableColumn<MatchStatsType>[] = [
   >
     <template #label-cell="{ row }">
       <match-chart
-        v-if="p1 && p2"
+        v-if="match && row.original.category !== 'Service Speed'"
         :category="row.original.category"
         :label="row.original.label"
-        :p1
-        :p2
-        :stats="stats.filter(s => s.category === row.original.category)"
+        :p1="match.p1"
+        :p2="match.p2"
+        :stats="match.match_stats.filter(s => s.category === row.original.category)"
+        :tournament="match?.tournament"
+      />
+      <match-service-speed
+        v-else-if="match"
+        :category="row.original.category"
+        :label="row.original.label"
+        :p1="match.p1"
+        :p2="match.p2"
+        :stats="match.match_stats.filter(s => s.category === row.original.category)"
+        :tournament="match?.tournament"
       />
     </template>
 
     <template #p1_pc-header>
       <div class="flex items-center gap-2 justify-center">
         <template
-          v-for="(player, index) in p1"
+          v-for="(player, index) in match?.p1 ?? []"
           :key="player.id"
         >
           <u-separator
@@ -129,7 +138,7 @@ const columns: TableColumn<MatchStatsType>[] = [
     <template #p2_pc-header>
       <div class="flex items-center gap-2 justify-center">
         <template
-          v-for="(player, index) in p2"
+          v-for="(player, index) in match?.p2 ?? []"
           :key="player.id"
         >
           <u-separator

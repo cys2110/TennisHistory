@@ -1,27 +1,45 @@
 <script setup lang="ts">
+import { UButton } from "#components"
 import type { TableColumn } from "@nuxt/ui"
-const letter = defineModel<string | undefined>()
+const { icons } = useAppConfig()
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
+const smAndDown = breakpoints.smallerOrEqual("sm")
+
 const page = ref(1)
-const sort = ref<SortType>()
+const firstName = ref<string | undefined>()
+const lastName = ref<string | undefined>()
+const sortOrder = ref<{ type: string; sort: SortType }[]>([])
 
-const coaches = ref<PersonInterface[]>([])
+watch(
+  () => [firstName, lastName, sortOrder.value],
+  () => {
+    page.value = 1
+    set(coaches, [])
+  },
+  { deep: true }
+)
 
-const { data, status, execute } = await useFetch<{ count: number; coaches: PersonInterface[] }>("/api/coaches", {
-  key: `coaches-${letter}-40-${page}`,
-  query: { letter, page, skip: 40, sort },
-  default: () => ({ count: 0, coaches: [] }),
+const coaches = ref([])
+
+// API call
+const { data, status, execute } = await useFetch<{ total: number; coach: PlayerInterface }[]>("/api/coaches", {
+  key: `coaches-${firstName.value}-${lastName.value}-${sortOrder.value}`,
+  query: {
+    pageSize: 40,
+    page,
+    first_name: firstName,
+    last_name: lastName,
+    sort_order: sortOrder
+  },
+  default: () => [],
   lazy: true,
   immediate: false,
-  onResponse: ({ response }) => set(coaches, [...coaches.value, ...(response._data.coaches || [])])
+  onResponse: ({ response }) => {
+    set(coaches, [...coaches.value, ...(response._data.map((item: any) => item.coach) || [])])
+  }
 })
 
 execute()
-
-// Reset skip and tournaments when the selected letter or sort options change
-watch([sort, letter], () => {
-  page.value = 1
-  set(coaches, [])
-})
 
 const table = useTemplateRef<ComponentPublicInstance>("table")
 onMounted(() => {
@@ -33,40 +51,68 @@ onMounted(() => {
     {
       distance: 50,
       canLoadMore: () => {
-        return status.value !== "pending" && data.value.count > coaches.value.length
+        return status.value !== "pending" && (data.value?.[0]?.total ?? 0) > coaches.value.length
       }
     }
   )
 })
 
-const columns: TableColumn<PersonInterface>[] = [{ accessorKey: "last_name" }]
+const columns: TableColumn<PlayerInterface>[] = [
+  { accessorKey: "first_name", footer: () => `Total: ${data.value?.[0]?.total ?? 0}` },
+  { accessorKey: "last_name" },
+  {
+    id: "navigation",
+    cell: ({ row }) =>
+      h(UButton, {
+        label: "Go to...",
+        trailingIcon: icons.coach,
+        to: { name: "coach", params: { id: kebabCase(row.original.id) } },
+        size: smAndDown ? "xs" : "sm"
+      })
+  }
+]
 </script>
 
 <template>
-  <u-table
-    ref="table"
-    :data="coaches"
-    :columns
-    :loading="status === 'pending'"
-    sticky
-    empty="No coaches found"
-    class="scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent w-fit min-w-sm mx-auto"
-  >
-    <template #last_name-header>
-      <custom-sort-table-header
-        label="Coach"
-        type="alpha"
-        v-model="sort"
-      />
-    </template>
+  <div class="w-full">
+    <u-dashboard-panel>
+      <template #header>
+        <u-dashboard-navbar>
+          <template #title>
+            <page-title />
+          </template>
+        </u-dashboard-navbar>
+      </template>
 
-    <template #last_name-cell="{ row }">
-      <u-link
-        :to="{ name: 'coach', params: { id: kebabCase(row.original.id) } }"
-        class="hover-link"
-      >
-        {{ row.original.first_name }} {{ row.original.last_name }}
-      </u-link>
-    </template>
-  </u-table>
+      <template #body>
+        <u-table
+          ref="table"
+          :data="coaches"
+          :columns
+          :loading="status === 'pending'"
+          sticky
+          empty="No coaches found"
+          :ui="{
+            root: 'w-fit min-w-1/3 mx-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent'
+          }"
+        >
+          <template #first_name-header>
+            <custom-input-table-header
+              label="First Name"
+              v-model:filter="firstName"
+              v-model:sort-order="sortOrder"
+            />
+          </template>
+
+          <template #last_name-header>
+            <custom-input-table-header
+              label="Last Name"
+              v-model:filter="lastName"
+              v-model:sort-order="sortOrder"
+            />
+          </template>
+        </u-table>
+      </template>
+    </u-dashboard-panel>
+  </div>
 </template>

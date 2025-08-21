@@ -1,50 +1,61 @@
 <script setup lang="ts">
-import { TournamentCalendarGrid, TournamentCalendarTable } from "#components"
-
 definePageMeta({ name: "surface" })
-const { params } = useRoute()
-const { id } = params as { id: string }
+const {
+  // @ts-ignore
+  params: { id }
+} = useRoute()
+const { viewMode } = useDefaults()
 const { icons } = useAppConfig()
-const { viewMode } = useViewMode()
-const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
-const mdAndUp = breakpoints.greaterOrEqual("md")
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const mdAndDown = breakpoints.smallerOrEqual("md")
+const lg = breakpoints.smallerOrEqual("lg")
 const componentKey = ref(0)
 
+useHead({
+  title: () => `${capitalCase(id as string)} | Surfaces`
+})
+
+const year = useRouteQuery("year", new Date().getFullYear(), { transform: Number })
 const tours = ref<TourType[]>()
-const year = useRouteQuery("year", new Date().getFullYear().toString())
 const months = ref<MonthType[]>()
 const categories = ref<CategoryType[]>()
 const environment = ref<EnvironmentType[]>()
+const surfaces = ref<SurfaceType[]>()
 
+// Force re-rendering of the component when filters change
 watch(
-  [tours, categories, environment, months],
+  [tours, categories, surfaces, environment, months],
   () => {
     componentKey.value++
   },
   { deep: true }
 )
 
-// API calls
+// API call
 const { data: events, status } = await useFetch<EventInterface[]>("/api/surfaces/details", {
+  key: `surface-details-${id}-${year}`,
   query: { id: capitalCase(id as string), year },
   default: () => []
 })
 
-useHead({ title: () => `${capitalCase(id as string)} | Surfaces` })
+useJsonld(() => ({
+  "@context": "https://schema.org",
+  "@type": "ItemPage",
+  name: capitalCase(id as string),
+  description: `Events which took place on the surface: ${capitalCase(id as string)}`
+}))
 
 const filteredEvents = computed(() =>
   events.value.filter(event => {
     if (
-      (tours.value && tours.value.length > 0 && !event.tours.some(tour => tours.value?.includes(tour))) ||
-      (categories.value &&
-        categories.value.length > 0 &&
+      (tours.value?.length && !event.tours.some(tour => tours.value?.includes(tour))) ||
+      (categories.value?.length &&
         [event.category, event.atp_category, event.wta_category, event.men_category, event.women_category].some(
           category => category && !categories.value?.includes(category)
         )) ||
-      (environment.value && environment.value.length > 0 && (!event.surface || !environment.value.includes(event.surface.environment))) ||
-      (months.value &&
-        months.value.length > 0 &&
+      (surfaces.value?.length && (!event.surface || !surfaces.value.includes(event.surface.surface))) ||
+      (environment.value?.length && (!event.surface || !environment.value.includes(event.surface.environment))) ||
+      (months.value?.length &&
         [
           event.start_date?.month,
           event.atp_start_date?.month,
@@ -52,9 +63,8 @@ const filteredEvents = computed(() =>
           event.men_start_date?.month,
           event.women_start_date?.month
         ].some(month => month && !months.value?.includes(MONTHS[month - 1]!)))
-    ) {
+    )
       return false
-    }
     return true
   })
 )
@@ -72,65 +82,123 @@ const toc = computed(() => [
 </script>
 
 <template>
-  <page-wrapper>
-    <!--Filters-->
-    <template #nav-right>
-      <u-slideover
-        v-if="mdAndDown"
-        title="Filters"
-        class="ml-auto"
-      >
-        <u-button
-          :icon="icons.filter"
-          size="xs"
-        />
-        <template #body>
-          <filter-combined
-            :filters="['all-years', 'month', 'tour', 'category']"
-            v-model:year="year"
-            v-model:months="months"
+  <div class="w-full">
+    <u-dashboard-panel>
+      <template #header>
+        <u-dashboard-navbar>
+          <template #title>
+            <page-title />
+          </template>
+
+          <template #right>
+            <u-slideover
+              v-if="mdAndDown && viewMode !== 'list'"
+              title="Filters"
+              class="ml-auto"
+            >
+              <u-button
+                :icon="icons.filter"
+                size="xs"
+              />
+
+              <template #body>
+                <filter-select-all-years v-model="year" />
+                <filter-select-months v-model="months" />
+                <filter-checkbox-tours v-model="tours" />
+                <filter-select-categories
+                  v-model="categories"
+                  v-model:tour="tours"
+                />
+                <filter-checkbox-surfaces
+                  v-model="surfaces"
+                  v-model:environment="environment"
+                />
+              </template>
+            </u-slideover>
+            <u-popover v-if="viewMode !== 'list'">
+              <u-button
+                :size="mdAndDown ? 'xs' : 'sm'"
+                :icon="icons.toc"
+              />
+              <template #content>
+                <u-command-palette
+                  placeholder="Search events"
+                  :groups="toc"
+                  :loading="status === 'pending'"
+                  :fuse="{ resultLimit: 200 }"
+                  :ui="{ content: 'max-h-80', root: 'border border-primary rounded-lg' }"
+                />
+              </template>
+            </u-popover>
+          </template>
+        </u-dashboard-navbar>
+
+        <u-dashboard-toolbar v-if="!mdAndDown && viewMode !== 'list'">
+          <filter-select-all-years v-model="year" />
+          <filter-select-months v-model="months" />
+          <filter-select-tours
+            v-if="lg"
+            v-model="tours"
+          />
+          <filter-checkbox-tours
+            v-else
+            v-model="tours"
+          />
+          <filter-select-categories
+            v-model="categories"
             v-model:tour="tours"
-            v-model:categories="categories"
+          />
+          <filter-select-surfaces
+            v-if="lg"
+            v-model="surfaces"
             v-model:environment="environment"
           />
-        </template>
-      </u-slideover>
-      <u-popover v-if="viewMode === 'cards' || mdAndDown">
-        <u-button
-          :size="mdAndDown ? 'xs' : 'sm'"
-          :icon="icons.toc"
-        />
-        <template #content>
-          <u-command-palette
-            placeholder="Search events"
-            :groups="toc"
-            :loading="status === 'pending'"
-            :fuse="{ resultLimit: 200 }"
-            :ui="{ content: 'max-h-80', root: 'border border-primary rounded-lg' }"
+          <filter-checkbox-surfaces
+            v-else
+            v-model="surfaces"
+            v-model:environment="environment"
           />
-        </template>
-      </u-popover>
-    </template>
-    <template
-      #toolbar
-      v-if="!mdAndDown"
-    >
-      <filter-combined
-        :filters="['all-years', 'month', 'tour', 'category']"
-        v-model:year="year"
-        v-model:months="months"
-        v-model:tour="tours"
-        v-model:categories="categories"
-        v-model:environment="environment"
-      />
-    </template>
+        </u-dashboard-toolbar>
+      </template>
 
-    <component
-      :is="viewMode === 'list' && mdAndUp ? TournamentCalendarTable : TournamentCalendarGrid"
-      :events="filteredEvents"
-      :status
-      :key="`${viewMode}-${componentKey}`"
-      :value="capitalCase(id as string)"
-    />
-  </page-wrapper>
+      <template #body>
+        <event-table
+          v-if="viewMode === 'list'"
+          v-model="year"
+          :events
+          :status
+        />
+
+        <u-page-grid
+          v-else-if="events.length || status === 'pending'"
+          class="xl:grid-cols-4 2xl:grid-cols-5 p-5 scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent overflow-y-auto scroll-smooth"
+        >
+          <event-card
+            v-if="events.length"
+            v-for="event in filteredEvents"
+            :key="event.id"
+            :event
+          />
+
+          <loading-event
+            v-else
+            v-for="_ in 10"
+            :key="_"
+          />
+        </u-page-grid>
+
+        <error-message
+          v-else
+          :message="`No events took place on ${capitalCase(id as string)} in ${year}.`"
+        />
+      </template>
+
+      <template
+        #footer
+        v-if="viewMode !== 'list'"
+      >
+        <div class="font-semibold p-5 border-t border-muted">Total: {{ filteredEvents.length }}</div>
+      </template>
+    </u-dashboard-panel>
+  </div>
 </template>

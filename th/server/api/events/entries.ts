@@ -3,38 +3,46 @@ export default defineEventHandler(async query => {
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (e:Event {id: toInteger($id)})-[:EDITION_OF]->(t:Tournament)
+      MATCH (e:Event {id: toInteger($id)})
       MATCH (p:Player)-[:ENTERED]->(f:Entry)
       WHERE f.id STARTS WITH $id
-      OPTIONAL MATCH (f)-[:SCORED]->(s:Score)-[:SCORED]->(n:Best3|Best5)
-      OPTIONAL MATCH (f)-[z:WITHDREW|Q_WITHDREW]->(:Event)
+      OPTIONAL MATCH (f)-[:SCORED]->(s:Score)-[:SCORED]->(n:Match)
+      OPTIONAL MATCH (f)-[x:WITHDREW|Q_WITHDREW]->(:Event)
       OPTIONAL MATCH (s)<-[:SCORED]-(:Entry)<-[:ENTERED]-(p1:Player)
       WHERE p.id <> p1.id
       CALL (p, e) {
         MATCH (p)-[:REPRESENTS]->(c:Country)
-        OPTIONAL MATCH (p)-[x:REPRESENTED]->(o:Country)
+        OPTIONAL MATCH
+          (p)-
+            [z:REPRESENTED WHERE
+              (z.start_date <= e.start_date OR
+                ('ATP' IN labels(p) AND
+                  z.start_date <= coalesce(e.atp_start_date, e.men_start_date)) OR
+                ('WTA') IN labels(p) AND
+                z.start_date <= coalesce(e.wta_start_date, e.women_start_date)) AND
+              (z.end_date > e.start_date OR
+                ('ATP' IN labels(p) AND
+                  z.end_date > coalesce(e.atp_start_date, e.men_start_date) OR
+                  ('WTA' IN labels(p) AND
+                    z.end_date > coalesce(e.wta_start_date, e.women_start_date))))]->
+          (o:Country)
         RETURN
           CASE
-            WHEN
-              x IS NOT NULL AND
-              x.start_date <= e.start_date AND
-              x.end_date > e.start_date
-              THEN apoc.any.properties(o)
-            ELSE apoc.any.properties(c)
+            WHEN z IS NULL THEN properties(c)
+            ELSE properties(o)
           END AS country
       }
       WITH
-        t.name AS tournament,
         country,
         p,
         f,
-        z,
+        x,
         CASE
           WHEN f:Singles THEN 'Singles'
           ELSE 'Doubles'
         END AS type,
         CASE
-          WHEN n:Main OR (z IS NOT NULL AND z:WITHDREW) THEN 'Main'
+          WHEN n:Main OR (x IS NOT NULL AND x:WITHDREW) THEN 'Main'
           ELSE 'Qualifying'
         END AS draw,
         CASE
@@ -43,27 +51,28 @@ export default defineEventHandler(async query => {
         END AS tour,
         p1.id AS team_mate,
         CASE
-          WHEN z IS NULL THEN false
+          WHEN x IS NULL THEN false
           ELSE true
         END AS withdrawn,
-        z.team_mate AS withdrawn_teammate
+        x.team_mate AS withdrawn_teammate
       ORDER BY f.rank
       RETURN DISTINCT
-        tournament,
-        apoc.map.mergeList(
-          [
-            apoc.any.properties(f),
-            apoc.any.properties(p),
-            {
-              country: country,
-              draw: draw,
-              type: type,
-              team_mate: CASE WHEN withdrawn_teammate IS NULL THEN team_mate ELSE withdrawn_teammate END,
-              withdrawn: withdrawn,
-              tour: tour
-            }
-          ]
-        ) AS entry
+        apoc.map.mergeList([
+          properties(f),
+          properties(p),
+          {
+            country: country,
+            draw: draw,
+            type: type,
+            team_mate:
+              CASE
+                WHEN withdrawn_teammate IS NULL THEN team_mate
+                ELSE withdrawn_teammate
+              END,
+            withdrawn: withdrawn,
+            tour: tour
+          }
+        ]) AS entry
     `,
     { id }
   )
@@ -81,8 +90,5 @@ export default defineEventHandler(async query => {
     return entry
   })
 
-  return {
-    tournament: records[0]?.get("tournament") ?? null,
-    entries
-  }
+  return entries
 })

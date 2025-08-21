@@ -229,8 +229,8 @@ export default defineAppConfig({
     slideover: { slots: { body: "flex flex-col gap-5" } },
     table: {
       slots: {
-        th: "text-xs md:text-sm lg:text-md p-2 text-center",
-        td: "text-xs md:text-sm lg:text-md p-2 text-center"
+        th: "text-xs md:text-sm text-center py-2",
+        td: "text-xs md:text-sm text-center py-2"
       },
       defaultVariants: { loadingAnimation: "swing" }
     },
@@ -275,7 +275,7 @@ export default defineAppConfig({
         body: "scroll-smooth"
       }
     },
-    dashboardToolbar: { slots: { root: "py-2 flex-wrap gap-x-6 xl:gap-x-2" } },
+    dashboardToolbar: { slots: { root: "py-2 flex-wrap gap-x-4 xl:gap-x-2" } },
     pageSection: { slots: { container: "py-4 sm:py-4 lg:py-4" } },
     pageCard: {
       slots: { footer: "self-center mt-auto pt-4 flex justify-center" }

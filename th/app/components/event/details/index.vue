@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { EventDetailsGrid, EventDetailsTable } from "#components"
-const { viewMode } = useViewMode()
+const { eid, year } = useRoute().params as { eid: string; year: string }
 const { icons } = useAppConfig()
-const { params } = useRoute()
-const { eid } = params as { eid: string }
+const { viewMode, tableMode } = useDefaults()
+const tours = inject<TourType[]>("tours", [])
+const tournament = inject<TournamentInterface>("tournament")
 
 // API call
 const { data: event, status } = await useFetch<EventInterface>("/api/events/details", {
+  key: `event-details-${eid}`,
   query: { id: eid }
 })
 </script>
@@ -17,11 +18,399 @@ const { data: event, status } = await useFetch<EventInterface>("/api/events/deta
     title="Details"
     :icon="icons.overview"
   >
-    <component
-      :is="viewMode === 'list' ? EventDetailsTable : EventDetailsGrid"
-      :key="viewMode"
-      :event
-      :status
+    <table
+      v-if="viewMode === 'list' && event"
+      class="w-1/3 min-w-fit mx-auto"
+    >
+      <tbody>
+        <tr v-if="event?.sponsor_name">
+          <th>Sponsor Name</th>
+          <td>{{ event.sponsor_name }}</td>
+        </tr>
+        <tr v-if="event?.category || event?.wta_category || event?.atp_category || event?.men_category || event?.women_category">
+          <th>Category</th>
+          <td>
+            <u-link
+              v-if="event.category"
+              :to="{ name: 'category', params: { id: kebabCase(event.category) } }"
+              class="hover-link"
+            >
+              {{ event.category }}
+            </u-link>
+            <div
+              v-else
+              class="flex flex-col"
+            >
+              <u-link
+                v-if="event.atp_category"
+                class="hover-link"
+                :class="{ 'atp-link': tours.length > 1 }"
+                :to="{ name: 'category', params: { id: kebabCase(event.atp_category) } }"
+              >
+                {{ event.atp_category }}
+              </u-link>
+              <u-link
+                v-if="event.wta_category"
+                class="hover-link"
+                :class="{ 'wta-link': tours.length > 1 }"
+                :to="{ name: 'category', params: { id: kebabCase(event.wta_category) } }"
+              >
+                {{ event.wta_category }}
+              </u-link>
+              <u-link
+                v-if="event.men_category"
+                class="hover-link"
+                :class="{ 'men-link': tours.length > 1 }"
+                :to="{ name: 'category', params: { id: kebabCase(event.men_category) } }"
+              >
+                {{ event.men_category }}
+              </u-link>
+              <u-link
+                v-if="event.women_category"
+                class="hover-link"
+                :class="{ 'women-link': tours.length > 1 }"
+                :to="{ name: 'category', params: { id: kebabCase(event.women_category) } }"
+              >
+                {{ event.women_category }}
+              </u-link>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th>Dates</th>
+          <td>
+            <div v-if="event.start_date && event.end_date">
+              {{ dateTimeFormat.formatRange(getDate(event.start_date), getDate(event.end_date)) }}
+            </div>
+            <div class="flex flex-col">
+              <div
+                v-if="event.atp_start_date && event.atp_end_date"
+                :class="{ 'text-atp': tours.length > 1 }"
+              >
+                {{ dateTimeFormat.formatRange(getDate(event.atp_start_date), getDate(event.atp_end_date)) }}
+              </div>
+              <div
+                v-if="event.wta_start_date && event.wta_end_date"
+                :class="{ 'text-wta': tours.length > 1 }"
+              >
+                {{ dateTimeFormat.formatRange(getDate(event.wta_start_date), getDate(event.wta_end_date)) }}
+              </div>
+              <div
+                v-if="event.men_start_date && event.men_end_date"
+                :class="{ 'text-men': tours.length > 1 }"
+              >
+                {{ dateTimeFormat.formatRange(getDate(event.men_start_date), getDate(event.men_end_date)) }}
+              </div>
+              <div
+                v-if="event.women_start_date && event.women_end_date"
+                :class="{ 'text-women': tours.length > 1 }"
+              >
+                {{ dateTimeFormat.formatRange(getDate(event.women_start_date), getDate(event.women_end_date)) }}
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr v-if="event.surface">
+          <th>Surface</th>
+          <td>
+            <u-link
+              class="hover-link font-bold"
+              :to="{ name: 'surface', params: { id: kebabCase(event.surface.id) } }"
+            >
+              {{ event.surface.id }}
+            </u-link>
+          </td>
+        </tr>
+        <tr v-if="event.venues.length">
+          <th>Venues</th>
+          <td>
+            <div class="flex flex-col">
+              <div
+                class="flex items-center gap-2"
+                v-for="venue in event.venues"
+                :key="venue.id"
+              >
+                <u-link
+                  class="hover-link w-fit"
+                  :to="{ name: 'venue', params: { id: kebabCase(venue.id) } }"
+                >
+                  {{ venue.name ? `${venue.name}, ${venue.city}` : venue.city }}
+                </u-link>
+                <country-link :country="venue.country" />
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr v-if="event.supervisors.length">
+          <th>Supervisors</th>
+          <td>
+            <div class="flex flex-col">
+              <u-link
+                v-for="supervisor in event.supervisors"
+                :key="supervisor.id"
+                class="hover-link w-fit"
+                :to="{ name: 'supervisor', params: { id: kebabCase(supervisor.id) } }"
+              >
+                {{ supervisor.id }}
+              </u-link>
+            </div>
+          </td>
+        </tr>
+        <tr v-if="(event.atp_pm && event.atp_currency) || (event.men_pm && event.men_currency) || (event.women_pm && event.women_currency)">
+          <th>Prize Money</th>
+          <td>
+            <div class="flex flex-col">
+              <div
+                v-if="event.atp_pm"
+                :class="{ 'text-atp': tours.length > 1 }"
+              >
+                {{ event.atp_pm.toLocaleString("en-GB", { style: "currency", currency: event.atp_currency }) }}
+              </div>
+              <div
+                v-if="event.men_pm"
+                :class="{ 'text-men': tours.length > 1 }"
+              >
+                {{ event.men_pm.toLocaleString("en-GB", { style: "currency", currency: event.men_currency }) }}
+              </div>
+              <div
+                v-if="event.women_pm"
+                :class="{ 'text-women': tours.length > 1 }"
+              >
+                {{ event.women_pm.toLocaleString("en-GB", { style: "currency", currency: event.women_currency }) }}
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr v-if="(event.atp_tfc && event.atp_currency) || (event.wta_tfc && event.wta_currency)">
+          <th>Total Financial Commitment</th>
+          <td>
+            <div class="flex flex-col">
+              <div
+                v-if="event.atp_tfc"
+                :class="{ 'text-atp': tours.length > 1 }"
+              >
+                {{ event.atp_tfc.toLocaleString("en-GB", { style: "currency", currency: event.atp_currency }) }}
+              </div>
+              <div
+                v-if="event.wta_tfc"
+                :class="{ 'text-wta': tours.length > 1 }"
+              >
+                {{ event.wta_tfc.toLocaleString("en-GB", { style: "currency", currency: event.wta_currency }) }}
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <u-page-columns
+      v-else-if="event"
+      class="xl:columns-4 2xl:columns-5"
+    >
+      <details-card
+        v-if="event.sponsor_name"
+        title="Sponsor Name"
+        :value="event.sponsor_name"
+      />
+
+      <details-card
+        v-if="event.category || event.atp_category || event.wta_category || event.men_category || event.women_category"
+        title="Category"
+      >
+        <u-link
+          v-if="event.category"
+          :to="{ name: 'category', params: { id: kebabCase(event.category) } }"
+          class="hover-link"
+        >
+          {{ event.category }}
+        </u-link>
+        <div class="flex flex-col">
+          <u-link
+            v-if="event.atp_category"
+            class="hover-link"
+            :class="{ 'atp-link': tours.length > 1 }"
+            :to="{ name: 'category', params: { id: kebabCase(event.atp_category) } }"
+          >
+            {{ event.atp_category }}
+          </u-link>
+          <u-link
+            v-if="event.wta_category"
+            class="hover-link"
+            :class="{ 'wta-link': tours.length > 1 }"
+            :to="{ name: 'category', params: { id: kebabCase(event.wta_category) } }"
+          >
+            {{ event.wta_category }}
+          </u-link>
+          <u-link
+            v-if="event.men_category"
+            class="hover-link"
+            :class="{ 'men-link': tours.length > 1 }"
+            :to="{ name: 'category', params: { id: kebabCase(event.men_category) } }"
+          >
+            {{ event.men_category }}
+          </u-link>
+          <u-link
+            v-if="event.women_category"
+            class="hover-link"
+            :class="{ 'women-link': tours.length > 1 }"
+            :to="{ name: 'category', params: { id: kebabCase(event.women_category) } }"
+          >
+            {{ event.women_category }}
+          </u-link>
+        </div>
+      </details-card>
+
+      <details-card title="Dates">
+        <div v-if="event.start_date && event.end_date">
+          {{ dateTimeFormat.formatRange(getDate(event.start_date), getDate(event.end_date)) }}
+        </div>
+        <div class="flex flex-col">
+          <div
+            v-if="event.atp_start_date && event.atp_end_date"
+            :class="{ 'text-atp': tours.length > 1 }"
+          >
+            {{ dateTimeFormat.formatRange(getDate(event.atp_start_date), getDate(event.atp_end_date)) }}
+          </div>
+          <div
+            v-if="event.wta_start_date && event.wta_end_date"
+            :class="{ 'text-wta': tours.length > 1 }"
+          >
+            {{ dateTimeFormat.formatRange(getDate(event.wta_start_date), getDate(event.wta_end_date)) }}
+          </div>
+          <div
+            v-if="event.men_start_date && event.men_end_date"
+            :class="{ 'text-men': tours.length > 1 }"
+          >
+            {{ dateTimeFormat.formatRange(getDate(event.men_start_date), getDate(event.men_end_date)) }}
+          </div>
+          <div
+            v-if="event.women_start_date && event.women_end_date"
+            :class="{ 'text-women': tours.length > 1 }"
+          >
+            {{ dateTimeFormat.formatRange(getDate(event.women_start_date), getDate(event.women_end_date)) }}
+          </div>
+        </div>
+      </details-card>
+
+      <details-card
+        v-if="event.surface"
+        title="Surface"
+      >
+        <u-link
+          class="hover-link font-bold"
+          :to="{ name: 'surface', params: { id: kebabCase(event.surface.id) } }"
+        >
+          {{ event.surface.id }}
+        </u-link>
+      </details-card>
+
+      <details-card
+        v-if="event.venues.length"
+        :title="event.venues.length === 1 ? 'Venue' : 'Venues'"
+      >
+        <template #icon>
+          <country-link :country="event.venues[0]!.country" />
+        </template>
+
+        <div class="flex flex-col">
+          <u-link
+            v-for="venue in event.venues"
+            :key="venue.id"
+            class="hover-link font-bold w-fit mx-auto"
+            :to="{ name: 'venue', params: { id: kebabCase(venue.id) } }"
+          >
+            {{ venue.name ? `${venue.name}, ${venue.city}` : venue.city }}
+          </u-link>
+        </div>
+      </details-card>
+
+      <details-card
+        v-if="event.supervisors.length"
+        :title="event.supervisors.length === 1 ? 'Supervisor' : 'Supervisors'"
+      >
+        <div class="flex flex-col">
+          <u-link
+            v-for="supervisor in event.supervisors"
+            :key="supervisor.id"
+            class="hover-link font-bold w-fit mx-auto"
+            :to="{ name: 'supervisor', params: { id: kebabCase(supervisor.id) } }"
+          >
+            {{ supervisor.id }}
+          </u-link>
+        </div>
+      </details-card>
+
+      <details-card
+        v-if="(event.atp_pm && event.atp_currency) || (event.men_pm && event.men_currency) || (event.women_pm && event.women_currency)"
+        title="Prize Money"
+      >
+        <div class="flex flex-col">
+          <div
+            v-if="event.atp_pm"
+            :class="{ 'text-atp': tours.length > 1 }"
+          >
+            {{ event.atp_pm.toLocaleString("en-GB", { style: "currency", currency: event.atp_currency }) }}
+          </div>
+          <div
+            v-if="event.men_pm"
+            :class="{ 'text-men': tours.length > 1 }"
+          >
+            {{ event.men_pm.toLocaleString("en-GB", { style: "currency", currency: event.men_currency }) }}
+          </div>
+          <div
+            v-if="event.women_pm"
+            :class="{ 'text-women': tours.length > 1 }"
+          >
+            {{ event.women_pm.toLocaleString("en-GB", { style: "currency", currency: event.women_currency }) }}
+          </div>
+        </div>
+      </details-card>
+
+      <details-card
+        v-if="(event.atp_tfc && event.atp_currency) || (event.wta_tfc && event.wta_currency)"
+        title="Total Financial Commitment"
+      >
+        <div class="flex flex-col">
+          <div
+            v-if="event.atp_tfc"
+            :class="{ 'text-atp': tours.length > 1 }"
+          >
+            {{ event.atp_tfc.toLocaleString("en-GB", { style: "currency", currency: event.atp_currency }) }}
+          </div>
+          <div
+            v-if="event.wta_tfc"
+            :class="{ 'text-wta': tours.length > 1 }"
+          >
+            {{ event.wta_tfc.toLocaleString("en-GB", { style: "currency", currency: event.wta_currency }) }}
+          </div>
+        </div>
+      </details-card>
+    </u-page-columns>
+    <u-page-columns v-else>
+      <loading-base
+        v-for="_ in 10"
+        :key="_"
+      />
+    </u-page-columns>
+    <error-message
+      v-else
+      :message="`No details found for ${tournament?.name} ${year}`"
     />
   </dashboard-subpanel>
 </template>
+
+<style scoped>
+@reference "../../../assets/css/main.css";
+
+tr {
+  @apply border-y border-muted;
+}
+
+td {
+  @apply p-2 text-sm;
+}
+
+th {
+  @apply text-sm text-muted;
+}
+</style>

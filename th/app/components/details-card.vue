@@ -9,29 +9,27 @@ defineProps<{
 
 <template>
   <u-card
-    :class="tour ? `ring-${getTourColor(Array.isArray(tour) ? tour : [tour])}` : 'ring-joint'"
     :ui="{
-      header: 'font-bold text-center',
-      body: 'text-center'
+      root: tour ? `ring-${getTourColour(Array.isArray(tour) ? tour : [tour])}` : 'ring-joint',
+      header: 'font-semibold text-muted flex justify-between items-center',
+      body: 'text-center text-sm'
     }"
   >
-    <template #header>{{ title }}</template>
+    <template #header>
+      {{ title }}
+      <slot
+        name="icon"
+        v-if="$slots.icon"
+      />
+    </template>
 
-    <slot
-      name="description"
-      v-if="$slots.description"
-    />
+    <slot v-if="$slots.default" />
+
     <div
       v-else
       class="font-semibold"
     >
-      <div class="font-extrabold">{{ value }}</div>
-      <div
-        v-if="description"
-        class="text-sm font-semibold text-dimmed"
-      >
-        {{ description }}
-      </div>
+      <div>{{ value }}</div>
     </div>
   </u-card>
 </template>

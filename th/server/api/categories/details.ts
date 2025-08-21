@@ -1,34 +1,53 @@
 export default defineEventHandler(async query => {
   const { year, id } = getQuery<{ year: string; id: string }>(query)
 
-  // TODO: Remove start date guards
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-    MATCH (y:Year {id: $year})<-[:IN_YEAR]-(e:Event)-[:EDITION_OF]->(t:Tournament) WHERE apoc.text.clean($id) IN [apoc.text.clean(e.category), apoc.text.clean(e.atp_category), apoc.text.clean(e.wta_category), apoc.text.clean(e.men_category), apoc.text.clean(e.women_category)]
+    MATCH
+      (y:Year {id: $year})<-[:IN_YEAR]-
+      (e:Event
+        WHERE
+        coalesce(
+          e.start_date,
+          e.atp_start_date,
+          e.wta_start_date,
+          e.men_start_date,
+          e.women_start_date
+        ) IS
+        NOT
+        NULL)-
+        [:EDITION_OF]->
+      (t:Tournament)
+    WHERE
+      apoc.text.clean($id) IN [
+        apoc.text.clean(e.category),
+        apoc.text.clean(e.atp_category),
+        apoc.text.clean(e.wta_category),
+        apoc.text.clean(e.men_category),
+        apoc.text.clean(e.women_category)
+      ]
     OPTIONAL MATCH (e)-[:ON_SURFACE]->(s:Surface)
     OPTIONAL MATCH (e)-[:TOOK_PLACE_IN]->(v:Venue)-[:LOCATED_IN]->(c:Country)
-    WITH
-      DISTINCT *,
-      apoc.coll.min([e.start_date, e.atp_start_date, e.wta_start_date, e.men_start_date, e.women_start_date]) AS start_date
-    WHERE
-      (e.start_date IS NOT NULL OR e.atp_start_date IS NOT NULL OR e.wta_start_date IS NOT NULL OR e.men_start_date IS NOT NULL OR e.women_start_date IS NOT NULL)
+    WITH DISTINCT
+      *,
+      apoc.coll.min([
+        e.start_date,
+        e.atp_start_date,
+        e.wta_start_date,
+        e.men_start_date,
+        e.women_start_date
+      ]) AS start_date
     ORDER BY start_date
     WITH
-    CASE
-      WHEN COUNT(v) = 0 THEN []
-      ELSE
-        COLLECT(
-          apoc.map.merge(
-            apoc.any.properties(v),
-            {country: apoc.any.properties(c)}
-          )
-        )
-    END AS venues,
-    apoc.any.properties(s) AS surface,
-    apoc.any.properties(t) AS tournament,
-    apoc.any.properties(e) AS event,
-    [x IN labels(e) WHERE NOT x IN ['Event', 'Update']] AS tours,
-    y.id AS year
+      CASE
+        WHEN COUNT(v) = 0 THEN []
+        ELSE COLLECT(apoc.map.merge(properties(v), {country: properties(c)}))
+      END AS venues,
+      properties(s) AS surface,
+      properties(t) AS tournament,
+      properties(e) AS event,
+      [x IN labels(e) WHERE NOT x IN ['Event', 'Update']] AS tours,
+      y.id AS year
     RETURN
       apoc.map.merge(
         event,

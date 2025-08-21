@@ -5,267 +5,169 @@ const {
   icons,
   ui: { icons: appIcons }
 } = useAppConfig()
-const { name, params, query } = useRoute()
-const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
+const {
+  name: routeName,
+  // @ts-ignore
+  params: { id, name, year, mid, eid },
+  query
+} = useRoute()
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const mdAndUp = breakpoints.greaterOrEqual("md")
 
-const {
-  id,
-  mid,
-  eid,
-  year,
-  name: paramName
-} = params as {
-  id?: string
-  mid?: string
-  eid?: string
-  year?: string
-  name?: string
-}
-
 const apiRoute = computed(() => {
-  switch (name) {
+  switch (routeName) {
     case "category":
-      return "/api/categories/overview"
-    case "coach":
-      return `/api/coaches/overview`
-    case "country":
-      // case "country-players":
-      // case "country-events":
-      return `/api/countries/overview`
-    case "player":
-    case "activity":
-    case "titles-and-finals":
-    case "wl-index":
-    case "stats":
-    case "record":
-      return "/api/players/overview"
+      return {
+        route: `/api/categories/overview?id=${id}`,
+        key: `category-overview-${id}`
+      }
+    case "match":
+      return {
+        route: `/api/matches/overview?id=${eid}&mid=${mid}`,
+        key: `match-overview-${eid}-${mid}`
+      }
     case "supervisor":
-      return `/api/supervisors/overview`
+      return {
+        route: `/api/supervisors/overview?id=${id}`,
+        key: `supervisor-overview-${id}`
+      }
     case "tournament":
-      return `/api/tournaments/overview`
-    case "umpire":
-      return `/api/umpires/overview`
+    case "event":
+    case "results":
+    case "draws":
+      return {
+        route: `/api/tournaments/overview?id=${id}`,
+        key: `tournament-overview-${id}`
+      }
     case "venue":
-      return `/api/venues/overview`
-    case "match":
-      return "/api/matches/overview"
-    case "event":
-    case "results":
-    case "draws":
-      return "/api/events/overview"
+      return {
+        route: `/api/venues/overview?id=${id}`,
+        key: `venue-overview-${id}`
+      }
     default:
-      return ""
+      return {
+        route: "",
+        key: ""
+      }
   }
 })
 
-const apiParams = computed(() => {
-  switch (name) {
-    case "event":
-    case "results":
-    case "draws":
-    case "match":
-      return { id: eid, mid }
-    default:
-      return { id }
-  }
+const { data } = await useFetch<any>(() => apiRoute.value.route, {
+  key: apiRoute.value.key
 })
 
-const { data } = await useFetch<any>(apiRoute.value, { query: apiParams })
-
+// @ts-ignore
 const breadcrumbs = computed<BreadcrumbItem[]>(() => {
   const crumbs: BreadcrumbItem[] = [{ label: "Home", icon: icons.home, to: { name: "home" } }]
 
-  switch (name) {
+  switch (routeName) {
     case "about":
-      return [...crumbs, { label: "About", icon: appIcons.info }]
+      return [...crumbs, { label: "About", icon: appIcons.info, to: { name: "about" } }]
     case "categories":
-      return [...crumbs, { label: "Categories", icon: icons.categories }]
     case "category":
       return [
         ...crumbs,
         { label: "Categories", icon: icons.categories, to: { name: "categories" } },
-        { label: data.value || capitalCase(id as string) }
+        ...(routeName === "category" ? [{ label: data.value ?? capitalCase(id as string) }] : [])
       ]
-    // case "coach":
-    //   return [...crumbs, { label: "Coaches", icon: icons.coach, to: { name: "coaches" } }, { label: data.value?.name ?? "Loading..." }]
     case "coaches":
-      return [...crumbs, { label: "Coaches", icon: icons.coach }]
+      return [...crumbs, { label: "Coaches", icon: icons.coach, to: { name: "coaches" } }]
     case "countries":
-      return [...crumbs, { label: "Countries", icon: icons.countries }]
-    // case "country":
-    //   return [
-    //     ...crumbs,
-    //     { label: "Countries", icon: icons.countries, to: { name: "countries" } },
-    //     { label: data.value?.name || "Loading...", icon: getFlagCode(data.value) }
-    //   ]
-    // case "country-players":
-    // case "country-events":
-    //   return [
-    //     ...crumbs,
-    //     { label: "Countries", icon: icons.countries, to: { name: "countries" } },
-    //     {
-    //       label: data.value?.name || "Loading...",
-    //       icon: getFlagCode(data.value),
-    //       to: { name: "country", params: { id: params.id || "", name: params.name || "" } }
-    //     },
-    //     { label: name === "country-players" ? "Players" : "Events", icon: name === "country-players" ? icons.player : icons.event }
-    //   ]
-    case "event":
-    case "results":
-    case "draws":
-      const eventPage = computed(() => EVENT_PAGES.find(page => page.name === name))
-      return [
-        ...crumbs,
-        { label: "Tournaments", icon: icons.tournament, to: { name: "tournaments" } },
-        { label: data.value?.tournament || capitalCase(paramName as string) },
-        { label: year },
-        {
-          label: eventPage.value?.label || "",
-          icon: eventPage.value?.icon,
-          ui: { linkLeadingIcon: eventPage.value?.icon === icons.draw ? "rotate-90 text-lg" : undefined }
-        }
-      ]
-    case "h2h":
-      return [...crumbs, { label: "Head to Head", icon: icons.h2h }]
-    // case "h2h-player":
-    //   return [...crumbs, { label: "Head to Head", icon: icons.h2h, to: { name: "h2h" } }, { label: `${params.p1Name} vs ${params.p2Name}` }]
+      return [...crumbs, { label: "Countries", icon: icons.countries, to: { name: "countries" } }]
     case "match":
-      const { type, draw, tour } = destructureMid(mid as string)
+      const { type, tour } = destructureMid(mid)
       return [
         ...crumbs,
         { label: "Tournaments", icon: icons.tournament, to: { name: "tournaments" } },
-        { label: data.value?.tournament || "Loading...", to: { name: "tournament", params: { id, name: paramName } } },
-        { label: year, to: { name: "event", params: { id, name: paramName, year, eid } } },
+        { label: data.value?.name || capitalCase(name as string), to: { name: "tournament", params: { id, name } } },
+        { label: year as string, to: { name: "event", params: { id, name, year, eid } } },
         { label: tour },
         { label: type },
-        { label: draw },
-        { label: data.value?.round || "Loading" },
+        { label: data.value?.round || "Loading..." },
         { label: data.value ? `${data.value.player1} v ${data.value.player2}` : "Loading..." }
-      ] as BreadcrumbItem[]
-    case "player":
-    case "activity":
-    case "titles-and-finals":
-    case "wl-index":
-    case "stats":
-    case "record":
-      const playerPage = computed(() => PLAYER_PAGES.find(page => page.name === name))
-      return [
-        ...crumbs,
-        { label: "Players", icon: icons.player, to: { name: "players" } },
-        {
-          label: data.value ? `${get(data, "first_name")} ${get(data, "last_name")}` : capitalCase(paramName as string),
-          icon: data.value ? getFlagCode(get(data, "country")) : appIcons.loading
-        },
-        { label: playerPage.value?.label || "", icon: playerPage.value?.icon }
       ]
     case "players":
-      return [...crumbs, { label: "Players", icon: icons.player }]
-    case "ranking-rules":
-      return [...crumbs, { label: "Ranking Rules", icon: icons.seeds }, { label: (query.year as string) || "" }]
+      return [...crumbs, { label: "Players", icon: icons.player, to: { name: "players" } }]
     case "results-archive":
-      return [...crumbs, { label: "Results Archive", icon: icons.event }]
-    case "search":
-      return [...crumbs, { label: "Search", icon: appIcons.search }]
-    case "statistics-and-records":
-      return [...crumbs, { label: "Statistics and Records", icon: icons.stats }]
+      return [...crumbs, { label: "Results Archive", icon: icons.event, to: { name: "results-archive" } }]
     case "supervisor":
+    case "supervisors":
       return [
         ...crumbs,
         { label: "Supervisors", icon: icons.supervisor, to: { name: "supervisors" } },
-        { label: data.value?.id ?? capitalCase(id as string) }
+        ...(routeName === "supervisor" ? [{ label: data.value?.id || capitalCase(id as string) }] : [])
       ]
-    case "supervisors":
-      return [...crumbs, { label: "Supervisors", icon: icons.supervisor }]
     case "surface":
+    case "surfaces":
       return [
         ...crumbs,
         { label: "Surfaces", icon: icons.court, to: { name: "surfaces" } },
-        {
-          label: capitalCase(id as string) || "Loading...",
-          avatar: {
-            src: `/surfaces/${capitalCase(id as string)
-              .replace("Indoor ", "")
-              .replace("Outdoor ", "")}.jpg`,
-            alt: capitalCase(id as string) || ""
-          }
-        }
+        ...(routeName === "surface" ?
+          [
+            {
+              label: capitalCase(id as string),
+              avatar: {
+                src: `/surfaces/${capitalCase(id as string)
+                  .replace("Indoor ", "")
+                  .replace("Outdoor ", "")}.jpg`,
+                alt: capitalCase(id as string)
+              }
+            }
+          ]
+        : [])
       ]
-    case "surfaces":
-      return [...crumbs, { label: "Surfaces", icon: icons.court }]
+    case "tournaments":
     case "tournament":
+    case "event":
+    case "results":
+    case "draws":
       return [
         ...crumbs,
         { label: "Tournaments", icon: icons.tournament, to: { name: "tournaments" } },
-        { label: data.value?.name || capitalCase(paramName as string) }
+        ...(routeName !== "tournaments" ?
+          [{ label: data.value?.name || capitalCase(name as string), to: { name: "tournament", params: { id, name } } }]
+        : []),
+        ...(!["tournaments", "tournament"].includes(routeName) ?
+          [
+            { label: year as string },
+            { label: EVENT_PAGES.find(page => page.name === routeName)?.label || "", icon: EVENT_PAGES.find(page => page.name === routeName)?.icon }
+          ]
+        : [])
       ]
-    case "tournaments":
-      return [...crumbs, { label: "Tournaments", icon: icons.tournament }]
-    case "umpire":
-      return [...crumbs, { label: "Umpires", icon: icons.umpire, to: { name: "umpires" } }, { label: data.value?.id || capitalCase(id as string) }]
     case "umpires":
-      return [...crumbs, { label: "Umpires", icon: icons.umpire }]
-    case "upcoming-tournaments":
-      return [...crumbs, { label: "Upcoming Tournaments", icon: icons.upcoming }]
+      return [...crumbs, { label: "Umpires", icon: icons.umpire, to: { name: "umpires" } }]
     case "venue":
+    case "venues":
       return [
         ...crumbs,
         { label: "Venues", icon: icons.venue, to: { name: "venues" } },
-        {
-          label: data.value?.country?.name || "Loading...",
-          to: { name: "country", params: { id: data.value?.country?.id, name: kebabCase(data.value?.country?.name || "") } },
-          icon: getFlagCode(data.value?.country)
-        },
-        { label: data.value?.city || "Loading..." },
-        { label: data.value?.name || capitalCase(id as string) }
+        ...(routeName === "venue" ?
+          [
+            {
+              label: data.value?.country.name || "Loading...",
+              to: { name: "country", params: { id: data.value?.country.id, name: kebabCase(data.value?.country.name || "") } },
+              icon: getFlagCode(data.value?.country)
+            },
+            { label: data.value?.city || "Loading..." },
+            { label: data.value?.name || capitalCase(id as string) }
+          ]
+        : [])
       ]
-    case "venues":
-      return [...crumbs, { label: "Venues", icon: icons.venue }]
-    case "years":
-      return [...crumbs, { label: "Years", icon: icons.year }, { label: (query.year as string) || "" }]
     default:
       return crumbs
   }
 })
 
 const pageTitle = computed(() => {
-  switch (name) {
+  switch (routeName) {
     case "category":
       return data.value || capitalCase(id as string)
-    case "categories":
-      return "Categories"
-    case "coaches":
-      return "Coaches"
-    case "countries":
-      return "Countries"
-    case "match":
-      return data.value ? `${data.value.player1} vs ${data.value.player2}` : "Loading..."
-    case "players":
-      return "Players"
-    case "results-archive":
-      return "Results Archive"
     case "supervisor":
       return data.value?.id || capitalCase(id as string)
-    case "supervisors":
-      return "Supervisors"
     case "surface":
       return capitalCase(id as string)
-    case "surfaces":
-      return "Surfaces"
-    case "tournament":
-      return data.value?.name || capitalCase(paramName as string)
-    case "tournaments":
-      return "Tournaments"
-    case "umpire":
-      return data.value?.id || capitalCase(id as string)
-    case "umpires":
-      return "Umpires"
-    case "upcoming-tournaments":
-      return "Upcoming Tournaments"
-    case "venues":
-      return "Venues"
     default:
-      return "Home"
+      return `${capitalCase(routeName)}`
   }
 })
 </script>
@@ -274,38 +176,43 @@ const pageTitle = computed(() => {
   <u-breadcrumb
     v-if="mdAndUp"
     :items="breadcrumbs"
-    class="lg:max-w-190 xl:max-w-full"
   />
   <div
     v-else
-    className="font-semibold text-muted text-wrap"
+    class="font-semibold text-muted text-wrap text-sm"
   >
-    <div
-      v-if="name === 'venue' && data"
-      class="text-sm"
-    >
-      <span
-        v-if="data.name"
-        class="truncate"
-      >
-        {{ data.name }}
-      </span>
-      <span class="flex items-center gap-2">{{ data.city }} <country-link :country="data.country" /></span>
+    <div v-if="routeName === 'tournament'">
+      <div>{{ data.name ?? capitalCase(name as string) }}</div>
+      <div>
+        <span v-if="data.established">{{ data.established }}</span>
+        <span v-if="data.established && !data.abolished"> - present</span>
+        <span v-else-if="data.abolished && data.established !== data.abolished"> - {{ data.abolished }}</span>
+      </div>
     </div>
-    <div
-      v-else-if="['event', 'results', 'draws'].includes(name)"
-      class="text-sm"
-    >
-      <div>{{ EVENT_PAGES.find(page => page.name === name)?.label }}</div>
-      <div class="truncate">{{ data?.tournament ?? capitalCase(id as string) }} {{ year }}</div>
+
+    <div v-else-if="['event', 'results', 'draws'].includes(routeName as string)">
+      <div>{{ EVENT_PAGES.find(page => page.name === routeName)?.label }}</div>
+      <div class="truncate">{{ data.value?.name || capitalCase(name as string) }} {{ year }}</div>
     </div>
-    <div
-      v-else-if="['player', 'activity', 'titles-and-finals', 'wl-index', 'stats', 'record'].includes(name)"
-      class="text-sm"
-    >
-      <div>{{ PLAYER_PAGES.find(page => page.name === name)?.label }}</div>
-      <div class="truncate">{{ data ? `${data.first_name} ${data.last_name}` : capitalCase(paramName as string) }}</div>
+
+    <div v-else-if="routeName === 'venue'">
+      <div>{{ data?.name ? `${data.name}, ${data.city}` : (data?.city ?? capitalCase(id as string)) }}</div>
+      <country-link
+        v-if="data"
+        :country="data.country"
+        :icon-only="false"
+      />
     </div>
+
+    <div v-else-if="routeName === 'match'">
+      <div>{{ data ? `${data.player1} vs ${data.player2}` : `${capitalCase(name as string)} ${year}` }}</div>
+      <div>{{
+        data ?
+          `${data.name} ${year}`
+        : `${destructureMid(mid).tour.replace("Men", "ITF (M)").replace("Women", "ITF (W)")} ${destructureMid(mid).type} ${destructureMid(mid).draw} ${destructureMid(mid).match_no}`
+      }}</div>
+    </div>
+
     <template v-else>{{ pageTitle }}</template>
   </div>
 </template>

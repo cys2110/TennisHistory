@@ -8,30 +8,19 @@ export default defineEventHandler(async query => {
     OPTIONAL MATCH (e)-[:TOOK_PLACE_IN]->(v:Venue)-[:LOCATED_IN]->(c:Country)
     OPTIONAL MATCH (sup:Supervisor)-[:SUPERVISED]->(e)
     WITH DISTINCT
-      apoc.any.properties(e) AS eventProperties,
-      apoc.any.properties(t) AS tournament,
+      properties(e) AS eventProperties,
       COLLECT(
         DISTINCT
         CASE
           WHEN v IS NULL THEN null
-          ELSE
-            apoc.map.merge(
-              apoc.any.properties(v),
-              {country: apoc.any.properties(c)}
-            )
-        END
-      ) AS venues,
-      COLLECT(sup.id) AS supervisors,
-      apoc.any.properties(s) AS surface
+          ELSE apoc.map.merge(properties(v), {country: properties(c)})
+        END) AS venues,
+      COLLECT(properties(sup)) AS supervisors,
+      properties(s) AS surface
     RETURN
       apoc.map.merge(
         eventProperties,
-        {
-          tournament: tournament,
-          venues: venues,
-          supervisors: supervisors,
-          surface: surface
-        }
+        {venues: venues, supervisors: supervisors, surface: surface}
       ) AS event
     `,
     { id: Number(id) }
@@ -50,14 +39,14 @@ export default defineEventHandler(async query => {
     "women_start_date",
     "women_end_date"
   ]
-  const numberKeys = ["id", "tfc", "pm", "atp_tfc", "atp_pm", "wta_tfc", "wta_pm", "men_pm", "men_tfc", "women_pm", "women_tfc"]
+  const numberKeys = ["tfc", "pm", "atp_tfc", "atp_pm", "wta_tfc", "wta_pm", "men_pm", "men_tfc", "women_pm", "women_tfc"]
 
   for (const key of dateKeys) {
     if (event[key]) {
       event[key] = {
-        year: event[key].year.low,
-        month: event[key].month.low,
-        day: event[key].day.low
+        year: event[key].year.toInt(),
+        month: event[key].month.toInt(),
+        day: event[key].day.toInt()
       }
     }
   }
@@ -68,11 +57,5 @@ export default defineEventHandler(async query => {
     }
   }
 
-  return {
-    ...event,
-    tournament: {
-      ...event.tournament,
-      id: event.tournament.id.toInt()
-    }
-  }
+  return event
 })

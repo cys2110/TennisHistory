@@ -1,36 +1,22 @@
 <script setup lang="ts">
-const { setViewMode } = useViewMode()
-const { setItemsPerPage } = useDefaultItems()
-const { setTableMode } = useDefaultTable()
+const { setViewMode, setTableMode, setItemsPerPage } = useDefaults()
+
 const {
   icons,
-  ui: { icons: appIcons }
+  ui: { icons: uIcons }
 } = useAppConfig()
 
 // Internal navigation links
 const NAV_LINKS = [
-  {
-    label: "Tournaments",
-    defaultOpen: true,
-    children: [
-      { label: "Alphabetical List", to: { name: "tournaments" }, icon: icons.tournament },
-      { label: "Upcoming Tournaments", to: { name: "upcoming-tournaments" }, icon: icons.upcoming },
-      { label: "Results Archive", to: { name: "results-archive" }, icon: icons.event }
-    ]
-  },
-  {
-    label: "Players",
-    defaultOpen: true,
-    children: [
-      { label: "Alphabetical List", to: { name: "players" }, icon: icons.player },
-      { label: "Head to Head", to: { name: "h2h" }, icon: icons.h2h }
-    ]
-  },
+  { label: "Tournaments", icon: icons.tournament, to: { name: "tournaments" } },
+  { label: "Results Archive", to: { name: "results-archive" }, icon: icons.event },
+  { label: "Players", icon: icons.player, to: { name: "players" } },
+  { label: "Head to Head", to: { name: "h2h" }, icon: icons.h2h },
   { label: "Stats/Records", to: { name: "statistics-and-records" }, icon: icons.stats },
   { label: "Ranking Rules", to: { name: "ranking-rules" }, icon: icons.seeds },
   {
     label: "Other",
-    defaultOpen: true,
+    icon: "tabler:grid-dots",
     children: [
       { label: "Categories", to: { name: "categories" }, icon: icons.categories },
       { label: "Coaches", to: { name: "coaches" }, icon: icons.coach },
@@ -42,8 +28,9 @@ const NAV_LINKS = [
       { label: "Years", to: { name: "years" }, icon: icons.year }
     ]
   },
-  { label: "Search", to: { name: "search" }, icon: appIcons.search },
-  { label: "About", to: { name: "about" }, icon: appIcons.info }
+  { label: "Search", to: { name: "search" }, icon: uIcons.search },
+  { label: "About", to: { name: "about" }, icon: uIcons.info },
+  { label: "Settings", to: { name: "settings" }, icon: icons.settings }
 ]
 
 const RELATED_LINKS = [
@@ -150,39 +137,82 @@ const groups = computed(() => [
 
 <template>
   <u-dashboard-group>
-    <!--Command palette-->
     <u-dashboard-search :groups />
 
-    <u-dashboard-sidebar collapsible>
-      <template #header="{ collapsed }">
-        {{ collapsed ? "TH" : "TennisHistory" }}
-      </template>
+    <u-dashboard-sidebar :default-size="5">
+      <template #header> TH </template>
 
-      <template #default="{ collapsed }">
-        <!--Open command palette-->
+      <template #default>
         <u-dashboard-search-button
-          :collapsed
-          size="xs"
-          label="Settings"
-          :icon="icons.settings"
+          size="sm"
+          variant="ghost"
+          :kbds="[]"
+          label="Shortcuts"
         />
 
-        <!--Internal links-->
-        <u-navigation-menu
-          :collapsed
-          :items="NAV_LINKS"
-          orientation="vertical"
-          highlight
-        />
+        <template
+          v-for="link in NAV_LINKS"
+          :key="link.label"
+        >
+          <u-tooltip :text="link.label">
+            <!--@vue-expect-error-->
+            <u-button
+              v-if="link.to"
+              :icon="link.icon"
+              :to="link.to"
+              variant="link"
+              color="neutral"
+              class="2xl:flex-col"
+            />
+
+            <u-popover
+              v-else
+              class="mx-auto"
+              :content="{ side: 'right' }"
+            >
+              <u-button
+                :icon="link.icon"
+                variant="link"
+                color="neutral"
+                class="flex-col"
+                label="Other"
+                size="sm"
+                block
+              />
+
+              <template #content>
+                <!--@vue-expect-error-->
+                <u-navigation-menu
+                  :items="link.children"
+                  orientation="vertical"
+                />
+              </template>
+            </u-popover>
+          </u-tooltip>
+        </template>
       </template>
 
-      <template #footer="{ collapsed }">
-        <!--External links-->
-        <u-navigation-menu
-          :collapsed
-          :items="RELATED_LINKS"
-          orientation="vertical"
-        />
+      <template #footer>
+        <u-popover
+          class="mx-auto"
+          :content="{ side: 'right', sideOffset: 15 }"
+        >
+          <u-button
+            label="More"
+            variant="ghost"
+            color="neutral"
+            icon="solar:menu-dots-bold-duotone"
+            class="flex-col"
+            block
+          />
+
+          <template #content>
+            <u-navigation-menu
+              :items="RELATED_LINKS"
+              orientation="vertical"
+            />
+          </template>
+        </u-popover>
       </template>
     </u-dashboard-sidebar>
 

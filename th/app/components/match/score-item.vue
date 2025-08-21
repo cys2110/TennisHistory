@@ -1,10 +1,10 @@
 <script setup lang="ts">
-defineProps<{
+const { match_no } = defineProps<{
   labels: string[]
   sets: number[][][]
   tournament: TournamentInterface
   id: number
-  year: string
+  year: number
   match_no: number
   incomplete?: IncompleteType | null
   centred?: boolean
@@ -13,11 +13,13 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex items-center gap-1">
+  <div
+    class="flex items-center gap-1"
+    :class="{ 'justify-center': centred }"
+  >
     <u-link
       v-if="stats"
       class="hover-link"
-      :class="{ 'mx-auto': centred }"
       :to="{
         name: 'match',
         params: {
@@ -55,7 +57,8 @@ defineProps<{
     <u-badge
       v-if="incomplete"
       size="sm"
-      class="ml-2 bg-error-600"
+      color="error"
+      variant="subtle"
     >
       {{ incomplete }}.
     </u-badge>

@@ -1,95 +1,79 @@
 <script setup lang="ts">
-useHead({ title: "Venues", templateParams: { subPage: null } })
-const { viewMode } = useViewMode()
-const { tableMode } = useDefaultTable()
-const { itemsPerPage } = useDefaultItems()
+const { viewMode } = useDefaults()
+useHead({ title: "Venues" })
 const { icons } = useAppConfig()
-const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const mdAndDown = breakpoints.smallerOrEqual("md")
 
-const selectedLetter = ref<string | undefined>(tableMode.value === "grouped" && viewMode.value !== "cards" ? "A" : undefined)
-const skip = ref(itemsPerPage.value)
+useJsonld(() => ({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Venues",
+  description: "A collection of tennis venues"
+}))
 
-watch(
-  tableMode,
-  newMode => {
-    if (!selectedLetter.value && newMode === "grouped" && viewMode.value !== "cards") selectedLetter.value = "A"
-    if (newMode === "ungrouped" && viewMode.value !== "cards") selectedLetter.value = undefined
-  },
-  { immediate: true }
-)
+const selectedLetter = ref<string | undefined>()
 </script>
 
 <template>
-  <page-wrapper>
-    <template
-      #nav-right
-      v-if="viewMode !== 'list' || mdAndDown"
-    >
-      <u-slideover
-        v-if="mdAndDown"
-        title="Filters"
-        class="ml-auto"
-      >
-        <u-button
-          :icon="icons.filter"
-          size="xs"
-        />
-        <template #body>
-          <u-form-field label="Items per page">
-            <u-slider
-              v-model="skip"
-              :min="10"
-              :max="100"
-              :step="10"
-              tooltip
-            />
-          </u-form-field>
+  <div class="w-full">
+    <u-dashboard-panel>
+      <template #header>
+        <u-dashboard-navbar>
+          <template #title>
+            <page-title />
+          </template>
+
+          <template
+            #right
+            v-if="mdAndDown && viewMode !== 'list'"
+          >
+            <u-slideover
+              v-if="mdAndDown"
+              title="Filters"
+              class="ml-auto"
+            >
+              <u-button
+                :icon="icons.filter"
+                size="xs"
+              />
+              <template #body>
+                <filter-letters v-model="selectedLetter" />
+              </template>
+            </u-slideover>
+          </template>
+
+          <template #right>
+            <div id="toc" />
+          </template>
+        </u-dashboard-navbar>
+
+        <u-dashboard-toolbar v-if="!mdAndDown && viewMode !== 'list'">
           <filter-letters
             v-model="selectedLetter"
-            :all-letters="tableMode !== 'grouped' || viewMode === 'cards'"
+            :ui="{ fieldset: 'flex-wrap gap-2' }"
           />
-        </template>
-      </u-slideover>
-      <u-form-field
-        v-else
-        label="Items per page"
-        :ui="{ labelWrapper: 'justify-end' }"
-      >
-        <u-slider
-          v-model="skip"
-          :min="10"
-          :max="100"
-          :step="10"
-          tooltip
-          class="min-w-xs"
+        </u-dashboard-toolbar>
+      </template>
+
+      <template #body>
+        <venue-table v-if="viewMode === 'list'" />
+
+        <venue-grid
+          v-else
+          v-model="selectedLetter"
         />
-      </u-form-field>
-    </template>
-    <template
-      #toolbar
-      v-if="!mdAndDown"
-    >
-      <filter-letters
-        v-model="selectedLetter"
-        :all-letters="tableMode !== 'grouped' || viewMode === 'cards'"
-        :ui="{ fieldset: 'flex-wrap gap-2' }"
-      />
-    </template>
+      </template>
 
-    <u-page-header
-      v-if="mdAndDown"
-      title="Venues"
-    />
-
-    <venue-table
-      v-if="viewMode === 'list'"
-      v-model="selectedLetter"
-    />
-    <venue-grid
-      v-else
-      v-model="selectedLetter"
-      v-model:skip="skip"
-    />
-  </page-wrapper>
+      <template
+        #footer
+        v-if="viewMode !== 'list'"
+      >
+        <div
+          id="dashboard-footer"
+          class="font-semibold p-5 border-t border-muted"
+        />
+      </template>
+    </u-dashboard-panel>
+  </div>
 </template>

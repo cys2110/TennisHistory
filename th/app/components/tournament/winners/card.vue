@@ -62,7 +62,10 @@ const countryWinner = computed(() => {
           >
             {{ match.winner }}
           </div>
-          <player-link :player="match.winner as PlayerInterface" />
+          <player-link
+            v-else
+            :player="match.winner as PlayerInterface"
+          />
 
           <div v-if="match.loser">d.</div>
 
@@ -80,6 +83,7 @@ const countryWinner = computed(() => {
             :match_no="1"
             :stats="match.stats"
             :tournament="{ name, id: Number(id), tours }"
+            :incomplete="match.incomplete"
           />
         </div>
       </div>
@@ -126,6 +130,7 @@ const countryWinner = computed(() => {
             :match_no="1"
             :stats="match.stats"
             :tournament="{ name, id: Number(id), tours }"
+            :incomplete="match.incomplete"
           />
         </div>
       </div>

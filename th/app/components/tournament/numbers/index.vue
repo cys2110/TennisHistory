@@ -1,7 +1,19 @@
 <script setup lang="ts">
+import {
+  TournamentAge,
+  TournamentCountry,
+  TournamentFinalists,
+  TournamentLowestRank,
+  TournamentPm,
+  TournamentScoresStats,
+  TournamentSeeds,
+  TournamentStatuses
+} from "#components"
+
 const { icons } = useAppConfig()
 
 const selection = ref("pm")
+
 const options = [
   { label: "Historical Prize Money", value: "pm" },
   { label: "Finalists", value: "finalists" },
@@ -14,7 +26,7 @@ const options = [
     description: "Years when the top seeds reached the later rounds"
   },
   {
-    label: "Lucky Losers / Alternates / Wild Cards",
+    label: "Qualifiers / Lucky Losers / Alternates / Wild Cards",
     value: "statuses",
     description: "Who have won the tournament"
   },
@@ -22,15 +34,70 @@ const options = [
     label: "Lowest Ranked Player",
     value: "lowest-ranked",
     description: "To reach the later rounds"
-  },
-  { label: "Most Matches Played", value: "most-matches" },
-  { label: "Most 5 Set Wins", value: "5-set-wins" },
-  { label: "Comebacks from 2 sets to love", value: "comebacks" }
+  }
 ]
+
+const getStat = () => {
+  switch (selection.value) {
+    case "age":
+      return {
+        label: "Winners By Age",
+        icon: icons.calendar,
+        component: TournamentAge
+      }
+    case "country":
+      return {
+        label: "Countries by No. of Winners",
+        icon: icons.countries,
+        component: TournamentCountry
+      }
+    case "finalists":
+      return {
+        label: "Players by Number of Finals Played",
+        icon: icons.tournament,
+        component: TournamentFinalists
+      }
+    case "games-sets-lost":
+      return {
+        label: "Winners by Sets and Games Lost",
+        icon: icons.scores,
+        component: TournamentScoresStats
+      }
+    case "lowest-ranked":
+      return {
+        label: "Lowest Ranked Player to Reach Later Rounds",
+        icon: icons.sortNumberDown,
+        component: TournamentLowestRank
+      }
+    case "pm":
+      return {
+        label: "Historical Prize Money",
+        icon: icons.awards,
+        component: TournamentPm
+      }
+    case "seeds":
+      return {
+        label: "Years when the top seeds won and reach the final, semifinals or quarterfinals",
+        icon: icons.seeds,
+        component: TournamentSeeds
+      }
+    case "statuses":
+      return {
+        label: "Qualifiers / Lucky Losers / Alternates / Wild Cards Winners",
+        icon: icons.one,
+        component: TournamentStatuses
+      }
+    default:
+      null
+  }
+}
 </script>
 
 <template>
-  <dashboard-subpanel :title="options.find(o => o.value === selection)?.label || 'Tournament Numbers'">
+  <dashboard-subpanel
+    :title="getStat()?.label || 'Tournament Numbers'"
+    :icon="getStat()?.icon"
+  >
     <template #right>
       <u-drawer>
         <u-button
@@ -49,16 +116,9 @@ const options = [
       </u-drawer>
     </template>
 
-    <tournament-pm v-if="selection === 'pm'" />
-    <tournament-finalists v-if="selection === 'finalists'" />
-    <tournament-country-winners v-if="selection === 'country'" />
-    <tournament-age v-if="selection === 'age'" />
-    <tournament-games-sets v-if="selection === 'games-sets-lost'" />
-    <tournament-seeds v-if="selection === 'seeds'" />
-    <tournament-statuses v-if="selection === 'statuses'" />
-    <tournament-rank v-if="selection === 'lowest-ranked'" />
-    <tournament-most-matches v-if="selection === 'most-matches'" />
-    <tournament-set5 v-if="selection === '5-set-wins'" />
-    <tournament-comebacks v-if="selection === 'comebacks'" />
+    <component
+      :is="getStat()?.component"
+      v-if="selection"
+    />
   </dashboard-subpanel>
 </template>

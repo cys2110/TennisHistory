@@ -5,7 +5,7 @@ const { iconOnly = true } = defineProps<{ country: CountryInterface; iconOnly?: 
 <template>
   <u-link
     :to="{ name: 'country', params: { id: country.id, name: kebabCase(country.name) } }"
-    class="flex items-center gap-2"
+    class="w-fit flex items-center gap-2"
   >
     <u-icon
       :name="getFlagCode(country)"

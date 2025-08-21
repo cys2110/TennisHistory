@@ -1,22 +1,21 @@
 <script setup lang="ts">
-import { MatchGrid, MatchTable } from "#components"
 definePageMeta({ name: "match" })
-const { viewMode } = useViewMode()
+const { viewMode } = useDefaults()
 const {
   icons,
-  ui: { icons: appIcons }
+  ui: { icons: uIcons }
 } = useAppConfig()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
 const lgAndDown = breakpoints.smallerOrEqual("lg")
-const { params } = useRoute()
-const { mid, eid, name, year } = params as {
-  mid?: string
-  eid?: string
-  name?: string
-  year?: string
+const { mid, eid, name, year, id } = useRoute().params as {
+  mid: string
+  eid: string
+  name: string
+  year: string
+  id: string
 }
+const { draw, tour, type } = destructureMid(mid)
 
-// Variables
 const categories: Record<string, string> = {
   "Service Stats": "text-men",
   "Return Stats": "text-women",
@@ -25,80 +24,38 @@ const categories: Record<string, string> = {
 }
 
 // API call
-const { data: match, status } = await useFetch<MatchDetailsType>("/api/matches", {
+const { data: match, status } = await useFetch<MatchInterface & { tournament: string }>("/api/matches", {
+  key: `match-${mid}-${eid}`,
   query: { mid, id: eid }
 })
 
-// Head
-const headValues = computed(() => {
-  if (match.value) {
-    const {
-      match: { p1, p2 }
-    } = match.value
-    const p1Name = p1.map(p => `${p.first_name} ${p.last_name}`).join(" / ")
-    const p2Name = p2.map(p => `${p.first_name} ${p.last_name}`).join(" / ")
-    return {
-      title: `${p1Name} v ${p2Name}`,
-      subPage: `${capitalCase(name as string)} ${year}`
-    }
-  }
-  return {
-    title: `${capitalCase(name as string)} ${year}`,
-    subPage: null
-  }
-})
-
 useHead({
-  title: `${headValues.value.title} | ${headValues.value.subPage}`
-})
+  title: () => {
+    if (match.value) {
+      const { p1, p2, tournament } = match.value
+      const p1Name = p1.map(p => `${p.first_name} ${p.last_name}`).join(" / ")
+      const p2Name = p2.map(p => `${p.first_name} ${p.last_name}`).join(" / ")
 
-provide("tournament", match.value?.tournament ?? null)
-
-const compoundedStats = computed(() => {
-  if (match.value) {
-    return MATCH_STATS.map(stat => {
-      const keyExists = match.value?.match[stat.key]
-      if (keyExists && Array.isArray(keyExists)) {
-        if (keyExists.length === 2) {
-          const [p1Stat, p2Stat] = keyExists as number[]
-          return {
-            category: stat.category,
-            label: stat.label,
-            p1: p1Stat,
-            p1_pc: p1Stat! + p2Stat! === 0 ? 0 : percentage(p1Stat!, p1Stat! + p2Stat!),
-            p2: p2Stat,
-            p2_pc: p1Stat! + p2Stat! === 0 ? 0 : percentage(p2Stat!, p1Stat! + p2Stat!)
-          }
-        } else {
-          const [p1Net, p1Total, p2Net, p2Total] = keyExists
-          return {
-            category: stat.category,
-            label: stat.label,
-            p1: `${p1Net}/${p1Total}`,
-            p1_pc: p1Total === 0 ? 0 : percentage(p1Net! as number, p1Total! as number),
-            p2: `${p2Net}/${p2Total}`,
-            p2_pc: p2Total === 0 ? 0 : percentage(p2Net! as number, p2Total! as number)
-          }
-        }
-      }
-    }).filter(Boolean) as MatchStatsType[]
+      return `${p1Name} v ${p2Name} | ${tournament} ${year}`
+    }
+    return `${capitalCase(name as string)} ${year}`
   }
-  return []
 })
 
-// Related links
-const links = computed(() => {
+const additionalLinks = computed(() => {
   if (match.value) {
-    const { chart_link, p1, p2 } = match.value.match
+    const { chart_link, p1, p2 } = match.value
     const p1Links = p1.map(p => ({
       label: `${p.first_name} ${p.last_name}`,
       icon: icons.player,
-      to: { name: "player", params: { id: p.id, name: kebabCase(`${p.first_name} ${p.last_name}`) } }
+      to: { name: "player", params: { id: p.id, name: kebabCase(`${p.first_name} ${p.last_name}`) } },
+      color: ["ATP", "Men"].includes(tour) ? "atp" : "wta"
     }))
     const p2Links = p2.map(p => ({
       label: `${p.first_name} ${p.last_name}`,
       icon: icons.player,
-      to: { name: "player", params: { id: p.id, name: kebabCase(`${p.first_name} ${p.last_name}`) } }
+      to: { name: "player", params: { id: p.id, name: kebabCase(`${p.first_name} ${p.last_name}`) } },
+      color: ["ATP", "Men"].includes(tour) ? "atp" : "wta"
     }))
     const h2hLink =
       p1.length === 1 ?
@@ -131,49 +88,72 @@ const links = computed(() => {
       : []
     return [...p1Links, ...p2Links, ...h2hLink, ...chartLink]
   }
+
   return []
 })
 </script>
 
 <template>
-  <page-wrapper>
-    <template #nav-right>
-      <!--@vue-expect-error-->
-      <u-dropdown-menu :items="links">
-        <u-button
-          :icon="appIcons.ellipsis"
-          variant="ghost"
-          size="xl"
-          :ui="{ leadingIcon: 'rotate-90' }"
+  <event-wrapper v-slot="{ otherLinks }">
+    <u-dashboard-panel>
+      <template #header>
+        <u-dashboard-navbar>
+          <template #title>
+            <page-title />
+          </template>
+
+          <template #right>
+            <!--@vue-expect-error-->
+            <u-dropdown-menu :items="EVENT_PAGES.map(page => ({ ...page, to: { name: page.name, params: { year, eid, name, id } } }))">
+              <u-button
+                :icon="icons.layers"
+                variant="ghost"
+              />
+            </u-dropdown-menu>
+            <!--@vue-expect-error-->
+            <u-dropdown-menu :items="[...otherLinks, ...additionalLinks]">
+              <u-button
+                :icon="uIcons.ellipsis"
+                variant="ghost"
+                :ui="{ leadingIcon: 'rotate-90' }"
+              />
+            </u-dropdown-menu>
+          </template>
+        </u-dashboard-navbar>
+
+        <u-dashboard-toolbar>
+          <div
+            v-for="(className, category) in categories"
+            :key="category"
+            class="flex items-center gap-2"
+          >
+            <u-icon
+              :name="icons.colours"
+              :class="className"
+            />
+            <span>{{ category }}</span>
+          </div>
+        </u-dashboard-toolbar>
+      </template>
+
+      <template #body>
+        <match-details
+          v-if="match"
+          :match
         />
-      </u-dropdown-menu>
-    </template>
 
-    <template #toolbar>
-      <div
-        v-for="(className, category) in categories"
-        :key="category"
-        class="flex items-center gap-2"
-      >
-        <u-icon
-          :name="icons.colours"
-          :class="className"
+        <match-grid
+          v-if="viewMode === 'cards'"
+          :match
+          :status
         />
-        <span>{{ category }}</span>
-      </div>
-    </template>
 
-    <match-details
-      v-if="match"
-      :match
-    />
-
-    <component
-      :is="viewMode === 'cards' ? MatchGrid : MatchTable"
-      :stats="compoundedStats"
-      :status
-      :p1="match?.match.p1"
-      :p2="match?.match.p2"
-    />
-  </page-wrapper>
+        <match-table
+          v-else
+          :match
+          :status
+        />
+      </template>
+    </u-dashboard-panel>
+  </event-wrapper>
 </template>

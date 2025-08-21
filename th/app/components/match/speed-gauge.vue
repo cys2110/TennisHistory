@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { stat } = defineProps<{
-  stat: MatchStatsType
+  stat: MatchStatsInterface
 }>()
 const colorMode = useColorMode()
 const { colours } = useAppConfig()

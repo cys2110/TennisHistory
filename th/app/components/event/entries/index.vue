@@ -1,154 +1,119 @@
 <script setup lang="ts">
-import { EventEntriesGrid, EventEntriesTable } from "#components"
-
-const { viewMode } = useViewMode()
-const {
-  params: { eid }
-} = useRoute()
+const { eid } = useRoute().params as { eid: string }
 const { icons } = useAppConfig()
-const viewType = ref(true)
-const tours = inject<TourType[]>("tours", [])
-const tour = ref<TourType[]>(["ATP", "WTA"])
-const drawType = ref<DrawType[]>(["Main", "Qualifying"])
-const matchType = ref<MatchType[]>(["Singles", "Doubles"])
-
-type APIResponseType = {
-  tournament: string
-  entries: AllEntriesInterface[]
-}
+const viewType = ref("By Player")
 
 // API call
-const { data, status } = await useFetch<APIResponseType>("/api/events/entries", {
-  query: { id: eid }
+const { data: entries, status } = await useFetch<EntryInterface[]>("/api/events/entries", {
+  key: `event-entries-${eid}`,
+  query: { id: eid },
+  default: () => []
 })
 
-const sortedEntries = computed(() => {
-  if (data.value?.entries.length) {
-    const allEntries: ConsolidatedEntryType[] = []
+const consolidatedEntries = computed(() => {
+  if (entries.value.length) {
+    const allEntries = []
     const usedIds = new Set<string>()
-    const usedDoublesIds = new Set<string>()
-    for (const entry of data.value.entries) {
-      // Find all entries with the same id
-      const sameIdEntries = data.value.entries.filter(e => e.id === entry.id)
-      const singlesMainEntry = sameIdEntries.find(e => e.type === "Singles" && e.draw === "Main")
-      const singlesQualEntry = sameIdEntries.find(e => e.type === "Singles" && e.draw === "Qualifying")
-      const doublesMainEntry = sameIdEntries.find(e => e.type === "Doubles" && e.draw === "Main")
-      const doublesQualEntry = sameIdEntries.find(e => e.type === "Doubles" && e.draw === "Qualifying")
 
-      if (viewType.value) {
-        // Consolidate singles players
+    for (const entry of entries.value) {
+      if (viewType.value === "By Player") {
+        if (usedIds.has(entry.id)) continue
+
+        // Find all entries with the same id
+        const sameIdEntries = entries.value.filter(e => e.id === entry.id)
+        const singlesEntries = sameIdEntries.filter(e => e.type === "Singles")
+        const doublesEntries = sameIdEntries.filter(e => e.type === "Doubles")
+
+        allEntries.push({
+          id: entry.id,
+          tour: entry.tour,
+          first_name: entry.first_name,
+          last_name: entry.last_name,
+          country: entry.country,
+          singles: {
+            ...singlesEntries[0],
+            draw: singlesEntries.map(e => e.draw)
+          },
+          doubles: {
+            ...doublesEntries[0],
+            draw: doublesEntries.map(e => e.draw)
+          }
+        })
+
+        usedIds.add(entry.id)
+      } else {
+        // For team view, consolidate teams
         if (entry.type === "Singles") {
-          if (usedIds.has(entry.id)) continue
+          const singlesEntries = entries.value.filter(e => e.id === entry.id && e.type === "Singles")
 
           allEntries.push({
-            type: sameIdEntries.filter(e => e.type === "Singles").map(e => `${e.draw} ${e.type}`),
             tour: entry.tour,
-            ...(singlesMainEntry?.status && { singles_status: singlesMainEntry.status }),
-            ...(singlesQualEntry?.q_status && { singles_q_status: singlesQualEntry.q_status }),
-            ...(singlesMainEntry?.seed && { singles_seed: singlesMainEntry.seed }),
-            ...(singlesQualEntry?.q_seed && { singles_q_seed: singlesQualEntry.q_seed }),
-            singles_withdrawn: singlesMainEntry?.withdrawn || singlesQualEntry?.withdrawn,
+            type: "Singles",
+            draw: singlesEntries.map(e => e.draw),
+            seed: singlesEntries[0]?.seed,
+            rank: singlesEntries[0]?.rank,
+            q_seed: singlesEntries[0]?.q_seed,
+            q_status: singlesEntries[0]?.q_status,
+            status: singlesEntries[0]?.status,
+            withdrawn: singlesEntries[0]?.withdrawn,
             players: [
               {
                 id: entry.id,
                 first_name: entry.first_name,
                 last_name: entry.last_name,
                 country: entry.country,
-                ...((singlesMainEntry?.rank || singlesQualEntry?.rank) && { singles_rank: singlesMainEntry?.rank ?? singlesQualEntry?.rank })
+                rank: singlesEntries[0]?.rank
               }
             ]
           })
-          usedIds.add(entry.id)
         } else {
-          if (usedDoublesIds.has(entry.id)) continue
-          const partnerEntry = data.value.entries.find(e => e.id === entry.team_mate || e.team_mate === entry.id)!
+          if (usedIds.has(entry.id)) continue
+
+          const doublesEntries = entries.value.filter(e => e.id === entry.id && e.type === "Doubles")
+          const partnerEntry = entries.value.find(e => e.id === entry.team_mate || (e.team_mate === entry.id && e.type === "Doubles"))
 
           allEntries.push({
-            type: sameIdEntries.filter(e => e.type === "Doubles").map(e => `${e.draw} ${e.type}`),
             tour: entry.tour,
-            ...(doublesMainEntry?.status && { doubles_status: doublesMainEntry.status }),
-            ...(doublesQualEntry?.q_status && { doubles_q_status: doublesQualEntry.q_status }),
-            ...(doublesMainEntry?.seed && { doubles_seed: doublesMainEntry.seed }),
-            ...(doublesQualEntry?.q_seed && { doubles_q_seed: doublesQualEntry.q_seed }),
-            doubles_withdrawn: doublesMainEntry?.withdrawn || doublesQualEntry?.withdrawn,
+            type: "Doubles",
+            draw: doublesEntries.map(e => e.draw),
+            seed: doublesEntries[0]?.seed,
+            rank: doublesEntries[0]?.rank,
+            q_seed: doublesEntries[0]?.q_seed,
+            q_status: doublesEntries[0]?.q_status,
+            status: doublesEntries[0]?.status,
+            withdrawn: doublesEntries[0]?.withdrawn,
             players: [
               {
                 id: entry.id,
                 first_name: entry.first_name,
                 last_name: entry.last_name,
                 country: entry.country,
-                ...((doublesMainEntry?.rank || doublesQualEntry?.rank) && { doubles_rank: doublesMainEntry?.rank ?? doublesQualEntry?.rank })
+                rank: doublesEntries[0]?.rank
               },
-              ...(partnerEntry ?
-                [
-                  {
-                    id: partnerEntry.id,
-                    first_name: partnerEntry.first_name,
-                    last_name: partnerEntry.last_name,
-                    country: partnerEntry.country,
-                    ...(partnerEntry?.rank && { doubles_rank: partnerEntry.rank })
-                  }
-                ]
-              : [])
-            ]
+              partnerEntry ?
+                {
+                  id: partnerEntry.id,
+                  first_name: partnerEntry.first_name,
+                  last_name: partnerEntry.last_name,
+                  country: partnerEntry.country,
+                  rank: partnerEntry.rank
+                }
+              : null
+            ].filter(Boolean)
           })
-          usedDoublesIds.add(entry.id)
-          usedDoublesIds.add(partnerEntry?.id)
+
+          usedIds.add(entry.id)
+          if (partnerEntry) {
+            usedIds.add(partnerEntry.id)
+          }
         }
-      } else {
-        if (usedIds.has(entry.id)) continue
-        allEntries.push({
-          type: sameIdEntries.map(e => `${e.draw} ${e.type}`),
-          tour: entry.tour,
-          ...(singlesMainEntry?.status && { singles_status: singlesMainEntry.status }),
-          ...(singlesQualEntry?.q_status && { singles_q_status: singlesQualEntry.q_status }),
-          ...(singlesMainEntry?.seed && { singles_seed: singlesMainEntry.seed }),
-          ...(singlesQualEntry?.q_seed && { singles_q_seed: singlesQualEntry.q_seed }),
-          ...(doublesMainEntry?.status && { doubles_status: doublesMainEntry.status }),
-          ...(doublesQualEntry?.q_status && { doubles_q_status: doublesQualEntry.q_status }),
-          ...(doublesMainEntry?.seed && { doubles_seed: doublesMainEntry.seed }),
-          ...(doublesQualEntry?.q_seed && { doubles_q_seed: doublesQualEntry.q_seed }),
-          singles_withdrawn: singlesMainEntry?.withdrawn || singlesQualEntry?.withdrawn,
-          doubles_withdrawn: doublesMainEntry?.withdrawn || doublesQualEntry?.withdrawn,
-          players: [
-            {
-              id: entry.id,
-              first_name: entry.first_name,
-              last_name: entry.last_name,
-              country: entry.country,
-              ...((singlesMainEntry?.rank || singlesQualEntry?.rank) && { singles_rank: singlesMainEntry?.rank ?? singlesQualEntry?.rank }),
-              ...((doublesMainEntry?.rank || doublesQualEntry?.rank) && { doubles_rank: doublesMainEntry?.rank ?? doublesQualEntry?.rank })
-            }
-          ]
-        })
-        usedIds.add(entry.id)
       }
     }
 
-    return allEntries.sort((a, b) => {
-      const rankA = Math.min(...a.players.map(p => p.singles_rank ?? p.doubles_rank ?? Infinity)) || Infinity
-      const rankB = Math.min(...b.players.map(p => p.singles_rank ?? p.doubles_rank ?? Infinity)) || Infinity
-      return rankA - rankB
-    })
+    return allEntries
   }
-  return []
-})
 
-const formattedEntries = computed(() => {
-  return sortedEntries.value.filter(entry => {
-    const tourMatch = tour.value.includes(entry.tour)
-    const drawMatch = entry.type.some(t => {
-      if (drawType.value.includes("Main") && t.includes("Main")) return true
-      if (drawType.value.includes("Qualifying") && t.includes("Qualifying")) return true
-      return false
-    })
-    const matchMatch = entry.type.some(t => {
-      if (matchType.value.includes("Singles") && t.includes("Singles")) return true
-      if (matchType.value.includes("Doubles") && t.includes("Doubles")) return true
-      return false
-    })
-    return tourMatch && drawMatch && matchMatch
-  })
+  return []
 })
 </script>
 
@@ -159,45 +124,25 @@ const formattedEntries = computed(() => {
     :icon="icons.player"
   >
     <template #right>
-      <u-switch
+      <u-radio-group
         v-model="viewType"
-        :label="viewType ? 'Team' : 'Individual'"
-        :unchecked-icon="icons.noPeople"
-        :checked-icon="icons.people"
+        :items="['By Player', 'By Team']"
+        orientation="horizontal"
       />
     </template>
 
-    <div class="w-full flex items-center justify-between mb-5">
-      <u-checkbox-group
-        v-if="tours.includes('ATP') && tours.includes('WTA')"
-        v-model="tour"
-        :items="['ATP', 'WTA']"
-        orientation="horizontal"
-        :icon="icons.upcoming"
-      />
-      <u-checkbox-group
-        v-model="drawType"
-        :items="['Main', 'Qualifying']"
-        orientation="horizontal"
-        :icon="icons.upcoming"
-      />
-      <u-checkbox-group
-        v-model="matchType"
-        :items="['Singles', 'Doubles']"
-        orientation="horizontal"
-        :icon="icons.upcoming"
-      />
-    </div>
+    <!--@vue-expect-error-->
+    <event-entries-players
+      v-if="viewType === 'By Player'"
+      :entries="consolidatedEntries"
+      :status
+    />
 
-    <ClientOnly>
-      <component
-        :is="viewMode === 'list' ? EventEntriesTable : EventEntriesGrid"
-        :key="viewMode"
-        :entries="formattedEntries"
-        :status
-        :tournament="data?.tournament ?? ''"
-        :viewType
-      />
-    </ClientOnly>
+    <!--@vue-expect-error-->
+    <event-entries-teams
+      v-else
+      :entries="consolidatedEntries"
+      :status
+    />
   </dashboard-subpanel>
 </template>

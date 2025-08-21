@@ -31,11 +31,9 @@ export default defineEventHandler(async query => {
           WHEN s1:P1 THEN true
           ELSE false
         END AS isSingles,
-        t.name AS name
-      RETURN
-        {
-          tournament: name,
-          round: round,
+        t
+      RETURN apoc.map.merge(properties(t), {
+        round: round,
           player1:
             CASE
               WHEN isSingles THEN player1[0].first_name || ' ' || player1[0].last_name
@@ -63,8 +61,7 @@ export default defineEventHandler(async query => {
                 player2
                 [
                 1].last_name
-            END
-        } AS match
+            END}) AS match
     `,
     params
   )

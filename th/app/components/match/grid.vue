@@ -1,65 +1,54 @@
 <script setup lang="ts">
 import { MatchChart, MatchServiceSpeed } from "#components"
 
-const { stats, p1, p2 } = defineProps<{
-  stats: MatchStatsType[]
-  status: APIStatusType
-  p1: PlayerInterface[] | undefined
-  p2: PlayerInterface[] | undefined
+const { match } = defineProps<{
+  match: (MatchInterface & { tournament: string }) | undefined
 }>()
-const { icons } = useAppConfig()
-const { params } = useRoute()
-const { name, year, mid } = params as {
-  name?: string
-  year?: string
-  mid?: string
-}
 
 const categoryColours = {
-  "Service Stats": "ring-men-600 dark:ring-men-300",
-  "Return Stats": "ring-women-600 dark:ring-women-300",
-  "Points Stats": "ring-joint-600 dark:ring-joint-400",
-  "Service Speed": "ring-active-600 dark:ring-active-300"
+  "Service Stats": "ring-men",
+  "Return Stats": "ring-women",
+  "Points Stats": "ring-joint",
+  "Service Speed": "ring-active"
 }
 
 const categories = computed(() => {
   const baseCategories = ["Service Stats", "Return Stats", "Points Stats"]
-  if (stats.some(stat => stat.category === "Service Speed")) {
+  if (match?.match_stats.some(stat => stat.category === "Service Speed")) {
     baseCategories.push("Service Speed")
   }
   return baseCategories
 })
 
-const isBold = (stat: MatchStatsType, player: string, label: string) => {
-  const lowStats = ["Double faults", "Unforced errors"]
+const isBold = (stat: MatchStatsInterface, player: string, label: string) => {
   switch (player) {
     case "p1":
-      if (lowStats.includes(label)) {
+      if (stat.low) {
         return stat.p1_pc < stat.p2_pc
       } else if (
-        (label === "Break points saved" && stat.p1.endsWith("/0") && !stat.p2.endsWith("/0")) ||
-        (label === "Break points converted" && !stat.p1.endsWith("/0") && stat.p2.endsWith("/0"))
+        (label === "Break points saved" && (stat.p1 as string).endsWith("/0") && !(stat.p2 as string).endsWith("/0")) ||
+        (label === "Break points converted" && !(stat.p1 as string).endsWith("/0") && (stat.p2 as string).endsWith("/0"))
       ) {
         return true
       } else if (
-        (label === "Break points saved" && !stat.p1.endsWith("/0") && stat.p2.endsWith("/0")) ||
-        (label === "Break points converted" && stat.p1.endsWith("/0") && !stat.p2.endsWith("/0"))
+        (label === "Break points saved" && !(stat.p1 as string).endsWith("/0") && (stat.p2 as string).endsWith("/0")) ||
+        (label === "Break points converted" && (stat.p1 as string).endsWith("/0") && !(stat.p2 as string).endsWith("/0"))
       ) {
         return false
       } else {
         return stat.p1_pc > stat.p2_pc
       }
     default:
-      if (lowStats.includes(label)) {
+      if (stat.low) {
         return stat.p2_pc < stat.p1_pc
       } else if (
-        (label === "Break points saved" && !stat.p1.endsWith("/0") && stat.p2.endsWith("/0")) ||
-        (label === "Break points converted" && stat.p1.endsWith("/0") && !stat.p2.endsWith("/0"))
+        (label === "Break points saved" && !(stat.p1 as string).endsWith("/0") && (stat.p2 as string).endsWith("/0")) ||
+        (label === "Break points converted" && (stat.p1 as string).endsWith("/0") && !(stat.p2 as string).endsWith("/0"))
       ) {
         return true
       } else if (
-        (label === "Break points saved" && stat.p1.endsWith("/0") && !stat.p2.endsWith("/0")) ||
-        (label === "Break points converted" && !stat.p1.endsWith("/0") && stat.p2.endsWith("/0"))
+        (label === "Break points saved" && (stat.p1 as string).endsWith("/0") && !(stat.p2 as string).endsWith("/0")) ||
+        (label === "Break points converted" && !(stat.p1 as string).endsWith("/0") && (stat.p2 as string).endsWith("/0"))
       ) {
         return false
       } else {
@@ -71,7 +60,7 @@ const isBold = (stat: MatchStatsType, player: string, label: string) => {
 
 <template>
   <dashboard-subpanel
-    v-if="stats.length"
+    v-if="match"
     v-for="category in categories.filter(Boolean)"
     :title="category"
     :key="category"
@@ -80,15 +69,17 @@ const isBold = (stat: MatchStatsType, player: string, label: string) => {
       <component
         :is="category === 'Service Speed' ? MatchServiceSpeed : MatchChart"
         :category
-        :p1
-        :p2
-        :stats="stats.filter(s => s.category === category)"
+        :p1="match.p1"
+        :p2="match.p2"
+        :stats="match.match_stats.filter(s => s.category === category)"
+        :tournament="match.tournament"
       />
     </template>
+
     <u-page-columns class="lg:columns-2 xl:columns-3 2xl:columns-4">
       <u-card
-        v-if="stats.length"
-        v-for="stat in stats.filter(s => s.category === category)"
+        v-if="match.match_stats.length"
+        v-for="stat in match.match_stats.filter(s => s.category === category)"
         :key="stat.label"
         :ui="{
           root: categoryColours[stat.category as keyof typeof categoryColours],
@@ -112,7 +103,7 @@ const isBold = (stat: MatchStatsType, player: string, label: string) => {
             <div class="flex w-full justify-between items-center my-2">
               <div class="flex-1 flex flex-wrap items-center gap-2">
                 <template
-                  v-for="(player, index) in p1"
+                  v-for="(player, index) in match.p1"
                   :key="player.id"
                 >
                   <u-separator
@@ -153,7 +144,7 @@ const isBold = (stat: MatchStatsType, player: string, label: string) => {
             <div class="flex w-full justify-between items-center my-2">
               <div class="flex-1 flex flex-wrap items-center gap-2">
                 <template
-                  v-for="(player, index) in p2"
+                  v-for="(player, index) in match.p2"
                   :key="player.id"
                 >
                   <u-separator
@@ -186,7 +177,6 @@ const isBold = (stat: MatchStatsType, player: string, label: string) => {
   </dashboard-subpanel>
   <error-message
     v-else
-    :icon="icons.noChart"
-    :message="`No match stats available for ${name} ${year} ${mid}`"
+    message="No match stats available"
   />
 </template>

@@ -1,14 +1,18 @@
 <script setup lang="ts">
-const { tours } = defineProps<{ tours: TourType[] }>()
+const { tours, tournament } = defineProps<{
+  tours: TourType[]
+  tournament: TournamentInterface
+}>()
 provide<TourType[]>("tours", tours)
+provide<TournamentInterface>("tournament", tournament)
 </script>
 
 <template>
-  <div class="flex gap-5 flex-col">
+  <u-page-list class="*:my-5">
     <event-details />
     <event-awards />
     <event-seeds />
     <event-entry-info />
-    <!-- <event-entries /> -->
-  </div>
+    <event-entries />
+  </u-page-list>
 </template>

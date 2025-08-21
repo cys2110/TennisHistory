@@ -1,25 +1,21 @@
 export default defineEventHandler(async query => {
   const { id } = getQuery<{ id: string }>(query)
 
-  // TODO: Remove start date guards
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (t:Tournament {id: $id})<-[:EDITION_OF]-(e:Event)
-      WHERE
-        SIZE(
-          [
-            x IN
-            [
-              e.start_date,
-              e.atp_start_date,
-              e.wta_start_date,
-              e.men_start_date,
-              e.women_start_date
-            ]
-            WHERE x IS NOT NULL
-          ]
-        ) >
-        0
+      MATCH
+        (t:Tournament {id: $id})<-[:EDITION_OF]-
+        (e:Event
+          WHERE
+          coalesce(
+            e.start_date,
+            e.atp_start_date,
+            e.wta_start_date,
+            e.men_start_date,
+            e.women_start_date
+          ) IS
+          NOT
+          NULL)
       MATCH (e)-[:IN_YEAR]->(y:Year)
       WITH *, [x IN labels(e) WHERE NOT x IN ['Update', 'Event']] AS tours
       ORDER BY y.id
@@ -37,55 +33,60 @@ export default defineEventHandler(async query => {
           (ls:Loser)<-[:SCORED]-
           (:Entry)<-[:ENTERED]-
           (loser:$ (tour))
-        OPTIONAL MATCH (winner)-[f:REPRESENTED]->(z:Country)
+        OPTIONAL MATCH
+          (winner)-
+            [f:REPRESENTED WHERE
+              (f.start_date <= e.start_date AND f.end_date > e.start_date) OR
+              ('ATP' IN labels(winner) AND
+                f.start_date <= coalesce(e.atp_start_date, e.men_start_date) AND
+                f.end_date > coalesce(e.atp_start_date, e.men_start_date)) OR
+              ('WTA' IN labels(winner) AND
+                f.start_date <= coalesce(e.wta_start_date, e.women_start_date) AND
+                f.end_date > coalesce(e.wta_start_date, e.women_start_date))]->
+          (z:Country)
         OPTIONAL MATCH (winner)-[g:REPRESENTS]->(q:Country)
-        OPTIONAL MATCH (loser)-[f1:REPRESENTED]->(z1:Country)
+        OPTIONAL MATCH
+          (loser)-
+            [f1:REPRESENTED WHERE
+              (f1.start_date <= e.start_date AND f1.end_date > e.start_date) OR
+              ('ATP' IN labels(loser) AND
+                f1.start_date <= coalesce(e.atp_start_date, e.men_start_date) AND
+                f1.end_date > coalesce(e.atp_start_date, e.men_start_date)) OR
+              ('WTA' IN labels(loser) AND
+                f1.start_date <= coalesce(e.wta_start_date, e.women_start_date) AND
+                f1.end_date > coalesce(e.wta_start_date, e.women_start_date))]->
+          (z1:Country)
         OPTIONAL MATCH (loser)-[g1:REPRESENTS]->(q1:Country)
         WITH
           *,
           CASE
-            WHEN
-              f IS NOT NULL AND
-              (f.start_date <= e.start_date OR
-                (winner:ATP AND
-                  (f.start_date <= e.atp_start_date OR
-                    f.start_date <= e.men_start_date)) OR
-                (winner:WTA AND
-                  (f.start_date <= e.wta_start_date OR
-                    f.start_date <= e.women_start_date))) AND
-              (f.end_date > e.start_date OR
-                (winner:ATP AND
-                  (f.end_date > e.atp_start_date OR f.end_date > e.men_start_date)) OR
-                (winner:WTA AND
-                  (f.end_date > e.wta_start_date OR f.end_date > e.women_start_date)))
-              THEN apoc.any.properties(z)
-            ELSE apoc.any.properties(q)
+            WHEN f IS NOT NULL THEN properties(z)
+            ELSE properties(q)
           END AS winner_country,
           CASE
-            WHEN
-              f1 IS NOT NULL AND
-              (f1.start_date <= e.start_date OR
-                (loser:ATP AND
-                  (f1.start_date <= e.atp_start_date OR
-                    f1.start_date <= e.men_start_date)) OR
-                (loser:WTA AND
-                  (f1.start_date <= e.wta_start_date OR
-                    f1.start_date <= e.women_start_date))) AND
-              (f1.end_date > e.start_date OR
-                (loser:ATP AND
-                  (f1.end_date > e.atp_start_date OR f1.end_date > e.men_start_date)) OR
-                (loser:WTA AND
-                  (f1.end_date > e.wta_start_date OR
-                    f1.end_date > e.women_start_date)))
-              THEN apoc.any.properties(z1)
-            ELSE apoc.any.properties(q1)
+            WHEN f1 IS NOT NULL THEN properties(z1)
+            ELSE properties(q1)
           END AS loser_country
         WITH
-          apoc.map.merge(apoc.any.properties(winner), {country: winner_country}) AS winner,
-          apoc.map.merge(apoc.any.properties(loser), {country: loser_country}) AS loser,
+          apoc.map.merge(properties(winner), {country: winner_country}) AS winner,
+          apoc.map.merge(properties(loser), {country: loser_country}) AS loser,
           ws,
           ls,
-          m
+          m,
+          [
+            [ws.s1, ws.t1],
+            [ws.s2, ws.t2],
+            [ws.s3, ws.t3],
+            [ws.s4, ws.t4],
+            [ws.s5, ws.t5]
+          ] AS winner_sets,
+          [
+            [ls.s1, ls.t1],
+            [ls.s2, ls.t2],
+            [ls.s3, ls.t3],
+            [ls.s4, ls.t4],
+            [ls.s5, ls.t5]
+          ] AS loser_sets
         RETURN
           CASE
             WHEN
@@ -98,26 +99,15 @@ export default defineEventHandler(async query => {
                   loser: loser,
                   sets:
                     [
-                      [
-                        [ws.s1, ws.t1],
-                        [ws.s2, ws.t2],
-                        [ws.s3, ws.t3],
-                        [ws.s4, ws.t4],
-                        [ws.s5, ws.t5]
-                      ],
-                      [
-                        [ls.s1, ls.t1],
-                        [ls.s2, ls.t2],
-                        [ls.s3, ls.t3],
-                        [ls.s4, ls.t4],
-                        [ls.s5, ls.t5]
-                      ]
+                      [x IN winner_sets WHERE x[0] IS NOT NULL],
+                      [x IN loser_sets WHERE x[0] IS NOT NULL]
                     ],
                   incomplete: ls.incomplete,
-                  stats: CASE
-                    WHEN ws.serve1 IS NULL THEN FALSE
-                    ELSE TRUE
-                  END
+                  stats:
+                    CASE
+                      WHEN ws.serve1 IS NULL THEN false
+                      ELSE true
+                    END
                 }
             WHEN m IS NOT NULL THEN {tour: tour, winner: 'No final played'}
             ELSE null
@@ -136,61 +126,66 @@ export default defineEventHandler(async query => {
           (ls:Loser)<-[:SCORED]-
           (:Entry)<-[:ENTERED]-
           (loser:$ (tour))
-        OPTIONAL MATCH (winner)-[f:REPRESENTED]->(z:Country)
+        OPTIONAL MATCH
+          (winner)-
+            [f:REPRESENTED WHERE
+              (f.start_date <= e.start_date AND f.end_date > e.start_date) OR
+              ('ATP' IN labels(winner) AND
+                f.start_date <= coalesce(e.atp_start_date, e.men_start_date) AND
+                f.end_date > coalesce(e.atp_start_date, e.men_start_date)) OR
+              ('WTA' IN labels(winner) AND
+                f.start_date <= coalesce(e.wta_start_date, e.women_start_date) AND
+                f.end_date > coalesce(e.wta_start_date, e.women_start_date))]->
+          (z:Country)
         OPTIONAL MATCH (winner)-[g:REPRESENTS]->(q:Country)
-        OPTIONAL MATCH (loser)-[f1:REPRESENTED]->(z1:Country)
+        OPTIONAL MATCH
+          (loser)-
+            [f1:REPRESENTED WHERE
+              (f1.start_date <= e.start_date AND f1.end_date > e.start_date) OR
+              ('ATP' IN labels(loser) AND
+                f1.start_date <= coalesce(e.atp_start_date, e.men_start_date) AND
+                f1.end_date > coalesce(e.atp_start_date, e.men_start_date)) OR
+              ('WTA' IN labels(loser) AND
+                f1.start_date <= coalesce(e.wta_start_date, e.women_start_date) AND
+                f1.end_date > coalesce(e.wta_start_date, e.women_start_date))]->
+          (z1:Country)
         OPTIONAL MATCH (loser)-[g1:REPRESENTS]->(q1:Country)
         WITH
           *,
           CASE
-            WHEN
-              f IS NOT NULL AND
-              (f.start_date <= e.start_date OR
-                (winner:ATP AND
-                  (f.start_date <= e.atp_start_date OR
-                    f.start_date <= e.men_start_date)) OR
-                (winner:WTA AND
-                  (f.start_date <= e.wta_start_date OR
-                    f.start_date <= e.women_start_date))) AND
-              (f.end_date > e.start_date OR
-                (winner:ATP AND
-                  (f.end_date > e.atp_start_date OR f.end_date > e.men_start_date)) OR
-                (winner:WTA AND
-                  (f.end_date > e.wta_start_date OR f.end_date > e.women_start_date)))
-              THEN apoc.any.properties(z)
-            ELSE apoc.any.properties(q)
+            WHEN f IS NOT NULL THEN properties(z)
+            ELSE properties(q)
           END AS winner_country,
           CASE
-            WHEN
-              f1 IS NOT NULL AND
-              (f1.start_date <= e.start_date OR
-                (loser:ATP AND
-                  (f1.start_date <= e.atp_start_date OR
-                    f1.start_date <= e.men_start_date)) OR
-                (loser:WTA AND
-                  (f1.start_date <= e.wta_start_date OR
-                    f1.start_date <= e.women_start_date))) AND
-              (f1.end_date > e.start_date OR
-                (loser:ATP AND
-                  (f1.end_date > e.atp_start_date OR f1.end_date > e.men_start_date)) OR
-                (loser:WTA AND
-                  (f1.end_date > e.wta_start_date OR
-                    f1.end_date > e.women_start_date)))
-              THEN apoc.any.properties(z1)
-            ELSE apoc.any.properties(q1)
+            WHEN f1 IS NOT NULL THEN properties(z1)
+            ELSE properties(q1)
           END AS loser_country
         WITH
           COLLECT(
             DISTINCT
-            apoc.map.merge(apoc.any.properties(winner), {country: winner_country})
+            apoc.map.merge(properties(winner), {country: winner_country})
           ) AS winner,
           COLLECT(
             DISTINCT
-            apoc.map.merge(apoc.any.properties(loser), {country: loser_country})
+            apoc.map.merge(properties(loser), {country: loser_country})
           ) AS loser,
           ws,
           ls,
-          m
+          m,
+          [
+            [ws.s1, ws.t1],
+            [ws.s2, ws.t2],
+            [ws.s3, ws.t3],
+            [ws.s4, ws.t4],
+            [ws.s5, ws.t5]
+          ] AS winner_sets,
+          [
+            [ls.s1, ls.t1],
+            [ls.s2, ls.t2],
+            [ls.s3, ls.t3],
+            [ls.s4, ls.t4],
+            [ls.s5, ls.t5]
+          ] AS loser_sets
         RETURN
           CASE
             WHEN
@@ -203,26 +198,15 @@ export default defineEventHandler(async query => {
                   loser: loser,
                   sets:
                     [
-                      [
-                        [ws.s1, ws.t1],
-                        [ws.s2, ws.t2],
-                        [ws.s3, ws.t3],
-                        [ws.s4, ws.t4],
-                        [ws.s5, ws.t5]
-                      ],
-                      [
-                        [ls.s1, ls.t1],
-                        [ls.s2, ls.t2],
-                        [ls.s3, ls.t3],
-                        [ls.s4, ls.t4],
-                        [ls.s5, ls.t5]
-                      ]
+                      [x IN winner_sets WHERE x[0] IS NOT NULL],
+                      [x IN loser_sets WHERE x[0] IS NOT NULL]
                     ],
                   incomplete: ls.incomplete,
-                  stats: CASE
-                    WHEN ws.serve1 IS NULL THEN FALSE
-                    ELSE TRUE
-                  END
+                  stats:
+                    CASE
+                      WHEN ws.serve1 IS NULL THEN false
+                      ELSE true
+                    END
                 }
             WHEN m IS NOT NULL THEN {tour: tour, winner: 'No final played'}
             ELSE null
@@ -236,12 +220,7 @@ export default defineEventHandler(async query => {
           CASE
             WHEN
               x IS NOT NULL
-              THEN
-                {
-                  c1: apoc.any.properties(c1),
-                  c2: apoc.any.properties(c2),
-                  score: x.score
-                }
+              THEN {c1: properties(c1), c2: properties(c2), score: x.score}
             ELSE null
           END AS country
       }
@@ -269,39 +248,26 @@ export default defineEventHandler(async query => {
     event["id"] = event["id"].toInt()
     event["year"] = event["year"].toInt()
 
-    if (event["singles"].length) {
-      for (const singles of event["singles"]) {
-        if (singles.sets) {
-          for (let i = 0; i < 2; i++) {
-            for (let index = 4; index >= 0; index--) {
-              // Delete keys with null values in the array
-              if (singles.sets[i][index][0] === null) {
-                singles.sets[i].splice(index, 1)
-              } else {
-                singles.sets[i][index] = singles.sets[i][index].map((item: any) => (item ? item.toInt() : null))
-              }
-            }
+    for (const singles of event["singles"]) {
+      if (singles.sets) {
+        for (let i = 0; i < 2; i++) {
+          for (let index = 0; index < singles.sets[i].length; index++) {
+            singles.sets[i][index] = singles.sets[i][index].map((item: any) => (item ? item.toInt() : null))
           }
         }
       }
     }
 
-    if (event["doubles"].length) {
-      for (const doubles of event["doubles"]) {
-        if (doubles.sets) {
-          for (let i = 0; i < 2; i++) {
-            for (let index = 4; index >= 0; index--) {
-              // Delete keys with null values in the array
-              if (doubles.sets[i][index][0] === null) {
-                doubles.sets[i].splice(index, 1)
-              } else {
-                doubles.sets[i][index] = doubles.sets[i][index].map((item: any) => (item ? item.toInt() : null))
-              }
-            }
+    for (const doubles of event["doubles"]) {
+      if (doubles.sets) {
+        for (let i = 0; i < 2; i++) {
+          for (let index = 0; index < doubles.sets[i].length; index++) {
+            doubles.sets[i][index] = doubles.sets[i][index].map((item: any) => (item ? item.toInt() : null))
           }
         }
       }
     }
+
     return event
   })
 

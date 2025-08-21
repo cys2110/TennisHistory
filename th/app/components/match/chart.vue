@@ -7,16 +7,15 @@ const {
 } = defineProps<{
   category: string
   label?: string
-  stats: MatchStatsType[]
-  p1: PlayerInterface[]
-  p2: PlayerInterface[]
+  stats: MatchStatsInterface[]
+  p1: EntryInterface[]
+  p2: EntryInterface[]
+  tournament: string
 }>()
 const { colours, icons } = useAppConfig()
 const colorMode = useColorMode()
 const { params } = useRoute()
 const { year } = params as { year?: string }
-
-const tournament = inject<string>("tournament", "")
 
 const option = ref({
   backgroundColor: "transparent",

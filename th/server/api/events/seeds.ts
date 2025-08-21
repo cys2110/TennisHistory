@@ -4,10 +4,7 @@ export default defineEventHandler(async query => {
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       OPTIONAL MATCH
-        (t:Tournament)<-[:EDITION_OF]-
-        (e:Event {id: $id})<-[v:SEEDED|Q_SEEDED]-
-        (f:Entry)<-[:ENTERED]-
-        (p:Player)
+        (e:Event {id: $id})<-[v:SEEDED|Q_SEEDED]-(f:Entry)<-[:ENTERED]-(p:Player)
       WITH *
       ORDER BY f.seed, f.q_seed
       CALL (f, e) {
@@ -20,27 +17,32 @@ export default defineEventHandler(async query => {
       }
       CALL (p, e) {
         MATCH (p)-[:REPRESENTS]->(c:Country)
-        OPTIONAL MATCH (p)-[x:REPRESENTED]->(n:Country)
+        OPTIONAL MATCH
+          (p)-
+            [z:REPRESENTED WHERE
+              (z.start_date <= e.start_date OR
+                ('ATP' IN labels(p) AND
+                  z.start_date <= coalesce(e.atp_start_date, e.men_start_date)) OR
+                ('WTA') IN labels(p) AND
+                z.start_date <= coalesce(e.wta_start_date, e.women_start_date)) AND
+              (z.end_date > e.start_date OR
+                ('ATP' IN labels(p) AND
+                  z.end_date > coalesce(e.atp_start_date, e.men_start_date) OR
+                  ('WTA' IN labels(p) AND
+                    z.end_date > coalesce(e.wta_start_date, e.women_start_date))))]->
+          (n:Country)
         RETURN
           CASE
-            WHEN
-              x IS NOT NULL AND
-              (x.start_date <= e.start_date OR (p:ATP AND (x.start_date <= e.atp_start_date OR x.start_date <= e.men_start_date)) OR (p:WTA AND (x.start_date <= e.wta_start_date OR x.start_date <= e.women_start_date))) AND
-              x.end_date > e.start_date
-              THEN apoc.any.properties(n)
-            ELSE apoc.any.properties(c)
+            WHEN z IS NULL THEN properties(c)
+            ELSE properties(n)
           END AS country
       }
       WITH
         withdrew,
         country,
-        apoc.any.properties(p) AS player,
-        apoc.any.properties(f) AS entry,
-        CASE
-          WHEN p:WTA THEN 'WTA'
-          ELSE 'ATP'
-        END AS tour,
-        t.name AS tournament,
+        properties(p) AS player,
+        properties(f) AS entry,
+        [x IN labels(p) WHERE NOT x IN ['Update', 'Coach', 'Player']][0] AS tour,
         CASE
           WHEN v:SEEDED THEN 'Main'
           ELSE 'Qualifying'
@@ -50,25 +52,23 @@ export default defineEventHandler(async query => {
           WHEN f:Singles THEN 'Singles'
           ELSE 'Doubles'
         END AS type
+      ORDER BY tour, type DESC
       RETURN DISTINCT
         CASE
           WHEN player IS NULL THEN null
           ELSE
-            apoc.map.mergeList(
-              [
-                entry,
-                player,
-                {
-                  withdrew: withdrew,
-                  country: country,
-                  tour: tour,
-                  tournament: tournament,
-                  draw: drawType,
-                  rank2: rank2,
-                  type: type
-                }
-              ]
-            )
+            apoc.map.mergeList([
+              entry,
+              player,
+              {
+                withdrew: withdrew,
+                country: country,
+                tour: tour,
+                draw: drawType,
+                rank2: rank2,
+                type: type
+              }
+            ])
         END AS player
     `,
     { id: Number(id) }
@@ -87,68 +87,66 @@ export default defineEventHandler(async query => {
     return player
   })
 
-  // Turn singles players into single-player teams
-  const singlesSeeds = seeds
-    .filter((s: any) => s.type === "Singles")
-    .map((s: any) => {
-      return {
-        seed: s.seed ?? s.q_seed,
-        draw: s.draw,
-        rank2: s.rank2,
-        withdrew: s.withdrew,
-        tour: s.tour,
-        type: s.type,
-        team: [
-          {
-            id: s.id,
-            first_name: s.first_name,
-            last_name: s.last_name,
-            country: s.country,
-            rank: s.rank
-          }
-        ]
-      }
-    })
-
-  // Find doubles teams
-  const doublesPlayers = seeds.filter((s: any) => s.type === "Doubles")
-  const usedSeeds = new Set<string>()
   const teams: any[] = []
-  for (const player of doublesPlayers) {
-    if (usedSeeds.has(`${player.tour}-${player.draw}-${player.seed}`)) continue
-    const partner = doublesPlayers.find((p: any) => p.seed === player.seed && p.tour === player.tour && p.draw === player.draw && p.id !== player.id)
+  const usedIds = new Set<string>()
 
-    if (partner) {
+  for (const seed of seeds) {
+    if (seed.type === "Singles") {
       teams.push({
-        seed: player.seed,
-        draw: player.draw,
-        rank2: player.rank2,
-        withdrew: player.withdrew,
-        tour: player.tour,
-        type: player.type,
+        seed: seed.seed ?? seed.q_seed,
+        draw: seed.draw,
+        rank2: seed.rank2,
+        withdrew: seed.withdrew,
+        tour: seed.tour,
+        type: seed.type,
         team: [
           {
-            id: player.id,
-            first_name: player.first_name,
-            last_name: player.last_name,
-            country: player.country,
-            rank: player.rank
-          },
-          {
-            id: partner.id,
-            first_name: partner.first_name,
-            last_name: partner.last_name,
-            country: partner.country,
-            rank: partner.rank
+            id: seed.id,
+            first_name: seed.first_name,
+            last_name: seed.last_name,
+            country: seed.country,
+            rank: seed.rank
           }
         ]
       })
-      usedSeeds.add(`${player.tour}-${player.draw}-${player.seed}`)
+    } else {
+      if (!usedIds.has(seed.id)) {
+        const partner = seeds.find(
+          (s: any) =>
+            s.type === "Doubles" && (seed.seed ? s.seed === seed.seed : seed.q_seed === s.q_seed) && s.tour === seed.tour && s.id !== seed.id
+        )
+
+        if (partner) {
+          teams.push({
+            seed: seed.seed ?? seed.q_seed,
+            draw: seed.draw,
+            rank2: seed.rank2,
+            withdrew: seed.withdrew,
+            tour: seed.tour,
+            type: seed.type,
+            team: [
+              {
+                id: seed.id,
+                first_name: seed.first_name,
+                last_name: seed.last_name,
+                country: seed.country,
+                rank: seed.rank
+              },
+              {
+                id: partner.id,
+                first_name: partner.first_name,
+                last_name: partner.last_name,
+                country: partner.country,
+                rank: partner.rank
+              }
+            ]
+          })
+          usedIds.add(seed.id)
+          usedIds.add(partner.id)
+        }
+      }
     }
   }
 
-  return {
-    tournament: records[0]?.get("player")?.tournament,
-    seeds: [...singlesSeeds, ...teams].sort((a, b) => a.seed - b.seed)
-  }
+  return teams
 })

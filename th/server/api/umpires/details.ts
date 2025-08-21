@@ -1,7 +1,6 @@
 export default defineEventHandler(async query => {
   const { id } = getQuery(query)
 
-  // TODO: Remove start date guard
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       MATCH

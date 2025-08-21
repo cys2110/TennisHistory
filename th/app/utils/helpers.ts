@@ -1,10 +1,7 @@
 import appConfig from "~/app.config"
 
-export const convertToFt = (height: number) => {
-  const ftDecimal = convert(height, "cm").to("ft")
-  const ft = Math.floor(ftDecimal)
-  const inches = Math.round((ftDecimal - ft) * 12)
-  return `${ft}' ${inches}"`
+export const arraySorting = (rowA: any, rowB: any, columnId: string) => {
+  return useSorted(rowA.getValue(columnId)).value[0] < useSorted(rowB.getValue(columnId)).value[0] ? -1 : 1
 }
 
 export const constructMid = (match_no: number, labels: string[]) => {
@@ -22,9 +19,13 @@ export const constructMid = (match_no: number, labels: string[]) => {
   return `${drawTypePrefix}${genderPrefix}${typePrefix}${suffix}`
 }
 
-export const getDate = (date: DateType) => {
-  return new Date(date.year, date.month - 1, date.day)
-}
+export const dateTimeFormat = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric"
+})
+
+export const getDate = (date: DateType) => new Date(date.year, date.month - 1, date.day)
 
 export const getFlagCode = (country: CountryInterface) => {
   const countryMapping: Record<string, string> = {
@@ -32,7 +33,9 @@ export const getFlagCode = (country: CountryInterface) => {
     GBR: "united-kingdom",
     TCH: "czechia",
     FRG: "germany",
-    CIV: "cote-divoire"
+    CIV: "cote-divoire",
+    CGO: "congo-brazzaville",
+    COD: "congo-kinshasa"
   }
 
   if (countryMapping[country.id]) {
@@ -46,21 +49,15 @@ export const getFlagCode = (country: CountryInterface) => {
   }
 }
 
-export const getLinkColor = (tours: TourType[]) => {
-  if (tours.length === 1) {
-    return `${tours[0]?.toLowerCase()}-link`
-  }
-  return "joint-link"
-}
+export const shortDateFormat = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "numeric",
+  year: "2-digit"
+})
 
-export const getTourColor = (tours: TourType[]) => {
+export const getTourColour = (tours: TourType[]) => {
   if (tours.length === 1) {
-    return tours[0]?.toLowerCase() as keyof typeof appConfig.ui.colors
+    return tours[0]?.replace("ITF (M)", "men").replace("ITF (W)", "women").toLowerCase() as keyof typeof appConfig.ui.colors
   }
   return "joint"
 }
-
-export const handedness = (handedness: boolean) =>
-  handedness === true ? "Right-Handed"
-  : handedness === false ? "Left-Handed"
-  : "Unknown"

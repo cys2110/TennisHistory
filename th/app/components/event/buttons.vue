@@ -4,19 +4,14 @@ const {
   year,
   id,
   start_date,
-  orientation = "horizontal",
-  ui,
-  size
+  size = "xs"
 } = defineProps<{
   tournament: TournamentInterface
   year: number
   id: number
   start_date?: DateType
-  orientation?: "horizontal" | "vertical"
-  ui?: any
   size?: "xs" | "sm" | "md" | "lg" | "xl"
 }>()
-const { icons } = useAppConfig()
 
 // Show tooltip/disabled button if event has not started yet
 const startDate = computed(() => (start_date ? getDate(start_date) : new Date(1968, 0, 1)))
@@ -28,10 +23,8 @@ const isDisabled = computed(() => new Date() < startDate.value)
     :disabled="!isDisabled"
     text="Event has not started yet"
   >
-    <u-button-group
-      :size="size ?? 'xs'"
-      :orientation
-    >
+    <u-button-group :size>
+      <!--@vue-expect-error-->
       <u-button
         v-for="page in EVENT_PAGES"
         :key="page.name"
@@ -39,10 +32,14 @@ const isDisabled = computed(() => new Date() < startDate.value)
         :icon="page.icon"
         :to="{
           name: page.name,
-          params: { name: kebabCase(tournament.name), id: tournament.id, year, eid: id }
+          params: {
+            id: tournament.id,
+            name: kebabCase(tournament.name),
+            year,
+            eid: id
+          }
         }"
         :disabled="isDisabled"
-        :ui="{ ...ui, leadingIcon: page.icon === icons.draw ? 'rotate-270' : undefined }"
       />
     </u-button-group>
   </u-tooltip>

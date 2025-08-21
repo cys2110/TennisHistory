@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ name: "home" })
-useHead({ title: "Home" })
+useHead({ title: "Home " })
 const { icons } = useAppConfig()
 
 // Features
@@ -27,63 +27,75 @@ const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.p
 </script>
 
 <template>
-  <page-wrapper>
-    <u-page-section
-      title="Tennis History in the Open Era"
-      description="Explore the history of men's tennis since 1968"
-      :features
-    />
-    <div class="relative w-full h-[400px] overflow-hidden">
-      <UPageMarquee
-        reverse
-        orientation="vertical"
-        :overlay="false"
-        :ui="{
-          root: '[--duration:40s] absolute w-[460px] -left-[100px] -top-[300px] h-[940px] transform-3d rotate-x-55 rotate-y-0 rotate-z-30'
-        }"
-      >
-        <nuxt-img
-          v-for="screenshot in screenshots"
-          :key="screenshot"
-          :src="screenshot"
-          width="460"
-          height="258"
-          class="aspect-video border border-default rounded-lg bg-white"
+  <div class="w-full">
+    <u-dashboard-panel>
+      <template #header>
+        <u-dashboard-navbar>
+          <template #title>
+            <page-title />
+          </template>
+        </u-dashboard-navbar>
+      </template>
+
+      <template #body>
+        <u-page-section
+          title="Tennis History in the Open Era"
+          description="Explore tennis since 1968"
+          :features
         />
-      </UPageMarquee>
-      <UPageMarquee
-        orientation="vertical"
-        :overlay="false"
-        :ui="{
-          root: '[--duration:40s] absolute w-[460px] -top-[400px] left-[480px] h-[1160px] transform-3d rotate-x-55 rotate-y-0 rotate-z-30'
-        }"
-      >
-        <nuxt-img
-          v-for="screenshot in screenshots"
-          :key="screenshot"
-          :src="screenshot"
-          width="460"
-          height="258"
-          class="aspect-video border border-default rounded-lg bg-white"
-        />
-      </UPageMarquee>
-      <UPageMarquee
-        reverse
-        orientation="vertical"
-        :overlay="false"
-        :ui="{
-          root: 'hidden md:flex [--duration:40s] absolute w-[460px] -top-[300px] left-[1020px] h-[1060px] transform-3d rotate-x-55 rotate-y-0 rotate-z-30'
-        }"
-      >
-        <nuxt-img
-          v-for="screenshot in screenshots"
-          :key="screenshot"
-          :src="screenshot"
-          width="460"
-          height="258"
-          class="aspect-video border border-default rounded-lg bg-white"
-        />
-      </UPageMarquee>
-    </div>
-  </page-wrapper>
+        <div class="relative w-full h-[400px] overflow-hidden">
+          <UPageMarquee
+            reverse
+            orientation="vertical"
+            :overlay="false"
+            :ui="{
+              root: '[--duration:40s] absolute w-[460px] -left-[100px] -top-[300px] h-[940px] transform-3d rotate-x-55 rotate-y-0 rotate-z-30'
+            }"
+          >
+            <nuxt-img
+              v-for="screenshot in screenshots"
+              :key="screenshot"
+              :src="screenshot"
+              width="460"
+              height="258"
+              class="aspect-video border border-default rounded-lg bg-white"
+            />
+          </UPageMarquee>
+          <UPageMarquee
+            orientation="vertical"
+            :overlay="false"
+            :ui="{
+              root: '[--duration:40s] absolute w-[460px] -top-[400px] left-[480px] h-[1160px] transform-3d rotate-x-55 rotate-y-0 rotate-z-30'
+            }"
+          >
+            <nuxt-img
+              v-for="screenshot in screenshots"
+              :key="screenshot"
+              :src="screenshot"
+              width="460"
+              height="258"
+              class="aspect-video border border-default rounded-lg bg-white"
+            />
+          </UPageMarquee>
+          <UPageMarquee
+            reverse
+            orientation="vertical"
+            :overlay="false"
+            :ui="{
+              root: 'hidden md:flex [--duration:40s] absolute w-[460px] -top-[300px] left-[1020px] h-[1060px] transform-3d rotate-x-55 rotate-y-0 rotate-z-30'
+            }"
+          >
+            <nuxt-img
+              v-for="screenshot in screenshots"
+              :key="screenshot"
+              :src="screenshot"
+              width="460"
+              height="258"
+              class="aspect-video border border-default rounded-lg bg-white"
+            />
+          </UPageMarquee>
+        </div>
+      </template>
+    </u-dashboard-panel>
+  </div>
 </template>

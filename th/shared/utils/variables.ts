@@ -6,6 +6,7 @@ export const ATP_CATEGORIES: CategoryType[] = [
   "ATP 250",
   "Next Gen ATP Finals",
   "Laver Cup",
+  "ATP Challenger 175",
   "ATP Challenger 125",
   "ATP Challenger 100",
   "ATP Challenger 75",
@@ -42,7 +43,13 @@ export const WTA_CATEGORIES: CategoryType[] = [
   "NTL"
 ]
 
-export const ATP_CHALLENGER_CATEGORIES: CategoryType[] = ["ATP Challenger 125", "ATP Challenger 100", "ATP Challenger 75", "ATP Challenger 50"]
+export const ATP_CHALLENGER_CATEGORIES: CategoryType[] = [
+  "ATP Challenger 175",
+  "ATP Challenger 125",
+  "ATP Challenger 100",
+  "ATP Challenger 75",
+  "ATP Challenger 50"
+]
 
 export const WTA_CHALLENGER_CATEGORIES: CategoryType[] = ["WTA 125"]
 
@@ -60,33 +67,3 @@ export const MASTERS_CATEGORIES: CategoryType[] = [
   "WTA 1000",
   "WTA Premier Mandatory"
 ]
-
-export const MONTHS: MonthType[] = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
-]
-
-export const MONTHS_SERVER: Record<MonthType, number> = {
-  January: 1,
-  February: 2,
-  March: 3,
-  April: 4,
-  May: 5,
-  June: 6,
-  July: 7,
-  August: 8,
-  September: 9,
-  October: 10,
-  November: 11,
-  December: 12
-}

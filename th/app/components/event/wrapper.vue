@@ -1,31 +1,14 @@
 <script setup lang="ts">
 const {
-  icons,
-  ui: { icons: appIcons }
-} = useAppConfig()
-const { name, params } = useRoute()
-const {
-  year,
-  eid,
-  name: paramName,
-  id
-} = params as {
-  name: string
-  year: string
-  eid: string
-  id: string
-}
-
-type APIResponseType = Pick<EventInterface, "tours" | "atp_link" | "wiki_link" | "wta_link" | "men_link" | "women_link"> & { tournament: string }
+  name,
+  // @ts-ignore
+  params: { year, eid, name: paramName }
+} = useRoute()
 
 // API call
-const { data: event } = await useFetch<APIResponseType>(() => "/api/events/overview", {
-  query: { id: eid }
-})
-
-useHead({
-  title: `${EVENT_PAGES.find(page => page.name === name)?.label} | ${event.value?.tournament} ${year}`
-})
+const { data: event } = await useFetch<
+  Pick<EventInterface, "tours" | "atp_link" | "wta_link" | "men_link" | "women_link" | "wiki_link" | "tournament">
+>("/api/events/overview", { key: `event-overview-${eid}`, query: { id: eid } })
 
 const otherLinks = computed(() => {
   if (event.value) {
@@ -60,78 +43,22 @@ const otherLinks = computed(() => {
   return []
 })
 
-// TOC
-const toc = computed(() => [
-  {
-    label: "Details",
-    to: "#details",
-    icon: icons.overview
-  },
-  {
-    label: "Awards",
-    to: "#awards",
-    icon: icons.awards
-  },
-  {
-    label: "Seeds",
-    to: "#seeds",
-    icon: icons.seeds
-  },
-  {
-    label: "Entry Information",
-    to: "#entry-info",
-    icon: appIcons.info
-  },
-  {
-    label: "Entries",
-    to: "#entries",
-    icon: icons.player
+onMounted(() => {
+  if (name !== "match") {
+    useHead({
+      title: `${EVENT_PAGES.find(page => page.name === name)?.label} | ${event.value?.tournament.name ?? capitalCase(paramName as string)} ${year}`
+    })
   }
-])
+})
 </script>
 
 <template>
-  <page-wrapper>
-    <template #nav-right>
-      <!--@vue-expect-error-->
-      <u-dropdown-menu :items="EVENT_PAGES.map(page => ({ ...page, to: { name: page.name, params: { year, eid, name: paramName, id } } }))">
-        <u-button
-          :icon="icons.layers"
-          variant="ghost"
-        />
-      </u-dropdown-menu>
-      <u-dropdown-menu :items="otherLinks">
-        <u-button
-          :icon="appIcons.ellipsis"
-          variant="ghost"
-          :ui="{ leadingIcon: 'rotate-90' }"
-        />
-      </u-dropdown-menu>
-      <u-dropdown-menu
-        v-if="name === 'event'"
-        :items="toc"
-      >
-        <u-button
-          :icon="icons.toc"
-          variant="ghost"
-        />
-      </u-dropdown-menu>
-    </template>
-
-    <template
-      #toolbar
-      v-if="$slots.toolbar"
-    >
-      <slot
-        v-if="event"
-        name="toolbar"
-        :tours="event.tours"
-      />
-    </template>
-
+  <div class="w-full">
     <slot
       v-if="event"
       :tours="event.tours"
+      :tournament="event.tournament"
+      :other-links="otherLinks"
     />
-  </page-wrapper>
+  </div>
 </template>

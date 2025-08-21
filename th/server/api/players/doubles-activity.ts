@@ -3,8 +3,7 @@ export default defineEventHandler(async event => {
 
   const formattedParams = {
     id,
-    year: Number(year),
-    challenger: CHALLENGER_CATEGORIES
+    year: Number(year)
   }
 
   const { records: statsRecords } = await useDriver().executeQuery(
@@ -19,83 +18,26 @@ export default defineEventHandler(async event => {
         (y:Year {id: $year})
       WHERE m:Doubles
       WITH
-        *,
-        (e:Men OR e:Women) AS isITF,
-        (e.atp_category IN $challenger OR e.wta_category IN $challenger) AS isChallenger,
-        (e.category IS NULL) AND
-        (NOT m:ATP OR e.atp_category IS NULL OR NOT e.atp_category IN $challenger) AND
-        (NOT m:WTA OR e.wta_category IS NULL OR NOT e.wta_category IN $challenger) AS isNotChallenger
-      WITH
         sum(
           CASE
-            WHEN s:Winner AND NOT isITF AND isNotChallenger THEN 1
+            WHEN s:Winner THEN 1
             ELSE 0
-          END) AS tour_wins,
+          END) AS wins,
         sum(
           CASE
-            WHEN s:Winner AND isChallenger THEN 1
+            WHEN s:Loser THEN 1
             ELSE 0
-          END) AS challenger_wins,
+          END) AS losses,
         sum(
           CASE
-            WHEN s:Winner AND isITF THEN 1
+            WHEN s:Winner AND r.round = 'Final' THEN 1
             ELSE 0
-          END) AS itf_wins,
-        sum(
-          CASE
-            WHEN s:Loser AND NOT isITF AND isNotChallenger THEN 1
-            ELSE 0
-          END) AS tour_losses,
-        sum(
-          CASE
-            WHEN s:Loser AND isChallenger THEN 1
-            ELSE 0
-          END) AS challenger_losses,
-        sum(
-          CASE
-            WHEN s:Loser AND isITF THEN 1
-            ELSE 0
-          END) AS itf_losses,
-        sum(
-          CASE
-            WHEN
-              s:Winner AND r.round = 'Final' AND NOT isITF AND isNotChallenger
-              THEN 1
-            ELSE 0
-          END
-        ) AS tour_titles,
-        sum(
-          CASE
-            WHEN s:Winner AND r.round = 'Final' AND isChallenger THEN 1
-            ELSE 0
-          END
-        ) AS challenger_titles,
-        sum(
-          CASE
-            WHEN s:Winner AND r.round = 'Final' AND isITF THEN 1
-            ELSE 0
-          END) AS itf_titles
-      RETURN
-        [
-          {
-            category: 'Wins',
-            tour: tour_wins,
-            challenger: challenger_wins,
-            itf: itf_wins
-          },
-          {
-            category: 'Losses',
-            tour: tour_losses,
-            challenger: challenger_losses,
-            itf: itf_losses
-          },
-          {
-            category: 'Titles',
-            tour: tour_titles,
-            challenger: challenger_titles,
-            itf: itf_titles
-          }
-        ] AS stats
+          END) AS titles
+      RETURN [
+        {category: 'Wins', value: wins},
+        {category: 'Losses', value: losses},
+        {category: 'Titles', value: titles}
+      ] AS stats
     `,
     formattedParams
   )
@@ -113,23 +55,17 @@ export default defineEventHandler(async event => {
       MATCH (t:Tournament)<-[:EDITION_OF]-(e)
       WITH
         *,
-        apoc.coll.min(
-          [
-            e.start_date,
-            e.atp_start_date,
-            e.wta_start_date,
-            e.men_start_date,
-            e.women_start_date
-          ]
-        ) AS start_date
+        apoc.coll.min([e.start_date, e.atp_start_date, e.wta_start_date]) AS start_date
       ORDER BY start_date, r.number DESC, m.match_no DESC
       CALL (e, m) {
         OPTIONAL MATCH (e)-[:ON_SURFACE]->(z:Surface)
         OPTIONAL MATCH (m)-[:PLAYED]->(:Tie)-[:ON_SURFACE]->(z1:Surface)
         RETURN
           CASE
-            WHEN z IS NOT NULL THEN apoc.any.properties(z)
-            ELSE apoc.any.properties(z1)
+            WHEN
+              z IS NOT NULL
+              THEN {id: z.id, surface: z.surface, environment: z.environment}
+            ELSE {id: z1.id, surface: z1.surface, environment: z1.environment}
           END AS surface
       }
       CALL (e, m) {
@@ -144,15 +80,19 @@ export default defineEventHandler(async event => {
             WHEN
               v IS NOT NULL
               THEN
-                apoc.map.merge(
-                  apoc.any.properties(v),
-                  {country: apoc.any.properties(c)}
-                )
+                {
+                  id: v.id,
+                  name: v.name,
+                  city: v.city,
+                  country: {id: c.id, name: c.name, alpha2: c.alpha2}
+                }
             ELSE
-              apoc.map.merge(
-                apoc.any.properties(v1),
-                {county: apoc.any.properties(c1)}
-              )
+              {
+                id: v1.id,
+                name: v1.name,
+                city: v1.city,
+                country: {id: c1.id, name: c1.name, alpha2: c1.alpha2}
+              }
           END AS location
         RETURN COLLECT(location) AS locations
       }
@@ -166,32 +106,18 @@ export default defineEventHandler(async event => {
             CASE
               WHEN
                 px IS NOT NULL AND
-                (px.start_date <= e.start_date OR
-                  (pp:ATP AND
-                    (px.start_date <= e.atp_start_date OR
-                      px.start_date <= e.men_start_date)) OR
-                  (pp:WTA AND
-                    (px.start_date <= e.wta_start_date OR
-                      px.start_date <= e.women_start_date))) AND
-                (px.end_date > e.start_date OR
-                  (pp:ATP AND
-                    (px.end_date > e.atp_start_date OR
-                      px.end_date > e.men_start_date)) OR
-                  (pp:WTA AND
-                    (px.end_date > e.wta_start_date OR
-                      px.end_date > e.women_start_date)))
-                THEN apoc.any.properties(pn)
-              ELSE apoc.any.properties(pc)
+                px.start_date <= e.start_date AND
+                px.end_date > e.start_date
+                THEN {id: pn.id, alpha2: pn.alpha2, name: pn.name}
+              ELSE {id: pc.id, alpha2: pc.alpha2, name: pc.name}
             END AS country
         }
-        RETURN
-          {
-            id: pp.id,
-            first_name: pp.first_name,
-            last_name: pp.last_name,
-            country: country,
-            rank: pe.rank
-          } AS partner
+        RETURN {
+          id: pp.id,
+          name: pp.first_name || ' ' || pp.last_name,
+          country: country,
+          rank: pe.rank
+        } AS partner
       }
       CALL (m, s, r, e) {
         OPTIONAL MATCH
@@ -210,25 +136,17 @@ export default defineEventHandler(async event => {
           of,
           op,
           w,
+          oc,
+          ox,
+          on,
           r,
           CASE
             WHEN
               ox IS NOT NULL AND
-              (ox.start_date <= e.start_date OR
-                (op:ATP AND
-                  (ox.start_date <= e.atp_start_date OR
-                    ox.start_date <= e.men_start_date)) OR
-                (op:WTA AND
-                  (ox.start_date <= e.wta_start_date OR
-                    ox.start_date <= e.women_start_date))) AND
-              (ox.end_date > e.start_date OR
-                (op:ATP AND
-                  (ox.end_date > e.atp_start_date OR ox.end_date > e.men_start_date)) OR
-                (op:WTA AND
-                  (ox.end_date > e.wta_start_date OR
-                    ox.end_date > e.women_start_date)))
-              THEN apoc.any.properties(on)
-            ELSE apoc.any.properties(oc)
+              ox.start_date <= e.start_date AND
+              ox.end_date > e.start_date
+              THEN {id: on.id, alpha2: on.alpha2, name: on.name}
+            ELSE {id: oc.id, alpha2: oc.alpha2, name: oc.name}
           END AS country
         WITH
           s,
@@ -236,20 +154,17 @@ export default defineEventHandler(async event => {
           r,
           w,
           os,
-          CASE
-            WHEN op IS NULL THEN null
-            ELSE
-              apoc.map.mergeList(
-                [
-                  apoc.any.properties(of),
-                  apoc.any.properties(op),
-                  {
-                    country: country,
-                    incomplete: coalesce(s.incomplete, os.incomplete, null)
-                  }
-                ]
-              )
-          END AS opponent
+          CASE WHEN op IS NULL THEN null ELSE {
+            id: op.id,
+            name: op.first_name || ' ' || op.last_name,
+            country: country,
+            incomplete: coalesce(s.incomplete, os.incomplete, null),
+            seed: of.seed,
+            status: of.status,
+            rank: of.rank,
+            q_seed: of.q_seed,
+            q_status: of.q_status
+          } END AS opponent
         WITH
           s,
           m,
@@ -260,20 +175,11 @@ export default defineEventHandler(async event => {
           m.match_no AS match_no,
           w.id AS winner_id,
           [
-            [
-              [s.s1, s.t1],
-              [s.s2, s.t2],
-              [s.s3, s.t3],
-              [s.s4, s.t4],
-              [s.s5, s.t5]
-            ],
-            [
-              [os.s1, os.t1],
-              [os.s2, os.t2],
-              [os.s3, os.t3],
-              [os.s4, os.t4],
-              [os.s5, os.t5]
-            ]
+            toString(s.s1) || toString(os.s1),
+            toString(s.s2) || toString(os.s2),
+            toString(s.s3) || toString(os.s3),
+            toString(s.s4) || toString(os.s4),
+            toString(s.s5) || toString(os.s5)
           ] AS sets,
           COLLECT(opponent) AS opponents
 
@@ -285,42 +191,144 @@ export default defineEventHandler(async event => {
           w,
           toString(e.id) + '|' + r.round + '|' + toString(m.match_no) AS matchKey,
           {
-            labels: labels(m),
             round: r.round,
             match_no: m.match_no,
             incomplete: m.incomplete,
             winner_id: w.id,
-            sets: sets,
-            opponents: opponents,
-            stats:
+            sets: [
+              toString(s.s1) || toString(os.s1),
+              toString(s.s2) || toString(os.s2),
+              toString(s.s3) || toString(os.s3),
+              toString(s.s4) || toString(os.s4),
+              toString(s.s5) || toString(os.s5)
+            ],
+            tbs: [
               CASE
-                WHEN s.serve1 IS NOT NULL THEN true
-                ELSE false
+                WHEN
+                  s.t1 IS NOT NULL
+                  THEN
+                    toString(apoc.coll.min([x IN [s.t1, os.t1] WHERE x IS NOT NULL]))
+                ELSE null
+              END,
+              CASE
+                WHEN
+                  s.t2 IS NOT NULL
+                  THEN
+                    toString(apoc.coll.min([x IN [s.t2, os.t2] WHERE x IS NOT NULL]))
+                ELSE null
+              END,
+              CASE
+                WHEN
+                  s.t3 IS NOT NULL
+                  THEN
+                    toString(apoc.coll.min([x IN [s.t3, os.t3] WHERE x IS NOT NULL]))
+                ELSE null
+              END,
+              CASE
+                WHEN
+                  s.t4 IS NOT NULL
+                  THEN
+                    toString(apoc.coll.min([x IN [s.t4, os.t4] WHERE x IS NOT NULL]))
+                ELSE null
+              END,
+              CASE
+                WHEN
+                  s.t5 IS NOT NULL
+                  THEN
+                    toString(apoc.coll.min([x IN [s.t5, os.t5] WHERE x IS NOT NULL]))
+                ELSE null
               END
+            ],
+            opponents: opponents
           } AS match
 
         WITH matchKey, apoc.agg.first(match) AS match
         RETURN match
       }
       WITH e, t, surface, f, COLLECT(DISTINCT match) AS matches, locations, partner
-      RETURN
-        apoc.map.merge(
-          apoc.any.properties(e),
-          {
-            tours: [x IN labels(e) WHERE NOT x IN ['Update', 'Event']],
-            level: CASE
-              WHEN e:Men OR e:Women THEN 'ITF'
-              WHEN (e:ATP AND e.atp_category IN $challenger) OR (e:WTA AND e.wta_category IN $challenger) THEN 'Challenger'
-              ELSE 'Tour'
-            END,
-            tournament: apoc.any.properties(t),
-            venues: locations,
-            surface: surface,
-            matches: matches,
-            partner: partner,
-            player: apoc.any.properties(f)
-          }
-        ) AS event
+      RETURN {
+        tours: labels(e),
+        id: e.id,
+        name: e.sponsor_name,
+        tournament: {id: t.id, name: t.name},
+        category: e.category,
+        atp_category: e.atp_category,
+        wta_category: e.wta_category,
+        dates:
+          CASE
+            WHEN e.start_date IS NULL OR e.end_date IS NULL THEN null
+            WHEN
+              e.start_date.year <> e.end_date.year
+              THEN
+                apoc.temporal.format(e.start_date, 'dd MMMM yyyy') ||
+                ' - ' ||
+                apoc.temporal.format(e.end_date, 'dd MMMM yyyy')
+            WHEN
+              e.start_date.month <> e.end_date.month
+              THEN
+                apoc.temporal.format(e.start_date, 'dd MMMM') ||
+                ' - ' ||
+                apoc.temporal.format(e.end_date, 'dd MMMM yyyy')
+            ELSE
+              apoc.temporal.format(e.start_date, 'dd') ||
+              ' - ' ||
+              apoc.temporal.format(e.end_date, 'dd MMMM yyyy')
+          END,
+        atp_dates:
+          CASE
+            WHEN e.atp_start_date IS NULL OR e.atp_end_date IS NULL THEN null
+            WHEN
+              e.atp_start_date.year <> e.atp_end_date.year
+              THEN
+                apoc.temporal.format(e.atp_start_date, 'dd MMMM yyyy') ||
+                ' - ' ||
+                apoc.temporal.format(e.atp_end_date, 'dd MMMM yyyy')
+            WHEN
+              e.atp_start_date.month <> e.atp_end_date.month
+              THEN
+                apoc.temporal.format(e.atp_start_date, 'dd MMMM') ||
+                ' - ' ||
+                apoc.temporal.format(e.atp_end_date, 'dd MMMM yyyy')
+            ELSE
+              apoc.temporal.format(e.atp_start_date, 'dd') ||
+              ' - ' ||
+              apoc.temporal.format(e.atp_end_date, 'dd MMMM yyyy')
+          END,
+        wta_dates:
+          CASE
+            WHEN e.wta_start_date IS NULL OR e.wta_end_date IS NULL THEN null
+            WHEN
+              e.wta_start_date.year <> e.wta_end_date.year
+              THEN
+                apoc.temporal.format(e.wta_start_date, 'dd MMMM yyyy') ||
+                ' - ' ||
+                apoc.temporal.format(e.wta_end_date, 'dd MMMM yyyy')
+            WHEN
+              e.wta_start_date.month <> e.wta_end_date.month
+              THEN
+                apoc.temporal.format(e.wta_start_date, 'dd MMMM') ||
+                ' - ' ||
+                apoc.temporal.format(e.wta_end_date, 'dd MMMM yyyy')
+            ELSE
+              apoc.temporal.format(e.wta_start_date, 'dd') ||
+              ' - ' ||
+              apoc.temporal.format(e.wta_end_date, 'dd MMMM yyyy')
+          END,
+        venues: locations,
+        surface: surface,
+        currency: e.currency,
+        matches: matches,
+        player: {
+          seed: f.seed,
+          status: f.status,
+          rank: f.rank,
+          points: f.points,
+          pm: apoc.number.format(f.pm, '#,###'),
+          q_seed: f.q_seed,
+          q_status: f.q_status
+        },
+        partner: partner
+      } AS event
     `,
     formattedParams
   )
@@ -328,68 +336,40 @@ export default defineEventHandler(async event => {
   const statsResults = statsRecords[0].get("stats")
   const activityResults = activityRecords.map(record => record.get("event"))
 
-  for (const event of activityResults) {
-    const dateKeys = [
-      "start_date",
-      "end_date",
-      "atp_start_date",
-      "atp_end_date",
-      "wta_start_date",
-      "wta_end_date",
-      "men_start_date",
-      "men_end_date",
-      "women_start_date",
-      "women_end_date"
-    ]
-
-    event["id"] = event["id"].toInt()
-    event["tournament"]["id"] = event["tournament"]["id"].toInt()
-    event["player"]["seed"] = event["player"]["seed"]?.toInt()
-    event["player"]["rank"] = event["player"]["rank"]?.toInt()
-    event["player"]["points"] = event["player"]["points"]?.toInt()
-    event["player"]["q_seed"] = event["player"]["q_seed"]?.toInt()
-    event["player"]["pm"] = event["player"]["pm"]?.toInt()
-    event["partner"]["rank"] = event["partner"]["rank"]?.toInt()
-
-    for (const key of dateKeys) {
-      if (event[key]) {
-        event[key] = {
-          year: event[key].year?.toInt(),
-          month: event[key].month?.toInt(),
-          day: event[key].day?.toInt()
-        }
-      }
-    }
-
-    for (const match of event.matches) {
-      match["match_no"] = match["match_no"].toInt()
-
-      for (const opponent of match.opponents) {
-        opponent["seed"] = opponent["seed"]?.toInt()
-        opponent["rank"] = opponent["rank"]?.toInt()
-        opponent["q_seed"] = opponent["q_seed"]?.toInt()
-      }
-
-      for (let i = 0; i < 2; i++) {
-        for (let index = 4; index >= 0; index--) {
-          // Delete keys with null values in the array
-          if (match.sets[i][index][0] === null) {
-            match.sets[i].splice(index, 1)
-          } else {
-            match.sets[i][index] = match.sets[i][index].map((item: any) => (item ? item.toInt() : null))
-          }
-        }
-      }
-    }
-  }
-
   return {
     stats: statsResults.map((stat: any) => ({
       category: stat.category,
-      tour: stat.tour?.toInt(),
-      challenger: stat.challenger?.toInt(),
-      itf: stat.itf?.toInt()
+      value: stat.value.low
     })),
-    activity: activityResults
+    activity: activityResults.map((event: any) => ({
+      ...event,
+      tours: event.tours.filter((tour: string) => tour !== "Event" && tour !== "Update"),
+      id: event.id.low,
+      tournament: {
+        ...event.tournament,
+        id: event.tournament.id.low
+      },
+      player: {
+        ...event.player,
+        seed: event.player.seed?.low,
+        rank: event.player.rank?.low,
+        points: event.player.points?.low,
+        q_seed: event.player.q_seed?.low
+      },
+      partner: {
+        ...event.partner,
+        rank: event.partner.rank?.low
+      },
+      matches: event.matches.map((match: any) => ({
+        ...match,
+        match_no: match.match_no.low,
+        opponents: match.opponents.map((opponent: any) => ({
+          ...opponent,
+          seed: opponent.seed?.low,
+          rank: opponent.rank?.low,
+          q_seed: opponent.q_seed?.low
+        }))
+      }))
+    }))
   }
 })

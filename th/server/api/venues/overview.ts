@@ -4,7 +4,7 @@ export default defineEventHandler(async query => {
   const { records } = await useDriver().executeQuery(
     `/* cypher */
     MATCH (v:Venue)-[:LOCATED_IN]->(c:Country) WHERE apoc.text.compareCleaned(v.id, $id)
-    RETURN apoc.map.merge(apoc.any.properties(v), {country: apoc.any.properties(c)}) AS venue
+    RETURN apoc.map.merge(properties(v), {country: properties(c)}) AS venue
     `,
     { id }
   )

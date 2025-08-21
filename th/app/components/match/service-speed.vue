@@ -1,13 +1,13 @@
 <script setup lang="ts">
 defineProps<{
-  stats: MatchStatsType[]
+  stats: MatchStatsInterface[]
   label?: string
   category: string
+  tournament: string
 }>()
 const { params } = useRoute()
 const { year } = params as { year?: string }
 const { icons } = useAppConfig()
-const tournament = inject<string>("tournament", "")
 </script>
 
 <template>
