@@ -59,11 +59,6 @@ export default defineEventHandler(async query => {
             'men_end_date',
             'women_start_date',
             'women_end_date',
-            'category',
-            'atp_category',
-            'wta_category',
-            'men_category',
-            'women_category',
             'sponsor_name',
             'atp_draw_s',
             'atp_draw_d',
@@ -125,11 +120,6 @@ export default defineEventHandler(async query => {
     }
 
     const {
-      category,
-      atp_category,
-      wta_category,
-      men_category,
-      women_category,
       id,
       start_date,
       end_date,
@@ -154,26 +144,9 @@ export default defineEventHandler(async query => {
       ...rest
     } = event
 
-    // level
-    const levels = []
-
-    if (
-      category ||
-      (atp_category && !ATP_CHALLENGER_CATEGORIES.includes(atp_category)) ||
-      (wta_category && !WTA_CHALLENGER_CATEGORIES.includes(wta_category))
-    )
-      levels.push("Tour")
-
-    if ((atp_category && ATP_CHALLENGER_CATEGORIES.includes(atp_category)) || (wta_category && WTA_CHALLENGER_CATEGORIES.includes(wta_category)))
-      levels.push("Challenger")
-
-    if (men_category || women_category) levels.push("ITF")
-
     return {
       id: id.toInt(),
       tours: getCorrectTours(tours),
-      levels,
-      categories: [category, atp_category, wta_category, men_category, women_category],
       dates: [
         [start_date, end_date],
         [atp_start_date, atp_end_date],
