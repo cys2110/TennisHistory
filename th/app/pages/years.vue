@@ -83,9 +83,9 @@ const handleSelectRow = async (row: TableRow<APIResponse>) => {
           </template>
         </u-dashboard-navbar>
 
-        <u-dashboard-toolbar>
+        <!-- <u-dashboard-toolbar>
           <filter-select-all-years v-model="id as number" />
-        </u-dashboard-toolbar>
+        </u-dashboard-toolbar> -->
       </template>
 
       <template #body>
