@@ -215,20 +215,14 @@ const columnPinning = ref({
           render-fallback-value="Various"
         >
           <template #loading>
-            <u-icon
-              :name="uIcons.loading"
-              class="size-8"
-            />
+            <loading-icon />
           </template>
 
           <template #empty>
-            <div class="flex justify-center items-center w-full gap-2 text-error">
-              <u-icon
-                :name="icons.noCalendar"
-                class="text-base"
-              />
-              No {{ category || capitalCase(id as string) }} events took place in {{ year }}.
-            </div>
+            <empty-message
+              :icon="icons.noCalendar"
+              :message="`No ${category || capitalCase(id as string)} events took place in ${year}.`"
+            />
           </template>
         </u-table>
       </template>

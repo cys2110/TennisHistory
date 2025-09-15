@@ -2,10 +2,7 @@
 import type { TableColumn, TableRow } from "@nuxt/ui"
 
 useHead({ title: "Coaches" })
-const {
-  icons,
-  ui: { icons: uIcons }
-} = useAppConfig()
+const { icons } = useAppConfig()
 
 useJsonld(() => ({
   "@context": "https://schema.org",
@@ -64,14 +61,17 @@ onMounted(() => {
     {
       distance: 50,
       canLoadMore: () => {
-        return status.value !== "pending" && (data.value?.[0]?.total ?? 0) > coaches.value.length
+        return status.value !== "pending" && (get(data)?.[0]?.total ?? 0) > get(coaches).length
       }
     }
   )
 })
 
 const columns: TableColumn<PersonInterface>[] = [
-  { accessorKey: "first_name", footer: () => `Total: ${data.value?.[0]?.total ?? 0}` },
+  {
+    accessorKey: "first_name",
+    footer: () => `Total: ${data.value?.[0]?.total ?? 0}`
+  },
   { accessorKey: "last_name" }
 ]
 
@@ -101,20 +101,14 @@ const handleSelectRow = async (row: TableRow<PersonInterface>) => {
           :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer' }"
         >
           <template #loading>
-            <u-icon
-              :name="uIcons.loading"
-              class="size-8"
-            />
+            <loading-icon />
           </template>
 
           <template #empty>
-            <div class="flex justify-center items-center w-full gap-2 text-error">
-              <u-icon
-                :name="icons.noPeople"
-                class="text-base"
-              />
-              No coaches found
-            </div>
+            <empty-message
+              :icon="icons.noPeople"
+              message="No coaches found"
+            />
           </template>
 
           <template #first_name-header>
