@@ -5,7 +5,7 @@ import { type Column, getFacetedRowModel, getFacetedUniqueValues, getGroupedRowM
 
 const {
   icons,
-  ui: { icons: uIcons, colors }
+  ui: { icons: uIcons }
 } = useAppConfig()
 const {
   params: { id, name }

@@ -112,8 +112,6 @@ const grouping_options = ref<GroupingOptions>({
   getGroupedRowModel: getGroupedRowModel()
 })
 
-const table = useTemplateRef("table")
-
 const handleSelectRow = async (row: TableRow<PlayerInterface>) => {
   if (!row.getIsGrouped()) {
     await navigateTo({ name: "player", params: { id: row.original.id, name: kebabCase(`${row.original.first_name}-${row.original.last_name}`) } })
@@ -128,7 +126,6 @@ const handleSelectRow = async (row: TableRow<PlayerInterface>) => {
     id="number-ones"
   >
     <u-table
-      ref="table"
       :data="players"
       :columns
       :loading="['idle', 'pending'].includes(status)"

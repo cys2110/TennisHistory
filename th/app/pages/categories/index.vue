@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { FilterTableHeader, UButton } from "#components"
+import { ColouredBadge, FilterTableHeader, GroupedCell, GroupFilterTableHeader, UButton } from "#components"
 import type { TableColumn, TableRow } from "@nuxt/ui"
 import { type Column, getFacetedRowModel, getFacetedUniqueValues, getGroupedRowModel, type GroupingOptions } from "@tanstack/vue-table"
 
 useHead({ title: "Categories" })
-const {
-  icons,
-  ui: { icons: uIcons }
-} = useAppConfig()
+const { icons } = useAppConfig()
 
 useJsonld(() => ({
   "@context": "https://schema.org",
@@ -17,43 +14,21 @@ useJsonld(() => ({
 }))
 
 // API call
-const { data: categories, status } = await useFetch<CategoryType[]>("/api/categories", {
+const { data: categories, status } = await useFetch<EventInterface[]>("/api/categories", {
   key: "categories",
   default: () => [],
   server: false
 })
 
-const columns: TableColumn<CategoryType>[] = [
+const columns: TableColumn<EventInterface>[] = [
   {
-    id: "tour",
-    accessorFn: row =>
-      ATP_CATEGORIES.includes(row) ? "ATP"
-      : WTA_CATEGORIES.includes(row) ? "WTA"
-      : ITF_MEN_CATEGORIES.includes(row) ? "ITF (M)"
-      : ITF_WOMEN_CATEGORIES.includes(row) ? "ITF (W)"
-      : undefined,
+    accessorKey: "tour",
     sortUndefined: "last",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Tour",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(GroupFilterTableHeader, { column: column as Column<unknown>, label: "Tour", type: "alpha" }),
+    cell: ({ row }) =>
+      h(GroupedCell, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "tour" }, () =>
+        h(ColouredBadge, { label: row.getValue("tour") as string, class: "mx-auto" })
       ),
     footer: ({ table }) => {
       const filteredRows = table.getFilteredRowModel().rows
@@ -61,61 +36,37 @@ const columns: TableColumn<CategoryType>[] = [
     }
   },
   {
-    id: "level",
-    accessorFn: row =>
-      ATP_CHALLENGER_CATEGORIES.includes(row) || WTA_CHALLENGER_CATEGORIES.includes(row) ? "Challenger"
-      : ITF_MEN_CATEGORIES.includes(row) || ITF_WOMEN_CATEGORIES.includes(row) ? "ITF"
-      : "Tour",
+    accessorKey: "level",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Level",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(GroupFilterTableHeader, { column: column as Column<unknown>, label: "Level", type: "alpha" }),
+    cell: ({ row }) =>
+      h(GroupedCell, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "level" }, () =>
+        h(ColouredBadge, { label: row.getValue("level") as string, class: "mx-auto" })
       )
   },
   {
-    id: "category",
-    accessorFn: row => row,
+    accessorKey: "category",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     aggregationFn: "uniqueCount",
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Category",
-        type: "alpha"
-      })
+    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Category", type: "alpha" }),
+    cell: ({ row, cell }) => (row.getIsGrouped() ? `${cell.getValue()} categories` : cell.getValue())
   }
 ]
 
 const columnFilters = ref([])
 
 const grouping = ref<string[]>([])
-
 const grouping_options = ref<GroupingOptions>({
   getGroupedRowModel: getGroupedRowModel()
 })
 
 const table = useTemplateRef("table")
 
-const handleSelectRow = async (row: TableRow<CategoryType>) => {
-  if (!row.getIsGrouped()) {
-    await navigateTo({ name: "category", params: { id: kebabCase(row.original) } })
+const handleSelectRow = async (row: TableRow<EventInterface>) => {
+  if (row.getIsGrouped()) {
+    row.toggleExpanded()
+  } else {
+    await navigateTo({ name: "category", params: { id: kebabCase(row.original.category) } })
   }
 }
 </script>
@@ -163,64 +114,11 @@ const handleSelectRow = async (row: TableRow<CategoryType>) => {
           :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer', td: 'empty:p-0' }"
         >
           <template #loading>
-            <u-icon
-              :name="uIcons.loading"
-              class="size-8"
-            />
+            <loading-icon />
           </template>
 
           <template #empty>
-            <div class="flex justify-center items-center w-full gap-2 text-error">
-              <u-icon
-                :name="uIcons.caution"
-                class="text-base"
-              />
-              No categories found
-            </div>
-          </template>
-
-          <template #tour-cell="{ row }">
-            <div class="flex items-center gap-2">
-              <u-button
-                v-if="row.getIsGrouped() && grouping[0] === 'tour'"
-                :icon="uIcons.chevronDoubleRight"
-                size="xs"
-                variant="link"
-                color="neutral"
-                @click="row.toggleExpanded()"
-                :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-              />
-
-              <template v-if="row.getValue('tour')">
-                <coloured-badge
-                  v-if="(row.getIsGrouped() && row.groupingColumnId === 'tour') || (!grouping.includes('tour') && !row.getIsGrouped())"
-                  :label="row.getValue('tour')"
-                  class="mx-auto"
-                />
-              </template>
-            </div>
-          </template>
-
-          <template #level-cell="{ row }">
-            <div class="flex items-center gap-2">
-              <u-button
-                v-if="row.getIsGrouped() && grouping[0] === 'level'"
-                :icon="uIcons.chevronDoubleRight"
-                size="xs"
-                variant="link"
-                color="neutral"
-                @click="row.toggleExpanded()"
-                :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-              />
-
-              <template v-if="row.getValue('level')">
-                <coloured-badge
-                  v-if="(row.getIsGrouped() && row.groupingColumnId === 'level') || (!grouping.includes('level') && !row.getIsGrouped())"
-                  :label="row.getValue('level')"
-                  class="mx-auto"
-                />
-              </template>
-            </div>
+            <empty-message message="No categories found" />
           </template>
         </u-table>
       </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ArrayFilterTableHeader, ColouredBadge, CountryLink, FilterTableHeader, NameTableHeader, RangeTableHeader, UButton, ULink } from "#components"
-import type { TableColumn, TableRow } from "@nuxt/ui"
+import { ArrayFilterTableHeader, ColouredBadge, FilterTableHeader, RangeTableHeader, UButton, ULink } from "#components"
+import type { TableColumn } from "@nuxt/ui"
 import { type Column, getFacetedRowModel, getFacetedUniqueValues, getGroupedRowModel, type GroupingOptions } from "@tanstack/vue-table"
 
 const {
