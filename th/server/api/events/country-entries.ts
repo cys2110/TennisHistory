@@ -41,7 +41,7 @@ export default defineEventHandler(async query => {
           END) AS doubles_rank
       RETURN
         apoc.map.merge(
-          properties(p),
+          apoc.map.submap(p, ['id', 'first_name', 'last_name']),
           {
             singles_rank: singles_rank,
             doubles_rank: doubles_rank,

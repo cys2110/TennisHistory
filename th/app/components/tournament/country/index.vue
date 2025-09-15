@@ -1,22 +1,26 @@
 <script setup lang="ts">
 import { CountryLink, FilterTableHeader, SortTableHeader, UBadge } from "#components"
-import type { TableColumn } from "@nuxt/ui"
+import type { TableColumn, TableRow } from "@nuxt/ui"
 import { type Column, createColumnHelper, getFacetedRowModel, getFacetedMinMaxValues, getFacetedUniqueValues } from "@tanstack/vue-table"
 
-const { viewMode } = useDefaults()
 const {
-  //@ts-ignore
   params: { id }
-} = useRoute()
-const { icons } = useAppConfig()
+} = useRoute("tournament")
+const {
+  icons,
+  ui: { icons: uIcons }
+} = useAppConfig()
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
+const mdAndUp = breakpoints.greaterOrEqual("md")
 const tours = inject<TourType[]>("tours", [])
 const tournamentName = inject<string>("tournamentName", "")
 
 // API call
-const { data: countries, status } = await useFetch<TournamentCountryType[]>("/api/tournaments/country-winners", {
+const { data: countries, status } = await useFetch<TournamentCountryType[]>("/api/tournaments/country", {
   key: `tournament-country-${id}`,
   query: { id },
-  default: () => []
+  default: () => [],
+  server: false
 })
 
 const columnHelper = createColumnHelper<TournamentCountryType>()
@@ -24,6 +28,7 @@ const columnHelper = createColumnHelper<TournamentCountryType>()
 const columns: TableColumn<TournamentCountryType>[] = [
   {
     accessorKey: "country.name",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
       h(FilterTableHeader, {
         column: column as Column<unknown>,
@@ -35,8 +40,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
         country: row.original.country,
         iconOnly: false,
         class: "mx-auto"
-      }),
-    footer: ({ table }) => `Total: ${table.getRowCount()}`
+      })
   },
   columnHelper.group({
     header: "Individual Winners",
@@ -183,7 +187,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
       }),
       columnHelper.group({
         id: "distinct_total",
-        header: () => h(UBadge, { color: "joint", label: "Total", class: "font-semibold" }),
+        header: () => h(UBadge, { color: "primary", label: "Total", class: "font-semibold" }),
         columns: [
           {
             id: "total_singles",
@@ -400,7 +404,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
       }),
       columnHelper.group({
         id: "all_total",
-        header: () => h(UBadge, { color: "joint", label: "Total", class: "font-semibold" }),
+        header: () => h(UBadge, { color: "primary", label: "Total", class: "font-semibold" }),
         columns: [
           {
             id: "all_singles",
@@ -478,136 +482,29 @@ const columnVisibility = ref({
   tour: tours.length > 1
 })
 const columnFilters = ref([])
+
+const handleSelectRow = async (row: TableRow<TournamentCountryType>) => {
+  await navigateTo({
+    name: "country",
+    params: {
+      id: row.original.country.id,
+      name: kebabCase(row.original.country.name)
+    }
+  })
+}
 </script>
 
 <template>
-  <div v-if="viewMode === 'cards'">
-    <u-page-grid v-if="countries.length || status === 'pending'">
-      <u-card
-        v-if="countries.length"
-        v-for="country in countries"
-        :key="country.country.id"
-        class="ring-joint"
-      >
-        <template #header>
-          <country-link
-            :country="country.country"
-            :icon-only="false"
-          />
-        </template>
-
-        <dashboard-subpanel title="Individual Winners">
-          <div class="text-center text-sm">
-            <div class="grid grid-cols-4 gap-2">
-              <div></div>
-              <div>Singles</div>
-              <div>Doubles</div>
-              <div>Total</div>
-            </div>
-
-            <div class="grid grid-cols-4 gap-2 mt-2">
-              <u-badge
-                label="ATP"
-                color="atp"
-                class="w-fit mx-auto"
-              />
-              <div class="font-semibold">{{ country.atp_singles_wins }}</div>
-              <div class="font-semibold">{{ country.atp_doubles_wins }}</div>
-              <div class="font-semibold">{{ country.atp_singles_wins + country.atp_doubles_wins }}</div>
-            </div>
-
-            <div class="grid grid-cols-4 gap-2 mt-2">
-              <u-badge
-                label="WTA"
-                color="wta"
-                class="w-fit mx-auto"
-              />
-              <div class="font-semibold">{{ country.wta_singles_wins }}</div>
-              <div class="font-semibold">{{ country.wta_doubles_wins }}</div>
-              <div class="font-semibold">{{ country.wta_singles_wins + country.wta_doubles_wins }}</div>
-            </div>
-
-            <div class="grid grid-cols-4 gap-2 mt-2">
-              <u-badge
-                label="Total"
-                color="joint"
-                class="w-fit mx-auto"
-              />
-              <div class="font-semibold">{{ country.atp_singles_wins + country.wta_singles_wins }}</div>
-              <div class="font-semibold">{{ country.atp_doubles_wins + country.wta_doubles_wins }}</div>
-              <div class="font-semibold">{{
-                country.atp_singles_wins + country.atp_doubles_wins + country.wta_singles_wins + country.wta_doubles_wins
-              }}</div>
-            </div>
-          </div>
-        </dashboard-subpanel>
-
-        <dashboard-subpanel title="Total Wins">
-          <div class="text-center text-sm">
-            <div class="grid grid-cols-4 gap-2">
-              <div></div>
-              <div>Singles</div>
-              <div>Doubles</div>
-              <div>Total</div>
-            </div>
-
-            <div class="grid grid-cols-4 gap-2 mt-2">
-              <u-badge
-                label="ATP"
-                color="atp"
-                class="w-fit mx-auto"
-              />
-              <div class="font-semibold">{{ country.total_atp_singles_wins }}</div>
-              <div class="font-semibold">{{ country.total_atp_doubles_wins }}</div>
-              <div class="font-semibold">{{ country.total_atp_singles_wins + country.total_atp_doubles_wins }}</div>
-            </div>
-
-            <div class="grid grid-cols-4 gap-2 mt-2">
-              <u-badge
-                label="WTA"
-                color="wta"
-                class="w-fit mx-auto"
-              />
-              <div class="font-semibold">{{ country.total_wta_singles_wins }}</div>
-              <div class="font-semibold">{{ country.total_wta_doubles_wins }}</div>
-              <div class="font-semibold">{{ country.total_wta_singles_wins + country.total_wta_doubles_wins }}</div>
-            </div>
-
-            <div class="grid grid-cols-4 gap-2 mt-2">
-              <u-badge
-                label="Total"
-                color="joint"
-                class="w-fit mx-auto"
-              />
-              <div class="font-semibold">{{ country.total_atp_singles_wins + country.total_wta_singles_wins }}</div>
-              <div class="font-semibold">{{ country.total_atp_doubles_wins + country.total_wta_doubles_wins }}</div>
-              <div class="font-semibold">{{
-                country.total_atp_singles_wins + country.total_atp_doubles_wins + country.total_wta_singles_wins + country.total_wta_doubles_wins
-              }}</div>
-            </div>
-          </div>
-        </dashboard-subpanel>
-      </u-card>
-
-      <loading-base
-        v-else
-        v-for="_ in 10"
-        :key="_"
-      />
-    </u-page-grid>
-    <error-message
-      v-else
-      :icon="icons.noCountries"
-      :message="`No countries represented by winners of ${tournamentName}`"
-    />
-  </div>
+  <client-only>
+    <teleport to="#chart-container">
+      <tournament-country-chart v-if="mdAndUp" />
+    </teleport>
+  </client-only>
   <u-table
-    v-else
     :data="countries"
     :columns
-    :loading="status === 'pending'"
+    :loading="['idle', 'pending'].includes(status)"
     sticky
-    :empty="`No countries represented by winners of ${tournamentName}`"
     :faceted-options="{
       getFacetedRowModel: getFacetedRowModel(),
       getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -615,6 +512,24 @@ const columnFilters = ref([])
     }"
     v-model:columnFilters="columnFilters"
     v-model:column-visibility="columnVisibility"
-    :ui="{ root: 'scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent max-h-165', td: 'empty:p-0' }"
-  />
+    @select="handleSelectRow"
+    :ui="{ root: '2xl:max-w-19/20', tbody: '[&>tr]:cursor-pointer' }"
+  >
+    <template #loading>
+      <u-icon
+        :name="uIcons.loading"
+        class="size-8"
+      />
+    </template>
+
+    <template #empty>
+      <div class="flex justify-center items-center w-full gap-2 text-error">
+        <u-icon
+          :name="icons.noCountries"
+          class="text-base"
+        />
+        No countries represented by winners of {{ tournamentName }}
+      </div>
+    </template>
+  </u-table>
 </template>

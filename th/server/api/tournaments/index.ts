@@ -28,6 +28,8 @@ export default defineEventHandler(async event => {
         tournament[key] = tournament[key].toInt()
       }
     }
+
+    tournament["tours"] = getCorrectTours(tournament["tours"])
   }
 
   return results

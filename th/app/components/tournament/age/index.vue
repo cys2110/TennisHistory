@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CountryLink, FilterTableHeader, RangeTableHeader, UBadge, UButton, ULink } from "#components"
+import { CountryLink, FilterTableHeader, NameTableHeader, RangeTableHeader, SortTableHeader, UBadge, UButton, ULink } from "#components"
 import type { TableColumn } from "@nuxt/ui"
 import {
   type Column,
@@ -11,16 +11,16 @@ import {
   type GroupingOptions
 } from "@tanstack/vue-table"
 
-const { viewMode } = useDefaults()
 const {
-  //@ts-ignore
   params: { id, name }
-} = useRoute()
+} = useRoute("tournament")
 const {
   icons,
   ui: { icons: uIcons }
 } = useAppConfig()
 const { tableMode } = useDefaults()
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
+const mdAndUp = breakpoints.greaterOrEqual("md")
 const tours = inject<TourType[]>("tours", [])
 const tournamentName = inject<string>("tournamentName", "")
 
@@ -28,54 +28,40 @@ const tournamentName = inject<string>("tournamentName", "")
 const { data: winners, status } = await useFetch<TournamentAgeType[]>("/api/tournaments/winners-by-age", {
   key: `tournament-age-${id}`,
   query: { id },
-  default: () => []
+  default: () => [],
+  server: false
 })
-
-const getAge = (age: { months: number; days: number }) => {
-  const years = Math.floor(age.months / 12)
-  const months = age.months % 12
-  const days = age.days
-  return `${years} years, ${months} months, ${days} days`
-}
 
 const columnHelper = createColumnHelper<TournamentAgeType>()
 
 const columns = computed<TableColumn<TournamentAgeType>[]>(() => [
-  ...(tableMode.value === "grouped" ?
-    [
-      {
-        id: "expand",
-        cell: ({ row }: { row: any }) => {
-          if (row.getIsGrouped()) {
-            return h(UButton, {
-              variant: "link",
-              color: "neutral",
-              class: "mr-2",
-              size: "xs",
-              icon: uIcons.chevronDoubleRight,
-              ui: {
-                leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
-              },
-              onClick: () => row.toggleExpanded()
-            })
-          }
-        }
+  {
+    id: "expand",
+    cell: ({ row }: { row: any }) => {
+      if (row.getIsGrouped()) {
+        return h(UButton, {
+          variant: "link",
+          color: "neutral",
+          class: "mr-2",
+          size: "xs",
+          icon: uIcons.chevronDoubleRight,
+          ui: {
+            leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
+          },
+          onClick: () => row.toggleExpanded()
+        })
       }
-    ]
-  : []),
+    }
+  },
   {
     accessorKey: "player.tour",
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Tour",
-        type: "alpha"
-      }),
+    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Tour", type: "alpha" }),
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     cell: ({ row, cell }) => {
       if (tableMode.value === "ungrouped" || (row.getIsGrouped() && row.depth === 0)) {
         return h(UBadge, {
           label: cell.getValue() as string,
-          color: getTourColour([cell.getValue() as TourType]),
+          color: getTourColour(cell.getValue() as TourType),
           class: "font-semibold"
         })
       }
@@ -83,17 +69,13 @@ const columns = computed<TableColumn<TournamentAgeType>[]>(() => [
   },
   {
     accessorKey: "type",
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Tour",
-        type: "alpha"
-      }),
-    cell: ({ row, cell }) => {
-      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && row.depth === 1)) {
+    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Type", type: "alpha" }),
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    cell: ({ row }) => {
+      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && (tours.length > 1 ? row.depth === 1 : row.depth === 0))) {
         return h(UBadge, {
-          label: cell.getValue() as string,
-          color: (cell.getValue() as string).toLowerCase() as "singles" | "doubles",
+          label: row.original.type,
+          color: getMatchTypeColour(row.original.type),
           class: "font-semibold"
         })
       }
@@ -101,18 +83,14 @@ const columns = computed<TableColumn<TournamentAgeType>[]>(() => [
   },
   {
     accessorKey: "year",
-    header: ({ column }) =>
-      h(RangeTableHeader, {
-        column: column as Column<unknown>,
-        label: "Year"
-      }),
+    header: ({ column }) => h(RangeTableHeader, { column: column as Column<unknown>, label: "Year" }),
     cell: ({ row }) => {
       if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
         return h(
           ULink,
           {
             to: { name: "event", params: { id, name, year: row.original.year, eid: row.original.id } },
-            class: "hover-link"
+            class: "hover-link default-link w-fit"
           },
           () => row.original.year
         )
@@ -121,7 +99,7 @@ const columns = computed<TableColumn<TournamentAgeType>[]>(() => [
   },
   {
     id: "age",
-    accessorFn: row => (row.age ? Math.floor(row.age?.months / 12) : undefined),
+    accessorFn: row => (row.age ? row.age.months * 30.4375 + row.age?.days : undefined),
     sortingFn: (rowA, rowB) => {
       const ageA = rowA.original.age
       const ageB = rowB.original.age
@@ -149,9 +127,10 @@ const columns = computed<TableColumn<TournamentAgeType>[]>(() => [
       return `Avg: ${years} years, ${months} months, ${days} days`
     },
     header: ({ column }) =>
-      h(RangeTableHeader, {
+      h(SortTableHeader, {
         column: column as Column<unknown>,
-        label: "Age"
+        label: "Age",
+        type: "number"
       }),
     cell: ({ row }) => {
       if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
@@ -166,12 +145,8 @@ const columns = computed<TableColumn<TournamentAgeType>[]>(() => [
     columns: [
       {
         accessorKey: "player.country.name",
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Country",
-            type: "alpha"
-          }),
+        filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+        header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Country", type: "alpha" }),
         cell: ({ row }) => {
           if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
             return h(CountryLink, {
@@ -182,49 +157,22 @@ const columns = computed<TableColumn<TournamentAgeType>[]>(() => [
         }
       },
       {
-        accessorKey: "player.first_name",
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "First Name",
-            type: "alpha"
-          }),
-        cell: ({ row, cell }) => {
+        id: "player_name",
+        accessorFn: row => `${row.player.last_name}, ${row.player.first_name}`,
+        filterFn: (row, columnId, filterValue) => filterIncludesNameString(row, columnId, filterValue),
+        header: ({ column }) => h(NameTableHeader, { column: column as Column<unknown>, label: "Name" }),
+        cell: ({ row }) => {
           if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
             return h(
               ULink,
               {
                 to: {
                   name: "player",
-                  params: { id: row.original.player.id, name: kebabCase(`${row.original.player.first_name} ${row.original.player.last_name}`) }
+                  params: { id: row.original.player.id, name: kebabCase(`${row.original.player.first_name}-${row.original.player.last_name}`) }
                 },
-                class: "hover-link"
+                class: "hover-link default-link w-fit"
               },
-              () => cell.getValue()
-            )
-          }
-        }
-      },
-      {
-        accessorKey: "player.last_name",
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Last Name",
-            type: "alpha"
-          }),
-        cell: ({ row, cell }) => {
-          if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
-            return h(
-              ULink,
-              {
-                to: {
-                  name: "player",
-                  params: { id: row.original.player.id, name: kebabCase(`${row.original.player.first_name} ${row.original.player.last_name}`) }
-                },
-                class: "hover-link"
-              },
-              () => cell.getValue()
+              () => `${row.original.player.first_name} ${row.original.player.last_name}`
             )
           }
         }
@@ -234,6 +182,7 @@ const columns = computed<TableColumn<TournamentAgeType>[]>(() => [
 ])
 
 const columnVisibility = ref({
+  expand: tableMode.value === "grouped",
   tour: tours.length > 1
 })
 const columnFilters = ref([])
@@ -251,60 +200,19 @@ const grouping_options = ref<GroupingOptions>({
 </script>
 
 <template>
-  <div v-if="viewMode === 'cards'">
-    <u-page-grid
-      v-if="winners.length || status === 'pending'"
-      class="2xl:grid-cols-4 max-h-165 overflow-y-auto p-5 scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent"
-    >
-      <template
-        v-if="winners.length"
-        v-for="winner in winners"
-        :key="winner.id"
-      >
-        <u-card
-          v-if="winner.age"
-          :ui="{ root: `ring-${getTourColour([winner.player.tour])}`, body: 'text-center' }"
-        >
-          <template #header>
-            <div class="flex justify-between items-center font-semibold">
-              <player-link :player="winner.player" />
-              <div class="flex items-center gap-1">
-                <u-badge
-                  :label="winner.player.tour"
-                  :color="getTourColour([winner.player.tour])"
-                />
-
-                <u-badge
-                  :label="winner.type"
-                  :color="winner.type === 'Singles' ? 'singles' : 'doubles'"
-                />
-              </div>
-            </div>
-          </template>
-
-          {{ getAge(winner.age) }}
-        </u-card>
-      </template>
-
-      <loading-base
-        v-else
-        v-for="_ in 10"
-        :key="_"
+  <client-only>
+    <teleport to="#chart-container">
+      <tournament-age-chart
+        v-if="mdAndUp"
+        :winners
       />
-    </u-page-grid>
-    <error-message
-      v-else
-      :icon="icons.noCalendar"
-      :message="`No winners found for ${tournamentName}`"
-    />
-  </div>
+    </teleport>
+  </client-only>
   <u-table
-    v-else
     :data="winners"
     :columns
-    :loading="status === 'pending'"
+    :loading="['idle', 'pending'].includes(status)"
     sticky
-    :empty="`No winners found for ${tournamentName}`"
     :faceted-options="{
       getFacetedRowModel: getFacetedRowModel(),
       getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -314,6 +222,23 @@ const grouping_options = ref<GroupingOptions>({
     :grouping-options="grouping_options"
     v-model:columnFilters="columnFilters"
     v-model:column-visibility="columnVisibility"
-    :ui="{ root: 'scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent max-h-165', td: 'empty:p-0' }"
-  />
+    :ui="{ root: 'lg:max-w-full', td: 'empty:p-0' }"
+  >
+    <template #loading>
+      <u-icon
+        :name="uIcons.loading"
+        class="size-8"
+      />
+    </template>
+
+    <template #empty>
+      <div class="flex justify-center items-center w-full gap-2 text-error">
+        <u-icon
+          :name="icons.noTournament"
+          class="text-base"
+        />
+        No winners found for {{ tournamentName }}
+      </div>
+    </template>
+  </u-table>
 </template>

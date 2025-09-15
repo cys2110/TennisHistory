@@ -1,13 +1,16 @@
 <script setup lang="ts">
-defineProps<{ player: PlayerInterface }>()
+defineProps<{ player: PersonInterface; centred?: boolean }>()
 </script>
 
 <template>
-  <div class="flex items-center gap-2">
+  <div
+    class="flex items-center gap-2"
+    :class="{ 'justify-center': centred }"
+  >
     <country-link :country="player.country" />
     <u-link
       :to="{ name: 'player', params: { id: player.id, name: kebabCase(`${player.first_name} ${player.last_name}`) } }"
-      class="hover-link"
+      class="hover-link default-link"
     >
       {{ player.first_name }} {{ player.last_name }}
     </u-link>

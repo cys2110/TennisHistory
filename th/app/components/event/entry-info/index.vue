@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CountryLink, FilterTableHeader, RangeTableHeader, UBadge, UButton, ULink } from "#components"
+import { ArrayFilterTableHeader, CountryLink, FilterTableHeader, NameTableHeader, UBadge, UButton, ULink } from "#components"
 import type { TableColumn } from "@nuxt/ui"
 import {
   type Column,
@@ -11,68 +11,51 @@ import {
   type GroupingOptions
 } from "@tanstack/vue-table"
 
-const { eid, year } = useRoute().params as { eid: string; year: string }
 const {
-  icons,
+  params: { eid, year }
+} = useRoute("event")
+const {
   ui: { icons: uIcons }
 } = useAppConfig()
-const { viewMode, tableMode } = useDefaults()
+const { tableMode } = useDefaults()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const mdAndUp = breakpoints.greaterOrEqual("md")
-const tours = inject<TourType[]>("tours", [])
-const tournament = inject<TournamentInterface>("tournament")
+const tours = useState<TourType[]>("tours")
+const tournamentName = useState<string>("tournament-name")
 
 // API call
 const { data: teams, status } = await useFetch<EntryInfoInterface[]>("/api/events/entry-info", {
   key: `event-entry-info-${eid}`,
   query: { id: eid },
-  default: () => []
-})
-
-const groupedTeams = computed(() => {
-  if (teams.value.length) {
-    const relationships = useArrayUnique(teams.value.map(team => team.label))
-
-    return relationships.value.map(label => ({
-      label,
-      teams: teams.value.filter(team => team.label === label)
-    }))
-  }
-
-  return []
+  default: () => [],
+  server: false
 })
 
 const columnHelper = createColumnHelper<EntryInfoInterface>()
 
-const arraySorting = (rowA: any, rowB: any, columnId: string) => {
-  return useSorted(rowA.getValue(columnId)).value[0] < useSorted(rowB.getValue(columnId)).value[0] ? -1 : 1
-}
-
 const columns = computed<TableColumn<EntryInfoInterface>[]>(() => [
-  ...(tableMode.value === "grouped" ?
-    [
-      {
-        id: "expand",
-        cell: ({ row }: { row: any }) => {
-          if (row.getIsGrouped()) {
-            return h(UButton, {
-              variant: "link",
-              color: "neutral",
-              class: "mr-2",
-              size: "xs",
-              icon: uIcons.chevronDoubleRight,
-              ui: {
-                leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
-              },
-              onClick: () => row.toggleExpanded()
-            })
-          }
-        }
+  {
+    id: "expand",
+    cell: ({ row }: { row: any }) => {
+      if (row.getIsGrouped()) {
+        return h(UButton, {
+          variant: "link",
+          color: "neutral",
+          class: "mr-2",
+          size: "xs",
+          icon: uIcons.chevronDoubleRight,
+          ui: {
+            leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
+          },
+          onClick: () => row.toggleExpanded()
+        })
       }
-    ]
-  : []),
+    }
+  },
   {
     accessorKey: "label",
+    meta: { class: { td: "font-semibold" } },
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
       h(FilterTableHeader, {
         column: column as Column<unknown>,
@@ -87,6 +70,7 @@ const columns = computed<TableColumn<EntryInfoInterface>[]>(() => [
   },
   {
     accessorKey: "tour",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
       h(FilterTableHeader, {
         column: column as Column<unknown>,
@@ -97,7 +81,7 @@ const columns = computed<TableColumn<EntryInfoInterface>[]>(() => [
       if (tableMode.value === "ungrouped" || (row.getIsGrouped() && row.depth === 1)) {
         return h(UBadge, {
           label: row.original.tour,
-          color: getTourColour([row.original.tour]),
+          color: getTourColour(row.original.tour),
           class: "font-semibold"
         })
       }
@@ -105,6 +89,7 @@ const columns = computed<TableColumn<EntryInfoInterface>[]>(() => [
   },
   {
     accessorKey: "type",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
       h(FilterTableHeader, {
         column: column as Column<unknown>,
@@ -112,13 +97,10 @@ const columns = computed<TableColumn<EntryInfoInterface>[]>(() => [
         type: "alpha"
       }),
     cell: ({ row }) => {
-      if (
-        tableMode.value === "ungrouped" ||
-        (row.getIsGrouped() && ((tours.length > 1 && row.depth === 2) || (tours.length < 2 && row.depth === 1)))
-      ) {
+      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && (tours.value.length > 1 ? row.depth === 2 : row.depth === 1))) {
         return h(UBadge, {
           label: row.original.type,
-          color: row.original.type === "Singles" ? "singles" : "doubles",
+          color: getMatchTypeColour(row.original.type),
           class: "font-semibold"
         })
       }
@@ -126,6 +108,7 @@ const columns = computed<TableColumn<EntryInfoInterface>[]>(() => [
   },
   {
     accessorKey: "draw",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
       h(FilterTableHeader, {
         column: column as Column<unknown>,
@@ -133,13 +116,10 @@ const columns = computed<TableColumn<EntryInfoInterface>[]>(() => [
         type: "alpha"
       }),
     cell: ({ row }) => {
-      if (
-        tableMode.value === "ungrouped" ||
-        (row.getIsGrouped() && ((tours.length > 1 && row.depth === 3) || (tours.length < 2 && row.depth === 2)))
-      ) {
+      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && (tours.value.length > 1 ? row.depth === 3 : row.depth === 2))) {
         return h(UBadge, {
           label: row.original.draw,
-          color: row.original.draw === "Main" ? "main" : "qualifying",
+          color: getDrawColour(row.original.draw),
           class: "font-semibold"
         })
       }
@@ -152,8 +132,9 @@ const columns = computed<TableColumn<EntryInfoInterface>[]>(() => [
         id: "country",
         accessorFn: row => row.team.map(player => player.country.name),
         sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
+        filterFn: "arrIncludesSome",
         header: ({ column }) =>
-          h(FilterTableHeader, {
+          h(ArrayFilterTableHeader, {
             column: column as Column<unknown>,
             label: "Country",
             type: "alpha"
@@ -171,13 +152,14 @@ const columns = computed<TableColumn<EntryInfoInterface>[]>(() => [
         }
       },
       {
-        id: "first_name",
-        accessorFn: row => row.team.map(player => player.first_name),
+        id: "name",
+        accessorFn: row => row.team.map(player => `${player.last_name}, ${player.first_name}`),
         sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
+        filterFn: (row, columnId, filterValue) => filterIncludesName(row, columnId, filterValue),
         header: ({ column }) =>
-          h(FilterTableHeader, {
+          h(NameTableHeader, {
             column: column as Column<unknown>,
-            label: "First Name",
+            label: "Name",
             type: "alpha"
           }),
         cell: ({ row }) => {
@@ -196,44 +178,9 @@ const columns = computed<TableColumn<EntryInfoInterface>[]>(() => [
                       name: "player",
                       params: { id: player.id, name: kebabCase(`${player.first_name} ${player.last_name}`) }
                     },
-                    class: "hover-link"
+                    class: "hover-link default-link w-fit"
                   },
-                  () => player.first_name
-                )
-              )
-            )
-          }
-        }
-      },
-      {
-        id: "last_name",
-        accessorFn: row => row.team.map(player => player.last_name),
-        sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Last Name",
-            type: "alpha"
-          }),
-        cell: ({ row }) => {
-          if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
-            return h(
-              "div",
-              {
-                class: "flex flex-col items-center"
-              },
-              row.original.team.map(player =>
-                h(
-                  ULink,
-                  {
-                    key: player.id,
-                    to: {
-                      name: "player",
-                      params: { id: player.id, name: kebabCase(`${player.first_name} ${player.last_name}`) }
-                    },
-                    class: "hover-link"
-                  },
-                  () => player.last_name
+                  () => `${player.first_name} ${player.last_name}`
                 )
               )
             )
@@ -255,18 +202,24 @@ const columns = computed<TableColumn<EntryInfoInterface>[]>(() => [
         return `${row.type === "Singles" ? "" : `${row.team[0].last_name} - `} ${row.team[0].reason}`
       if (row.team[1]?.reason && row.team[1].reason !== "teammate") return `${row.team[1].last_name} - ${row.team[1].reason}`
       if (row.team_reason) return row.team_reason
+    },
+    cell: ({ cell, row }) => {
+      if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
+        return cell.getValue()
+      }
     }
   }
 ])
 
 const columnFilters = ref([])
-const columnVisibility = ref({
-  tour: tours.length > 1
-})
+const columnVisibility = computed(() => ({
+  tour: tours.value?.length > 1,
+  expand: tableMode.value === "grouped"
+}))
 const grouping = computed(() => {
   return (
     tableMode.value === "grouped" ?
-      tours.length > 1 ?
+      tours.value.length > 1 ?
         ["label", "tour", "type", "draw"]
       : ["label", "type", "draw"]
     : []
@@ -276,6 +229,12 @@ const grouping_options = ref<GroupingOptions>({
   groupedColumnMode: false,
   getGroupedRowModel: getGroupedRowModel()
 })
+const sorting = ref([
+  { id: "label", desc: false },
+  { id: "tour", desc: false },
+  { id: "type", desc: true },
+  { id: "draw", desc: false }
+])
 </script>
 
 <template>
@@ -283,6 +242,7 @@ const grouping_options = ref<GroupingOptions>({
     id="entry-info"
     title="Entry Information"
     :icon="uIcons.info"
+    class="max-h-200"
   >
     <template #right>
       <event-entry-info-chart
@@ -292,12 +252,10 @@ const grouping_options = ref<GroupingOptions>({
     </template>
 
     <u-table
-      v-if="viewMode === 'list'"
       :data="teams"
       :columns
-      :loading="status === 'pending'"
+      :loading="['idle', 'pending'].includes(status)"
       sticky
-      :empty="`No entry information available for ${tournament?.name} ${year}`"
       :faceted-options="{
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -307,72 +265,25 @@ const grouping_options = ref<GroupingOptions>({
       :grouping-options="grouping_options"
       v-model:columnFilters="columnFilters"
       v-model:column-visibility="columnVisibility"
-      :ui="{ root: 'scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent max-h-165', td: 'empty:p-0' }"
-    />
-
-    <u-collapsible
-      v-else-if="groupedTeams.length"
-      v-for="item in groupedTeams"
-      :key="item.label"
+      v-model:sorting="sorting"
+      :ui="{ td: 'empty:p-0' }"
     >
-      <u-button
-        class="group my-2"
-        :label="`${item.label}s`"
-        color="neutral"
-        :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
-        block
-        :trailing-icon="uIcons.chevronDown"
-      />
+      <template #loading>
+        <u-icon
+          :name="uIcons.loading"
+          class="size-8"
+        />
+      </template>
 
-      <template #content>
-        <div
-          v-for="(team, index) in item.teams"
-          :key="`${item.label}-${index}`"
-          class="flex justify-between items-center text-sm gap-3"
-        >
-          <div class="flex items-center gap-2">
-            <u-badge
-              :color="getTourColour([team.tour])"
-              :label="team.tour"
-            />
-            <u-badge
-              :color="team.type === 'Singles' ? 'singles' : 'doubles'"
-              :label="team.type"
-            />
-            <u-badge
-              :color="team.draw === 'Main' ? 'main' : 'qualifying'"
-              :label="team.draw"
-            />
-            <template
-              v-for="(player, idx) in team.team"
-              :key="player.id"
-            >
-              <u-separator
-                v-if="idx > 0"
-                orientation="vertical"
-                class="h-4"
-              />
-              <player-link :player />
-            </template>
-          </div>
-
-          <div>
-            <span v-if="item.label === 'Last Direct Acceptance'">{{ team.status === "PR" ? "P" : "" }}{{ team.rank }}</span>
-            <span v-else-if="['Withdrawal', 'Retirement', 'Walkover'].includes(item.label)">
-              {{
-                team.team[0]?.reason && team.team[0].reason !== "teammate" ?
-                  `${team.type === "Singles" ? "" : `${team.team[0].last_name} - `} ${team.team[0].reason}`
-                : team.team[1]?.reason && team.team[1].reason !== "teammate" ? `${team.team[1].last_name} - ${team.team[1].reason}`
-                : team.team_reason
-              }}
-            </span>
-          </div>
+      <template #empty>
+        <div class="flex justify-center items-center w-full gap-2 text-error">
+          <u-icon
+            :name="uIcons.caution"
+            class="text-base"
+          />
+          No entry information available for {{ tournamentName }} {{ year }}
         </div>
       </template>
-    </u-collapsible>
-    <error-message
-      v-else
-      :message="`No entry information available for ${tournament?.name} ${year}`"
-    />
+    </u-table>
   </dashboard-subpanel>
 </template>

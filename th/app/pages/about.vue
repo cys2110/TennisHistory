@@ -15,7 +15,7 @@ const badges: [keyof typeof colors, string][] = [
   ["wta", "WTA"],
   ["men", "ITF (M)"],
   ["women", "ITF (W)"],
-  ["joint", "Joint tours"],
+  ["primary", "Joint tours"],
   ["active", "Active"],
   ["inactive", "Inactive"],
   ["singles", "Singles"],
@@ -59,13 +59,7 @@ const badges: [keyof typeof colors, string][] = [
             as, even where available, stats for doubles matches often do not break out the individual players' stats. All stats are drawn from matches
             where stats are available online.
           </div>
-          <div class="my-5">
-            You can toggle between light and dark mode, toggle between list, card and hybrid mode, change the default number of items shown on the
-            page and view tables grouped or ungrouped by going into settings. You can also quickly do so by clicking the
-            <u-icon :name="icons.search" /> button in the sidebar. Card view provides a more aesthetic view of the data but list view provides a
-            quicker overview. You can also choose the hybrid view which prioritises the card view, but defaults to list view for pages which are more
-            suited to the list view.
-          </div>
+          <div class="my-5"> You can toggle between light and dark mode by clicking the <u-icon :name="icons.search" /> button in the sidebar. </div>
           <div>
             Different categories on the website are colour-coded as follows:
             <div class="flex flex-wrap items-center gap-5 my-5">

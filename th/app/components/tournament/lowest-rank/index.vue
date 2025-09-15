@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CountryLink, FilterTableHeader, RangeTableHeader, UBadge, UButton, ULink } from "#components"
+import { CountryLink, FilterTableHeader, NameTableHeader, SortTableHeader, UBadge, UButton, ULink } from "#components"
 import type { TableColumn } from "@nuxt/ui"
 import {
   type Column,
@@ -11,149 +11,94 @@ import {
   type GroupingOptions
 } from "@tanstack/vue-table"
 
-const { viewMode } = useDefaults()
 const {
-  //@ts-ignore
   params: { id, name }
-} = useRoute()
+} = useRoute("tournament")
 const {
   icons,
   ui: { icons: uIcons }
 } = useAppConfig()
 const { tableMode } = useDefaults()
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
+const mdAndUp = breakpoints.greaterOrEqual("md")
 const tours = inject<TourType[]>("tours", [])
 const tournamentName = inject<string>("tournamentName", "")
 
 // API call
-const { data, status } = await useFetch<TournamentLowestRankedType[]>("/api/tournaments/lowest-ranked", {
+const { data: events, status } = await useFetch<TournamentLowestRankedType[]>("/api/tournaments/lowest-ranked", {
   key: `tournament-lowest-ranked-${id}`,
   query: { id },
-  default: () => []
+  default: () => [],
+  server: false
 })
 
-// Group results by round
-const groupedResults = computed(() => {
-  const rounds: Record<string, TournamentLowestRankedType[]> = {}
-  data.value.forEach(result => {
-    if (!rounds[result.round]) {
-      rounds[result.round] = []
-    }
-    rounds[result.round]!.push(result)
-  })
+const columnHelper = createColumnHelper<TournamentLowestRankedType>()
 
-  return rounds
-})
-
-const gridColumns: TableColumn<TournamentLowestRankedType>[] = [
-  { accessorKey: "tour", header: "Tour" },
-  { accessorKey: "type", header: "Type" },
-  { accessorKey: "rank", header: "Rank" },
-  { id: "year", header: "Year" },
-  { id: "players", header: "Players" }
-]
-const gridColumnVisibility = ref({
-  tour: tours.length > 1
-})
-
-const flattenedResults = computed(() => {
-  const newResults: TournamentFlattenedLowestRankedType[] = []
-  data.value.forEach(result => {
-    result.players.forEach(player => {
-      newResults.push({
-        ...result,
-        year: player.year,
-        id: player.eid,
-        player: {
-          id: player.id,
-          first_name: player.first_name,
-          last_name: player.last_name,
-          country: player.country,
-          tour: result.tour
-        }
-      })
-    })
-  })
-  return newResults
-})
-
-const columnHelper = createColumnHelper<TournamentFlattenedLowestRankedType>()
-
-// @ts-ignore
-const columns = computed<TableColumn<TournamentFlattenedLowestRankedType>[]>(() => [
-  ...(tableMode.value === "grouped" ?
-    [
-      {
-        id: "expand",
-        cell: ({ row }: { row: any }) => {
-          if (row.getIsGrouped()) {
-            return h(UButton, {
-              variant: "link",
-              color: "neutral",
-              class: "mr-2",
-              size: "xs",
-              icon: uIcons.chevronDoubleRight,
-              ui: {
-                leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
-              },
-              onClick: () => row.toggleExpanded()
-            })
-          }
-        }
+const columns = computed<TableColumn<TournamentLowestRankedType>[]>(() => [
+  {
+    id: "expand",
+    cell: ({ row }: { row: any }) => {
+      if (row.getIsGrouped()) {
+        return h(UButton, {
+          variant: "link",
+          color: "neutral",
+          class: "mr-2",
+          size: "xs",
+          icon: uIcons.chevronDoubleRight,
+          ui: {
+            leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
+          },
+          onClick: () => row.toggleExpanded()
+        })
       }
-    ]
-  : []),
+    }
+  },
   {
     accessorKey: "round",
     meta: { class: { td: "font-semibold" } },
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Round",
-        type: "alpha"
-      }),
-    footer: ({ table }) => `Lowest Rank: ${table.getColumn("rank")?.getFacetedMinMaxValues()?.[1].toLocaleString() ?? ""}`
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Round", type: "alpha" })
   },
   {
     accessorKey: "tour",
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Tour",
-        type: "alpha"
-      }),
-    cell: ({ row }) => {
+    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Tour", type: "alpha" }),
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    cell: ({ row, cell }) => {
       if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
         return h(UBadge, {
-          label: row.original.tour,
-          color: getTourColour([row.original.tour])
+          label: cell.getValue() as string,
+          color: getTourColour(cell.getValue() as TourType),
+          class: "font-semibold"
         })
       }
     }
   },
   {
     accessorKey: "type",
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Type",
-        type: "alpha"
-      }),
+    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Type", type: "alpha" }),
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     cell: ({ row }) => {
       if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
         return h(UBadge, {
           label: row.original.type,
-          color: row.original.type === "Singles" ? "singles" : "doubles"
+          color: getMatchTypeColour(row.original.type),
+          class: "font-semibold"
         })
       }
     }
   },
-  { accessorKey: "rank", aggregationFn: "max", header: "Rank" },
+  {
+    accessorKey: "rank",
+    aggregationFn: "max",
+    header: ({ column }) => h(SortTableHeader, { column: column as Column<unknown>, label: "Rank", type: "number" })
+  },
   {
     accessorKey: "year",
     header: ({ column }) =>
-      h(RangeTableHeader, {
+      h(SortTableHeader, {
         column: column as Column<unknown>,
-        label: "Year"
+        label: "Year",
+        type: "number"
       }),
     cell: ({ row }) => {
       if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
@@ -161,7 +106,7 @@ const columns = computed<TableColumn<TournamentFlattenedLowestRankedType>[]>(() 
           ULink,
           {
             to: { name: "event", params: { id, name, year: row.original.year, eid: row.original.id } },
-            class: "hover-link"
+            class: "hover-link default-link w-fit"
           },
           () => row.original.year
         )
@@ -173,12 +118,8 @@ const columns = computed<TableColumn<TournamentFlattenedLowestRankedType>[]>(() 
     columns: [
       {
         accessorKey: "player.country.name",
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Country",
-            type: "alpha"
-          }),
+        filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+        header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Country", type: "alpha" }),
         cell: ({ row }) => {
           if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
             return h(CountryLink, {
@@ -189,55 +130,24 @@ const columns = computed<TableColumn<TournamentFlattenedLowestRankedType>[]>(() 
         }
       },
       {
-        accessorKey: "player.first_name",
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "First Name",
-            type: "alpha"
-          }),
-        cell: ({ row, cell }) => {
+        id: "player_name",
+        accessorFn: row => `${row.player.last_name}, ${row.player.first_name}`,
+        filterFn: (row, columnId, filterValue) => filterIncludesNameString(row, columnId, filterValue),
+        header: ({ column }) => h(NameTableHeader, { column: column as Column<unknown>, label: "Name" }),
+        cell: ({ row }) => {
           if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
             return h(
               ULink,
               {
                 to: {
                   name: "player",
-                  params: { id: row.original.player.id, name: kebabCase(`${row.original.player.first_name} ${row.original.player.last_name}`) }
+                  params: { id: row.original.player.id, name: kebabCase(`${row.original.player.first_name}-${row.original.player.last_name}`) }
                 },
-                class: "hover-link"
+                class: "hover-link default-link w-fit"
               },
-              () => cell.getValue()
+              () => `${row.original.player.first_name} ${row.original.player.last_name}`
             )
           }
-        }
-      },
-      {
-        accessorKey: "player.last_name",
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Last Name",
-            type: "alpha"
-          }),
-        cell: ({ row, cell }) => {
-          if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
-            return h(
-              ULink,
-              {
-                to: {
-                  name: "player",
-                  params: { id: row.original.player.id, name: kebabCase(`${row.original.player.first_name} ${row.original.player.last_name}`) }
-                },
-                class: "hover-link"
-              },
-              () => cell.getValue()
-            )
-          }
-        },
-        footer: ({ table }) => {
-          const rankColumn = table.getFilteredRowModel().rows.map(row => row.getValue("rank"))
-          return `Average Rank: ${useAverage(rankColumn as number[]).value.toLocaleString()}`
         }
       }
     ]
@@ -256,88 +166,19 @@ const grouping_options = ref<GroupingOptions>({
 </script>
 
 <template>
-  <div v-if="viewMode === 'cards'">
-    <u-page-grid
-      v-if="Object.keys(groupedResults).length || status === 'pending'"
-      class="md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2"
-    >
-      <u-card
-        v-if="Object.keys(groupedResults).length"
-        v-for="round in Object.entries(groupedResults)"
-        :key="round[0]"
-        :ui="{
-          root: 'ring-joint',
-          header: 'font-semibold'
-        }"
-      >
-        <template #header>{{ round[0] }}</template>
-
-        <u-table
-          :data="round[1]"
-          :columns="gridColumns"
-          v-model:column-visibility="gridColumnVisibility"
-          class="w-fit mx-auto"
-        >
-          <template #tour-cell="{ row }">
-            <u-badge
-              class="font-semibold"
-              :label="row.original.tour"
-              :color="getTourColour([row.original.tour])"
-            />
-          </template>
-
-          <template #type-cell="{ row }">
-            <u-badge
-              class="font-semibold"
-              :label="row.original.type"
-              :color="row.original.type === 'Singles' ? 'singles' : 'doubles'"
-            />
-          </template>
-
-          <template #year-cell="{ row }">
-            <div class="flex flex-col items-center">
-              <u-link
-                v-for="player in row.original.players"
-                :key="player.id"
-                :to="{ name: 'event', params: { id, name, year: player.year, eid: player.eid } }"
-                class="hover-link"
-              >
-                {{ player.year }}
-              </u-link>
-            </div>
-          </template>
-
-          <template #players-cell="{ row }">
-            <div class="flex flex-col items-center mx-10">
-              <player-link
-                v-for="player in row.original.players"
-                :key="player.id"
-                :player
-              />
-            </div>
-          </template>
-        </u-table>
-      </u-card>
-
-      <loading-player
-        v-else
-        v-for="_ in 4"
-        :key="_"
+  <client-only>
+    <teleport to="#chart-container">
+      <tournament-lowest-rank-chart
+        v-if="mdAndUp"
+        :events
       />
-    </u-page-grid>
-    <error-message
-      v-else
-      :icon="icons.seeds"
-      :message="`No players found for ${tournamentName}`"
-    />
-  </div>
+    </teleport>
+  </client-only>
   <u-table
-    v-else
-    :data="flattenedResults"
+    :data="events"
     :columns
-    :loading="status === 'pending'"
+    :loading="['idle', 'pending'].includes(status)"
     sticky
-    :empty="`No players found for ${tournamentName}`"
     :faceted-options="{
       getFacetedRowModel: getFacetedRowModel(),
       getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -347,6 +188,23 @@ const grouping_options = ref<GroupingOptions>({
     :grouping-options="grouping_options"
     v-model:columnFilters="columnFilters"
     v-model:column-visibility="columnVisibility"
-    :ui="{ root: 'scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent max-h-165', td: 'empty:p-0' }"
-  />
+    :ui="{ td: 'empty:p-0' }"
+  >
+    <template #loading>
+      <u-icon
+        :name="uIcons.loading"
+        class="size-8"
+      />
+    </template>
+
+    <template #empty>
+      <div class="flex justify-center items-center w-full gap-2 text-error">
+        <u-icon
+          :name="icons.noPlayer"
+          class="text-base"
+        />
+        No players found for {{ tournamentName }}
+      </div>
+    </template>
+  </u-table>
 </template>

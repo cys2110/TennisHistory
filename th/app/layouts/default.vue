@@ -1,19 +1,17 @@
 <script setup lang="ts">
-const { setViewMode, setTableMode, setItemsPerPage } = useDefaults()
-
 const {
   icons,
   ui: { icons: uIcons }
 } = useAppConfig()
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
+const lgAndUp = breakpoints.greaterOrEqual("lg")
+const { setTableMode } = useDefaults()
 
-// Internal navigation links
-const NAV_LINKS = [
+const navLinks = [
+  { label: "Results Archive", icon: icons.event, to: { name: "results-archive" } },
   { label: "Tournaments", icon: icons.tournament, to: { name: "tournaments" } },
-  { label: "Results Archive", to: { name: "results-archive" }, icon: icons.event },
   { label: "Players", icon: icons.player, to: { name: "players" } },
-  { label: "Head to Head", to: { name: "h2h" }, icon: icons.h2h },
-  { label: "Stats/Records", to: { name: "statistics-and-records" }, icon: icons.stats },
-  { label: "Ranking Rules", to: { name: "ranking-rules" }, icon: icons.seeds },
+  { label: "Head to Head", icon: icons.h2h, to: { name: "h2h" } },
   {
     label: "Other",
     icon: "tabler:grid-dots",
@@ -28,12 +26,13 @@ const NAV_LINKS = [
       { label: "Years", to: { name: "years" }, icon: icons.year }
     ]
   },
-  { label: "Search", to: { name: "search" }, icon: uIcons.search },
-  { label: "About", to: { name: "about" }, icon: uIcons.info },
-  { label: "Settings", to: { name: "settings" }, icon: icons.settings }
+  { label: "Stats/Records", icon: icons.stats, to: { name: "statistics-and-records" } },
+  { label: "Ranking Rules", icon: icons.seeds, to: { name: "ranking-rules" } },
+  { label: "Search", icon: uIcons.search, to: { name: "search" } },
+  { label: "About", icon: uIcons.info, to: { name: "about" } }
 ]
 
-const RELATED_LINKS = [
+const relatedLinks = [
   {
     label: "Governing Bodies",
     children: [
@@ -63,60 +62,6 @@ const RELATED_LINKS = [
 
 const groups = computed(() => [
   {
-    id: "viewMode",
-    label: "View mode",
-    items: [
-      {
-        label: "Cards",
-        suffix: "View data in cards mode",
-        icon: icons.cards,
-        onSelect: () => setViewMode("cards")
-      },
-      {
-        label: "List",
-        suffix: "View data in list mode",
-        icon: icons.list,
-        onSelect: () => setViewMode("list")
-      },
-      {
-        label: "Hybrid",
-        suffix: "View data in hybrid mode",
-        icon: icons.hybrid,
-        onSelect: () => setViewMode("hybrid")
-      }
-    ]
-  },
-  {
-    id: "itemsPerPage",
-    label: "Default items per page",
-    items: [
-      {
-        icon: "tabler:number-10-small",
-        label: " ",
-        suffix: "Display 10 items per page",
-        onSelect: () => setItemsPerPage(10)
-      },
-      {
-        icon: "tabler:number-20-small",
-        label: " ",
-        suffix: "Display 20 items per page",
-        onSelect: () => setItemsPerPage(25)
-      },
-      {
-        icon: "tabler:number-50-small",
-        label: " ",
-        suffix: "Display 50 items per page",
-        onSelect: () => setItemsPerPage(50)
-      },
-      {
-        icon: "tabler:number-100-small",
-        label: " ",
-        suffix: "Display 100 items per page",
-        onSelect: () => setItemsPerPage(100)
-      }
-    ]
-  },
-  {
     id: "tableMode",
     label: "Default table view",
     items: [
@@ -139,57 +84,30 @@ const groups = computed(() => [
   <u-dashboard-group>
     <u-dashboard-search :groups />
 
-    <u-dashboard-sidebar :default-size="5">
-      <template #header> TH </template>
+    <u-dashboard-sidebar
+      :default-size="5"
+      mode="drawer"
+    >
+      <template #header>{{ lgAndUp ? "TH" : "Tennis History" }}</template>
 
       <template #default>
         <u-dashboard-search-button
+          v-if="lgAndUp"
           size="sm"
           variant="ghost"
           :kbds="[]"
           label="Shortcuts"
         />
-
-        <template
-          v-for="link in NAV_LINKS"
-          :key="link.label"
-        >
-          <u-tooltip :text="link.label">
-            <!--@vue-expect-error-->
-            <u-button
-              v-if="link.to"
-              :icon="link.icon"
-              :to="link.to"
-              variant="link"
-              color="neutral"
-              class="2xl:flex-col"
-            />
-
-            <u-popover
-              v-else
-              class="mx-auto"
-              :content="{ side: 'right' }"
-            >
-              <u-button
-                :icon="link.icon"
-                variant="link"
-                color="neutral"
-                class="flex-col"
-                label="Other"
-                size="sm"
-                block
-              />
-
-              <template #content>
-                <!--@vue-expect-error-->
-                <u-navigation-menu
-                  :items="link.children"
-                  orientation="vertical"
-                />
-              </template>
-            </u-popover>
-          </u-tooltip>
-        </template>
+        <!--@vue-expect-error-->
+        <u-navigation-menu
+          orientation="vertical"
+          :collapsed="lgAndUp"
+          :tooltip="lgAndUp"
+          :items="navLinks"
+          :popover="lgAndUp"
+          variant="link"
+          class="mx-auto"
+        />
       </template>
 
       <template #footer>
@@ -208,7 +126,7 @@ const groups = computed(() => [
 
           <template #content>
             <u-navigation-menu
-              :items="RELATED_LINKS"
+              :items="relatedLinks"
               orientation="vertical"
             />
           </template>
@@ -216,7 +134,6 @@ const groups = computed(() => [
       </template>
     </u-dashboard-sidebar>
 
-    <!--Main content-->
     <slot />
   </u-dashboard-group>
 </template>

@@ -1,10 +1,12 @@
 <script setup lang="ts">
 const { teams } = defineProps<{ teams: EntryInfoInterface[] }>()
-const { year } = useRoute().params as { year: string }
+const {
+  params: { year }
+} = useRoute("event")
 const { icons, colours } = useAppConfig()
 const colorMode = useColorMode()
-const tours = inject<TourType[]>("tours")
-const tournament = inject<TournamentInterface>("tournament")
+const tours = useState<TourType[]>("tours")
+const tournamentName = useState<string>("tournament-name")
 
 const treeData = computed(() => {
   const groupedData = []
@@ -13,7 +15,7 @@ const treeData = computed(() => {
 
   for (const relationship of uniqueRelationships.value) {
     const relationshipChildren = []
-    for (const tour of tours!) {
+    for (const tour of tours.value) {
       const tourChildren = []
       for (const type of ["Singles", "Doubles"]) {
         const filteredTeams = teams.filter(team => team.label === relationship && team.tour === tour && team.type === type)
@@ -65,7 +67,7 @@ const treeData = computed(() => {
   }
 })
 
-const option = ref({
+const option = computed(() => ({
   backgroundColor: "transparent",
   darkMode: colorMode.value === "dark",
   textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
@@ -94,15 +96,15 @@ const option = ref({
       expandAndCollapse: true,
       animationDuration: 550,
       animationDurationUpdate: 750,
-      initialTreeDepth: 6
+      initialTreeDepth: 3
     }
   ]
-})
+}))
 </script>
 
 <template>
   <u-modal
-    :title="`${tournament?.name} ${year}`"
+    :title="`${tournamentName} ${year}`"
     description="Entry Information"
     fullscreen
   >
@@ -114,7 +116,7 @@ const option = ref({
 
     <template #body>
       <v-chart
-        class="min-h-50 w-full"
+        class="min-h-200 w-full"
         :option
         :autoresize="true"
       />

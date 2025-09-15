@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CountryLink, FilterTableHeader, RangeTableHeader, UBadge, UButton, ULink } from "#components"
+import { CountryLink, FilterTableHeader, NameTableHeader, RangeTableHeader, UBadge, UButton, ULink } from "#components"
 import type { TableColumn } from "@nuxt/ui"
 import {
   type Column,
@@ -11,50 +11,48 @@ import {
   type GroupingOptions
 } from "@tanstack/vue-table"
 
-defineProps<{
-  entries: ConsolidatedEntryType[]
-  status: APIStatusType
-}>()
-const { year } = useRoute().params as { year: string }
-const { viewMode, tableMode } = useDefaults()
 const {
-  icons,
+  params: { eid, year }
+} = useRoute("event")
+const {
   ui: { icons: uIcons }
 } = useAppConfig()
-const tours = inject<TourType[]>("tours", [])
-const tournament = inject<TournamentInterface>("tournament")
+const { tableMode } = useDefaults()
+const tours = useState<TourType[]>("tours")
+const tournamentName = useState<string>("tournament-name")
 
-const columnHelper = createColumnHelper<ConsolidatedEntryType>()
+// API call
+const { data: entries, status } = await useFetch<EntryInterface[]>("/api/events/player-entries", {
+  key: `event-player-entries-${eid}`,
+  query: { id: eid },
+  default: () => [],
+  server: false
+})
 
-const arraySorting = (rowA: any, rowB: any, columnId: string) => {
-  return useSorted(rowA.getValue(columnId)).value[0] < useSorted(rowB.getValue(columnId)).value[0] ? -1 : 1
-}
+const columnHelper = createColumnHelper<EntryInterface>()
 
-const columns = computed<TableColumn<ConsolidatedEntryType>[]>(() => [
-  ...(tableMode.value === "grouped" && tours.length > 1 ?
-    [
-      {
-        id: "expand",
-        cell: ({ row }: { row: any }) => {
-          if (row.getIsGrouped()) {
-            return h(UButton, {
-              variant: "link",
-              color: "neutral",
-              class: "mr-2",
-              size: "xs",
-              icon: uIcons.chevronDoubleRight,
-              ui: {
-                leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
-              },
-              onClick: () => row.toggleExpanded()
-            })
-          }
-        }
+const columns = computed<TableColumn<EntryInterface>[]>(() => [
+  {
+    id: "expand",
+    cell: ({ row }: { row: any }) => {
+      if (row.getIsGrouped()) {
+        return h(UButton, {
+          variant: "link",
+          color: "neutral",
+          class: "mr-2",
+          size: "xs",
+          icon: uIcons.chevronDoubleRight,
+          ui: {
+            leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
+          },
+          onClick: () => row.toggleExpanded()
+        })
       }
-    ]
-  : []),
+    }
+  },
   {
     accessorKey: "tour",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
       h(FilterTableHeader, {
         column: column as Column<unknown>,
@@ -65,7 +63,7 @@ const columns = computed<TableColumn<ConsolidatedEntryType>[]>(() => [
       if (tableMode.value === "ungrouped" || (row.getIsGrouped() && row.depth === 0)) {
         return h(UBadge, {
           label: row.original.tour,
-          color: getTourColour([row.original.tour]),
+          color: getTourColour(row.original.tour),
           class: "font-semibold"
         })
       }
@@ -76,6 +74,7 @@ const columns = computed<TableColumn<ConsolidatedEntryType>[]>(() => [
     columns: [
       {
         accessorKey: "country.name",
+        filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
         header: ({ column }) =>
           h(FilterTableHeader, {
             column: column as Column<unknown>,
@@ -83,218 +82,120 @@ const columns = computed<TableColumn<ConsolidatedEntryType>[]>(() => [
             type: "alpha"
           }),
         cell: ({ row }) => {
-          if (tableMode.value === "grouped" && tours.length > 1 && row.getIsGrouped()) {
-            return undefined
-          } else {
+          if (tableMode.value === "ungrouped" || (row.getIsGrouped() && (tours.value.length > 1 ? row.depth === 1 : row.depth === 0))) {
             return h(CountryLink, {
               country: row.original.country,
+              key: `${row.original.id}-${row.original.country.id}`,
               class: "mx-auto"
             })
           }
         }
       },
       {
-        accessorKey: "first_name",
+        id: "name",
+        accessorFn: row => `${row.last_name}, ${row.first_name}`,
+        filterFn: (row, columnId, filterValue) => filterIncludesNameString(row, columnId, filterValue),
         header: ({ column }) =>
-          h(FilterTableHeader, {
+          h(NameTableHeader, {
             column: column as Column<unknown>,
-            label: "First Name",
+            label: "Name",
             type: "alpha"
           }),
-        cell: ({ row, cell }) => {
-          if (tableMode.value === "grouped" && tours.length > 1 && row.getIsGrouped()) {
-            return undefined
-          } else {
+        cell: ({ row }) => {
+          if (tableMode.value === "ungrouped" || (row.getIsGrouped() && (tours.value.length > 1 ? row.depth === 1 : row.depth === 0))) {
             return h(
               ULink,
               {
-                to: { name: "player", params: { id: row.original.id, name: kebabCase(`${row.original.first_name} ${row.original.last_name}`) } },
-                class: "mx-auto hover-link w-fit"
+                key: row.original.id,
+                to: {
+                  name: "player",
+                  params: { id: row.original.id, name: kebabCase(`${row.original.first_name} ${row.original.last_name}`) }
+                },
+                class: "hover-link default-link w-fit"
               },
-              () => cell.getValue()
-            )
-          }
-        }
-      },
-      {
-        accessorKey: "last_name",
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Last Name",
-            type: "alpha"
-          }),
-        cell: ({ row, cell }) => {
-          if (tableMode.value === "grouped" && tours.length > 1 && row.getIsGrouped()) {
-            return undefined
-          } else {
-            return h(
-              ULink,
-              {
-                to: { name: "player", params: { id: row.original.id, name: kebabCase(`${row.original.first_name} ${row.original.last_name}`) } },
-                class: "mx-auto hover-link w-fit"
-              },
-              () => cell.getValue()
+              () => `${row.original.first_name} ${row.original.last_name}`
             )
           }
         }
       }
     ]
   }),
-  columnHelper.group({
-    header: "Singles",
-    columns: [
-      {
-        id: "singles_draw",
-        accessorFn: row => row.singles.draw.map(draw => draw),
-        sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Draw",
-            type: "alpha"
-          }),
-        cell: ({ row }) => {
-          if (tableMode.value === "grouped" && tours.length > 1 && row.getIsGrouped()) {
-            return undefined
-          } else {
-            return h(
-              "div",
-              {
-                class: "flex items-center gap-2 justify-center"
-              },
-              row.original.singles.draw.map(draw =>
-                h(UBadge, {
-                  label: draw,
-                  color: draw === "Main" ? "main" : "qualifying"
-                })
-              )
-            )
-          }
-        }
-      },
-      {
-        id: "singles_seed",
-        accessorFn: row => row.singles.seed?.toString() ?? (row.singles.q_seed ? `Q-${row.singles.q_seed}` : undefined),
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Seed",
-            type: "alpha"
-          })
-      },
-      {
-        id: "singles_status",
-        accessorFn: row =>
-          row.singles.status && row.singles.q_status ? [row.singles.status, `Q-${row.singles.q_status}`]
-          : row.singles.status || row.singles.q_status ? [row.singles.status ?? `Q-${row.singles.q_status}`]
-          : undefined,
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Status",
-            type: "alpha"
-          })
-      },
-      {
-        accessorKey: "singles.rank",
-        aggregationFn: "extent",
-        header: ({ column }) =>
-          h(RangeTableHeader, {
-            column: column as Column<unknown>,
-            label: "Rank"
-          }),
-        cell: ({ row, cell }) => {
-          if (tableMode.value === "grouped" && tours.length > 1 && row.getIsGrouped()) {
-            return `${(cell.getValue() as number[])[0]}-${(cell.getValue() as number[])[1]}`
-          } else {
-            return cell.getValue()
-          }
-        }
+  {
+    accessorKey: "type",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    header: ({ column }) =>
+      h(FilterTableHeader, {
+        column: column as Column<unknown>,
+        label: "S/D",
+        type: "alpha"
+      }),
+    cell: ({ row }) => {
+      if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
+        return h(UBadge, {
+          label: row.original.type,
+          color: getMatchTypeColour(row.original.type),
+          class: "font-semibold"
+        })
       }
-    ]
-  }),
-  columnHelper.group({
-    header: "Doubles",
-    columns: [
-      {
-        id: "doubles_draw",
-        accessorFn: row => row.doubles.draw.map(draw => draw),
-        sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Draw",
-            type: "alpha"
-          }),
-        cell: ({ row }) => {
-          if (tableMode.value === "grouped" && tours.length > 1 && row.getIsGrouped()) {
-            return undefined
-          } else {
-            return h(
-              "div",
-              {
-                class: "flex items-center gap-2 justify-center"
-              },
-              row.original.doubles.draw.map(draw =>
-                h(UBadge, {
-                  label: draw,
-                  color: draw === "Main" ? "main" : "qualifying"
-                })
-              )
-            )
-          }
-        }
-      },
-      {
-        id: "doubles_seed",
-        accessorFn: row => row.doubles.seed?.toString() ?? (row.doubles.q_seed ? `Q-${row.doubles.q_seed}` : undefined),
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Seed",
-            type: "alpha"
-          })
-      },
-      {
-        id: "doubles_status",
-        accessorFn: row =>
-          row.doubles.status && row.doubles.q_status ? [row.doubles.status, `Q-${row.doubles.q_status}`]
-          : row.doubles.status || row.doubles.q_status ? [row.doubles.status ?? `Q-${row.doubles.q_status}`]
-          : undefined,
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Status",
-            type: "alpha"
-          })
-      },
-      {
-        accessorKey: "doubles.rank",
-        aggregationFn: "extent",
-        header: ({ column }) =>
-          h(RangeTableHeader, {
-            column: column as Column<unknown>,
-            label: "Rank"
-          }),
-        cell: ({ row, cell }) => {
-          if (tableMode.value === "grouped" && tours.length > 1 && row.getIsGrouped()) {
-            return `${(cell.getValue() as number[])[0]}-${(cell.getValue() as number[])[1]}`
-          } else {
-            return cell.getValue()
-          }
-        }
+    }
+  },
+  {
+    accessorKey: "draw",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    header: ({ column }) =>
+      h(FilterTableHeader, {
+        column: column as Column<unknown>,
+        label: "Draw",
+        type: "alpha"
+      }),
+    cell: ({ row }) => {
+      if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
+        return h(UBadge, {
+          label: row.original.draw,
+          color: getDrawColour(row.original.draw),
+          class: "font-semibold"
+        })
       }
-    ]
-  })
+    }
+  },
+  {
+    id: "seed",
+    accessorFn: row => (row.draw === "Main" ? row.seed : row.q_seed),
+    sortUndefined: "last",
+    header: ({ column }) => h(RangeTableHeader, { column: column as Column<unknown>, label: "Seed" })
+  },
+  {
+    id: "status",
+    accessorFn: row =>
+      row.draw === "Main" && row.status ? STATUSES[row.status].longName
+      : row.draw === "Qualifying" && row.q_status ? STATUSES[row.q_status].longName
+      : undefined,
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    sortUndefined: "last",
+    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Status", type: "alpha" })
+  },
+  {
+    accessorKey: "rank",
+    header: ({ column }) => h(RangeTableHeader, { column: column as Column<unknown>, label: "Rank" })
+    // cell: ({ row }) => {
+    //   return tableMode.value === "ungrouped" || (!row.getIsGrouped() && row.original.rank)
+    // }
+  }
 ])
 
 const columnFilters = ref([])
-const columnVisibility = ref({
-  tour: tours.length > 1
-})
+const columnVisibility = computed(() => ({
+  tour: tours.value?.length > 1,
+  expand: tableMode.value === "grouped"
+}))
 const grouping = computed(() => {
-  return tableMode.value === "grouped" && tours.length > 1 ? ["tour"] : []
+  return (
+    tableMode.value === "grouped" ?
+      tours.value.length > 1 ?
+        ["tour", "name"]
+      : ["name"]
+    : []
+  )
 })
 const grouping_options = ref<GroupingOptions>({
   groupedColumnMode: false,
@@ -304,12 +205,10 @@ const grouping_options = ref<GroupingOptions>({
 
 <template>
   <u-table
-    v-if="viewMode === 'list'"
     :data="entries"
     :columns
-    :loading="status === 'pending'"
+    :loading="['idle', 'pending'].includes(status)"
     sticky
-    :empty="`No entries found for ${tournament?.name} ${year}`"
     :faceted-options="{
       getFacetedRowModel: getFacetedRowModel(),
       getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -319,116 +218,23 @@ const grouping_options = ref<GroupingOptions>({
     :grouping-options="grouping_options"
     v-model:columnFilters="columnFilters"
     v-model:column-visibility="columnVisibility"
-    :ui="{ root: 'scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent max-h-165', td: 'empty:p-0' }"
-  />
-
-  <u-page-columns
-    v-else-if="entries.length || status === 'pending'"
-    class="xl:columns-4 2xl:columns-5"
+    :ui="{ td: 'empty:p-0' }"
   >
-    <u-page-card
-      v-if="entries.length"
-      v-for="entry in entries"
-      :key="entry.id"
-      highlight
-      :highlight-color="getTourColour([entry.tour])"
-      :to="{ name: 'player', params: { id: entry.id, name: kebabCase(`${entry.first_name}-${entry.last_name}`) } }"
-      :title="`${entry.first_name} ${entry.last_name}`"
-    >
-      <template #leading>
-        <div class="flex items-center gap-2">
-          <u-icon
-            :name="getFlagCode(entry.country)"
-            class="text-2xl"
-          />
-          <u-badge
-            :label="entry.tour"
-            :color="getTourColour([entry.tour])"
-          />
-        </div>
-      </template>
+    <template #loading>
+      <u-icon
+        :name="uIcons.loading"
+        class="size-8"
+      />
+    </template>
 
-      <template #description>
-        <div class="flex flex-col gap-3 mt-3">
-          <div
-            v-if="entry.singles.draw.length"
-            class="flex flex-col gap-1"
-          >
-            <div class="flex items-center gap-2">
-              <u-badge
-                label="Singles"
-                color="singles"
-              />
-              <u-badge
-                v-for="draw in entry.singles.draw"
-                :key="`Singles-${draw}`"
-                :label="draw"
-                :color="draw === 'Main' ? 'main' : 'qualifying'"
-              />
-            </div>
-            <div class="flex items-center text-sm ml-2">
-              <div v-if="entry.singles.seed || entry.singles.q_seed">
-                Seed: {{ entry.singles.q_seed ? `Q-${entry.singles.q_seed}` : entry.singles.seed }} | &nbsp;
-              </div>
-              <div v-if="entry.singles.status || entry.singles.q_status">
-                <span v-if="entry.singles.status">{{ entry.singles.status }}</span>
-                <u-separator
-                  v-if="entry.singles.status && entry.singles.q_status"
-                  class="h-4"
-                  orientation="vertical"
-                />
-                <span v-if="entry.singles.q_status">Q-{{ entry.singles.q_status }}</span>
-                |&nbsp;
-              </div>
-              <div>Rank: {{ entry.singles.rank ?? 0 }}</div>
-            </div>
-          </div>
-          <div
-            v-if="entry.doubles.draw.length"
-            class="flex flex-col gap-1"
-          >
-            <div class="flex items-center gap-2">
-              <u-badge
-                label="Doubles"
-                color="doubles"
-              />
-              <u-badge
-                v-for="draw in entry.doubles.draw"
-                :key="`Doubles-${draw}`"
-                :label="draw"
-                :color="draw === 'Main' ? 'main' : 'qualifying'"
-              />
-            </div>
-            <div class="flex items-center text-sm ml-2">
-              <div v-if="entry.doubles.seed || entry.doubles.q_seed">
-                Seed: {{ entry.doubles.q_seed ? `Q-${entry.doubles.q_seed}` : entry.doubles.seed }} | &nbsp;
-              </div>
-              <div v-if="entry.doubles.status || entry.doubles.q_status">
-                <span v-if="entry.doubles.status">{{ entry.doubles.status }}</span>
-                <u-separator
-                  v-if="entry.doubles.status && entry.doubles.q_status"
-                  class="h-4"
-                  orientation="vertical"
-                />
-                <span v-if="entry.doubles.q_status">Q-{{ entry.doubles.q_status }}</span>
-                |&nbsp;
-              </div>
-              <div>Rank: {{ entry.doubles.rank ?? 0 }}</div>
-            </div>
-          </div>
-        </div>
-      </template>
-    </u-page-card>
-
-    <loading-player
-      v-else
-      v-for="_ in 10"
-      :key="_"
-    />
-  </u-page-columns>
-  <error-message
-    v-else
-    :message="`No entries found for ${tournament?.name} ${year}`"
-    :icon="icons.noPlayer"
-  />
+    <template #empty>
+      <div class="flex justify-center items-center w-full gap-2 text-error">
+        <u-icon
+          :name="uIcons.caution"
+          class="text-base"
+        />
+        No entries available for {{ tournamentName }} {{ year }}
+      </div>
+    </template>
+  </u-table>
 </template>

@@ -3,7 +3,7 @@ export default defineEventHandler(async event => {
     `/* cypher */
     MATCH (s:Supervisor)
     WITH *
-    ORDER BY s.last_name
+    ORDER BY toLower(s.last_name)
     RETURN properties(s) AS supervisor
     `
   )

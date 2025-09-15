@@ -45,6 +45,8 @@ declare global {
     | "ATP Challenger 75"
     | "ATP Challenger 100"
     | "ATP Challenger 50"
+    | "ITF W100"
+    | "ITF W15"
 
   type CurrencyType = "USD" | "EUR" | "GBP" | "AUD" | "FRF"
 
@@ -66,7 +68,7 @@ declare global {
 
   type IncompleteType = "B" | "R" | "Def" | "WO"
 
-  type LevelType = "Challenger" | "Tour"
+  type LevelType = "Challenger" | "Tour" | "ITF"
 
   type MatchType = "Singles" | "Doubles"
 
@@ -100,98 +102,122 @@ declare global {
 
   type TourType = "ATP" | "WTA" | "Women" | "Men" | "ITF (M)" | "ITF (W)"
 
-  // Base interfaces
+  // Schemas
   interface CountryInterface {
+    alpha2?: string
     id: string
     name: string
-    alpha2?: string
+    start_date?: DateType
+    end_date?: DateType
   }
 
-  interface EntryInterface extends PlayerInterface {
-    doubles_rank?: number
+  interface DrawInterface {
+    rounds: DrawRoundInterface[]
+    matches?: DrawMatchInterface[]
+    contestants?: {
+      [contestantId: string]: DrawContestantInterface
+    }
+  }
+
+  interface DrawRoundInterface {
+    name?: string
+  }
+
+  interface DrawMatchInterface {
+    roundIndex: number
+    order: number
+    sides?: DrawSideInterface[]
+    matchStatus?: string
+    isBronzeMatch?: boolean
+  }
+
+  interface DrawContestantInterface {
+    entryStatus?: string
+    players?: DrawPlayerInterface[]
+  }
+
+  interface DrawSideInterface {
+    title?: string
+    contestantId?: string
+    scores?: DrawScoreInterface[]
+    isWinner?: boolean
+  }
+
+  interface DrawScoreInterface {
+    mainScore: number
+    subscore?: number
+    isWinner?: boolean
+  }
+
+  interface DrawPlayerInterface {
+    title: string
+    nationality: string
+  }
+
+  interface EntryInterface extends PersonInterface {
     draw: DrawType
+    status: StatusType
+    year: number
     eid: number
-    players: PlayerInterface[]
-    points?: number
+    type: MatchType
+    tour: TourType
+    players: (PersonInterface & { rank: number })[]
+    pm: number
+    seed?: number
     q_seed?: number
     q_status?: StatusType
-    rank?: number
-    reason?: string
-    seed?: number
-    singles_rank?: number
     status?: StatusType
-    team_mate?: string
+    rank?: number
+  }
+
+  interface EntryInfoInterface {
+    label: string
+    tour: TourType
     type: MatchType
-    withdrawn: boolean
-    year: number
+    status?: StatusType
+    team_reason?: string
+    rank?: number
+    draw: DrawType
+    team: (PlayerInterface & { reason?: string })[]
   }
 
   interface EventInterface {
     atp_category: CategoryType
-    atp_currency?: CurrencyType
-    atp_draw_d: RoundType
-    atp_draw_s: RoundType
-    atp_end_date: DateType
     atp_link?: string
-    atp_pm?: number
-    atp_start_date: DateType
-    atp_tfc?: number
+    atp_sponsor_name?: string
     category: CategoryType
-    currency?: CurrencyType
-    draw_type: RoundType
+    categories: (CategoryType | undefined)[]
+    currency: CurrencyType
+    currencies: (CurrencyType | undefined)[]
+    dates: (DateType | undefined)[][]
+    draws: (string | null)[][]
     end_date: DateType
     id: number
-    men_category: CategoryType
-    men_currency?: CurrencyType
-    men_draw_d: RoundType
-    men_draw_s: RoundType
-    men_end_date: DateType
+    level: LevelType
+    levels: LevelType[]
     men_link?: string
-    men_pm?: number
-    men_start_date: DateType
+    pm: (number | undefined)[]
     sponsor_name?: string
     start_date: DateType
-    supervisors: Pick<PlayerInterface, "id" | "first_name" | "last_name">[]
+    supervisors: PersonInterface[]
     surface: SurfaceInterface
-    tfc?: number
+    tfc: (number | undefined)[]
     tournament: TournamentInterface
     tours: TourType[]
     venues: VenueInterface[]
     wiki_link?: string
-    women_category: CategoryType
-    women_currency?: CurrencyType
-    women_draw_d: RoundType
-    women_draw_s: RoundType
-    women_end_date: DateType
     women_link?: string
-    women_pm?: number
-    women_start_date: DateType
     wta_category: CategoryType
-    wta_currency?: CurrencyType
-    wta_draw_d: RoundType
-    wta_draw_s: RoundType
-    wta_end_date: DateType
     wta_link?: string
-    wta_start_date: DateType
-    wta_tfc?: number
+    wta_sponsor_name?: string
     year: number
-  }
-
-  interface MatchStatsInterface {
-    label: string
-    category: string
-    low?: boolean
-    percent?: boolean
-    p1: string | number
-    p2: string | number
-    p1_pc: number
-    p2_pc: number
   }
 
   interface MatchInterface {
     chart_link?: string
     court?: string
     date?: DateType
+    draw: DrawType
     duration?: DurationType
     end_date: DateType
     id: string
@@ -203,6 +229,7 @@ declare global {
     }
     match_no: number
     match_stats: MatchStatsInterface[]
+    opponents: EntryInterface[]
     p1: EntryInterface[]
     p1_incomplete?: IncompleteType
     p1_winner: boolean
@@ -216,25 +243,78 @@ declare global {
     tour: TourType
     type: MatchType
     umpire?: string
+    winner: PlayerInterface
+    winner_id: string
     winners: {
       players: EntryInterface[]
       sets: [number, number][]
     }
   }
 
-  interface PersonInterface extends Pick<PlayerInterface, "id" | "first_name" | "last_name"> {
-    labels: string[]
-    years: number[]
+  interface MatchStatsInterface {
+    label: string
+    category: string
+    low?: boolean
+    percent?: boolean
+    p1: string | number
+    p2: string | number
+    p1_pc: number
+    p2_pc: number
   }
 
-  interface PlayerInterface {
+  interface PersonInterface {
     country: CountryInterface
     first_name: string
     id: string
-    max_year?: number
-    min_year?: number
+    labels: string[]
     last_name: string
     tour: TourType
+    years?: number[]
+  }
+
+  interface PlayerInterface extends PersonInterface {
+    age?: number
+    atp_link?: string
+    bh?: "One" | "Two"
+    ch_singles?: number
+    ch_doubles?: number
+    coach: boolean
+    coaches?: CoachInterface[]
+    countries: CountryInterface[]
+    current_doubles?: number
+    current_singles?: number
+    dob?: DateType
+    dod?: DateType
+    doubles_ch_date?: DateType
+    height?: number
+    hof?: number
+    losses: number
+    min_year?: number
+    max_year?: number
+    official_link?: string
+    pm: number
+    retired?: number
+    rh?: boolean
+    singles_ch_date?: DateType
+    turned_pro?: number
+    wiki_link?: string
+    wins: number
+    wta_link?: string
+
+    // WL
+    wl?: WinLossType[]
+    titles: {
+      level: LevelType
+      singles: number
+      doubles: number
+    }[]
+
+    // h2h
+    h2h?: {
+      opponent: PlayerInterface
+      matches: number
+      wins: number
+    }[]
   }
 
   interface RoundInterface {
@@ -248,10 +328,20 @@ declare global {
     type: MatchType
   }
 
+  interface SeedInterface {
+    draw: DrawType
+    rank: number
+    seed: number
+    withdrew?: boolean
+    team: (PersonInterface & { rank: number })[]
+    tour: TourType
+    type: MatchType
+  }
+
   interface SurfaceInterface {
+    environment: EnvironmentType
     id: string
     surface: SurfaceType
-    environment: EnvironmentType
   }
 
   interface TournamentInterface {
@@ -259,77 +349,59 @@ declare global {
     established?: number
     id: number
     name: string
-    tours: TourType[]
+    tours?: TourType[]
     website?: string
   }
 
   interface VenueInterface {
-    id: string
-    name?: string
     city: string
     country: CountryInterface
-  }
-
-  // API types
-
-  interface ConsolidatedEntryType {
-    tour: TourType
-    first_name: string
-    last_name: string
-    country: CountryInterface
     id: string
+    name?: string
+  }
+
+  interface WLIndexInterface {
+    category: string
+    stat: string
+    draw: DrawType
+    level: "Tour" | "Challenger" | "ITF"
+    wins: number
+    losses: number
+    titles?: number
+    value: number
+    ytd_wins: number
+    ytd_losses: number
+    ytd_titles?: number
+    ytd_value: number
+  }
+
+  interface ActivityStatsInterface {
+    category: string
+    value: number
+    type: MatchType
+  }
+
+  interface ActivityInterface extends EventInterface {
+    partner: EntryInterface | null
+    match: MatchInterface
+    player: EntryInterface
+    type: MatchType
+  }
+
+  type ActivityType = {
+    activity: ActivityInterface[]
+    stats: ActivityStatsInterface[]
+  }
+
+  interface RecordInterface extends EventInterface {
     singles: {
-      draw: DrawType[]
-      seed?: number
-      rank?: number
-      status?: StatusType
-      q_seed?: number
-      q_status?: StatusType
-      withdrawn: boolean
-    }
+      round: RoundType
+      number: number
+    } | null
     doubles: {
-      draw: DrawType[]
-      seed?: number
-      rank?: number
-      status?: StatusType
-      q_seed?: number
-      q_status?: StatusType
-      withdrawn: boolean
-    }
-  }
-
-  interface ConsolidatedEntryTeam {
-    tour: TourType
-    type: MatchType
-    draw: DrawType[]
-    seed?: number
-    rank?: number
-    q_seed?: number
-    q_status?: StatusType
-    status?: StatusType
-    withdrawn: boolean
-    players: EntryInterface[]
-  }
-
-  interface EntryInfoInterface {
-    label: string
-    tour: TourType
-    type: MatchType
-    status: StatusType
-    team_reason?: string
-    rank?: number
-    draw: DrawType
-    team: EntryInterface[]
-  }
-
-  interface SeedInterface {
-    draw: DrawType
-    rank2?: number
-    seed: number
-    withdrew?: boolean
-    team: EntryInterface[]
-    tour: TourType
-    type: MatchType
+      round: RoundType
+      number: number
+    } | null
   }
 
   type TournamentAgeType = {
@@ -340,7 +412,7 @@ declare global {
       months: number
       days: number
     } | null
-    player: PlayerInterface
+    player: PersonInterface
   }
 
   type TournamentCountryType = {
@@ -361,17 +433,17 @@ declare global {
     singles_losses: number
     doubles_wins: number
     doubles_losses: number
-    player: PlayerInterface
+    player: PersonInterface
   }
 
-  interface TournamentLowestRankedType extends Omit<TournamentSeedType, "teams" | "year" | "id"> {
-    rank: number
-    players: (PlayerInterface & { year: number; eid: number })[]
-  }
-
-  interface TournamentFlattenedLowestRankedType extends Omit<TournamentSeedType, "teams"> {
-    rank: number
-    player: PlayerInterface
+  interface TournamentLowestRankedType {
+    id: number
+    year: number
+    round: RoundType
+    tour: TourType
+    type: MatchType
+    worstRank: number
+    player: PersonInterface
   }
 
   type TournamentPmType = {
@@ -386,6 +458,18 @@ declare global {
     currency: CurrencyType
   }
 
+  interface TournamentSeedType {
+    id: number
+    year: number
+    round: RoundType
+    tour: TourType
+    type: MatchType
+    teams: {
+      seed: number
+      players: PersonInterface[]
+    }[]
+  }
+
   interface TournamentScoreStatsType {
     type: MatchType
     tour: TourType
@@ -395,58 +479,27 @@ declare global {
     sets_lost: number
     games_won: number
     games_lost: number
-    team: PlayerInterface[]
-  }
-
-  interface TournamentSeedType {
-    id: number
-    year: number
-    round: RoundType
-    tour: TourType
-    type: MatchType
-    teams: {
-      seed: number
-      players: PlayerInterface[]
-    }[]
-  }
-
-  type TournamentWinnerFlattenedType = {
-    id: number
-    year: number
-    labels?: string[]
-    tour?: TourType
-    winner: PlayerInterface[] | CountryInterface
-    loser: PlayerInterface[] | CountryInterface
-    sets?: number[][][]
-    incomplete?: IncompleteType
-    stats?: boolean
-    score?: string
-    type: MatchType | "Country"
-  }
-
-  type TournamentWinnerResultsType = {
-    labels: string[]
-    tour: TourType
-    winner: PlayerInterface | PlayerInterface[] | string
-    loser: PlayerInterface | PlayerInterface[]
-    sets: number[][][]
-    incomplete: IncompleteType
-    stats: boolean
-  }
-
-  type TournamentCountryWinnerType = {
-    c1: CountryInterface
-    c2: CountryInterface
-    score: string
+    team: PersonInterface[]
   }
 
   type TournamentWinnerEventType = {
     id: number
-    tours: TourType[]
+    incomplete?: IncompleteType
+    loser?: PersonInterface[] | CountryInterface
+    score: string
+    sets: number[][][]
+    stats: boolean
+    tour: TourType
+    type: MatchType
+    winner: PersonInterface[] | string | CountryInterface
     year: number
-    singles: TournamentWinnerResultsType[]
-    doubles: TournamentWinnerResultsType[]
-    country: TournamentCountryWinnerType
+  }
+
+  interface UmpireAPIType extends EventInterface {
+    rounds: {
+      round: RoundType
+      matches: MatchInterface[]
+    }[]
   }
 }
 

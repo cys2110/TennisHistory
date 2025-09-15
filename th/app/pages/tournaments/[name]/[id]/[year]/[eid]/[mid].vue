@@ -1,32 +1,28 @@
 <script setup lang="ts">
+import { type DropdownMenuItem } from "@nuxt/ui"
+
 definePageMeta({ name: "match" })
-const { viewMode } = useDefaults()
 const {
   icons,
   ui: { icons: uIcons }
 } = useAppConfig()
-const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
-const lgAndDown = breakpoints.smallerOrEqual("lg")
-const { mid, eid, name, year, id } = useRoute().params as {
-  mid: string
-  eid: string
-  name: string
-  year: string
-  id: string
-}
+const {
+  params: { name, id, year, eid, mid }
+} = useRoute("match")
 const { draw, tour, type } = destructureMid(mid)
 
 const categories: Record<string, string> = {
   "Service Stats": "text-men",
   "Return Stats": "text-women",
-  "Points Stats": "text-joint",
-  "Service Speed": "text-active"
+  "Points Stats": "text-primary",
+  "Service Speed": "text-main"
 }
 
 // API call
 const { data: match, status } = await useFetch<MatchInterface & { tournament: string }>("/api/matches", {
   key: `match-${mid}-${eid}`,
-  query: { mid, id: eid }
+  query: { mid, id: eid },
+  server: false
 })
 
 useHead({
@@ -42,7 +38,7 @@ useHead({
   }
 })
 
-const additionalLinks = computed(() => {
+const additionalLinks = computed<DropdownMenuItem[]>(() => {
   if (match.value) {
     const { chart_link, p1, p2 } = match.value
     const p1Links = p1.map(p => ({
@@ -86,7 +82,7 @@ const additionalLinks = computed(() => {
           }
         ]
       : []
-    return [...p1Links, ...p2Links, ...h2hLink, ...chartLink]
+    return [...p1Links, ...p2Links, ...h2hLink, ...chartLink] as DropdownMenuItem[]
   }
 
   return []
@@ -94,66 +90,40 @@ const additionalLinks = computed(() => {
 </script>
 
 <template>
-  <event-wrapper v-slot="{ otherLinks }">
-    <u-dashboard-panel>
-      <template #header>
-        <u-dashboard-navbar>
-          <template #title>
-            <page-title />
-          </template>
-
-          <template #right>
-            <!--@vue-expect-error-->
-            <u-dropdown-menu :items="EVENT_PAGES.map(page => ({ ...page, to: { name: page.name, params: { year, eid, name, id } } }))">
-              <u-button
-                :icon="icons.layers"
-                variant="ghost"
-              />
-            </u-dropdown-menu>
-            <!--@vue-expect-error-->
-            <u-dropdown-menu :items="[...otherLinks, ...additionalLinks]">
-              <u-button
-                :icon="uIcons.ellipsis"
-                variant="ghost"
-                :ui="{ leadingIcon: 'rotate-90' }"
-              />
-            </u-dropdown-menu>
-          </template>
-        </u-dashboard-navbar>
-
-        <u-dashboard-toolbar>
-          <div
-            v-for="(className, category) in categories"
-            :key="category"
-            class="flex items-center gap-2"
-          >
-            <u-icon
-              :name="icons.colours"
-              :class="className"
-            />
-            <span>{{ category }}</span>
-          </div>
-        </u-dashboard-toolbar>
-      </template>
-
-      <template #body>
-        <match-details
-          v-if="match"
-          :match
+  <event-wrapper>
+    <template #navbar-right>
+      <u-dropdown-menu :items="additionalLinks">
+        <u-button
+          :icon="uIcons.info"
+          variant="ghost"
         />
+      </u-dropdown-menu>
+    </template>
 
-        <match-grid
-          v-if="viewMode === 'cards'"
-          :match
-          :status
+    <template #toolbar>
+      <div
+        v-for="(className, category) in categories"
+        :key="category"
+        class="flex items-center gap-2"
+      >
+        <u-icon
+          :name="icons.colours"
+          :class="className"
         />
+        <span>{{ category }}</span>
+      </div>
+    </template>
 
-        <match-table
-          v-else
-          :match
-          :status
-        />
-      </template>
-    </u-dashboard-panel>
+    <match-details
+      v-if="match"
+      :match
+      :status
+    />
+
+    <match-table
+      v-if="match"
+      :match
+      :status
+    />
   </event-wrapper>
 </template>

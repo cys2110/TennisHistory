@@ -57,7 +57,7 @@ export const CHALLENGER_CATEGORIES: CategoryType[] = [...ATP_CHALLENGER_CATEGORI
 
 export const ITF_MEN_CATEGORIES: CategoryType[] = ["Davis Cup", "Olympics", "ITF M25", "ITF"]
 
-export const ITF_WOMEN_CATEGORIES: CategoryType[] = ["Billie Jean King Cup", "Olympics", "ITF", "ITF W75"]
+export const ITF_WOMEN_CATEGORIES: CategoryType[] = ["Billie Jean King Cup", "Olympics", "ITF", "ITF W75", "ITF W100", "ITF W15"]
 
 export const MASTERS_CATEGORIES: CategoryType[] = [
   "ATP Masters 1000",

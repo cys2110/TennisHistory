@@ -1,9 +1,5 @@
-<script setup lang="ts"></script>
-
 <template>
-  <div>
-    Component: event/country/index
-  </div>
-</template>
+  <event-country-details />
 
-<style scoped></style>
+  <event-country-entries />
+</template>

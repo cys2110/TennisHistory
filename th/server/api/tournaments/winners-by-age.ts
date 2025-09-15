@@ -28,7 +28,7 @@ export default defineEventHandler(async query => {
                   z.end_date > coalesce(e.wta_start_date, e.women_start_date))))]->
         (c1:Country)
       WITH
-        p,
+        apoc.map.submap(p, ['id', 'first_name', 'last_name']) AS player,
         y,
         e,
         CASE
@@ -40,11 +40,14 @@ export default defineEventHandler(async query => {
           ELSE 'Doubles'
         END AS type,
         CASE
-          WHEN p.dob IS NULL THEN NULL
+          WHEN p.dob IS NULL THEN null
           WHEN e.end_date IS NOT NULL THEN duration.between(p.dob, e.end_date)
-          WHEN p:ATP THEN duration.between(p.dob, coalesce(e.atp_start_date, e.men_start_date))
+          WHEN
+            p:ATP
+            THEN duration.between(p.dob, coalesce(e.atp_start_date, e.men_start_date))
           ELSE duration.between(p.dob, coalesce(e.wta_start_date, e.women_start_date))
-        END AS age
+        END AS age,
+        [x IN labels(p) WHERE NOT x IN ['Update', 'Player', 'Coach']][0] AS tour
       ORDER BY age
 
       RETURN {
@@ -52,14 +55,7 @@ export default defineEventHandler(async query => {
         year: y.id,
         type: type,
         age: age,
-        player:
-          apoc.map.merge(
-            properties(p),
-            {
-              tour: [x IN labels(p) WHERE NOT x IN ['Update', 'Player', 'Coach']][0],
-              country: country
-            }
-          )
+        player: apoc.map.merge(player, {tour: tour, country: country})
       } AS winner
     `,
     { id: Number(id) }

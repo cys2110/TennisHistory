@@ -6,14 +6,14 @@ export default defineEventHandler(async query => {
       MATCH
         (:Tournament {id: $id})<-[:EDITION_OF]-
         (e:Event)<-[:ROUND_OF]-
-        (r:Round {round: 'Final'})<-[:PLAYED]-
-        (m:Match)<-[:SCORED]-
-        (s:Winner)<-[:SCORED]-
+        (:Round {round: 'Final'})<-[:PLAYED]-
+        (:Match)<-[:SCORED]-
+        (:Winner)<-[:SCORED]-
         (f:Entry)<-[:ENTERED]-
         (p:Player)-[:REPRESENTS]->
         (c:Country)
       MATCH (e)-[:IN_YEAR]->(y:Year)
-      MATCH (s1:Loser)-[:SCORED]->(m)
+      MATCH (f)-[:SCORED]->(s:Score)-[:SCORED]->(:Match)<-[:SCORED]-(s1:Score)
       OPTIONAL MATCH
         (p)-
           [z:REPRESENTED WHERE
@@ -30,7 +30,7 @@ export default defineEventHandler(async query => {
         (c1:Country)
       WITH
         CASE
-          WHEN m:Singles THEN 'Singles'
+          WHEN f:Singles THEN 'Singles'
           ELSE 'Doubles'
         END AS type,
         p,
@@ -97,7 +97,12 @@ export default defineEventHandler(async query => {
 
       WITH
         year,
-        COLLECT (DISTINCT apoc.map.merge(properties(p), {country: country})) AS players,
+        COLLECT(
+          DISTINCT
+          apoc.map.merge(
+            apoc.map.submap(p, ['id', 'first_name', 'last_name']),
+            {country: country}
+          )) AS players,
         [x IN labels(p) WHERE NOT x IN ['Update', 'Coach', 'Player']][0] AS tour,
         eid,
         games_won,

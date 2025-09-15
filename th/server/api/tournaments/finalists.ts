@@ -57,7 +57,7 @@ export default defineEventHandler(async query => {
       RETURN
         finals,
         apoc.map.merge(
-          properties(p),
+          apoc.map.submap(p, ['id', 'first_name', 'last_name']),
           {
             country: country,
             tour: [x IN labels(p) WHERE NOT x IN ['Update', 'Player', 'Coach']][0]

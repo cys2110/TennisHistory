@@ -3,9 +3,8 @@ import { TournamentNumbers, TournamentWinners } from "#components"
 
 definePageMeta({ name: "tournament" })
 const {
-  // @ts-ignore
   params: { id, name }
-} = useRoute()
+} = useRoute("tournament")
 const {
   icons,
   ui: { icons: appIcons }
@@ -89,10 +88,6 @@ provide<string>("tournamentName", tournament.value?.name || capitalCase(name as 
           :is="selectedTab === 'winners' ? TournamentWinners : TournamentNumbers"
           :key="selectedTab"
         />
-      </template>
-
-      <template #footer>
-        <div id="dashboard-footer" />
       </template>
     </u-dashboard-panel>
   </div>

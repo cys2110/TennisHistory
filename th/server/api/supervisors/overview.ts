@@ -9,7 +9,7 @@ export default defineEventHandler(async query => {
       ORDER BY y.id
       WITH s, COLLECT(DISTINCT y.id) AS years
       RETURN
-        apoc.map.merge(properties(s), {years: years, labels: labels(s)}) AS supervisor
+        apoc.map.merge(apoc.map.submap(s, ['id', 'first_name', 'last_name']), {years: years, labels: labels(s)}) AS supervisor
     `,
     { id }
   )

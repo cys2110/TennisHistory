@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { InputTableHeader, ULink } from "#components"
-import type { TableColumn } from "@nuxt/ui"
+import { FilterTableHeader } from "#components"
+import type { TableColumn, TableRow } from "@nuxt/ui"
 import { type Column, getFacetedRowModel, getFacetedUniqueValues } from "@tanstack/vue-table"
-const { viewMode } = useDefaults()
+
 useHead({ title: "Supervisors" })
-const { icons } = useAppConfig()
-const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
-const mdAndDown = breakpoints.smallerOrEqual("md")
+const {
+  icons,
+  ui: { icons: uIcons }
+} = useAppConfig()
 
 useJsonld(() => ({
   "@context": "https://schema.org",
@@ -15,49 +16,24 @@ useJsonld(() => ({
   description: "A collection of tennis supervisors"
 }))
 
-const selectedLetter = ref<string | undefined>()
-
 // API call
-const { data: supervisors, status } = await useFetch<PlayerInterface[]>("/api/supervisors", {
+const { data: supervisors, status } = await useFetch<PersonInterface[]>("/api/supervisors", {
   key: "supervisors",
-  default: () => []
+  default: () => [],
+  server: false
 })
 
-const filteredSupervisors = computed(() => {
-  if (supervisors.value && selectedLetter.value) {
-    return supervisors.value.filter(supervisor => supervisor.last_name.startsWith(selectedLetter.value!))
-  }
-  return supervisors.value
-})
-
-// TOC
-const toc = computed(() => [
-  {
-    id: "supervisors",
-    items: filteredSupervisors.value.map(supervisor => ({
-      label: supervisor.id,
-      to: `#${supervisor.id}`
-    }))
-  }
-])
-
-const columns: TableColumn<PlayerInterface>[] = [
+const columns: TableColumn<PersonInterface>[] = [
   {
     accessorKey: "last_name",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
-      h(InputTableHeader, {
+      h(FilterTableHeader, {
         column: column as Column<unknown>,
-        label: "Supervisor"
+        label: "Supervisor",
+        type: "alpha"
       }),
-    cell: ({ row }) =>
-      h(
-        ULink,
-        {
-          class: "hover-link",
-          to: { name: "supervisor", params: { id: kebabCase(row.original.id) } }
-        },
-        () => row.original.id
-      ),
+    cell: ({ row }) => row.original.id,
     footer: ({ table }) => {
       const filteredRows = table.getFilteredRowModel().rows
       return `Total: ${filteredRows.length}`
@@ -66,6 +42,10 @@ const columns: TableColumn<PlayerInterface>[] = [
 ]
 
 const columnFilters = ref([])
+
+const handleSelectRow = async (row: TableRow<PersonInterface>) => {
+  await navigateTo({ name: "supervisor", params: { id: kebabCase(row.original.id) } })
+}
 </script>
 
 <template>
@@ -76,106 +56,39 @@ const columnFilters = ref([])
           <template #title>
             <page-title />
           </template>
-
-          <template
-            #right
-            v-if="viewMode !== 'list'"
-          >
-            <u-slideover
-              v-if="mdAndDown"
-              title="Filters"
-              class="ml-auto"
-            >
-              <u-button
-                :icon="icons.filter"
-                size="xs"
-              />
-              <template #body>
-                <filter-letters v-model="selectedLetter" />
-              </template>
-            </u-slideover>
-
-            <u-popover>
-              <u-button
-                :size="mdAndDown ? 'xs' : 'sm'"
-                :icon="icons.toc"
-              />
-              <template #content>
-                <u-command-palette
-                  placeholder="Search supervisors"
-                  :groups="toc"
-                  :loading="status === 'pending'"
-                  :fuse="{ resultLimit: 1000 }"
-                  :ui="{ content: 'max-h-80', root: 'border border-primary rounded-lg' }"
-                />
-              </template>
-            </u-popover>
-          </template>
         </u-dashboard-navbar>
-
-        <u-dashboard-toolbar v-if="!mdAndDown && viewMode !== 'list'">
-          <filter-letters
-            v-model="selectedLetter"
-            :ui="{ fieldset: 'flex-wrap gap-2' }"
-          />
-        </u-dashboard-toolbar>
       </template>
-
       <template #body>
         <u-table
-          v-if="viewMode === 'list'"
           :data="supervisors"
           :columns
-          :loading="status === 'pending'"
+          :loading="['idle', 'pending'].includes(status)"
           sticky
-          empty="No supervisors found"
-          v-model:columnFilters="columnFilters"
+          v-model:column-filters="columnFilters"
           :faceted-options="{
             getFacetedRowModel: getFacetedRowModel(),
             getFacetedUniqueValues: getFacetedUniqueValues()
           }"
-          :ui="{
-            root: 'w-fit mx-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent'
-          }"
-        />
-
-        <u-page-grid
-          v-else-if="supervisors.length || status === 'pending'"
-          class="xl:grid-cols-4 2xl:grid-cols-5 p-5 scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent overflow-y-auto scroll-smooth"
+          @select="handleSelectRow"
+          :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer' }"
         >
-          <div
-            v-if="supervisors.length"
-            v-for="supervisor in filteredSupervisors"
-            :key="supervisor.id"
-            :id="supervisor.id"
-          >
-            <u-page-card
-              :title="supervisor.id"
-              highlight
-              highlight-color="joint"
-              :to="{ name: 'supervisor', params: { id: kebabCase(supervisor.id) } }"
-              :ui="{ title: 'text-center', body: 'w-full' }"
+          <template #loading>
+            <u-icon
+              :name="uIcons.loading"
+              class="size-8"
             />
-          </div>
+          </template>
 
-          <loading-base
-            v-else
-            v-for="_ in 10"
-            :key="_"
-          />
-        </u-page-grid>
-        <error-message
-          v-else
-          message="No supervisors found"
-          :icon="icons.noSupervisor"
-        />
-      </template>
-
-      <template
-        #footer
-        v-if="viewMode !== 'list'"
-      >
-        <div class="font-semibold p-5 border-t border-muted">Total: {{ filteredSupervisors.length }}</div>
+          <template #empty>
+            <div class="flex justify-center items-center w-full gap-2 text-error">
+              <u-icon
+                :name="icons.noSupervisor"
+                class="text-base"
+              />
+              No supervisors found
+            </div>
+          </template>
+        </u-table>
       </template>
     </u-dashboard-panel>
   </div>

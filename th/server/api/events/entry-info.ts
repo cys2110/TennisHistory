@@ -5,7 +5,7 @@ export default defineEventHandler(async query => {
     "LUCKY_LOSER",
     "ALTERNATE",
     "DEFAULTED",
-    "QUALIFIER",
+    "QUALIFIED",
     "LDA",
     "WILD_CARD",
     "WITHDREW",
@@ -19,6 +19,7 @@ export default defineEventHandler(async query => {
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
+      CYPHER 25
       WITH ['Q_LDA', 'Q_WILD_CARD', 'Q_WITHDREW', 'Q_ALTERNATE'] AS quals
       UNWIND $relationships AS relationship
       MATCH (e:Event {id: $id})
@@ -40,14 +41,31 @@ export default defineEventHandler(async query => {
                   z.end_date > coalesce(e.wta_start_date, e.women_start_date))))]->
         (c1:Country)
       OPTIONAL MATCH
-        (f)-[:SCORED]->(:Score)<-[:SCORED]-(:Entry)<-[:ENTERED]-(p1:Player)
+        (f)-[:SCORED]->(s:Score)<-[:SCORED]-(:Entry)<-[:ENTERED]-(p1:Player)
       WHERE p.id <> p1.id
+      CALL (*) {
+        WHEN relationship IN quals THEN
+          RETURN 'Qualifying' AS draw
+        WHEN relationship = 'RETIRED' THEN {
+          MATCH (f)-[:SCORED]->(s:Score {incomplete: 'R'})
+          RETURN
+            CASE
+              WHEN s:Qualifying THEN 'Qualifying'
+              ELSE 'Main'
+            END AS draw }
+        WHEN relationship = 'WALKOVER' THEN {
+          MATCH (f)-[:SCORED]->(s:Score {incomplete: 'WO'})
+          RETURN
+            CASE
+              WHEN s:Qualifying THEN 'Qualifying'
+              ELSE 'Main'
+            END AS draw }
+        ELSE
+          RETURN 'Main' AS draw
+      }
       WITH
-        CASE
-          WHEN relationship IN quals THEN 'Qualifying'
-          ELSE 'Main'
-        END AS draw,
-        properties(p) AS player,
+        draw,
+        apoc.map.submap(p, ['id', 'first_name', 'last_name']) AS player,
         TYPE(t) AS label,
         [x IN labels(p) WHERE x IN ['ATP', 'WTA']][0] AS tour,
         properties(t) AS properties,
@@ -95,7 +113,7 @@ export default defineEventHandler(async query => {
         return "Alternate"
       case "DEFAULTED":
         return "Default"
-      case "QUALIFIER":
+      case "QUALIFIED":
         return "Qualifier"
       case "LDA":
       case "Q_LDA":

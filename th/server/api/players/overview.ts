@@ -8,13 +8,9 @@ export default defineEventHandler(async query => {
       WITH *
       ORDER BY y.id
       RETURN
-        {
-          id: c.id,
-          name: c.name,
-          alpha2: c.alpha2
-        } AS country,
+        properties(c) AS country,
         COLLECT(DISTINCT(y.id)) AS years,
-        labels(p) AS tour, p.atp_link AS atp_link, p.wiki_link AS wiki_link, p.official_link AS official_link, p.wta_link AS wta_link
+        labels(p) AS tour, p.atp_link AS atp_link, p.wiki_link AS wiki_link, p.official_link AS official_link, p.wta_link AS wta_link, p.first_name as first_name, p.last_name AS last_name
     `,
     { id }
   )
@@ -25,6 +21,6 @@ export default defineEventHandler(async query => {
     ...results,
     tour: results.tour.includes("ATP") ? "ATP" : "WTA",
     coach: results.tour.includes("Coach"),
-    years: results.years.map((y: any) => y.low)
+    years: results.years.map((y: any) => y.toInt())
   }
 })

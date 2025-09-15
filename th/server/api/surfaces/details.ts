@@ -37,20 +37,55 @@ export default defineEventHandler(async query => {
       END AS venues,
       properties(s) AS surface,
       properties(t) AS tournament,
-      properties(e) AS event,
+      apoc.map.submap(
+          e,
+          [
+            'id',
+            'start_date',
+            'end_date',
+            'atp_start_date',
+            'atp_end_date',
+            'wta_start_date',
+            'wta_end_date',
+            'men_start_date',
+            'men_end_date',
+            'women_start_date',
+            'women_end_date',
+            'category',
+            'atp_category',
+            'wta_category',
+            'men_category',
+            'women_category',
+            'sponsor_name',
+            'atp_draw_s',
+            'atp_draw_d',
+            'wta_draw_s',
+            'wta_draw_d',
+            'men_draw_s',
+            'men_draw_d',
+            'women_draw_s',
+            'women_draw_d'
+          ],
+          null,
+          false
+        ) AS event,
       [x IN labels(e) WHERE NOT x IN ['Event', 'Update']] AS tours,
       y.id AS year
     RETURN
-      apoc.map.merge(
-        event,
-        {
-          surface: surface,
-          venues: venues,
-          tournament: tournament,
-          year: year,
-          tours: tours
-        }
-      ) AS event
+      apoc.map.clean(
+          apoc.map.merge(
+            event,
+            {
+              surface: surface,
+              venues: venues,
+              tournament: tournament,
+              year: year,
+              tours: tours
+            }
+          ),
+          [],
+          [null]
+        ) AS event
     `,
     { year: Number(year), id }
   )
@@ -70,7 +105,6 @@ export default defineEventHandler(async query => {
       "women_start_date",
       "women_end_date"
     ]
-    const numberKeys = ["id", "tfc", "pm", "atp_tfc", "atp_pm", "wta_tfc", "wta_pm", "men_pm", "women_pm", "men_tfc", "women_tfc", "year"]
 
     for (const key of dateKeys) {
       if (event[key]) {
@@ -82,18 +116,69 @@ export default defineEventHandler(async query => {
       }
     }
 
-    for (const key of numberKeys) {
-      if (event[key]) {
-        event[key] = event[key]?.toInt()
-      }
-    }
+    const {
+      category,
+      atp_category,
+      wta_category,
+      men_category,
+      women_category,
+      id,
+      start_date,
+      end_date,
+      atp_start_date,
+      atp_end_date,
+      wta_start_date,
+      wta_end_date,
+      men_start_date,
+      men_end_date,
+      women_start_date,
+      women_end_date,
+      tours,
+      atp_draw_s,
+      atp_draw_d,
+      wta_draw_s,
+      wta_draw_d,
+      men_draw_s,
+      men_draw_d,
+      women_draw_s,
+      women_draw_d,
+      tournament,
+      ...rest
+    } = event
+
+    // level
+    const levels = []
+
+    if (
+      category ||
+      (atp_category && !ATP_CHALLENGER_CATEGORIES.includes(atp_category)) ||
+      (wta_category && !WTA_CHALLENGER_CATEGORIES.includes(wta_category))
+    )
+      levels.push("Tour")
+
+    if ((atp_category && ATP_CHALLENGER_CATEGORIES.includes(atp_category)) || (wta_category && WTA_CHALLENGER_CATEGORIES.includes(wta_category)))
+      levels.push("Challenger")
+
+    if (men_category || women_category) levels.push("ITF")
 
     return {
-      ...event,
+      id: id.toInt(),
+      tours: getCorrectTours(tours),
+      levels,
+      categories: [category, atp_category, wta_category, men_category, women_category],
+      dates: [
+        [start_date, end_date],
+        [atp_start_date, atp_end_date],
+        [wta_start_date, wta_end_date],
+        [men_start_date, men_end_date],
+        [women_start_date, women_end_date]
+      ],
+      draws: [[], [atp_draw_s, atp_draw_d], [wta_draw_s, wta_draw_d], [men_draw_s, men_draw_d], [women_draw_s, women_draw_d]],
       tournament: {
-        ...event.tournament,
-        id: event.tournament.id.toInt()
-      }
+        ...tournament,
+        id: tournament.id?.toInt()
+      },
+      ...rest
     }
   })
 

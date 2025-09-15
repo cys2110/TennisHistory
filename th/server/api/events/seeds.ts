@@ -40,7 +40,7 @@ export default defineEventHandler(async query => {
       WITH
         withdrew,
         country,
-        properties(p) AS player,
+        apoc.map.submap(p, ['id', 'first_name', 'last_name']) AS player,
         properties(f) AS entry,
         [x IN labels(p) WHERE NOT x IN ['Update', 'Coach', 'Player']][0] AS tour,
         CASE
@@ -79,9 +79,7 @@ export default defineEventHandler(async query => {
     const player = seed.get("player")
 
     for (const key of numberKeys) {
-      if (player[key]) {
-        player[key] = player[key].toInt()
-      }
+      if (player[key]) player[key] = player[key].toInt()
     }
 
     return player
@@ -95,7 +93,7 @@ export default defineEventHandler(async query => {
       teams.push({
         seed: seed.seed ?? seed.q_seed,
         draw: seed.draw,
-        rank2: seed.rank2,
+        rank: seed.rank2,
         withdrew: seed.withdrew,
         tour: seed.tour,
         type: seed.type,
@@ -120,7 +118,7 @@ export default defineEventHandler(async query => {
           teams.push({
             seed: seed.seed ?? seed.q_seed,
             draw: seed.draw,
-            rank2: seed.rank2,
+            rank: seed.rank2,
             withdrew: seed.withdrew,
             tour: seed.tour,
             type: seed.type,

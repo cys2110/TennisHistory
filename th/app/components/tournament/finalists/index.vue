@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { CountryLink, FilterTableHeader, RangeTableHeader, UBadge, ULink } from "#components"
-import type { TableColumn } from "@nuxt/ui"
+import { CountryLink, FilterTableHeader, NameTableHeader, RangeTableHeader, UBadge } from "#components"
+import type { TableColumn, TableRow } from "@nuxt/ui"
 import { type Column, createColumnHelper, getFacetedRowModel, getFacetedMinMaxValues, getFacetedUniqueValues } from "@tanstack/vue-table"
 
-const { viewMode } = useDefaults()
 const {
-  //@ts-ignore
   params: { id }
-} = useRoute()
-const { icons } = useAppConfig()
+} = useRoute("tournament")
+const {
+  icons,
+  ui: { icons: uIcons }
+} = useAppConfig()
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
+const mdAndUp = breakpoints.greaterOrEqual("md")
 const tours = inject<TourType[]>("tours", [])
 const tournamentName = inject<string>("tournamentName", "")
 
@@ -16,7 +19,8 @@ const tournamentName = inject<string>("tournamentName", "")
 const { data: finalists, status } = await useFetch<TournamentFinalistType[]>("/api/tournaments/finalists", {
   key: `tournament-finalists-${id}`,
   query: { id },
-  default: () => []
+  default: () => [],
+  server: false
 })
 
 const columnHelper = createColumnHelper<TournamentFinalistType>()
@@ -36,9 +40,8 @@ const columns: TableColumn<TournamentFinalistType>[] = [
         cell: ({ row }) =>
           h(UBadge, {
             label: row.original.player.tour,
-            color: getTourColour([row.original.player.tour])
-          }),
-        footer: ({ table }) => `Total: ${table.getRowCount()}`
+            color: getTourColour(row.original.player.tour)
+          })
       },
       {
         accessorKey: "player.country.name",
@@ -48,51 +51,18 @@ const columns: TableColumn<TournamentFinalistType>[] = [
             label: "Country",
             type: "alpha"
           }),
-        cell: ({ row }) => h(CountryLink, { country: row.original.player.country, class: "mx-auto" })
+        cell: ({ row }) =>
+          h(CountryLink, {
+            country: row.original.player.country,
+            class: "mx-auto"
+          })
       },
       {
-        accessorKey: "player.first_name",
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "First Name",
-            type: "alpha"
-          }),
-        cell: ({ cell, row }) =>
-          h(
-            ULink,
-            {
-              key: row.original.player.id,
-              to: {
-                name: "player",
-                params: { id: row.original.player.id, name: kebabCase(`${row.original.player.first_name} ${row.original.player.last_name}`) }
-              },
-              class: "hover-link w-fit"
-            },
-            () => cell.getValue()
-          )
-      },
-      {
-        accessorKey: "player.last_name",
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Last Name",
-            type: "alpha"
-          }),
-        cell: ({ cell, row }) =>
-          h(
-            ULink,
-            {
-              key: row.original.player.id,
-              to: {
-                name: "player",
-                params: { id: row.original.player.id, name: kebabCase(`${row.original.player.first_name} ${row.original.player.last_name}`) }
-              },
-              class: "hover-link w-fit"
-            },
-            () => cell.getValue()
-          )
+        id: "player_name",
+        accessorFn: row => `${row.player.last_name}, ${row.player.first_name}`,
+        filterFn: (row, columnId, filterValue) => filterIncludesNameString(row, columnId, filterValue),
+        header: ({ column }) => h(NameTableHeader, { column: column as Column<unknown>, label: "Name" }),
+        cell: ({ row }) => `${row.original.player.first_name} ${row.original.player.last_name}`
       }
     ]
   }),
@@ -170,84 +140,29 @@ const columnVisibility = ref({
   tour: tours.length > 1
 })
 const columnFilters = ref([])
+
+const handleSelectRow = (row: TableRow<TournamentFinalistType>) => {
+  navigateTo({
+    name: "player",
+    params: { id: row.original.player.id, name: kebabCase(`${row.original.player.first_name}-${row.original.player.last_name}`) }
+  })
+}
 </script>
 
 <template>
-  <div v-if="viewMode === 'cards'">
-    <u-page-grid
-      v-if="finalists.length || status === 'pending'"
-      class="2xl:grid-cols-4"
-    >
-      <u-card
-        v-if="finalists.length"
-        v-for="finalist in finalists"
-        :key="finalist.player.id"
-        :class="`ring-${getTourColour([finalist.player.tour])}`"
-      >
-        <template #header>
-          <div class="flex justify-between items-center font-semibold">
-            <player-link :player="finalist.player" />
-            <u-badge
-              :label="finalist.player.tour"
-              :color="getTourColour([finalist.player.tour])"
-            />
-          </div>
-        </template>
-
-        <div class="w-full text-sm">
-          <div class="grid grid-cols-4">
-            <div></div>
-            <div class="text-center">Titles</div>
-            <div class="text-center">Runner-up</div>
-            <div class="text-center">Win %</div>
-          </div>
-
-          <div class="grid grid-cols-4">
-            <div>Singles</div>
-            <div class="font-semibold text-center">{{ finalist.singles_wins }}</div>
-            <div class="font-semibold text-center">{{ finalist.singles_losses }}</div>
-            <div class="font-semibold text-center">
-              {{
-                finalist.singles_wins + finalist.singles_losses ?
-                  percentage(finalist.singles_wins, finalist.singles_wins + finalist.singles_losses)
-                : 0
-              }}%
-            </div>
-          </div>
-
-          <div class="grid grid-cols-4">
-            <div>Doubles</div>
-            <div class="font-semibold text-center">{{ finalist.doubles_wins }}</div>
-            <div class="font-semibold text-center">{{ finalist.doubles_losses }}</div>
-            <div class="font-semibold text-center">
-              {{
-                finalist.doubles_wins + finalist.doubles_losses ?
-                  percentage(finalist.doubles_wins, finalist.doubles_wins + finalist.doubles_losses)
-                : 0
-              }}%
-            </div>
-          </div>
-        </div>
-      </u-card>
-      <loading-player
-        v-else
-        v-for="_ in 10"
-        :key="_"
+  <client-only>
+    <teleport to="#chart-container">
+      <tournament-finalists-chart
+        v-if="mdAndUp"
+        :finalists
       />
-    </u-page-grid>
-    <error-message
-      v-else
-      :icon="icons.noTournament"
-      :message="`No finalists found for ${tournamentName}`"
-    />
-  </div>
+    </teleport>
+  </client-only>
   <u-table
-    v-else
     :data="finalists"
     :columns
-    :loading="status === 'pending'"
+    :loading="['idle', 'pending'].includes(status)"
     sticky
-    :empty="`No finalists found for ${tournamentName}`"
     :faceted-options="{
       getFacetedRowModel: getFacetedRowModel(),
       getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -255,6 +170,24 @@ const columnFilters = ref([])
     }"
     v-model:columnFilters="columnFilters"
     v-model:column-visibility="columnVisibility"
-    :ui="{ root: 'scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent max-h-165', td: 'empty:p-0' }"
-  />
+    @select="handleSelectRow"
+    :ui="{ tbody: '[&>tr]:cursor-pointer', td: 'empty:p-0' }"
+  >
+    <template #loading>
+      <u-icon
+        :name="uIcons.loading"
+        class="size-8"
+      />
+    </template>
+
+    <template #empty>
+      <div class="flex justify-center items-center w-full gap-2 text-error">
+        <u-icon
+          :name="icons.noTournament"
+          class="text-base"
+        />
+        No finalists found for {{ tournamentName }}
+      </div>
+    </template>
+  </u-table>
 </template>

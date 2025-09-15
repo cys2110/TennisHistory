@@ -3,15 +3,19 @@ export default defineEventHandler(async query => {
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      OPTIONAL MATCH (p:Player)-[:REPRESENTS]->(x:Country) WHERE p.first_name + ' ' + p.last_name =~ '(?i).*'+ $searchTerm + '.*'
-      WITH p, x
+      OPTIONAL MATCH (p:Player)-[:REPRESENTS]->(c:Country) WHERE p.first_name + ' ' + p.last_name =~ '(?i).*'+ $searchTerm + '.*'
+      WITH *
       ORDER BY p.last_name
-      RETURN CASE WHEN COUNT(p) > 0 THEN COLLECT(DISTINCT{value: p.id, label: p.first_name || ' ' || p.last_name, country: { id: x.id, name: x.name, alpha2: x.alpha2}}) ELSE [] END AS players
+      RETURN apoc.map.clean(apoc.map.merge(apoc.map.submap(p, ['id', 'first_name', 'last_name']), {country: properties(c)}), [], [null]) AS player
     `,
     { searchTerm }
   )
 
-  const results = records[0].toObject()
+  const results = records.map(r => r.get("player"))
 
-  return results.players
+  if (Object.keys(results[0]).length === 0) {
+    return []
+  } else {
+    return results
+  }
 })

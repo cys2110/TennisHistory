@@ -83,7 +83,7 @@ const getButtonColour = (category: string) => {
     case "Return Stats":
       return "women"
     case "Points Stats":
-      return "joint"
+      return "primary"
     case "Service Speed":
       return "active"
     default:

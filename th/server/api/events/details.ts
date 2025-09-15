@@ -52,10 +52,73 @@ export default defineEventHandler(async query => {
   }
 
   for (const key of numberKeys) {
-    if (event[key]) {
-      event[key] = event[key]?.toInt()
-    }
+    if (event[key]) event[key] = event[key]?.toInt()
   }
 
-  return event
+  const {
+    category,
+    atp_category,
+    wta_category,
+    men_category,
+    women_category,
+    id: eid,
+    start_date,
+    end_date,
+    atp_start_date,
+    atp_end_date,
+    wta_start_date,
+    wta_end_date,
+    men_start_date,
+    men_end_date,
+    women_start_date,
+    women_end_date,
+    atp_draw_s,
+    atp_draw_d,
+    wta_draw_s,
+    wta_draw_d,
+    men_draw_s,
+    men_draw_d,
+    women_draw_s,
+    women_draw_d,
+    draw_type,
+    pm,
+    atp_pm,
+    wta_pm,
+    men_pm,
+    women_pm,
+    tfc,
+    atp_tfc,
+    wta_tfc,
+    men_tfc,
+    women_tfc,
+    currency,
+    atp_currency,
+    wta_currency,
+    men_currency,
+    women_currency,
+    ...rest
+  } = event
+
+  return {
+    id: eid,
+    categories: [category, atp_category, wta_category, men_category, women_category],
+    dates: [
+      [start_date, end_date],
+      [atp_start_date, atp_end_date],
+      [wta_start_date, wta_end_date],
+      [men_start_date, men_end_date],
+      [women_start_date, women_end_date]
+    ],
+    draws: [
+      [draw_type, undefined],
+      [atp_draw_s, atp_draw_d],
+      [wta_draw_s, wta_draw_d],
+      [men_draw_s, men_draw_d],
+      [women_draw_s, women_draw_d]
+    ],
+    currencies: [currency, atp_currency, wta_currency, men_currency, women_currency],
+    pm: [pm, atp_pm, wta_pm, men_pm, women_pm],
+    tfc: [tfc, atp_tfc, wta_tfc, men_tfc, women_tfc],
+    ...rest
+  }
 })

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ name: "home" })
-useHead({ title: "Home " })
+useHead({ title: "Home" })
 const { icons } = useAppConfig()
 
 // Features
@@ -44,7 +44,7 @@ const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.p
           :features
         />
         <div class="relative w-full h-[400px] overflow-hidden">
-          <UPageMarquee
+          <u-marquee
             reverse
             orientation="vertical"
             :overlay="false"
@@ -60,8 +60,8 @@ const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.p
               height="258"
               class="aspect-video border border-default rounded-lg bg-white"
             />
-          </UPageMarquee>
-          <UPageMarquee
+          </u-marquee>
+          <u-marquee
             orientation="vertical"
             :overlay="false"
             :ui="{
@@ -76,8 +76,8 @@ const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.p
               height="258"
               class="aspect-video border border-default rounded-lg bg-white"
             />
-          </UPageMarquee>
-          <UPageMarquee
+          </u-marquee>
+          <u-marquee
             reverse
             orientation="vertical"
             :overlay="false"
@@ -93,7 +93,7 @@ const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.p
               height="258"
               class="aspect-video border border-default rounded-lg bg-white"
             />
-          </UPageMarquee>
+          </u-marquee>
         </div>
       </template>
     </u-dashboard-panel>

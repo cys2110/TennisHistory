@@ -19,4 +19,6 @@ export const destructureMid = (mid: string) => {
   return { draw, tour, type, match_no: Number(number) }
 }
 
+export const getCorrectTours = (tours: TourType[]) => tours.map(tour => tour.replace("Men", "ITF (M)").replace("Women", "ITF (W)"))
+
 export const percentage = (value1: number, value2: number) => Math.round((value1 / value2) * 100)

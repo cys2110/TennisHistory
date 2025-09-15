@@ -1,111 +1,81 @@
 <script setup lang="ts">
-import { FilterTableHeader, InputTableHeader, RangeTableHeader, UBadge, ULink } from "#components"
-import type { TableColumn } from "@nuxt/ui"
-import { type Column, getFacetedRowModel, getFacetedUniqueValues } from "@tanstack/vue-table"
-const { viewMode } = useDefaults()
-useHead({ title: "Tournaments" })
-const { icons } = useAppConfig()
-const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
-const mdAndDown = breakpoints.smallerOrEqual("md")
+import { ArrayFilterTableHeader, FilterTableHeader, RangeTableHeader, UBadge } from "#components"
+import { type TableColumn, type TableRow } from "@nuxt/ui"
+import { type Column, getFacetedRowModel, getFacetedMinMaxValues, getFacetedUniqueValues } from "@tanstack/vue-table"
 
+useHead({ title: "Tournaments" })
 useJsonld(() => ({
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: "Tournaments",
   description: "A collection of tennis tournaments"
 }))
-
-const selectedLetter = ref<string | undefined>()
+const {
+  icons,
+  ui: { icons: uIcons }
+} = useAppConfig()
 
 // API call
 const { data: tournaments, status } = await useFetch<TournamentInterface[]>("/api/tournaments", {
   key: "tournaments",
-  default: () => []
+  default: () => [],
+  server: false
 })
-
-const filteredTournaments = computed(() => {
-  if (tournaments.value && selectedLetter.value) {
-    return tournaments.value.filter(tournament => tournament.name.startsWith(selectedLetter.value!))
-  }
-  return tournaments.value
-})
-
-// TOC
-const toc = computed(() => [
-  {
-    id: "tournaments",
-    items: filteredTournaments.value.map(tournament => ({
-      label: tournament.name,
-      to: `#tournament-${tournament.id}`
-    }))
-  }
-])
-
-const arraySorting = (rowA: any, rowB: any, columnId: string) => {
-  return useSorted(rowA.getValue(columnId)).value[0] < useSorted(rowB.getValue(columnId)).value[0] ? -1 : 1
-}
 
 const columns: TableColumn<TournamentInterface>[] = [
   {
-    id: "tours",
-    accessorFn: row => row.tours.map(tour => tour.replace("Men", "ITF (M)").replace("Women", "ITF (W)")),
+    accessorKey: "tours",
+    sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
+    filterFn: "arrIncludesSome",
+    meta: { class: { td: "flex justify-center items-center gap-1" } },
     header: ({ column }) =>
-      h(FilterTableHeader, {
+      h(ArrayFilterTableHeader, {
         column: column as Column<unknown>,
-        label: "Tours",
-        type: "alpha"
+        label: "Tours"
       }),
     cell: ({ row }) =>
-      row.original.tours.map(tour =>
+      row.original.tours?.map(tour =>
         h(UBadge, {
-          key: tour,
-          label: tour.replace("Men", "ITF (M)").replace("Women", "ITF (W)"),
-          color: getTourColour([tour]),
-          class: "mx-1"
+          key: `${row.original.id}-${tour}`,
+          label: tour,
+          color: getTourColour(tour)
         })
       ),
-    sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
-    filterFn: "arrIncludes"
+    footer: ({ table }) => `Total: ${table.getRowCount()}`
   },
   {
     accessorKey: "name",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
-      h(InputTableHeader, {
+      h(FilterTableHeader, {
         column: column as Column<unknown>,
-        label: "Tournaments"
-      }),
-    cell: ({ row }) =>
-      h(
-        ULink,
-        {
-          class: "hover-link",
-          to: { name: "tournament", params: { id: row.original.id, name: kebabCase(row.original.name) } }
-        },
-        () => row.original.name
-      ),
-    footer: ({ table }) => "Total: " + table.getFilteredRowModel().rows.length
+        label: "Name",
+        type: "alpha"
+      })
   },
   {
     accessorKey: "established",
     sortUndefined: "last",
-    header: ({ column }) =>
-      h(RangeTableHeader, {
-        column: column as Column<unknown>,
-        label: "Established"
-      })
+    header: ({ column }) => h(RangeTableHeader, { column: column as Column<unknown>, label: "Established" })
   },
   {
     accessorKey: "abolished",
     sortUndefined: "last",
-    header: ({ column }) =>
-      h(RangeTableHeader, {
-        column: column as Column<unknown>,
-        label: "Abolished"
-      })
+    header: ({ column }) => h(RangeTableHeader, { column: column as Column<unknown>, label: "Abolished" })
   }
 ]
 
 const columnFilters = ref([])
+
+const handleSelectRow = async (row: TableRow<TournamentInterface>) => {
+  await navigateTo({
+    name: "tournament",
+    params: {
+      id: row.original.id,
+      name: kebabCase(row.original.name)
+    }
+  })
+}
 </script>
 
 <template>
@@ -116,122 +86,40 @@ const columnFilters = ref([])
           <template #title>
             <page-title />
           </template>
-
-          <template
-            #right
-            v-if="viewMode !== 'list'"
-          >
-            <u-slideover
-              v-if="mdAndDown"
-              title="Filters"
-              class="ml-auto"
-            >
-              <u-button
-                :icon="icons.filter"
-                size="xs"
-              />
-              <template #body>
-                <filter-letters v-model="selectedLetter" />
-              </template>
-            </u-slideover>
-
-            <u-popover>
-              <u-button
-                :size="mdAndDown ? 'xs' : 'sm'"
-                :icon="icons.toc"
-              />
-              <template #content>
-                <u-command-palette
-                  placeholder="Search tournaments"
-                  :groups="toc"
-                  :loading="status === 'pending'"
-                  :fuse="{ resultLimit: 1000 }"
-                  :ui="{ content: 'max-h-80', root: 'border border-primary rounded-lg' }"
-                />
-              </template>
-            </u-popover>
-          </template>
         </u-dashboard-navbar>
-
-        <u-dashboard-toolbar v-if="!mdAndDown && viewMode !== 'list'">
-          <filter-letters
-            v-model="selectedLetter"
-            :ui="{ fieldset: 'flex-wrap gap-2' }"
-          />
-        </u-dashboard-toolbar>
       </template>
-
       <template #body>
         <u-table
-          v-if="viewMode === 'list'"
           :data="tournaments"
           :columns
-          :loading="status === 'pending'"
+          :loading="['idle', 'pending'].includes(status)"
           sticky
-          empty="No tournaments found"
-          v-model:columnFilters="columnFilters"
+          v-model:column-filters="columnFilters"
           :faceted-options="{
             getFacetedRowModel: getFacetedRowModel(),
+            getFacetedMinMaxValues: getFacetedMinMaxValues(),
             getFacetedUniqueValues: getFacetedUniqueValues()
           }"
-          :ui="{
-            root: 'w-fit mx-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent'
-          }"
-        />
-
-        <u-page-grid
-          v-else-if="tournaments.length || status === 'pending'"
-          class="xl:grid-cols-4 2xl:grid-cols-5 p-5 scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent overflow-y-auto scroll-smooth"
+          @select="handleSelectRow"
+          :ui="{ tbody: '[&>tr]:cursor-pointer' }"
         >
-          <div
-            v-if="tournaments.length"
-            v-for="tournament in filteredTournaments"
-            :key="tournament.id"
-            :id="`tournament-${tournament.id}`"
-          >
-            <u-page-card
-              :title="tournament.name"
-              highlight
-              :highlight-color="getTourColour(tournament.tours)"
-              :to="{ name: 'tournament', params: { id: tournament.id, name: kebabCase(tournament.name) } }"
-              :ui="{ title: 'text-center', body: 'w-full mx-auto', description: 'text-center' }"
-            >
-              <template #leading>
-                <u-badge
-                  v-for="tour in tournament.tours"
-                  :key="tour"
-                  :color="getTourColour([tour])"
-                  :label="tour.replace('Men', 'ITF (M)').replace('Women', 'ITF (W)')"
-                  class="mx-1"
-                />
-              </template>
+          <template #loading>
+            <u-icon
+              :name="uIcons.loading"
+              class="size-8"
+            />
+          </template>
 
-              <template #description>
-                <span v-if="tournament.established">{{ tournament.established }}</span>
-                <span v-if="tournament.established && !tournament.abolished"> - present</span>
-                <span v-else-if="tournament.abolished && tournament.established !== tournament.abolished"> - {{ tournament.abolished }}</span>
-              </template>
-            </u-page-card>
-          </div>
-
-          <loading-base
-            v-else
-            v-for="_ in 10"
-            :key="_"
-          />
-        </u-page-grid>
-        <error-message
-          v-else
-          message="No tournaments found"
-          :icon="icons.noTournament"
-        />
-      </template>
-
-      <template
-        #footer
-        v-if="viewMode !== 'list'"
-      >
-        <div class="font-semibold p-5 border-t border-muted">Total: {{ filteredTournaments.length }}</div>
+          <template #empty>
+            <div class="flex justify-center items-center w-full gap-2 text-error">
+              <u-icon
+                :name="icons.noTournament"
+                class="text-base"
+              />
+              No tournaments found
+            </div>
+          </template>
+        </u-table>
       </template>
     </u-dashboard-panel>
   </div>

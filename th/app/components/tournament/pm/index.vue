@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CountryLink, FilterTableHeader, RangeTableHeader, UBadge, UButton, ULink } from "#components"
+import { FilterTableHeader, RangeTableHeader, UBadge, UButton, ULink } from "#components"
 import type { TableColumn } from "@nuxt/ui"
 import {
   type Column,
@@ -10,16 +10,16 @@ import {
   type GroupingOptions
 } from "@tanstack/vue-table"
 
-const { viewMode } = useDefaults()
 const {
-  //@ts-ignore
   params: { id, name }
-} = useRoute()
+} = useRoute("tournament")
 const {
   icons,
   ui: { icons: uIcons }
 } = useAppConfig()
 const { tableMode } = useDefaults()
+const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
+const mdAndUp = breakpoints.greaterOrEqual("md")
 const tours = inject<TourType[]>("tours", [])
 const tournamentName = inject<string>("tournamentName", "")
 
@@ -27,70 +27,29 @@ const tournamentName = inject<string>("tournamentName", "")
 const { data: rounds, status } = await useFetch<TournamentPmType[]>("/api/tournaments/pm", {
   key: `tournament-pm-${id}`,
   query: { id },
-  default: () => []
-})
-
-const groupedRounds = computed(() => {
-  const years = []
-  const usedYears = new Set<number>()
-
-  for (const round of rounds.value) {
-    if (!usedYears.has(round.year)) {
-      const yearRounds = rounds.value.filter(r => r.year === round.year)
-
-      const tourRounds = []
-
-      for (const tour of tours) {
-        const tourSinglesRounds = yearRounds.filter(
-          r => r.tour === (tour.replace("Men", "ITF (M)").replace("Women", "ITF (W)") as TourType) && r.type === "Singles"
-        )
-        const tourDoublesRounds = yearRounds.filter(
-          r => r.tour === (tour.replace("Men", "ITF (M)").replace("Women", "ITF (W)") as TourType) && r.type === "Doubles"
-        )
-
-        tourRounds.push({
-          tour,
-          singles: tourSinglesRounds,
-          doubles: tourDoublesRounds
-        })
-      }
-
-      years.push({
-        id: round.id,
-        year: round.year,
-        rounds: tourRounds
-      })
-
-      usedYears.add(round.year)
-    }
-  }
-
-  return years.sort((a, b) => b.year - a.year)
+  default: () => [],
+  server: false
 })
 
 const columns = computed<TableColumn<TournamentPmType>[]>(() => [
-  ...(tableMode.value === "grouped" ?
-    [
-      {
-        id: "expand",
-        cell: ({ row }: { row: any }) => {
-          if (row.getIsGrouped()) {
-            return h(UButton, {
-              variant: "link",
-              color: "neutral",
-              class: "mr-2",
-              size: "xs",
-              icon: uIcons.chevronDoubleRight,
-              ui: {
-                leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
-              },
-              onClick: () => row.toggleExpanded()
-            })
-          }
-        }
+  {
+    id: "expand",
+    cell: ({ row }: { row: any }) => {
+      if (row.getIsGrouped()) {
+        return h(UButton, {
+          variant: "link",
+          color: "neutral",
+          class: "mr-2",
+          size: "xs",
+          icon: uIcons.chevronDoubleRight,
+          ui: {
+            leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
+          },
+          onClick: () => row.toggleExpanded()
+        })
       }
-    ]
-  : []),
+    }
+  },
   {
     accessorKey: "year",
     header: ({ column }) =>
@@ -104,7 +63,7 @@ const columns = computed<TableColumn<TournamentPmType>[]>(() => [
           ULink,
           {
             to: { name: "event", params: { id, name, year: row.original.year, eid: row.original.id } },
-            class: "hover-link font-semibold"
+            class: "hover-link default-link font-semibold"
           },
           () => row.original.year
         )
@@ -113,6 +72,7 @@ const columns = computed<TableColumn<TournamentPmType>[]>(() => [
   },
   {
     accessorKey: "tour",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
       h(FilterTableHeader, {
         column: column as Column<unknown>,
@@ -123,7 +83,7 @@ const columns = computed<TableColumn<TournamentPmType>[]>(() => [
       if (tableMode.value === "ungrouped" || (row.getIsGrouped() && row.depth === 1)) {
         return h(UBadge, {
           label: row.original.tour,
-          color: getTourColour([row.original.tour]),
+          color: getTourColour(row.original.tour),
           class: "font-semibold"
         })
       }
@@ -138,10 +98,10 @@ const columns = computed<TableColumn<TournamentPmType>[]>(() => [
         type: "alpha"
       }),
     cell: ({ row }) => {
-      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && row.depth === 2)) {
+      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && (tours.length > 1 ? row.depth === 2 : row.depth === 1))) {
         return h(UBadge, {
           label: row.original.type,
-          color: row.original.type === "Singles" ? "singles" : "doubles",
+          color: getMatchTypeColour(row.original.type),
           class: "font-semibold"
         })
       }
@@ -149,6 +109,7 @@ const columns = computed<TableColumn<TournamentPmType>[]>(() => [
   },
   {
     accessorKey: "round",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
       h(FilterTableHeader, {
         column: column as Column<unknown>,
@@ -183,9 +144,10 @@ const columns = computed<TableColumn<TournamentPmType>[]>(() => [
   }
 ])
 
-const columnVisibility = ref({
-  tour: tours.length > 1
-})
+const columnVisibility = computed(() => ({
+  tour: tours.length > 1,
+  expand: tableMode.value === "grouped"
+}))
 const columnFilters = ref([])
 const grouping = computed(() =>
   tableMode.value === "grouped" ?
@@ -201,95 +163,19 @@ const grouping_options = ref<GroupingOptions>({
 </script>
 
 <template>
-  <div v-if="viewMode === 'cards'">
-    <u-page-grid
-      v-if="groupedRounds.length || status === 'pending'"
-      class="md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2"
-    >
-      <u-card
-        v-if="groupedRounds.length"
-        v-for="round in groupedRounds"
-        :key="round.id"
-        :ui="{
-          root: `ring-${getTourColour(tours)}`,
-          footer: 'mx-auto w-fit'
-        }"
-      >
-        <template #header>
-          <u-link
-            :to="{ name: 'event', params: { id, name, eid: round.id, year: round.year } }"
-            class="hover-link font-semibold"
-          >
-            {{ round.year }}
-          </u-link>
-        </template>
-
-        <div class="text-sm">
-          <dashboard-subpanel
-            v-for="tour in round.rounds"
-            :key="tour.tour"
-          >
-            <template #title>
-              <u-badge
-                :label="tour.tour"
-                :color="getTourColour([tour.tour])"
-              />
-            </template>
-
-            <div class="text-center text-sm">
-              <div class="grid grid-cols-5 text-muted">
-                <div></div>
-                <div class="col-span-2">Singles</div>
-                <div class="col-span-2">Doubles</div>
-              </div>
-              <div class="grid grid-cols-5 text-muted">
-                <div></div>
-                <div>Prize Money</div>
-                <div>Points</div>
-                <div>Prize Money</div>
-                <div>Points</div>
-              </div>
-              <div
-                v-for="(x, index) in tour.singles.length > tour.doubles.length ? tour.singles : tour.doubles"
-                :key="index"
-                class="grid grid-cols-5"
-              >
-                <div class="text-muted">{{ x.round }}</div>
-                <div class="font-semibold">{{
-                  isDefined(x.pm) && x.currency ? x.pm.toLocaleString("en-GB", { style: "currency", currency: x.currency }) : "—"
-                }}</div>
-                <div class="font-semibold">{{ isDefined(x.points) ? x.points.toLocaleString() : "—" }}</div>
-                <div class="font-semibold">{{
-                  isDefined(tour.doubles[index]?.pm) && tour.doubles[index]?.currency ?
-                    tour.doubles[index].pm.toLocaleString("en-GB", { style: "currency", currency: tour.doubles[index].currency })
-                  : "—"
-                }}</div>
-                <div class="font-semibold">{{ isDefined(tour.doubles[index]?.points) ? tour.doubles[index].points.toLocaleString() : "—" }}</div>
-              </div>
-            </div>
-          </dashboard-subpanel>
-        </div>
-      </u-card>
-
-      <loading-base
-        v-else
-        v-for="_ in 10"
-        :key="_"
+  <client-only>
+    <teleport to="#chart-container">
+      <tournament-pm-chart
+        v-if="mdAndUp"
+        :rounds
       />
-    </u-page-grid>
-    <error-message
-      v-else
-      :icon="icons.noAwards"
-      :message="`No prize money found for ${tournamentName}`"
-    />
-  </div>
+    </teleport>
+  </client-only>
   <u-table
-    v-else
     :data="rounds"
     :columns
-    :loading="status === 'pending'"
+    :loading="['idle', 'pending'].includes(status)"
     sticky
-    :empty="`No prize money found for ${tournamentName}`"
     :faceted-options="{
       getFacetedRowModel: getFacetedRowModel(),
       getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -299,6 +185,23 @@ const grouping_options = ref<GroupingOptions>({
     :grouping-options="grouping_options"
     v-model:columnFilters="columnFilters"
     v-model:column-visibility="columnVisibility"
-    :ui="{ root: 'scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent max-h-165', td: 'empty:p-0' }"
-  />
+    :ui="{ td: 'empty:p-0' }"
+  >
+    <template #loading>
+      <u-icon
+        :name="uIcons.loading"
+        class="size-8"
+      />
+    </template>
+
+    <template #empty>
+      <div class="flex justify-center items-center w-full gap-2 text-error">
+        <u-icon
+          :name="icons.noAwards"
+          class="text-base"
+        />
+        No prize money found for {{ tournamentName }}
+      </div>
+    </template>
+  </u-table>
 </template>

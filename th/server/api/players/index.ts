@@ -107,7 +107,7 @@ export default defineEventHandler(async event => {
       ORDER BY ${getSortOption()}
       SKIP toInteger($offset)
       LIMIT toInteger($pageSize)
-      RETURN apoc.map.clean(apoc.map.merge(properties(p), {country: properties(c), tour: tour, min_year: min_year.value, max_year: max_year.value}), [], [null]) AS player
+      RETURN apoc.map.clean(apoc.map.merge(apoc.map.submap(p, ['id', 'first_name', 'last_name']), {country: properties(c), tour: tour, min_year: min_year.value, max_year: max_year.value}), [], [null]) AS player
     }
 
     RETURN player, total

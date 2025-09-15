@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CountryLink, FilterTableHeader, RangeTableHeader, UBadge, UButton, ULink } from "#components"
+import { ArrayFilterTableHeader, CountryLink, FilterTableHeader, NameTableHeader, RangeTableHeader, UBadge, UButton, ULink } from "#components"
 import type { TableColumn } from "@nuxt/ui"
 import {
   type Column,
@@ -11,51 +11,51 @@ import {
   type GroupingOptions
 } from "@tanstack/vue-table"
 
-const { eid, year } = useRoute().params as { eid: string; year: string }
+const {
+  params: { eid, year }
+} = useRoute("event")
 const {
   icons,
   ui: { icons: uIcons }
 } = useAppConfig()
-const { viewMode, tableMode } = useDefaults()
+const { tableMode } = useDefaults()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const mdAndUp = breakpoints.greaterOrEqual("md")
-const tours = inject<TourType[]>("tours", [])
-const tournament = inject<TournamentInterface>("tournament")
+const tours = useState<TourType[]>("tours")
+const tournamentName = useState<string>("tournament-name")
 
 // API call
 const { data: seeds, status } = await useFetch<SeedInterface[]>("/api/events/seeds", {
   key: `event-seeds-${eid}`,
   query: { id: eid },
-  default: () => []
+  default: () => [],
+  server: false
 })
 
 const columnHelper = createColumnHelper<SeedInterface>()
 
 const columns = computed<TableColumn<SeedInterface>[]>(() => [
-  ...(tableMode.value === "grouped" ?
-    [
-      {
-        id: "expand",
-        cell: ({ row }: { row: any }) => {
-          if (row.getIsGrouped()) {
-            return h(UButton, {
-              variant: "link",
-              color: "neutral",
-              class: "mr-2",
-              size: "xs",
-              icon: uIcons.chevronDoubleRight,
-              ui: {
-                leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
-              },
-              onClick: () => row.toggleExpanded()
-            })
-          }
-        }
+  {
+    id: "expand",
+    cell: ({ row }: { row: any }) => {
+      if (row.getIsGrouped()) {
+        return h(UButton, {
+          variant: "link",
+          color: "neutral",
+          class: "mr-2",
+          size: "xs",
+          icon: uIcons.chevronDoubleRight,
+          ui: {
+            leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
+          },
+          onClick: () => row.toggleExpanded()
+        })
       }
-    ]
-  : []),
+    }
+  },
   {
     accessorKey: "tour",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
       h(FilterTableHeader, {
         column: column as Column<unknown>,
@@ -66,7 +66,7 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
       if (tableMode.value === "ungrouped" || (row.getIsGrouped() && row.depth === 0)) {
         return h(UBadge, {
           label: row.original.tour,
-          color: getTourColour([row.original.tour]),
+          color: getTourColour(row.original.tour),
           class: "font-semibold"
         })
       }
@@ -74,6 +74,7 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
   },
   {
     accessorKey: "type",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
       h(FilterTableHeader, {
         column: column as Column<unknown>,
@@ -81,13 +82,10 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
         type: "alpha"
       }),
     cell: ({ row }) => {
-      if (
-        tableMode.value === "ungrouped" ||
-        (row.getIsGrouped() && ((tours.length > 1 && row.depth === 1) || (tours.length < 2 && row.depth === 0)))
-      ) {
+      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && (tours.value.length > 1 ? row.depth === 1 : row.depth === 0))) {
         return h(UBadge, {
           label: row.original.type,
-          color: row.original.type === "Singles" ? "singles" : "doubles",
+          color: getMatchTypeColour(row.original.type),
           class: "font-semibold"
         })
       }
@@ -95,6 +93,7 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
   },
   {
     accessorKey: "draw",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
       h(FilterTableHeader, {
         column: column as Column<unknown>,
@@ -102,13 +101,10 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
         type: "alpha"
       }),
     cell: ({ row }) => {
-      if (
-        tableMode.value === "ungrouped" ||
-        (row.getIsGrouped() && ((tours.length > 1 && row.depth === 2) || (tours.length < 2 && row.depth === 1)))
-      ) {
+      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && (tours.value.length > 1 ? row.depth === 2 : row.depth === 1))) {
         return h(UBadge, {
           label: row.original.draw,
-          color: row.original.draw === "Main" ? "main" : "qualifying",
+          color: getDrawColour(row.original.draw),
           class: "font-semibold"
         })
       }
@@ -131,7 +127,7 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
         accessorFn: row => row.team.map(player => player.country.name),
         sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
         header: ({ column }) =>
-          h(FilterTableHeader, {
+          h(ArrayFilterTableHeader, {
             column: column as Column<unknown>,
             label: "Country",
             type: "alpha"
@@ -149,13 +145,14 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
         }
       },
       {
-        id: "first_name",
-        accessorFn: row => row.team.map(player => player.first_name),
+        id: "name",
+        accessorFn: row => row.team.map(player => `${player.last_name}, ${player.first_name}`),
         sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
+        filterFn: (row, columnId, filterValue) => filterIncludesName(row, columnId, filterValue),
         header: ({ column }) =>
-          h(FilterTableHeader, {
+          h(NameTableHeader, {
             column: column as Column<unknown>,
-            label: "First Name",
+            label: "Name",
             type: "alpha"
           }),
         cell: ({ row }) => {
@@ -174,44 +171,9 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
                       name: "player",
                       params: { id: player.id, name: kebabCase(`${player.first_name} ${player.last_name}`) }
                     },
-                    class: "hover-link"
+                    class: "hover-link default-link w-fit"
                   },
-                  () => player.first_name
-                )
-              )
-            )
-          }
-        }
-      },
-      {
-        id: "last_name",
-        accessorFn: row => row.team.map(player => player.last_name),
-        sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Last Name",
-            type: "alpha"
-          }),
-        cell: ({ row }) => {
-          if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
-            return h(
-              "div",
-              {
-                class: "flex flex-col items-center"
-              },
-              row.original.team.map(player =>
-                h(
-                  ULink,
-                  {
-                    key: player.id,
-                    to: {
-                      name: "player",
-                      params: { id: player.id, name: kebabCase(`${player.first_name} ${player.last_name}`) }
-                    },
-                    class: "hover-link"
-                  },
-                  () => player.last_name
+                  () => `${player.first_name} ${player.last_name}`
                 )
               )
             )
@@ -254,7 +216,7 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
     ]
   }),
   {
-    accessorKey: "rank2",
+    accessorKey: "rank",
     aggregationFn: "extent",
     header: ({ column }) =>
       h(RangeTableHeader, {
@@ -268,13 +230,14 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
 ])
 
 const columnFilters = ref([])
-const columnVisibility = ref({
-  tour: tours.length > 1
-})
+const columnVisibility = computed(() => ({
+  tour: tours.value?.length > 1,
+  expand: tableMode.value === "grouped"
+}))
 const grouping = computed(() => {
   return (
     tableMode.value === "grouped" ?
-      tours.length > 1 ?
+      tours.value.length > 1 ?
         ["tour", "type", "draw"]
       : ["type", "draw"]
     : []
@@ -291,6 +254,7 @@ const grouping_options = ref<GroupingOptions>({
     id="seeds"
     title="Seeds"
     :icon="icons.seeds"
+    class="max-h-200"
   >
     <template #right>
       <event-seeds-chart
@@ -300,12 +264,10 @@ const grouping_options = ref<GroupingOptions>({
     </template>
 
     <u-table
-      v-if="viewMode === 'list'"
       :data="seeds"
       :columns
-      :loading="status === 'pending'"
+      :loading="['idle', 'pending'].includes(status)"
       sticky
-      :empty="`No seeds in ${tournament?.name} ${year}`"
       :faceted-options="{
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -315,59 +277,24 @@ const grouping_options = ref<GroupingOptions>({
       :grouping-options="grouping_options"
       v-model:columnFilters="columnFilters"
       v-model:column-visibility="columnVisibility"
-      :ui="{ root: 'scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent max-h-165', td: 'empty:p-0' }"
-    />
-
-    <u-page-grid
-      v-else-if="seeds.length || status === 'pending'"
-      class="2xl:grid-cols-4"
+      :ui="{ td: 'empty:p-0' }"
     >
-      <u-card
-        v-if="seeds.length"
-        v-for="seed in seeds"
-        :key="`${seed.tour}-${seed.draw}-${seed.type}-${seed.seed}`"
-        :ui="{
-          root: `ring-${getTourColour([seed.tour])}`,
-          header: 'flex items-center justify-between'
-        }"
-      >
-        <template #header>
-          <div class="font-bold">{{ seed.seed }}</div>
-          <div class="flex items-center gap-2">
-            <u-badge
-              :label="seed.tour"
-              :color="getTourColour([seed.tour])"
-            />
-            <u-badge
-              :label="seed.type"
-              :color="seed.type === 'Singles' ? 'singles' : 'doubles'"
-            />
-            <u-badge
-              :label="seed.draw"
-              :color="seed.draw === 'Main' ? 'main' : 'qualifying'"
-            />
-          </div>
-        </template>
+      <template #loading>
+        <u-icon
+          :name="uIcons.loading"
+          class="size-8"
+        />
+      </template>
 
-        <div class="flex items-center justify-between">
-          <player-link
-            v-for="player in seed.team"
-            :key="player.id"
-            :player
+      <template #empty>
+        <div class="flex justify-center items-center w-full gap-2 text-error">
+          <u-icon
+            :name="icons.noPeople"
+            class="text-base"
           />
+          No seeds found for {{ tournamentName }} {{ year }}
         </div>
-      </u-card>
-
-      <loading-base
-        v-else
-        v-for="n in 10"
-        :key="n"
-      />
-    </u-page-grid>
-    <error-message
-      v-else
-      :icon="icons.noPeople"
-      :message="`No seeds in ${tournament?.name} ${year}`"
-    />
+      </template>
+    </u-table>
   </dashboard-subpanel>
 </template>

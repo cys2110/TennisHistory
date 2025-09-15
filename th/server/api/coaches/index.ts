@@ -51,7 +51,7 @@ export default defineEventHandler(async event => {
       ORDER BY ${getSortOption()}
       SKIP toInteger($offset)
       LIMIT toInteger($pageSize)
-      RETURN properties(c) AS coach
+      RETURN DISTINCT apoc.map.submap(c, ['id', 'first_name', 'last_name']) AS coach
     }
 
     RETURN coach, total

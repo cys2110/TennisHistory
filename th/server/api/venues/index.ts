@@ -2,14 +2,13 @@ export default defineEventHandler(async event => {
   const { records } = await useDriver().executeQuery(
     `/* cypher */
     MATCH (v:Venue)-[:LOCATED_IN]->(c:Country)
-    WITH *
+    WITH DISTINCT *
     ORDER BY c.name, v.city, v.name
-    WITH c, apoc.map.groupByMulti(COLLECT(DISTINCT properties(v)), "city") AS cities
-    RETURN apoc.map.merge(properties(c), {cities: cities}) AS results
+    RETURN apoc.map.merge(properties(v), {country: properties(c)}) AS venue
     `
   )
 
-  const results = records.map(record => record.get("results"))
+  const results = records.map(record => record.get("venue"))
 
   return results
 })
