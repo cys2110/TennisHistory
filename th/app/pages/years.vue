@@ -4,8 +4,9 @@ import type { TableColumn, TableRow } from "@nuxt/ui"
 import { type Column, getFacetedRowModel, getFacetedUniqueValues } from "@tanstack/vue-table"
 
 // @ts-ignore
-const id = useRouteQuery<number>("year", new Date().getFullYear().toString(), { transform: Number })
-useHead({ title: () => id.value as string, templateParams: { subPage: "Years" } })
+// const id = useRouteQuery<number>("year", new Date().getFullYear().toString(), { transform: Number })
+const id = ref(2025)
+useHead({ title: () => id.value })
 const {
   icons,
   ui: { icons: uIcons }

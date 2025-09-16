@@ -1,7 +1,14 @@
 <script setup lang="ts">
-import { FilterTableHeader, NameTableHeader, UButton, ULink } from "#components"
+import { ColouredBadge, CountryLink, FilterTableHeader, GroupedCell, GroupFilterTableHeader, NameTableHeader, UButton, ULink } from "#components"
 import type { TableColumn, TableRow } from "@nuxt/ui"
-import { type Column, getFacetedRowModel, getFacetedUniqueValues, getGroupedRowModel, type GroupingOptions } from "@tanstack/vue-table"
+import {
+  type Column,
+  getFacetedRowModel,
+  getFacetedMinMaxValues,
+  getFacetedUniqueValues,
+  getGroupedRowModel,
+  type GroupingOptions
+} from "@tanstack/vue-table"
 
 definePageMeta({ name: "coach" })
 const {
@@ -34,68 +41,38 @@ const { data: players, status } = await useFetch<APIResponse[]>("/api/coaches/de
 useHead({
   title: () => `${coach.value ? `${coach.value.first_name} ${coach.value.last_name}` : capitalCase(id as string)} | Coaches`
 })
+useJsonld(() => ({
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: coach.value ? `${coach.value.first_name} ${coach.value.last_name}` : capitalCase(id as string),
+  description: `Profile of tennis coach ${coach.value ? `${coach.value.first_name} ${coach.value.last_name}` : capitalCase(id as string)}`
+}))
 
 const columns = computed<TableColumn<APIResponse>[]>(() => [
   {
     accessorKey: "tour",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Tour",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(GroupFilterTableHeader, { column: column as Column<unknown>, label: "Tour", type: "alpha" }),
+    cell: ({ row }) =>
+      h(GroupedCell, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "tour" }, () =>
+        h(ColouredBadge, { label: row.getValue("tour") as string, class: "mx-auto" })
       )
   },
   {
     id: "country",
     accessorFn: row => row.country.name,
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Country",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(GroupFilterTableHeader, { column: column as Column<unknown>, label: "Country", type: "alpha" }),
+    cell: ({ row }) =>
+      h(GroupedCell, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "country" }, () =>
+        h(CountryLink, { country: row.original.country, class: "mx-auto" })
       )
   },
   {
     id: "name",
     accessorFn: row => `${row.last_name}, ${row.first_name}`,
     filterFn: (row, columnId, filterValue) => filterIncludesNameString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(NameTableHeader, {
-        column: column as Column<unknown>,
-        label: "Name"
-      }),
+    header: ({ column }) => h(NameTableHeader, { column: column as Column<unknown>, label: "Name" }),
     cell: ({ row }) => {
       if (!row.getIsGrouped() || grouping.value.length === 0) {
         return `${row.original.first_name} ${row.original.last_name}`
@@ -107,13 +84,10 @@ const columns = computed<TableColumn<APIResponse>[]>(() => [
     header: "Career High (Singles)",
     cell: ({ row }) => {
       if (row.original.ch_singles && (!row.getIsGrouped() || grouping.value.length === 0)) {
-        return h(
-          "div",
-          {
-            class: "text-center"
-          },
-          [h("div", row.original.ch_singles ?? "—"), h("div", dateTimeFormat.format(getDate(row.original.singles_ch_date!)))]
-        )
+        return h("div", { class: "text-center" }, [
+          h("div", row.original.ch_singles ?? "—"),
+          h("div", dateTimeFormat.format(getDate(row.original.singles_ch_date!)))
+        ])
       }
     }
   },
@@ -122,13 +96,10 @@ const columns = computed<TableColumn<APIResponse>[]>(() => [
     header: "Career High (Doubles)",
     cell: ({ row }) => {
       if (row.original.ch_doubles && (!row.getIsGrouped() || grouping.value.length === 0)) {
-        return h(
-          "div",
-          {
-            class: "text-center"
-          },
-          [h("div", row.original.ch_doubles ?? "—"), h("div", dateTimeFormat.format(getDate(row.original.doubles_ch_date!)))]
-        )
+        return h("div", { class: "text-center" }, [
+          h("div", row.original.ch_doubles ?? "—"),
+          h("div", dateTimeFormat.format(getDate(row.original.doubles_ch_date!)))
+        ])
       }
     }
   },
@@ -136,23 +107,13 @@ const columns = computed<TableColumn<APIResponse>[]>(() => [
     id: "start_date",
     accessorFn: row => (row.start_date ? row.start_date.year : undefined),
     sortUndefined: "last",
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Start",
-        type: "number"
-      })
+    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Start", type: "number" })
   },
   {
     id: "end_date",
     accessorFn: row => (row.end_date ? row.end_date.year : undefined),
     sortUndefined: "last",
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "End",
-        type: "number"
-      })
+    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "End", type: "number" })
   },
   {
     id: "gs",
@@ -161,9 +122,7 @@ const columns = computed<TableColumn<APIResponse>[]>(() => [
       if (!row.getIsGrouped() || grouping.value.length === 0) {
         return h(
           "div",
-          {
-            class: "flex flex-col items-center"
-          },
+          { class: "flex flex-col items-center" },
           row.original.gs.map(g =>
             h(
               ULink,
@@ -191,7 +150,9 @@ const grouping_options = ref<GroupingOptions>({
 const table = useTemplateRef("table")
 
 const handleSelectRow = async (row: TableRow<APIResponse>) => {
-  if (!row.getIsGrouped()) {
+  if (row.getIsGrouped()) {
+    row.toggleExpanded()
+  } else {
     await navigateTo({ name: "player", params: { id: row.original.id, name: kebabCase(`${row.original.first_name}-${row.original.last_name}`) } })
   }
 }
@@ -249,6 +210,7 @@ const handleSelectRow = async (row: TableRow<APIResponse>) => {
           v-model:column-filters="columnFilters"
           :faceted-options="{
             getFacetedRowModel: getFacetedRowModel(),
+            getFacetedMinMaxValues: getFacetedMinMaxValues(),
             getFacetedUniqueValues: getFacetedUniqueValues()
           }"
           :grouping="grouping"
@@ -258,58 +220,14 @@ const handleSelectRow = async (row: TableRow<APIResponse>) => {
           :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer', td: 'empty:p-0' }"
         >
           <template #loading>
-            <u-icon
-              :name="uIcons.loading"
-              class="size-8"
-            />
+            <loading-icon />
           </template>
 
           <template #empty>
-            <div class="flex justify-center items-center w-full gap-2 text-error">
-              <u-icon
-                :name="icons.noPlayer"
-                class="text-base"
-              />
-              No players found
-            </div>
-          </template>
-
-          <template #tour-cell="{ row }">
-            <div class="flex items-center gap-2">
-              <u-button
-                v-if="row.getIsGrouped() && grouping[0] === 'tour'"
-                :icon="uIcons.chevronDoubleRight"
-                size="xs"
-                variant="link"
-                color="neutral"
-                @click="row.toggleExpanded()"
-                :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-              />
-              <coloured-badge
-                v-if="(row.getIsGrouped() && row.groupingColumnId === 'tour') || (!grouping.includes('tour') && !row.getIsGrouped())"
-                :label="row.getValue('tour')"
-                class="mx-auto"
-              />
-            </div>
-          </template>
-
-          <template #country-cell="{ row }">
-            <div class="flex items-center gap-2">
-              <u-button
-                v-if="row.getIsGrouped() && grouping[0] === 'country'"
-                :icon="uIcons.chevronDoubleRight"
-                size="xs"
-                variant="link"
-                color="neutral"
-                @click="row.toggleExpanded()"
-                :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-              />
-              <country-link
-                v-if="(row.getIsGrouped() && row.groupingColumnId === 'country') || (!grouping.includes('country') && !row.getIsGrouped())"
-                :country="row.original.country"
-                class="mx-auto"
-              />
-            </div>
+            <empty-message
+              :icon="icons.noPlayer"
+              :message="`No players coached by ${coach?.first_name} ${coach?.last_name}`"
+            />
           </template>
         </u-table>
       </template>
