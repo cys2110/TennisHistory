@@ -3,18 +3,9 @@ const {
   icons,
   ui: { icons: appIcons }
 } = useAppConfig()
-const { name } = useRoute()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
 const middleSizes = breakpoints.between("md", "xl")
 const modelValue = defineModel<MonthType[]>()
-
-const options = computed(() => {
-  const currentMonth = new Date().getMonth()
-  if (name === "upcoming-tournaments") {
-    return MONTHS.filter((month, index) => index >= currentMonth)
-  }
-  return MONTHS
-})
 </script>
 
 <template>
@@ -25,7 +16,7 @@ const options = computed(() => {
     <u-select-menu
       v-model="modelValue"
       multiple
-      :items="options"
+      :items="MONTHS"
       :icon="icons.event"
       placeholder="Select months"
     >

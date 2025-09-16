@@ -41,7 +41,7 @@ export default defineEventHandler(async event => {
         max(rank) AS worstRank,
         collect(
           apoc.map.merge(
-            properties(p),
+            apoc.map.submap(p, ['id', 'first_name', 'last_name']),
             {
               rank: rank,
               country:
@@ -58,7 +58,8 @@ export default defineEventHandler(async event => {
         type,
         worstRank,
         [r IN rows WHERE r.rank = worstRank | apoc.map.clean(r, ['rank'], [])] AS players
-      RETURN 'Win' AS round, tour, type, worstRank, players
+      UNWIND players AS player
+      RETURN 'Win' AS round, tour, type, worstRank, player.eid AS id, player.year AS year, apoc.map.clean(player, ['eid', 'year'], []) AS player
         UNION
       WITH
         ['Final', 'Semifinals', 'Quarterfinals'] AS rounds,
@@ -103,7 +104,7 @@ export default defineEventHandler(async event => {
         max(rank) AS worstRank,
         collect(
           apoc.map.merge(
-            properties(p),
+            apoc.map.submap(p, ['id', 'first_name', 'last_name']),
             {
               rank: rank,
               country:
@@ -121,7 +122,8 @@ export default defineEventHandler(async event => {
         type,
         worstRank,
         [r IN rows WHERE r.rank = worstRank | apoc.map.clean(r, ['rank'], [])] AS players
-      RETURN *
+      UNWIND players AS player
+      RETURN round, tour, type, worstRank, player.eid AS id, player.year AS year, apoc.map.clean(player, ['eid', 'year'], []) AS player
       ORDER BY
       CASE round
         WHEN 'Win' THEN 0
@@ -135,18 +137,16 @@ export default defineEventHandler(async event => {
   )
 
   const results = records.map(record => {
-    const { round, tour, type, worstRank, players } = record.toObject()
+    const { round, tour, type, worstRank, player, id, year } = record.toObject()
 
     return {
       round,
       tour,
       type,
       rank: worstRank.toInt(),
-      players: players.map((player: any) => ({
-        ...player,
-        eid: player.eid.toInt(),
-        year: player.year.toInt()
-      }))
+      id: id.toInt(),
+      year: year.toInt(),
+      player
     }
   })
 

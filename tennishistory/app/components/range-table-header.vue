@@ -44,9 +44,8 @@ const columnFilterValue = computed(() => column.getFilterValue())
 </script>
 
 <template>
-  <div class="w-fit mx-auto">
-    <div>{{ label }}</div>
-    <div class="flex justify-center items-center gap-2">
+  <div class="w-fit mx-auto *:flex *:justify-center *:items-center *:gap-2">
+    <div>
       <u-dropdown-menu :items="sortOptions">
         <u-button
           color="neutral"
@@ -55,6 +54,9 @@ const columnFilterValue = computed(() => column.getFilterValue())
           class="-mx-2.5 data-[state=open]:bg-elevated"
         />
       </u-dropdown-menu>
+      <div>{{ label }}</div>
+    </div>
+    <div>
       <u-input
         type="number"
         :min="Number(column.getFacetedMinMaxValues()?.[0] ?? '')"

@@ -1,11 +1,12 @@
 @import "tailwindcss" theme(static);
-@import "@nuxt/ui-pro";
+@import "@nuxt/ui";
 @plugin 'tailwind-scrollbar';
 
 @theme {
   --font-sans: "Fira Sans Condensed", sans-serif;
   --font-cursive: "Petit Formal Script", cursive;
   --text-tiny: 0.625rem;
+  --container-8xl: 120rem;
 }
 
 ::-webkit-scrollbar {
@@ -22,6 +23,7 @@
   --ui-text-muted: var(--ui-color-neutral-500);
   --ui-text-dimmed: var(--ui-color-neutral-500);
   --ui-border: var(--ui-color-neutral-300);
+  --ui-container: var(--container-8xl);
 }
 
 .dark {
@@ -37,27 +39,31 @@
 }
 
 .hover-link {
-  @apply inline-block relative dark:after:bg-neutral-300 after:bg-neutral-600 after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:origin-center after:transition-all after:ease-in-out after:duration-500 hover:after:scale-x-100;
+  @apply bg-gradient-to-r bg-bottom bg-[length:0_1px] bg-no-repeat bg-[0_100%] transition-[background-size] hover:bg-[length:100%_1px] w-fit duration-500;
+}
+
+.default-link {
+  @apply from-[var(--ui-text-muted)] to-[var(--ui-text-muted)];
 }
 
 .atp-link {
-  @apply inline-block relative text-atp hover:text-atp-800 dark:hover:text-atp-300 after:bg-atp-800 dark:after:bg-atp-300 after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:origin-center after:transition-all after:ease-in-out after:duration-500 hover:after:scale-x-100;
+  @apply from-[var(--ui-atp)] to-[var(--ui-atp)] text-atp hover:text-atp;
 }
 
 .wta-link {
-  @apply inline-block relative text-wta hover:text-wta-700 dark:hover:text-wta-300 after:bg-wta-700 dark:after:bg-wta-300 after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:origin-center after:transition-all after:ease-in-out after:duration-500 hover:after:scale-x-100;
+  @apply from-[var(--ui-wta)] to-[var(--ui-wta)] text-wta hover:text-wta;
 }
 
 .men-link {
-  @apply inline-block relative text-men hover:text-men-700 dark:hover:text-men-300 after:bg-men-700 dark:after:bg-men-300 after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:origin-center after:transition-all after:ease-in-out after:duration-500 hover:after:scale-x-100;
+  @apply from-[var(--ui-men)] to-[var(--ui-men)] text-men hover:text-men;
 }
 
 .women-link {
-  @apply inline-block relative text-women hover:text-women-700 dark:hover:text-women-300 after:bg-women-700 dark:after:bg-women-300 after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:origin-center after:transition-all after:ease-in-out after:duration-500 hover:after:scale-x-100;
+  @apply from-[var(--ui-women)] to-[var(--ui-women)] text-women hover:text-women;
 }
 
-.joint-link {
-  @apply inline-block relative text-joint dark:text-joint-400 hover:text-joint-800 dark:hover:text-joint-300 after:bg-joint-800 dark:after:bg-joint-300 after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:origin-center after:transition-all after:ease-in-out after:duration-500 hover:after:scale-x-100;
+.primary-link {
+  @apply from-[var(--ui-primary)] to-[var(--ui-primary)] text-primary hover:text-primary;
 }
 
 .gs {
@@ -65,7 +71,7 @@
 }
 
 .a1000 {
-  @apply text-joint-600 dark:text-joint-400;
+  @apply text-active-600 dark:text-active-400;
 }
 
 .a500 {

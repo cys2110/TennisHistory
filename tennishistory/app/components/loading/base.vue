@@ -1,7 +1,5 @@
-<script setup lang="ts"></script>
-
 <template>
-  <u-card class="ring-joint">
-    <u-skeleton class="h-3 w-full" />
+  <u-card class="ring-primary">
+    <u-skeleton class="h-5 w-full" />
   </u-card>
 </template>

@@ -32,5 +32,8 @@ export default defineEventHandler(async query => {
     }
   })
 
-  return results
+  return {
+    ...results,
+    tours: results.tours.map((tour: TourType) => tour.replace("Men", "ITF (M)").replace("Women", "ITF (W)"))
+  }
 })

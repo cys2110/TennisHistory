@@ -7,7 +7,7 @@ export default defineEventHandler(async query => {
       WITH e, [x in labels(e) WHERE NOT x IN ['Event', 'Update']] AS tours, t
       RETURN
       {
-        tournament: properties(t),
+        tournament: apoc.map.submap(t, ['id', 'name']),
         tours: tours,
         atp_link: e.atp_link,
         wiki_link: e.wiki_link,

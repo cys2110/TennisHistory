@@ -29,9 +29,7 @@ export default defineEventHandler(async query => {
     const round = record.get("round")
     const numberKeys = ["pm", "points", "number"]
     for (const key of numberKeys) {
-      if (round[key]) {
-        round[key] = round[key].toInt()
-      }
+      if (round[key]) round[key] = round[key].toInt()
     }
     return round
   })

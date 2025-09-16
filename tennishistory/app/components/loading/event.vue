@@ -6,7 +6,7 @@ const smAndDown = breakpoints.smaller("md")
 <template>
   <u-card
     v-if="smAndDown"
-    class="ring-joint"
+    class="ring-primary"
   >
     <template #header>
       <u-skeleton class="h-3 w-full" />
@@ -34,7 +34,6 @@ const smAndDown = breakpoints.smaller("md")
   <u-page-card
     v-else
     highlight
-    highlight-color="joint"
     reverse
     :ui="{
       wrapper: 'order-last flex flex-col items-start',
@@ -62,7 +61,7 @@ const smAndDown = breakpoints.smaller("md")
     </template>
 
     <template #footer>
-      <u-skeleton class="h-6 w-50" />
+      <u-skeleton class="h-6 w-40" />
     </template>
   </u-page-card>
 </template>

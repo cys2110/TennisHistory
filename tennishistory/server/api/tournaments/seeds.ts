@@ -42,7 +42,7 @@ export default defineEventHandler(async event => {
       COLLECT(
         DISTINCT
         apoc.map.merge(
-          properties(p),
+          apoc.map.submap(p, ['id', 'first_name', 'last_name']),
           {
             seed: f.seed,
             country:
@@ -102,7 +102,7 @@ export default defineEventHandler(async event => {
           WHEN p IS NULL THEN null
           ELSE
             apoc.map.merge(
-              properties(p),
+              apoc.map.submap(p, ['id', 'first_name', 'last_name']),
               {
                 seed: f.seed,
                 country:

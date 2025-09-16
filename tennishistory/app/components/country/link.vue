@@ -13,7 +13,7 @@ const { iconOnly = true } = defineProps<{ country: CountryInterface; iconOnly?: 
     />
     <span
       v-if="!iconOnly"
-      class="hover-link w-fit"
+      class="hover-link default-link w-fit"
     >
       {{ country.name }}
     </span>

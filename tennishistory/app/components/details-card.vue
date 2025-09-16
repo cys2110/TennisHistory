@@ -10,7 +10,7 @@ defineProps<{
 <template>
   <u-card
     :ui="{
-      root: tour ? `ring-${getTourColor(Array.isArray(tour) ? tour : [tour])}` : 'ring-joint',
+      root: tour ? `ring-${getTourColour(Array.isArray(tour) ? tour : [tour])}` : 'ring-joint',
       header: 'font-semibold text-muted flex justify-between items-center',
       body: 'text-center text-sm'
     }"

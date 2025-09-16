@@ -53,8 +53,6 @@ const columns: TableColumn<EventInterface>[] = [
   }
 ]
 
-const columnFilters = ref([])
-
 const grouping = ref<string[]>([])
 const grouping_options = ref<GroupingOptions>({
   getGroupedRowModel: getGroupedRowModel()
@@ -102,7 +100,6 @@ const handleSelectRow = async (row: TableRow<EventInterface>) => {
           :columns
           :loading="['idle', 'pending'].includes(status)"
           sticky
-          v-model:column-filters="columnFilters"
           :faceted-options="{
             getFacetedRowModel: getFacetedRowModel(),
             getFacetedUniqueValues: getFacetedUniqueValues()

@@ -43,43 +43,32 @@ const sortOptions = computed(() => {
 })
 
 const columnFilterValue = computed({
-  get: () => column.getFilterValue(),
-  set: (value: any) => column.setFilterValue(value)
+  get: () => (column.getFilterValue() as string[]) ?? [],
+  set: (value: any) =>
+    column.setFilterValue(
+      Array.isArray(value) ? value
+      : value ? [value]
+      : []
+    )
 })
 
 const sortedUniqueValues = computed(() => {
-  const uniqueValues = Array.from(column.getFacetedUniqueValues().keys()).filter(Boolean)
-  if (Array.isArray(uniqueValues[0])) {
-    return useArrayUnique(
-      uniqueValues
-        .flat()
-        .sort((a, b) => {
-          if (type === "alpha") {
-            return a.localeCompare(b)
-          } else {
-            return parseFloat(a) - parseFloat(b)
-          }
-        })
-        .map(v => {
-          if (v === "Men") return "ITF (M)"
-          if (v === "Women") return "ITF (W)"
-          return v
-        })
-    ).value
-  }
+  const facetedValues = Array.from(column.getFacetedUniqueValues().keys()) // get faceted values
+    .filter(Boolean) // filter any undefined values
+    .sort((a, b) => {
+      if (type === "alpha") {
+        return a.localeCompare(b)
+      } else {
+        return parseFloat(a) - parseFloat(b)
+      }
+    }) // sort the values
 
-  return uniqueValues.sort((a, b) => {
-    if (type === "alpha") {
-      return a.localeCompare(b)
-    } else {
-      return parseFloat(a) - parseFloat(b)
-    }
-  })
+  return useArrayUnique(facetedValues).value // Return only unique values
 })
 </script>
 
 <template>
-  <div class="w-fit flex justify-center items-center gap-1 mx-auto">
+  <div class="w-fit flex justify-center items-center gap-2 mx-auto">
     <u-dropdown-menu :items="sortOptions">
       <u-button
         color="neutral"
@@ -91,8 +80,9 @@ const sortedUniqueValues = computed(() => {
     <u-select-menu
       v-model="columnFilterValue"
       :items="sortedUniqueValues"
-      class="w-fit"
+      class="w-fit max-w-50"
       :placeholder="label"
+      multiple
     >
       <template #content-bottom>
         <u-button
@@ -100,7 +90,7 @@ const sortedUniqueValues = computed(() => {
           color="neutral"
           variant="link"
           size="xs"
-          @click="columnFilterValue = undefined"
+          @click="columnFilterValue = []"
           label="Clear"
           block
           class="border-t rounded-t-none border-muted"

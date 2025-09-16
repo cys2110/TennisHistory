@@ -1,4 +1,5 @@
 <script setup lang="ts">
+defineProps<{ tours?: TourType[] }>()
 const modelValue = defineModel<TourType[]>()
 </script>
 
@@ -6,7 +7,9 @@ const modelValue = defineModel<TourType[]>()
   <u-checkbox-group
     legend="Tour"
     v-model="modelValue"
-    :items="TOUR_OPTIONS"
-    orientation="horizontal"
+    :items="tours ?? TOUR_OPTIONS"
+    :ui="{
+      item: 'ml-3'
+    }"
   />
 </template>

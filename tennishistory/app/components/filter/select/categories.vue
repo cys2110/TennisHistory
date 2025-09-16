@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { categories } = defineProps<{ categories?: CategoryType[] }>()
 const {
   icons,
   ui: { icons: appIcons }
@@ -6,22 +7,8 @@ const {
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
 const middleSizes = breakpoints.between("md", "xl")
 const modelValue = defineModel<CategoryType[]>()
-const tours = defineModel<TourType[]>("tour")
 
-const options = computed(() => {
-  if (tours.value === undefined || tours.value.length === 4) {
-    return useArrayUnique([...ATP_CATEGORIES, ...WTA_CATEGORIES, ...ITF_MEN_CATEGORIES, ...ITF_WOMEN_CATEGORIES]).value
-  } else {
-    const categories: CategoryType[] = []
-
-    if (tours.value.includes("ATP")) categories.push(...ATP_CATEGORIES)
-    if (tours.value.includes("WTA")) categories.push(...WTA_CATEGORIES)
-    if (tours.value.includes("ITF (M)")) categories.push(...ITF_MEN_CATEGORIES)
-    if (tours.value.includes("ITF (W)")) categories.push(...ITF_WOMEN_CATEGORIES)
-
-    return useArrayUnique(categories).value
-  }
-})
+const allCategories = useArrayUnique([...ATP_CATEGORIES, ...WTA_CATEGORIES, ...ITF_MEN_CATEGORIES, ...ITF_WOMEN_CATEGORIES]).value
 </script>
 
 <template>
@@ -32,7 +19,7 @@ const options = computed(() => {
     <u-select-menu
       v-model="modelValue"
       multiple
-      :items="options"
+      :items="categories ?? allCategories"
       :icon="icons.categories"
       placeholder="Select categories"
     >

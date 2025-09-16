@@ -4,10 +4,7 @@ import type { TableColumn, TableRow } from "@nuxt/ui"
 import { type Column, getFacetedRowModel, getFacetedUniqueValues } from "@tanstack/vue-table"
 
 useHead({ title: "Countries" })
-const {
-  icons,
-  ui: { icons: uIcons }
-} = useAppConfig()
+const { icons } = useAppConfig()
 
 useJsonld(() => ({
   "@context": "https://schema.org",
@@ -26,26 +23,11 @@ const { data: countries, status } = await useFetch<CountryInterface[]>("/api/cou
 const columns: TableColumn<CountryInterface>[] = [
   {
     accessorKey: "name",
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Country",
-        type: "alpha"
-      }),
-    cell: ({ row }) =>
-      h(CountryLink, {
-        country: row.original,
-        iconOnly: false,
-        class: "mx-auto"
-      }),
-    footer: ({ table }) => {
-      const filteredRows = table.getFilteredRowModel().rows
-      return `Total: ${filteredRows.length}`
-    }
+    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Country", type: "alpha" }),
+    cell: ({ row }) => h(CountryLink, { country: row.original, iconOnly: false, class: "mx-auto" }),
+    footer: ({ table }) => `Total: ${table.getRowCount()}`
   }
 ]
-
-const columnFilters = ref([])
 
 const handleSelectRow = async (row: TableRow<CountryInterface>) => {
   await navigateTo({ name: "country", params: { id: row.original.id, name: kebabCase(row.original.name) } })
@@ -68,7 +50,6 @@ const handleSelectRow = async (row: TableRow<CountryInterface>) => {
           :columns
           :loading="['idle', 'pending'].includes(status)"
           sticky
-          v-model:column-filters="columnFilters"
           :faceted-options="{
             getFacetedRowModel: getFacetedRowModel(),
             getFacetedUniqueValues: getFacetedUniqueValues()
@@ -77,20 +58,14 @@ const handleSelectRow = async (row: TableRow<CountryInterface>) => {
           :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer' }"
         >
           <template #loading>
-            <u-icon
-              :name="uIcons.loading"
-              class="size-8"
-            />
+            <loading-icon />
           </template>
 
           <template #empty>
-            <div class="flex justify-center items-center w-full gap-2 text-error">
-              <u-icon
-                :name="icons.noCountries"
-                class="text-base"
-              />
-              No countries found
-            </div>
+            <empty-message
+              :icon="icons.noCountries"
+              message="No countries found"
+            />
           </template>
         </u-table>
       </template>

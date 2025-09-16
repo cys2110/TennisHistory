@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from "vue-router"
+
 const {
   tournament,
   year,
@@ -23,23 +25,26 @@ const isDisabled = computed(() => new Date() < startDate.value)
     :disabled="!isDisabled"
     text="Event has not started yet"
   >
-    <u-button-group :size>
+    <u-field-group :size>
       <u-button
         v-for="page in EVENT_PAGES"
         :key="page.name"
         :label="page.label"
         :icon="page.icon"
-        :to="{
-          name: page.name,
-          params: {
-            id: tournament.id,
-            name: kebabCase(tournament.name),
-            year,
-            eid: id
-          }
-        }"
+        :to="
+          {
+            name: page.name,
+            params: {
+              id: tournament.id,
+              name: kebabCase(tournament.name),
+              year,
+              eid: id
+            }
+          } as RouteLocationRaw
+        "
         :disabled="isDisabled"
+        :ui="{ leadingIcon: page.name === 'draws' ? 'rotate-270' : '' }"
       />
-    </u-button-group>
+    </u-field-group>
   </u-tooltip>
 </template>

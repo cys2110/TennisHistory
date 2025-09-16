@@ -68,10 +68,7 @@ onMounted(() => {
 })
 
 const columns: TableColumn<PersonInterface>[] = [
-  {
-    accessorKey: "first_name",
-    footer: () => `Total: ${data.value?.[0]?.total ?? 0}`
-  },
+  { accessorKey: "first_name", footer: () => `Total: ${data.value?.[0]?.total ?? 0}` },
   { accessorKey: "last_name" }
 ]
 

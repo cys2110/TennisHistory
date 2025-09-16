@@ -1,7 +1,6 @@
 <template>
   <u-page-card
     highlight
-    highlight-color="joint"
     :ui="{ body: 'w-full', leading: 'flex items-center justify-between w-full' }"
   >
     <template #leading>

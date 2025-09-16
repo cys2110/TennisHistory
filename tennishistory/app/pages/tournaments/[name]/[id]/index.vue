@@ -1,18 +1,14 @@
 <script setup lang="ts">
-import { TournamentNumbers, TournamentWinners } from "#components"
-
 definePageMeta({ name: "tournament" })
 const {
   params: { id, name }
-} = useRoute()
+} = useRoute("tournament")
 const {
   icons,
-  ui: { icons: appIcons }
+  ui: { icons: uIcons }
 } = useAppConfig()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
-const mdAndDown = breakpoints.smallerOrEqual("md")
 const mdAndUp = breakpoints.greaterOrEqual("md")
-const xlAndUp = breakpoints.greaterOrEqual("xl")
 
 const selectedTab = ref("winners")
 const tabs = [
@@ -27,55 +23,83 @@ const { data: tournament } = await useFetch<TournamentInterface>("/api/tournamen
 })
 
 useHead({ title: () => tournament.value?.name ?? capitalCase(name as string) })
-
+useJsonld(() => ({
+  "@context": "https://schema.org",
+  "@type": "Event",
+  name: tournament.value?.name || capitalCase(name as string),
+  identifier: tournament.value?.id.toString()
+}))
 provide<TourType[]>("tours", tournament.value?.tours || [])
 provide<string>("tournamentName", tournament.value?.name || capitalCase(name as string))
 </script>
 
 <template>
-  <page-wrapper>
-    <template #nav-right>
-      <u-button
-        v-if="tournament?.website"
-        :to="tournament.website"
-        target="_blank"
-        :label="mdAndUp ? 'Website' : undefined"
-        :icon="appIcons.external"
-        size="xs"
-      />
-    </template>
-
-    <template #toolbar>
-      <div class="flex items-center gap-2">
-        <u-badge
-          v-if="tournament"
-          v-for="tour in tournament.tours"
-          :key="tour"
-          :label="tour"
-          :color="getTourColor([tour])"
-          :size="mdAndDown ? 'md' : 'lg'"
-        />
-      </div>
-      <u-tabs
+  <u-container>
+    <u-page>
+      <template
+        #left
         v-if="!COUNTRY_DRAWS.includes(id as string)"
-        v-model="selectedTab"
-        :items="tabs"
-        variant="link"
-        :size="xlAndUp ? 'md' : 'sm'"
-      />
-      <div
-        v-if="mdAndUp"
-        class="text-(--ui-text-muted) font-semibold"
       >
-        <span v-if="tournament?.established">{{ tournament.established }}</span>
-        <span v-if="tournament?.established && !tournament.abolished"> - present</span>
-        <span v-else-if="tournament?.abolished && tournament.established !== tournament.abolished"> - {{ tournament.abolished }}</span>
-      </div>
-    </template>
+        <u-page-aside>
+          <u-tabs
+            :items="tabs"
+            v-model="selectedTab"
+            variant="link"
+            orientation="vertical"
+          />
+        </u-page-aside>
+      </template>
 
-    <component
-      :is="selectedTab === 'winners' ? TournamentWinners : TournamentNumbers"
-      :key="selectedTab"
-    />
-  </page-wrapper>
+      <template #right>
+        <u-page-aside>
+          <div id="page-right" />
+        </u-page-aside>
+      </template>
+
+      <u-page-header
+        :title="tournament?.name ?? capitalCase(name as string)"
+        :ui="{ description: 'flex items-center justify-between' }"
+      >
+        <template #headline>
+          <div
+            v-if="tournament?.tours"
+            class="flex items-center gap-2"
+          >
+            <u-badge
+              v-for="tour in tournament.tours"
+              :key="tour"
+              :label="tour"
+              :color="getTourColour(tour)"
+            />
+          </div>
+        </template>
+
+        <template #description>
+          <div>
+            <span v-if="tournament?.established">{{ tournament.established }}</span>
+            <span v-if="tournament?.established && !tournament.abolished"> - present</span>
+            <span v-else-if="tournament?.abolished && tournament.established !== tournament.abolished"> - {{ tournament.abolished }}</span>
+          </div>
+          <div id="header-description" />
+        </template>
+
+        <template #links>
+          <u-button
+            v-if="tournament?.website"
+            :to="tournament.website"
+            target="_blank"
+            :label="mdAndUp ? 'Website' : undefined"
+            :icon="uIcons.external"
+          />
+          <div id="header-links" />
+        </template>
+      </u-page-header>
+
+      <u-page-body>
+        <tournament-winners v-if="selectedTab === 'winners'" />
+
+        <tournament-numbers v-else />
+      </u-page-body>
+    </u-page>
+  </u-container>
 </template>

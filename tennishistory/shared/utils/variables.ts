@@ -6,6 +6,7 @@ export const ATP_CATEGORIES: CategoryType[] = [
   "ATP 250",
   "Next Gen ATP Finals",
   "Laver Cup",
+  "ATP Challenger 175",
   "ATP Challenger 125",
   "ATP Challenger 100",
   "ATP Challenger 75",
@@ -42,7 +43,13 @@ export const WTA_CATEGORIES: CategoryType[] = [
   "NTL"
 ]
 
-export const ATP_CHALLENGER_CATEGORIES: CategoryType[] = ["ATP Challenger 125", "ATP Challenger 100", "ATP Challenger 75", "ATP Challenger 50"]
+export const ATP_CHALLENGER_CATEGORIES: CategoryType[] = [
+  "ATP Challenger 175",
+  "ATP Challenger 125",
+  "ATP Challenger 100",
+  "ATP Challenger 75",
+  "ATP Challenger 50"
+]
 
 export const WTA_CHALLENGER_CATEGORIES: CategoryType[] = ["WTA 125"]
 

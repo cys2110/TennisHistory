@@ -1,14 +1,15 @@
 <script setup lang="ts">
-defineProps<{
-  labels: string[]
+const { match_no } = defineProps<{
+  tour: TourType
+  type: MatchType
   sets: number[][][]
-  tournament: TournamentInterface
+  tournament: Pick<TournamentInterface, "name" | "id">
   id: number
-  year: string
+  year: number
   match_no: number
   incomplete?: IncompleteType | null
   centred?: boolean
-  stats?: boolean
+  stats: boolean
 }>()
 </script>
 
@@ -19,7 +20,7 @@ defineProps<{
   >
     <u-link
       v-if="stats"
-      class="hover-link"
+      class="hover-link default-link"
       :to="{
         name: 'match',
         params: {
@@ -27,22 +28,28 @@ defineProps<{
           id: tournament.id,
           year,
           eid: id,
-          mid: constructMid(match_no, labels)
+          mid: constructMid(match_no, tour, type, 'Main')
         }
       }"
     >
       <span
-        v-if="sets[0] && sets[1]"
-        v-for="(set, index) in sets[0]?.length"
+        v-for="(set, index) in sets[0]"
         :key="index"
       >
         <!--@vue-ignore-->
-        {{ sets[0][index][0] }}{{ sets[1][index][0]
-        }}<sup v-if="sets[0]?.[index]?.[1] && sets[1]?.[index]?.[1]">{{
-          sets[0][index][1] > sets[1][index][1] ? sets[1][index][1] : sets[0][index][1]
-        }}</sup>
+        {{ set[0] }}{{ sets[1][index][0]
+        }}<sup v-if="set[1] && sets[1]?.[index]?.[1]">{{ set[1] > sets[1][index][1] ? sets[1][index][1] : set[1] }}</sup>
       </span>
     </u-link>
+    <span
+      v-else
+      v-for="(set, index) in sets[0]"
+      :key="index"
+    >
+      <!--@vue-ignore-->
+      {{ set[0] }}{{ sets[1][index][0]
+      }}<sup v-if="set?.[1] && sets[1]?.[index]?.[1]">{{ set[1] > sets[1][index][1] ? sets[1][index][1] : set[1] }}</sup>
+    </span>
     <u-badge
       v-if="incomplete"
       size="sm"

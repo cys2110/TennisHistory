@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "@nuxt/image", "@vueuse/nuxt", "nuxt-echarts", "nuxt-neo4j", "@nuxt/ui-pro", "@nuxt/content"],
+  modules: ["@nuxt/eslint", "@nuxt/image", "nuxt-echarts", "nuxt-neo4j", "@vueuse/nuxt", "@nuxt/ui", "@nuxt/content", "nuxt-jsonld"],
   // Set page transitions
   app: { pageTransition: { name: "page", mode: "out-in" } },
   // Set scroll behaviour
@@ -29,7 +29,9 @@ export default defineNuxtConfig({
           "set",
           "useArrayFilter",
           "useArrayMap",
-          "useArrayJoin"
+          "useArrayJoin",
+          "useArrayFindLast",
+          "useArraySome"
         ]
       },
       {
@@ -75,7 +77,6 @@ export default defineNuxtConfig({
     theme: {
       colors: [
         "primary",
-        "joint",
         "neutral",
         "warning",
         "error",

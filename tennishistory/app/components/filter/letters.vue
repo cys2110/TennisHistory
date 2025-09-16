@@ -1,36 +1,27 @@
 <script setup lang="ts">
-const { allLetters = true } = defineProps<{ ui?: any; allLetters?: boolean }>()
+const { lettersOnly = false } = defineProps<{ ui?: any; lettersOnly?: boolean }>()
 
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
 const middleSizes = breakpoints.between("lg", "xl")
-const lgAndUp = breakpoints.greaterOrEqual("lg")
 const modelValue = defineModel<string>()
 
-const letters = computed(() => {
-  if (allLetters) {
-    return [
-      { label: "All", value: undefined },
-      ...LETTERS.map(letter => ({
-        label: letter,
-        value: letter
-      }))
-    ]
-  } else {
-    return LETTERS.map(letter => ({
-      label: letter,
-      value: letter
-    }))
-  }
-})
+const letters = computed(() => [
+  ...(lettersOnly ? [] : [{ label: "All", value: undefined }]),
+  ...LETTERS.map(letter => ({
+    label: letter,
+    value: letter
+  }))
+])
 </script>
 
 <template>
   <u-radio-group
     v-model="modelValue"
+    legend="Filter by letter"
     :items="letters"
-    :orientation="lgAndUp ? 'horizontal' : 'vertical'"
+    orientation="vertical"
     :size="middleSizes ? 'sm' : 'lg'"
-    class="mx-auto"
-    :ui
+    class="mx-auto my-5"
+    :ui="{ item: 'ml-5', ...ui }"
   />
 </template>

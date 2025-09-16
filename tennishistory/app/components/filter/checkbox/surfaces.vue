@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineProps<{
+  environments?: EnvironmentType[]
+  surfaces?: SurfaceType[]
+}>()
 const modelValue = defineModel<SurfaceType[]>()
 const environment = defineModel<EnvironmentType[]>("environment")
 </script>
@@ -7,13 +11,17 @@ const environment = defineModel<EnvironmentType[]>("environment")
   <u-checkbox-group
     legend="Environment"
     v-model="environment"
-    :items="ENVIRONMENTS"
-    orientation="horizontal"
+    :items="environments ?? ENVIRONMENTS"
+    orientation="vertical"
+    :ui="{ item: 'ml-3' }"
+    class="my-2"
   />
   <u-checkbox-group
     legend="Surfaces"
     v-model="modelValue"
-    :items="SURFACES"
-    orientation="horizontal"
+    :items="surfaces ?? SURFACES"
+    orientation="vertical"
+    :ui="{ item: 'ml-3', root: 'my-2' }"
+    class="my-2"
   />
 </template>

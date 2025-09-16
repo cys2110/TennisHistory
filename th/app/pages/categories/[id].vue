@@ -175,7 +175,6 @@ const columns = computed<TableColumn<EventInterface>[]>(() => [
   }
 ])
 
-const columnFilters = ref([])
 const columnVisibility = computed(() => ({
   venue: get(lgAndUp)
 }))
@@ -209,7 +208,6 @@ const columnPinning = ref({
             getFacetedRowModel: getFacetedRowModel(),
             getFacetedUniqueValues: getFacetedUniqueValues()
           }"
-          v-model:columnFilters="columnFilters"
           v-model:column-visibility="columnVisibility"
           v-model:column-pinning="columnPinning"
           render-fallback-value="Various"
