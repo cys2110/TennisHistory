@@ -40,15 +40,13 @@ const sortOptions = computed(() => {
 </script>
 
 <template>
-  <div class="w-full flex justify-center items-center gap-1">
-    <u-dropdown-menu :items="sortOptions">
-      <u-button
-        color="neutral"
-        variant="ghost"
-        :label="label ?? undefined"
-        :icon="getIcon"
-        class="-mx-2.5 data-[state=open]:bg-elevated"
-      />
-    </u-dropdown-menu>
-  </div>
+  <u-dropdown-menu :items="sortOptions">
+    <u-button
+      color="neutral"
+      variant="ghost"
+      :label="label ?? undefined"
+      :icon="getIcon"
+      class="-mx-2.5 data-[state=open]:bg-elevated"
+    />
+  </u-dropdown-menu>
 </template>

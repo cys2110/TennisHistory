@@ -106,6 +106,8 @@ export default defineAppConfig({
       }
     },
     tabs: { slots: { trigger: "cursor-pointer" } },
-    progress: { slots: { status: "!w-full" } }
+    progress: { slots: { status: "!w-full" } },
+    calendar: { slots: { cell: "cursor-pointer" } },
+    contextMenu: { slots: { item: "cursor-pointer" } }
   }
 })

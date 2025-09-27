@@ -130,11 +130,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => {
           : [])
       ]
     case "results-archive":
-      return [
-        ...crumbs,
-        { label: "Results Archive", icon: ICONS.event, to: { name: "results-archive" } },
-        { label: query.year ?? new Date().getFullYear() }
-      ] as BreadcrumbItem[]
+      return [...crumbs, { label: "Results Archive", icon: ICONS.event, to: { name: "results-archive" } }] as BreadcrumbItem[]
     // case "statistics-and-records":
     //   return [...crumbs, { label: "Statistics and Records", icon: icons.stats, to: { name: "statistics-and-records" } }]
     case "tournament":
@@ -176,8 +172,6 @@ const pageTitle = computed(() => {
       return data.value
         ? `${data.value.p1.first_name} ${data.value.p1.last_name} v ${data.value.p2.first_name} ${data.value.p2.last_name}`
         : `${capitalCase(p1Name as string)} v ${capitalCase(p2Name as string)}`
-    case "results-archive":
-      return `Results Archive ${query.year ?? new Date().getFullYear()}`
     case "years":
       return `Years - ${query.year ?? new Date().getFullYear()}`
     default:

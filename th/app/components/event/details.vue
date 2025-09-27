@@ -4,9 +4,6 @@ import type { TableColumn } from "@nuxt/ui"
 const {
   params: { eid, year }
 } = useRoute("event")
-const {
-  ui: { icons }
-} = useAppConfig()
 const tournamentName = useState<string>("tournament-name")
 
 // API call

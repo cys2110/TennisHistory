@@ -187,6 +187,7 @@ declare global {
     atp_sponsor_name?: string
     category: CategoryType
     categories: (CategoryType | undefined)[]
+    countries: CountryInterface[]
     currency: CurrencyType
     currencies: (CurrencyType | undefined)[]
     dates: (DateType | undefined)[][]
