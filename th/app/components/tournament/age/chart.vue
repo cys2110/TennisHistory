@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const { winners } = defineProps<{ winners: TournamentAgeType[] }>()
-const { icons, colours } = useAppConfig()
 const tours = inject<TourType[]>("tours", [])
 const tournamentName = inject<string>("tournamentName", "")
 const colorMode = useColorMode()
@@ -40,7 +39,7 @@ const formattedWinners = computed(() =>
 
 const option = computed(() => ({
   backgroundColor: "transparent",
-  textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+  textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
   grid: { containLabel: true },
   dataset: [
     {
@@ -125,7 +124,7 @@ const option = computed(() => ({
   >
     <u-button
       label="Chart"
-      :icon="icons.polarChart"
+      :icon="ICONS.polarChart"
     />
 
     <template #body>
@@ -163,7 +162,7 @@ const option = computed(() => ({
             class="flex items-center gap-2"
           >
             <u-icon
-              :name="icons.colours"
+              :name="ICONS.colours"
               :style="{ color: colour }"
             />
             <span class="mr-5">{{ player }}</span>

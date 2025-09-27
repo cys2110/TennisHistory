@@ -1,11 +1,21 @@
 <script setup lang="ts">
-import { CountryLink, FilterTableHeader, NameTableHeader, RangeTableHeader, UButton, ULink } from "#components"
-import type { TableColumn } from "@nuxt/ui"
+import {
+  ColouredBadge,
+  CountryLink,
+  TableCellGroup,
+  TableHeaderFilter,
+  TableHeaderGroup,
+  TableHeaderName,
+  TableHeaderRange,
+  UBadge,
+  UButton,
+  ULink
+} from "#components"
+import type { TableColumn, TableRow } from "@nuxt/ui"
 import { type Column, getFacetedRowModel, getFacetedUniqueValues, getGroupedRowModel, type GroupingOptions } from "@tanstack/vue-table"
 
 const {
-  icons,
-  ui: { icons: uIcons, colors }
+  ui: { icons, colors }
 } = useAppConfig()
 const {
   params: { id, name }
@@ -34,45 +44,26 @@ const { data: results, status } = await useFetch<APIResponseType[]>("/api/countr
 
 const columns = computed<TableColumn<APIResponseType>[]>(() => [
   {
+    id: "tour",
     accessorKey: "player.tour",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Tour",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Tour" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "tour" }, () =>
+        h(ColouredBadge, { label: row.getValue("tour") as string, class: "mx-auto" })
       )
   },
   {
     id: "country",
     accessorFn: row => row.player.country.name,
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Country",
-        type: "alpha"
-      }),
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Country" }),
     cell: ({ row }) => {
       if (!row.getIsGrouped() || grouping.value.length === 0) {
         return h(CountryLink, {
           country: row.original.player.country,
-          class: "mx-auto"
+          class: "mx-auto",
+          iconOnly: true
         })
       }
     }
@@ -81,11 +72,8 @@ const columns = computed<TableColumn<APIResponseType>[]>(() => [
     id: "name",
     accessorFn: row => `${row.player.last_name}, ${row.player.first_name}`,
     filterFn: (row, columnId, filterValue) => filterIncludesNameString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(NameTableHeader, {
-        column: column as Column<unknown>,
-        label: "Name"
-      }),
+    aggregationFn: "uniqueCount",
+    header: ({ column }) => h(TableHeaderName, { column: column as Column<unknown>, label: "Name" }),
     cell: ({ row }) => {
       if (!row.getIsGrouped() || grouping.value.length === 0) {
         return h(
@@ -99,103 +87,61 @@ const columns = computed<TableColumn<APIResponseType>[]>(() => [
           },
           () => `${row.original.player.first_name} ${row.original.player.last_name}`
         )
+      } else if (row.getIsGrouped()) {
+        return `${row.getValue("name")} players`
       }
     }
   },
   {
+    id: "type",
     accessorKey: "event.type",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "S/D",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "S/D" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "type" }, () =>
+        h(ColouredBadge, { label: row.getValue("type") as string, class: "mx-auto" })
       )
   },
   {
     id: "level",
     accessorFn: row =>
-      row.event.category === "Grand Slam" ? "Grand Slam"
-      : row.event.category === "Olympics" ? "Olympics"
-      : (
-        (row.event.atp_category && MASTERS_CATEGORIES.includes(row.event.atp_category)) ||
-        (row.event.wta_category && MASTERS_CATEGORIES.includes(row.event.wta_category))
-      ) ?
-        "Masters"
-      : "Year End Finals",
+      row.event.category === "Grand Slam"
+        ? "Grand Slam"
+        : row.event.category === "Olympics"
+        ? "Olympics"
+        : (row.event.atp_category && MASTERS_CATEGORIES.includes(row.event.atp_category)) ||
+          (row.event.wta_category && MASTERS_CATEGORIES.includes(row.event.wta_category))
+        ? "Masters"
+        : "Year End Finals",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Tournament Type",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Level" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "level" }, () =>
+        h(UBadge, {
+          label: row.getValue("level") as string,
+          color: levelBadgeMapping[row.getValue("level") as keyof typeof levelBadgeMapping] || "neutral",
+          class: "mx-auto"
+        })
       )
   },
   {
     id: "category",
     accessorFn: row => row.event.category ?? (row.player.tour === "ATP" ? row.event.atp_category : row.event.wta_category),
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Category" }),
+    cell: ({ row }) =>
       h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Category",
-            type: "alpha"
-          })
-        ]
+        TableCellGroup,
+        { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "category" },
+        () => row.getValue("category") as string
       )
   },
   {
+    id: "tournament",
     accessorKey: "event.tournament.name",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Tournament",
-        type: "alpha"
-      }),
+    aggregationFn: "count",
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Tournament" }),
     cell: ({ row }) => {
       if (!row.getIsGrouped() || grouping.value.length === 0) {
         return h(
@@ -209,16 +155,15 @@ const columns = computed<TableColumn<APIResponseType>[]>(() => [
           },
           () => row.original.event.tournament.name
         )
+      } else if (row.getIsGrouped()) {
+        return `${row.getValue("tournament")} tournaments`
       }
     }
   },
   {
+    id: "year",
     accessorKey: "event.year",
-    header: ({ column }) =>
-      h(RangeTableHeader, {
-        column: column as Column<unknown>,
-        label: "Year"
-      }),
+    header: ({ column }) => h(TableHeaderRange, { column: column as Column<unknown>, label: "Year" }),
     cell: ({ row }) => {
       if (!row.getIsGrouped() || grouping.value.length === 0) {
         return h(
@@ -242,36 +187,42 @@ const columns = computed<TableColumn<APIResponseType>[]>(() => [
   }
 ])
 
-const columnFilters = ref([])
-
 const grouping = ref<string[]>([])
-
 const grouping_options = ref<GroupingOptions>({
   getGroupedRowModel: getGroupedRowModel()
 })
-
 const table = useTemplateRef("table")
 </script>
 
 <template>
   <dashboard-subpanel
     :title="`Players who have won big titles representing ${countryName || capitalCase(name as string)}`"
-    :icon="icons.tournament"
+    :icon="ICONS.tournament"
     id="big-titles"
   >
     <template #right>
       <u-button
         label="Reset Sorting"
-        :icon="icons.sortAlpha"
+        :icon="ICONS.sortAlpha"
         @click="table?.tableApi.resetSorting()"
         size="sm"
       />
 
       <u-button
         label="Reset Grouping"
-        :icon="icons.ungroup"
+        :icon="ICONS.ungroup"
         @click="table?.tableApi.resetGrouping()"
         size="sm"
+      />
+      <u-button
+        label="Reset Filters"
+        :icon="ICONS.noFilter"
+        @click="table?.tableApi.resetColumnFilters()"
+        size="sm"
+      />
+      <table-visibility
+        v-if="table"
+        :table="table!"
       />
     </template>
 
@@ -281,7 +232,6 @@ const table = useTemplateRef("table")
       :columns
       :loading="['idle', 'pending'].includes(status)"
       sticky
-      v-model:column-filters="columnFilters"
       :faceted-options="{
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues()
@@ -292,99 +242,14 @@ const table = useTemplateRef("table")
       :ui="{ root: 'w-fit min-w-1/3 mx-auto', td: 'empty:p-0' }"
     >
       <template #loading>
-        <u-icon
-          :name="uIcons.loading"
-          class="size-8"
-        />
+        <table-loading-icon />
       </template>
 
       <template #empty>
-        <div class="flex justify-center items-center w-full gap-2 text-error">
-          <u-icon
-            :name="icons.noPlayer"
-            class="text-base"
-          />
-          No players found
-        </div>
-      </template>
-
-      <template #player_tour-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'player_tour'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <coloured-badge
-            v-if="(row.getIsGrouped() && row.groupingColumnId === 'player_tour') || (!grouping.includes('player_tour') && !row.getIsGrouped())"
-            :label="row.getValue('player_tour')"
-            class="mx-auto"
-          />
-        </div>
-      </template>
-
-      <template #event_type-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'event_type'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <coloured-badge
-            v-if="(row.getIsGrouped() && row.groupingColumnId === 'event_type') || (!grouping.includes('event_type') && !row.getIsGrouped())"
-            :label="row.getValue('event_type')"
-            class="mx-auto"
-          />
-        </div>
-      </template>
-
-      <template #level-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'level'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <u-badge
-            v-if="(row.getIsGrouped() && row.groupingColumnId === 'level') || (!grouping.includes('level') && !row.getIsGrouped())"
-            :label="row.getValue('level')"
-            :color="levelBadgeMapping[row.getValue('level') as keyof typeof levelBadgeMapping] || 'neutral'"
-            class="mx-auto"
-          />
-        </div>
-      </template>
-
-      <template #category-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'event_type'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <u-link
-            v-if="(row.getIsGrouped() && row.groupingColumnId === 'category') || (!grouping.includes('category') && !row.getIsGrouped())"
-            :to="{ name: 'category', params: { id: kebabCase(row.getValue('category') as string) } }"
-            class="hover-link default-link w-fit mx-auto"
-          >
-            {{ row.getValue("category") }}
-          </u-link>
-        </div>
+        <table-empty-message
+          :icon="ICONS.noTournament"
+          :message="`No players have won big titles representing ${countryName || capitalCase(name as string)}`"
+        />
       </template>
     </u-table>
   </dashboard-subpanel>

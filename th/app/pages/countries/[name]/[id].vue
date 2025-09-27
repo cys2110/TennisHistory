@@ -3,7 +3,6 @@ definePageMeta({ name: "country" })
 const {
   params: { id, name }
 } = useRoute("country")
-const { icons } = useAppConfig()
 
 // API call
 const { data: country } = await useFetch<CountryInterface>("/api/countries/overview", {
@@ -19,11 +18,11 @@ watch(country, () => {
 })
 
 const toc = [
-  { label: "Number Ones", to: "#number-ones", icon: icons.one },
-  { label: "Big Titles", to: "#big-titles", icon: icons.tournament },
-  { label: "Venues", to: "#venues", icon: icons.venue },
-  { label: "Events", to: "#events", icon: icons.event },
-  { label: "Players", to: "#players", icon: icons.player }
+  { label: "Number Ones", to: "#number-ones", icon: ICONS.one },
+  { label: "Big Titles", to: "#big-titles", icon: ICONS.tournament },
+  { label: "Venues", to: "#venues", icon: ICONS.venue },
+  { label: "Events", to: "#events", icon: ICONS.event },
+  { label: "Players", to: "#players", icon: ICONS.player }
 ]
 </script>
 
@@ -39,7 +38,7 @@ const toc = [
           <template #right>
             <u-dropdown-menu :items="toc">
               <u-button
-                :icon="icons.toc"
+                :icon="ICONS.toc"
                 variant="ghost"
               />
             </u-dropdown-menu>

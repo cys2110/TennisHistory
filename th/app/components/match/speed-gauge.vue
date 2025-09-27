@@ -3,7 +3,6 @@ const { stat } = defineProps<{
   stat: MatchStatsInterface
 }>()
 const colorMode = useColorMode()
-const { colours } = useAppConfig()
 
 const kmhData = [
   {
@@ -11,22 +10,22 @@ const kmhData = [
     name: stat.label,
     title: {
       offsetCenter: ["0%", "100%"],
-      color: colorMode.value === "dark" ? colours.darkText : colours.lightText
+      color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText
     },
     detail: {
       offsetCenter: ["-100%", "100%"],
-      color: colours.indigo700,
-      borderColor: colours.indigo700
+      color: COLOURS.indigo700,
+      borderColor: COLOURS.indigo700
     },
-    itemStyle: { color: colours.indigo700 }
+    itemStyle: { color: COLOURS.indigo700 }
   },
   {
     value: stat.p2,
-    itemStyle: { color: colours.fuchsia600 },
+    itemStyle: { color: COLOURS.fuchsia600 },
     detail: {
       offsetCenter: ["100%", "100%"],
-      color: colours.fuchsia600,
-      borderColor: colours.fuchsia600
+      color: COLOURS.fuchsia600,
+      borderColor: COLOURS.fuchsia600
     }
   }
 ]
@@ -42,7 +41,7 @@ const option = ref({
       axisLine: { show: false },
       axisLabel: {
         distance: 25,
-        color: colorMode.value === "dark" ? colours.darkText : colours.lightText
+        color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText
       },
       title: { fontSize: 14 },
       detail: {

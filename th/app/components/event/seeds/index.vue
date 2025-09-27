@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ArrayFilterTableHeader, CountryLink, FilterTableHeader, NameTableHeader, RangeTableHeader, UBadge, UButton, ULink } from "#components"
-import type { TableColumn } from "@nuxt/ui"
+import { ColouredBadge, CountryLink, TableCellGroup, TableHeaderFilter, TableHeaderGroup, TableHeaderRange, UButton, ULink } from "#components"
+import type { TableColumn, TableRow } from "@nuxt/ui"
 import {
   type Column,
   createColumnHelper,
@@ -14,11 +14,6 @@ import {
 const {
   params: { eid, year }
 } = useRoute("event")
-const {
-  icons,
-  ui: { icons: uIcons }
-} = useAppConfig()
-const { tableMode } = useDefaults()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const mdAndUp = breakpoints.greaterOrEqual("md")
 const tours = useState<TourType[]>("tours")
@@ -36,88 +31,36 @@ const columnHelper = createColumnHelper<SeedInterface>()
 
 const columns = computed<TableColumn<SeedInterface>[]>(() => [
   {
-    id: "expand",
-    cell: ({ row }: { row: any }) => {
-      if (row.getIsGrouped()) {
-        return h(UButton, {
-          variant: "link",
-          color: "neutral",
-          class: "mr-2",
-          size: "xs",
-          icon: uIcons.chevronDoubleRight,
-          ui: {
-            leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
-          },
-          onClick: () => row.toggleExpanded()
-        })
-      }
-    }
-  },
-  {
     accessorKey: "tour",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Tour",
-        type: "alpha"
-      }),
-    cell: ({ row }) => {
-      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && row.depth === 0)) {
-        return h(UBadge, {
-          label: row.original.tour,
-          color: getTourColour(row.original.tour),
-          class: "font-semibold"
-        })
-      }
-    }
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Tour" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "tour" }, () =>
+        h(ColouredBadge, { label: row.original.tour, class: "mx-auto" })
+      )
   },
   {
     accessorKey: "type",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "S/D",
-        type: "alpha"
-      }),
-    cell: ({ row }) => {
-      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && (tours.value.length > 1 ? row.depth === 1 : row.depth === 0))) {
-        return h(UBadge, {
-          label: row.original.type,
-          color: getMatchTypeColour(row.original.type),
-          class: "font-semibold"
-        })
-      }
-    }
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "S/D" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "type" }, () =>
+        h(ColouredBadge, { label: row.original.type, class: "mx-auto" })
+      )
   },
   {
     accessorKey: "draw",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Draw",
-        type: "alpha"
-      }),
-    cell: ({ row }) => {
-      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && (tours.value.length > 1 ? row.depth === 2 : row.depth === 1))) {
-        return h(UBadge, {
-          label: row.original.draw,
-          color: getDrawColour(row.original.draw),
-          class: "font-semibold"
-        })
-      }
-    }
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Draw" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "draw" }, () =>
+        h(ColouredBadge, { label: row.original.draw, class: "mx-auto" })
+      )
   },
   {
     accessorKey: "seed",
-    header: ({ column }) =>
-      h(RangeTableHeader, {
-        column: column as Column<unknown>,
-        label: "Seed"
-      }),
-    cell: ({ row, cell }) => (tableMode.value === "ungrouped" || !row.getIsGrouped() ? cell.getValue() : undefined)
+    header: ({ column }) => h(TableHeaderRange, { column: column as Column<unknown>, label: "Seed" }),
+    cell: ({ row, cell }) => (!row.getIsGrouped() || grouping.value.length === 0 ? cell.getValue() : undefined)
   },
   columnHelper.group({
     header: "Player(s)",
@@ -126,19 +69,15 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
         id: "country",
         accessorFn: row => row.team.map(player => player.country.name),
         sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
-        header: ({ column }) =>
-          h(ArrayFilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Country",
-            type: "alpha"
-          }),
+        header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Country" }),
         cell: ({ row }) => {
-          if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
+          if (!row.getIsGrouped() || grouping.value.length === 0) {
             return row.original.team.map(player =>
               h(CountryLink, {
                 country: player.country,
                 key: `${player.id}-${player.country.id}`,
-                class: "mx-auto"
+                class: "mx-auto",
+                iconOnly: true
               })
             )
           }
@@ -149,19 +88,12 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
         accessorFn: row => row.team.map(player => `${player.last_name}, ${player.first_name}`),
         sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
         filterFn: (row, columnId, filterValue) => filterIncludesName(row, columnId, filterValue),
-        header: ({ column }) =>
-          h(NameTableHeader, {
-            column: column as Column<unknown>,
-            label: "Name",
-            type: "alpha"
-          }),
+        header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Name" }),
         cell: ({ row }) => {
-          if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
+          if (!row.getIsGrouped() || grouping.value.length === 0) {
             return h(
               "div",
-              {
-                class: "flex flex-col items-center"
-              },
+              { class: "flex flex-col items-center" },
               row.original.team.map(player =>
                 h(
                   ULink,
@@ -194,18 +126,12 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
             return `${sortedRanks[0]}-${sortedRanks[sortedRanks.length - 1]}`
           }
         },
-        header: ({ column }) =>
-          h(RangeTableHeader, {
-            column: column as Column<unknown>,
-            label: "Rank (at event)"
-          }),
+        header: ({ column }) => h(TableHeaderRange, { column: column as Column<unknown>, label: "Rank (at event)" }),
         cell: ({ cell, row }) => {
-          if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
+          if (!row.getIsGrouped() || grouping.value.length === 0) {
             return h(
               "div",
-              {
-                class: "flex flex-col"
-              },
+              { class: "flex flex-col" },
               row.original.team.map(player => h("div", {}, [player.rank]))
             )
           } else {
@@ -218,33 +144,17 @@ const columns = computed<TableColumn<SeedInterface>[]>(() => [
   {
     accessorKey: "rank",
     aggregationFn: "extent",
-    header: ({ column }) =>
-      h(RangeTableHeader, {
-        column: column as Column<unknown>,
-        label: "Rank (at draw)"
-      }),
+    header: ({ column }) => h(TableHeaderRange, { column: column as Column<unknown>, label: "Rank (at draw)" }),
     cell: ({ cell, row }) => {
       return row.getIsGrouped() ? `${(cell.getValue() as number[])[0]}-${(cell.getValue() as number[])[1]}` : cell.getValue()
     }
   }
 ])
 
-const columnFilters = ref([])
-const columnVisibility = computed(() => ({
-  tour: tours.value?.length > 1,
-  expand: tableMode.value === "grouped"
-}))
-const grouping = computed(() => {
-  return (
-    tableMode.value === "grouped" ?
-      tours.value.length > 1 ?
-        ["tour", "type", "draw"]
-      : ["type", "draw"]
-    : []
-  )
-})
+const table = useTemplateRef("table")
+const columnVisibility = computed(() => ({ tour: tours.value?.length > 1 }))
+const grouping = ref<string[]>([])
 const grouping_options = ref<GroupingOptions>({
-  groupedColumnMode: false,
   getGroupedRowModel: getGroupedRowModel()
 })
 </script>
@@ -253,7 +163,7 @@ const grouping_options = ref<GroupingOptions>({
   <dashboard-subpanel
     id="seeds"
     title="Seeds"
-    :icon="icons.seeds"
+    :icon="ICONS.seeds"
     class="max-h-200"
   >
     <template #right>
@@ -263,7 +173,33 @@ const grouping_options = ref<GroupingOptions>({
       />
     </template>
 
+    <div class="flex items-center justify-between mb-5">
+      <u-button
+        label="Reset Sorting"
+        :icon="ICONS.sortAlpha"
+        @click="table?.tableApi.resetSorting()"
+        size="sm"
+      />
+      <u-button
+        label="Reset Grouping"
+        :icon="ICONS.ungroup"
+        @click="table?.tableApi.resetGrouping()"
+        size="sm"
+      />
+      <u-button
+        label="Reset Filters"
+        :icon="ICONS.noFilter"
+        @click="table?.tableApi.resetColumnFilters()"
+        size="sm"
+      />
+      <table-visibility
+        v-if="table"
+        :table="table!"
+      />
+    </div>
+
     <u-table
+      ref="table"
       :data="seeds"
       :columns
       :loading="['idle', 'pending'].includes(status)"
@@ -274,26 +210,20 @@ const grouping_options = ref<GroupingOptions>({
         getFacetedUniqueValues: getFacetedUniqueValues()
       }"
       :grouping
+      v-on:update:grouping="grouping = $event"
       :grouping-options="grouping_options"
-      v-model:columnFilters="columnFilters"
       v-model:column-visibility="columnVisibility"
       :ui="{ td: 'empty:p-0' }"
     >
       <template #loading>
-        <u-icon
-          :name="uIcons.loading"
-          class="size-8"
-        />
+        <table-loading-icon />
       </template>
 
       <template #empty>
-        <div class="flex justify-center items-center w-full gap-2 text-error">
-          <u-icon
-            :name="icons.noPeople"
-            class="text-base"
-          />
-          No seeds found for {{ tournamentName }} {{ year }}
-        </div>
+        <table-empty-message
+          :icon="ICONS.noPeople"
+          :message="`No seeds found for ${tournamentName} ${year}`"
+        />
       </template>
     </u-table>
   </dashboard-subpanel>

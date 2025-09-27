@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { iconOnly = true } = defineProps<{ country: CountryInterface; iconOnly?: boolean }>()
+const { iconOnly = false } = defineProps<{ country: CountryInterface; iconOnly?: boolean }>()
 </script>
 
 <template>
@@ -13,7 +13,7 @@ const { iconOnly = true } = defineProps<{ country: CountryInterface; iconOnly?: 
     />
     <span
       v-if="!iconOnly"
-      class="hover-link w-fit"
+      class="hover-link default-link w-fit"
     >
       {{ country.name }}
     </span>

@@ -3,7 +3,6 @@ const { teams } = defineProps<{ teams: EntryInfoInterface[] }>()
 const {
   params: { year }
 } = useRoute("event")
-const { icons, colours } = useAppConfig()
 const colorMode = useColorMode()
 const tours = useState<TourType[]>("tours")
 const tournamentName = useState<string>("tournament-name")
@@ -70,7 +69,7 @@ const treeData = computed(() => {
 const option = computed(() => ({
   backgroundColor: "transparent",
   darkMode: colorMode.value === "dark",
-  textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+  textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
   series: [
     {
       type: "tree",
@@ -92,7 +91,7 @@ const option = computed(() => ({
           align: "left"
         }
       },
-      itemStyle: { color: colours.violet700 },
+      itemStyle: { color: COLOURS.violet700 },
       expandAndCollapse: true,
       animationDuration: 550,
       animationDurationUpdate: 750,
@@ -110,7 +109,7 @@ const option = computed(() => ({
   >
     <u-button
       label="Chart"
-      :icon="icons.draw"
+      :icon="ICONS.draw"
       :ui="{ leadingIcon: 'rotate-90' }"
     />
 

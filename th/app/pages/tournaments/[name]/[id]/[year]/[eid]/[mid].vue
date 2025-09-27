@@ -3,11 +3,10 @@ import { type DropdownMenuItem } from "@nuxt/ui"
 
 definePageMeta({ name: "match" })
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
 const {
-  params: { name, id, year, eid, mid }
+  params: { name, year, eid, mid }
 } = useRoute("match")
 const { draw, tour, type } = destructureMid(mid)
 
@@ -43,40 +42,36 @@ const additionalLinks = computed<DropdownMenuItem[]>(() => {
     const { chart_link, p1, p2 } = match.value
     const p1Links = p1.map(p => ({
       label: `${p.first_name} ${p.last_name}`,
-      icon: icons.player,
+      icon: ICONS.player,
       to: { name: "player", params: { id: p.id, name: kebabCase(`${p.first_name} ${p.last_name}`) } },
       color: ["ATP", "Men"].includes(tour) ? "atp" : "wta"
     }))
     const p2Links = p2.map(p => ({
       label: `${p.first_name} ${p.last_name}`,
-      icon: icons.player,
+      icon: ICONS.player,
       to: { name: "player", params: { id: p.id, name: kebabCase(`${p.first_name} ${p.last_name}`) } },
       color: ["ATP", "Men"].includes(tour) ? "atp" : "wta"
     }))
-    const h2hLink =
-      p1.length === 1 ?
-        [
-          {
-            label: "H2H",
-            icon: icons.h2h,
-            to: {
-              name: "h2h-players",
-              params: {
-                p1Name: kebabCase(`${p1[0]?.first_name} ${p1[0]?.last_name}`),
-                p2Name: kebabCase(`${p2[0]?.first_name} ${p2[0]?.last_name}`),
-                p1Id: p1[0]?.id,
-                p2Id: p2[0]?.id
-              }
-            }
+    const h2hLink = [
+      {
+        label: "H2H",
+        icon: ICONS.h2h,
+        to: {
+          name: "head-to-head",
+          params: {
+            p1Name: p1.map(player => kebabCase(`${player.first_name} ${player.last_name}`)).join("+"),
+            p2Name: p2.map(player => kebabCase(`${player.first_name} ${player.last_name}`)).join("+"),
+            p1Id: p1.map(player => player.id).join("+"),
+            p2Id: p2.map(player => player.id).join("+")
           }
-        ]
-      : []
-    const chartLink =
-      chart_link ?
-        [
+        }
+      }
+    ]
+    const chartLink = chart_link
+      ? [
           {
             label: "TA Chart",
-            icon: icons.lineChart,
+            icon: ICONS.lineChart,
             to: chart_link,
             target: "_blank"
           }
@@ -94,7 +89,7 @@ const additionalLinks = computed<DropdownMenuItem[]>(() => {
     <template #navbar-right>
       <u-dropdown-menu :items="additionalLinks">
         <u-button
-          :icon="uIcons.info"
+          :icon="icons.info"
           variant="ghost"
         />
       </u-dropdown-menu>
@@ -107,7 +102,7 @@ const additionalLinks = computed<DropdownMenuItem[]>(() => {
         class="flex items-center gap-2"
       >
         <u-icon
-          :name="icons.colours"
+          :name="ICONS.colours"
           :class="className"
         />
         <span>{{ category }}</span>

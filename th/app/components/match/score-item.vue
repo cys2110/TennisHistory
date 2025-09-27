@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { match_no } = defineProps<{
-  draw?: DrawType
+  draw: DrawType
   tour: TourType
   type: MatchType
   sets: number[][][]
@@ -29,7 +29,7 @@ const { match_no } = defineProps<{
           id: tournament.id,
           year,
           eid: id,
-          mid: constructMid(match_no, tour, type, draw ?? 'Main')
+          mid: constructMid(match_no, tour, type, draw)
         }
       }"
     >

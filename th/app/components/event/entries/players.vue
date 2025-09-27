@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { CountryLink, FilterTableHeader, NameTableHeader, RangeTableHeader, UBadge, UButton, ULink } from "#components"
-import type { TableColumn } from "@nuxt/ui"
+import { ColouredBadge, CountryLink, TableCellGroup, TableHeaderFilter, TableHeaderGroup, TableHeaderRange, UButton, ULink } from "#components"
+import type { TableColumn, TableRow } from "@nuxt/ui"
 import {
   type Column,
   createColumnHelper,
@@ -15,9 +15,8 @@ const {
   params: { eid, year }
 } = useRoute("event")
 const {
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
-const { tableMode } = useDefaults()
 const tours = useState<TourType[]>("tours")
 const tournamentName = useState<string>("tournament-name")
 
@@ -33,60 +32,28 @@ const columnHelper = createColumnHelper<EntryInterface>()
 
 const columns = computed<TableColumn<EntryInterface>[]>(() => [
   {
-    id: "expand",
-    cell: ({ row }: { row: any }) => {
-      if (row.getIsGrouped()) {
-        return h(UButton, {
-          variant: "link",
-          color: "neutral",
-          class: "mr-2",
-          size: "xs",
-          icon: uIcons.chevronDoubleRight,
-          ui: {
-            leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
-          },
-          onClick: () => row.toggleExpanded()
-        })
-      }
-    }
-  },
-  {
     accessorKey: "tour",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Tour",
-        type: "alpha"
-      }),
-    cell: ({ row }) => {
-      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && row.depth === 0)) {
-        return h(UBadge, {
-          label: row.original.tour,
-          color: getTourColour(row.original.tour),
-          class: "font-semibold"
-        })
-      }
-    }
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Tour" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "tour" }, () =>
+        h(ColouredBadge, { label: row.original.tour, class: "mx-auto" })
+      )
   },
   columnHelper.group({
+    id: "players",
     header: "Player(s)",
     columns: [
       {
         accessorKey: "country.name",
         filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Country",
-            type: "alpha"
-          }),
+        header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Country" }),
         cell: ({ row }) => {
-          if (tableMode.value === "ungrouped" || (row.getIsGrouped() && (tours.value.length > 1 ? row.depth === 1 : row.depth === 0))) {
+          if (!row.getIsGrouped() || grouping.value.length === 0) {
             return h(CountryLink, {
               country: row.original.country,
-              key: `${row.original.id}-${row.original.country.id}`,
-              class: "mx-auto"
+              class: "mx-auto",
+              iconOnly: true
             })
           }
         }
@@ -95,15 +62,10 @@ const columns = computed<TableColumn<EntryInterface>[]>(() => [
         id: "name",
         accessorFn: row => `${row.last_name}, ${row.first_name}`,
         filterFn: (row, columnId, filterValue) => filterIncludesNameString(row, columnId, filterValue),
-        header: ({ column }) =>
-          h(NameTableHeader, {
-            column: column as Column<unknown>,
-            label: "Name",
-            type: "alpha"
-          }),
-        cell: ({ row }) => {
-          if (tableMode.value === "ungrouped" || (row.getIsGrouped() && (tours.value.length > 1 ? row.depth === 1 : row.depth === 0))) {
-            return h(
+        header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Name" }),
+        cell: ({ row }) =>
+          h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "name" }, () =>
+            h(
               ULink,
               {
                 key: row.original.id,
@@ -115,96 +77,93 @@ const columns = computed<TableColumn<EntryInterface>[]>(() => [
               },
               () => `${row.original.first_name} ${row.original.last_name}`
             )
-          }
-        }
+          )
       }
     ]
   }),
   {
     accessorKey: "type",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "S/D",
-        type: "alpha"
-      }),
-    cell: ({ row }) => {
-      if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
-        return h(UBadge, {
-          label: row.original.type,
-          color: getMatchTypeColour(row.original.type),
-          class: "font-semibold"
-        })
-      }
-    }
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "S/D" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "type" }, () =>
+        h(ColouredBadge, { label: row.original.type, class: "mx-auto" })
+      )
   },
   {
     accessorKey: "draw",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Draw",
-        type: "alpha"
-      }),
-    cell: ({ row }) => {
-      if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
-        return h(UBadge, {
-          label: row.original.draw,
-          color: getDrawColour(row.original.draw),
-          class: "font-semibold"
-        })
-      }
-    }
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Draw" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "draw" }, () =>
+        h(ColouredBadge, { label: row.original.draw, class: "mx-auto" })
+      )
   },
   {
     id: "seed",
     accessorFn: row => (row.draw === "Main" ? row.seed : row.q_seed),
     sortUndefined: "last",
-    header: ({ column }) => h(RangeTableHeader, { column: column as Column<unknown>, label: "Seed" })
+    header: ({ column }) => h(TableHeaderRange, { column: column as Column<unknown>, label: "Seed" })
   },
   {
     id: "status",
     accessorFn: row =>
-      row.draw === "Main" && row.status ? STATUSES[row.status].longName
-      : row.draw === "Qualifying" && row.q_status ? STATUSES[row.q_status].longName
-      : undefined,
+      row.draw === "Main" && row.status
+        ? STATUSES[row.status].longName
+        : row.draw === "Qualifying" && row.q_status
+        ? STATUSES[row.q_status].longName
+        : undefined,
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     sortUndefined: "last",
-    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Status", type: "alpha" })
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Status", type: "alpha" })
   },
   {
     accessorKey: "rank",
-    header: ({ column }) => h(RangeTableHeader, { column: column as Column<unknown>, label: "Rank" })
-    // cell: ({ row }) => {
-    //   return tableMode.value === "ungrouped" || (!row.getIsGrouped() && row.original.rank)
-    // }
+    header: ({ column }) => h(TableHeaderRange, { column: column as Column<unknown>, label: "Rank" }),
+    cell: ({ row }) => {
+      if (!row.getIsGrouped() || grouping.value.length === 0) {
+        return row.original.rank
+      }
+    }
   }
 ])
 
-const columnFilters = ref([])
-const columnVisibility = computed(() => ({
-  tour: tours.value?.length > 1,
-  expand: tableMode.value === "grouped"
-}))
-const grouping = computed(() => {
-  return (
-    tableMode.value === "grouped" ?
-      tours.value.length > 1 ?
-        ["tour", "name"]
-      : ["name"]
-    : []
-  )
-})
+const table = useTemplateRef("table")
+const columnVisibility = computed(() => ({ tour: tours.value?.length > 1 }))
+const grouping = ref<string[]>([])
 const grouping_options = ref<GroupingOptions>({
-  groupedColumnMode: false,
   getGroupedRowModel: getGroupedRowModel()
 })
 </script>
 
 <template>
+  <div class="flex items-center justify-between mb-5">
+    <u-button
+      label="Reset Sorting"
+      :icon="ICONS.sortAlpha"
+      @click="table?.tableApi.resetSorting()"
+      size="sm"
+    />
+    <u-button
+      label="Reset Grouping"
+      :icon="ICONS.ungroup"
+      @click="table?.tableApi.resetGrouping()"
+      size="sm"
+    />
+    <u-button
+      label="Reset Filters"
+      :icon="ICONS.noFilter"
+      @click="table?.tableApi.resetColumnFilters()"
+      size="sm"
+    />
+    <table-visibility
+      v-if="table"
+      :table="table!"
+    />
+  </div>
+
   <u-table
+    ref="table"
     :data="entries"
     :columns
     :loading="['idle', 'pending'].includes(status)"
@@ -215,26 +174,17 @@ const grouping_options = ref<GroupingOptions>({
       getFacetedUniqueValues: getFacetedUniqueValues()
     }"
     :grouping
+    v-on:update:grouping="grouping = $event"
     :grouping-options="grouping_options"
-    v-model:columnFilters="columnFilters"
     v-model:column-visibility="columnVisibility"
     :ui="{ td: 'empty:p-0' }"
   >
     <template #loading>
-      <u-icon
-        :name="uIcons.loading"
-        class="size-8"
-      />
+      <table-loading-icon />
     </template>
 
     <template #empty>
-      <div class="flex justify-center items-center w-full gap-2 text-error">
-        <u-icon
-          :name="uIcons.caution"
-          class="text-base"
-        />
-        No entries available for {{ tournamentName }} {{ year }}
-      </div>
+      <table-empty-message :message="`No entries found for ${tournamentName} ${year}`" />
     </template>
   </u-table>
 </template>

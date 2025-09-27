@@ -3,7 +3,6 @@ const { seeds } = defineProps<{ seeds: SeedInterface[] }>()
 const {
   params: { year }
 } = useRoute("event")
-const { icons, colours } = useAppConfig()
 const colorMode = useColorMode()
 const tours = useState<TourType[]>("tours")
 const tournamentName = useState<string>("tournament-name")
@@ -15,7 +14,7 @@ const formattedSeeds = seeds.map(seed => ({
 
 const option = computed(() => ({
   backgroundColor: "transparent",
-  textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+  textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
   grid: { containLabel: true },
   dataset: [
     {
@@ -75,19 +74,19 @@ const option = computed(() => ({
     trigger: "item"
   },
   legend: {
-    textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+    textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
     top: "middle",
     right: "right"
   },
   xAxis: {
     type: "category",
-    axisLabel: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText }
+    axisLabel: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText }
   },
   yAxis: {
     type: "value",
     name: "Rank at draw",
     splitLine: { show: false },
-    axisLabel: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText }
+    axisLabel: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText }
   },
   series: [
     ...tours.value.map((tour, index) => ({
@@ -126,7 +125,7 @@ const option = computed(() => ({
   >
     <u-button
       label="Chart"
-      :icon="icons.barChart"
+      :icon="ICONS.barChart"
     />
 
     <template #body>

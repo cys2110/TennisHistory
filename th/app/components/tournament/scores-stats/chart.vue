@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const { winners } = defineProps<{ winners: TournamentScoreStatsType[] }>()
-const { icons, colours } = useAppConfig()
 const tours = inject<TourType[]>("tours", [])
 const tournamentName = inject<string>("tournamentName", "")
 const colorMode = useColorMode()
@@ -32,7 +31,7 @@ console.log(formattedWinners.value)
 
 const option = computed(() => ({
   backgroundColor: "transparent",
-  textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+  textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
   grid: { containLabel: true },
   dataset: [
     {
@@ -42,13 +41,13 @@ const option = computed(() => ({
     {
       transform: {
         type: "filter",
-        config: { dimension: "type", value: selectedType.value }
+        config: { dimension: "type", value: get(selectedType) }
       }
     },
     {
       transform: {
         type: "filter",
-        config: { dimension: "tour", value: selectedTour.value }
+        config: { dimension: "tour", value: get(selectedTour) }
       }
     },
     {
@@ -66,13 +65,13 @@ const option = computed(() => ({
   xAxis: [
     {
       type: "value",
-      axisLabel: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+      axisLabel: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
       name: "Sets",
       splitLine: { show: false }
     },
     {
       type: "value",
-      axisLabel: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+      axisLabel: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
       name: "Games",
       splitLine: { show: false }
     }
@@ -80,7 +79,7 @@ const option = computed(() => ({
   yAxis: {
     type: "category",
     inverse: true,
-    axisLabel: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText }
+    axisLabel: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText }
   },
   tooltip: {
     trigger: "axis",
@@ -93,7 +92,7 @@ const option = computed(() => ({
       encode: { x: "sets_won", y: "team" },
       stack: "sets",
       datasetIndex: datasetIndex.value,
-      itemStyle: { color: colours.orange600 },
+      itemStyle: { color: COLOURS.orange600 },
       xAxisIndex: 0,
       barGap: "100%"
     },
@@ -103,13 +102,13 @@ const option = computed(() => ({
       encode: { x: "sets_lost", y: "team" },
       stack: "sets",
       datasetIndex: datasetIndex.value,
-      itemStyle: { color: colours.orange300 },
+      itemStyle: { color: COLOURS.orange300 },
       xAxisIndex: 0,
       label: {
         show: true,
         formatter: ({ data }: any) => `${percentage(data.sets_won, data.sets_won + data.sets_lost)}%`,
         position: "right",
-        color: colorMode.value === "dark" ? colours.darkText : colours.lightText
+        color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText
       },
       barGap: "100%"
     },
@@ -119,7 +118,7 @@ const option = computed(() => ({
       encode: { x: "games_won", y: "team" },
       stack: "games",
       datasetIndex: datasetIndex.value,
-      itemStyle: { color: colours.indigo700 },
+      itemStyle: { color: COLOURS.indigo700 },
       xAxisIndex: 1,
       barGap: "100%"
     },
@@ -129,13 +128,13 @@ const option = computed(() => ({
       encode: { x: "games_lost", y: "team" },
       stack: "games",
       datasetIndex: datasetIndex.value,
-      itemStyle: { color: colours.indigo300 },
+      itemStyle: { color: COLOURS.indigo300 },
       xAxisIndex: 1,
       label: {
         show: true,
         formatter: ({ data }: any) => `${percentage(data.games_won, data.games_won + data.games_lost)}%`,
         position: "right",
-        color: colorMode.value === "dark" ? colours.darkText : colours.lightText
+        color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText
       },
       barGap: "100%"
     }
@@ -151,7 +150,7 @@ const option = computed(() => ({
   >
     <u-button
       label="Chart"
-      :icon="icons.barChart"
+      :icon="ICONS.barChart"
     />
 
     <template #body>
@@ -180,21 +179,6 @@ const option = computed(() => ({
           :option
           :autoresize="true"
         />
-        <div
-          class="flex flex-col gap-1 max-h-150 overflow-y-auto my-auto scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent text-sm shrink-0"
-        >
-          <!-- <div
-            v-for="[player, colour] in Object.entries(playerColourMap)"
-            :key="player"
-            class="flex items-center gap-2"
-          >
-            <u-icon
-              :name="icons.colours"
-              :style="{ color: colour }"
-            />
-            <span class="mr-5">{{ player }}</span>
-          </div>-->
-        </div>
       </div>
     </template>
   </u-modal>

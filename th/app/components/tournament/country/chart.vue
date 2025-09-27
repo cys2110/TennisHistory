@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const { icons, colours } = useAppConfig()
 const {
   params: { id }
 } = useRoute("tournament")
@@ -201,7 +200,7 @@ watch([selectedTour, selectedType], () => {
 const option = computed(() => ({
   animationDuration: 10000,
   backgroundColor: "transparent",
-  textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+  textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
   grid: { containLabel: true },
   dataset: [
     {
@@ -238,18 +237,15 @@ const option = computed(() => ({
   ],
   legend: {
     type: "scroll",
-    textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
-    top: "middle",
-    right: "right",
-    orient: "vertical",
-    height: "50%"
+    textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
+    top: "top"
   },
   tooltip: {
     trigger: "item",
     axisPointer: {
       type: "cross",
       label: {
-        backgroundColor: colorMode.value === "dark" ? colours.lightText : colours.darkText
+        backgroundColor: colorMode.value === "dark" ? COLOURS.lightText : COLOURS.darkText
       }
     },
     textStyle: {
@@ -285,7 +281,7 @@ const option = computed(() => ({
   >
     <u-button
       label="Chart"
-      :icon="icons.lineChart"
+      :icon="ICONS.lineChart"
     />
 
     <template #body>

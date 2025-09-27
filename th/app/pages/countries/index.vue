@@ -1,17 +1,9 @@
 <script setup lang="ts">
-import { CountryLink, FilterTableHeader } from "#components"
+import { CountryLink, TableHeaderFilter } from "#components"
 import type { TableColumn, TableRow } from "@nuxt/ui"
 import { type Column, getFacetedRowModel, getFacetedUniqueValues } from "@tanstack/vue-table"
 
 useHead({ title: "Countries" })
-const { icons } = useAppConfig()
-
-useJsonld(() => ({
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  name: "Countries",
-  description: "A collection of countries"
-}))
 
 // API call
 const { data: countries, status } = await useFetch<CountryInterface[]>("/api/countries", {
@@ -23,7 +15,8 @@ const { data: countries, status } = await useFetch<CountryInterface[]>("/api/cou
 const columns: TableColumn<CountryInterface>[] = [
   {
     accessorKey: "name",
-    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Country", type: "alpha" }),
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Country", type: "alpha" }),
     cell: ({ row }) => h(CountryLink, { country: row.original, iconOnly: false, class: "mx-auto" }),
     footer: ({ table }) => `Total: ${table.getRowCount()}`
   }
@@ -58,12 +51,12 @@ const handleSelectRow = async (row: TableRow<CountryInterface>) => {
           :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer' }"
         >
           <template #loading>
-            <loading-icon />
+            <table-loading-icon />
           </template>
 
           <template #empty>
-            <empty-message
-              :icon="icons.noCountries"
+            <table-empty-message
+              :icon="ICONS.noCountries"
               message="No countries found"
             />
           </template>

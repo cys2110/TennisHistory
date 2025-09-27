@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { type DropdownMenuItem } from "@nuxt/ui"
 
-definePageMeta({ name: "h2h-players" })
+definePageMeta({ name: "head-to-head" })
 const {
   params: { p1Id, p2Id, p1Name, p2Name }
-} = useRoute("h2h-players")
+} = useRoute("head-to-head")
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
 
 // API call
@@ -18,7 +17,9 @@ const { data: h2h } = await useFetch<{ p1: PlayerInterface; p2: PlayerInterface;
 
 useHead({
   title: () =>
-    `${h2h.value ? `${get(h2h)?.p1.first_name} ${get(h2h)?.p1.last_name}` : capitalCase(p1Name as string)} v ${h2h.value ? `${get(h2h)?.p2.first_name} ${get(h2h)?.p2.last_name}` : capitalCase(p2Name as string)}`
+    `${h2h.value ? `${get(h2h)?.p1.first_name} ${get(h2h)?.p1.last_name}` : capitalCase(p1Name as string)} v ${
+      h2h.value ? `${get(h2h)?.p2.first_name} ${get(h2h)?.p2.last_name}` : capitalCase(p2Name as string)
+    }`
 })
 
 // Related links
@@ -29,13 +30,13 @@ const links = computed<DropdownMenuItem[]>(
         label: h2h.value ? `${get(h2h)?.p1.first_name} ${get(h2h)?.p1.last_name}` : capitalCase(p1Name as string),
         to: { name: "player", params: { name: p1Name, id: p1Id } },
         color: h2h.value ? get(h2h)?.p1.tour : "ATP",
-        icon: icons.player
+        icon: ICONS.player
       },
       {
         label: h2h.value ? `${get(h2h)?.p2.first_name} ${get(h2h)?.p2.last_name}` : capitalCase(p2Name as string),
         to: { name: "player", params: { name: p2Name, id: p2Id } },
         color: h2h.value ? get(h2h)?.p2.tour : "ATP",
-        icon: icons.player
+        icon: ICONS.player
       }
     ] as DropdownMenuItem[]
 )
@@ -53,7 +54,7 @@ const links = computed<DropdownMenuItem[]>(
           <template #right>
             <u-dropdown-menu :items="links">
               <u-button
-                :icon="uIcons.ellipsis"
+                :icon="icons.ellipsis"
                 variant="link"
                 :ui="{ leadingIcon: 'rotate-90' }"
               />

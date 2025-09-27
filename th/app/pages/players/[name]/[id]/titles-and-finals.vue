@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FilterTableHeader, RangeTableHeader, SortTableHeader, UButton, ULink } from "#components"
+import { ColouredBadge, TableCellGroup, TableHeaderFilter, TableHeaderGroup, TableHeaderRange, TableHeaderSort, ULink } from "#components"
 import type { TableColumn, TableRow } from "@nuxt/ui"
 import {
   type Column,
@@ -12,12 +12,9 @@ import {
 
 definePageMeta({ name: "titles-and-finals" })
 const {
-  icons,
-  ui: { icons: uIcons }
-} = useAppConfig()
-const {
   params: { id }
 } = useRoute("titles-and-finals")
+const playerName = useState<string>("player-name")
 
 const selection = ref<"Titles" | "Finals">("Titles")
 
@@ -32,87 +29,32 @@ const columns = computed<TableColumn<EventInterface>[]>(() => [
   {
     accessorKey: "type",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "S/D",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "S/D" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "type" }, () =>
+        h(ColouredBadge, { label: row.getValue("type") as string, class: "mx-auto" })
       )
   },
   {
     accessorKey: "level",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Tournament Type",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Level" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "level" }, () =>
+        h(ColouredBadge, { label: row.getValue("level") as string, class: "mx-auto" })
       )
   },
   {
     accessorKey: "category",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Category",
-            type: "alpha"
-          })
-        ]
-      )
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Category" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "category" }, () => row.getValue("category"))
   },
   {
     accessorKey: "tournament.name",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Tournament",
-        type: "alpha"
-      }),
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Tournament" }),
     cell: ({ row }) => {
       if (!row.getIsGrouped() || grouping.value.length === 0) {
         return h(
@@ -128,21 +70,18 @@ const columns = computed<TableColumn<EventInterface>[]>(() => [
   },
   {
     accessorKey: "year",
-    header: ({ column }) => h(RangeTableHeader, { column: column as Column<unknown>, label: "Year" }),
+    header: ({ column }) => h(TableHeaderRange, { column: column as Column<unknown>, label: "Year" }),
     aggregationFn: "extent"
   },
   {
     id: "date",
     accessorFn: row => `${row.end_date.year}-${row.end_date.month}-${row.end_date.day}`,
-    header: ({ column }) => h(SortTableHeader, { column: column as Column<unknown>, label: "Date", type: "alpha" }),
+    header: ({ column }) => h(TableHeaderSort, { column: column as Column<unknown>, label: "Date", type: "alpha" }),
     cell: ({ row }) => dateTimeFormat.format(getDate(row.original.end_date))
   }
 ])
 
-const columnFilters = ref([])
-
 const grouping = ref<string[]>([])
-
 const grouping_options = ref<GroupingOptions>({
   getGroupedRowModel: getGroupedRowModel()
 })
@@ -150,23 +89,20 @@ const grouping_options = ref<GroupingOptions>({
 const table = useTemplateRef("table")
 
 const handleSelectRow = async (row: TableRow<EventInterface>) => {
-  await navigateTo({
-    name: "event",
-    params: { id: row.original.tournament.id, name: kebabCase(row.original.tournament.name), year: row.original.year, eid: row.original.id }
-  })
+  if (row.getIsGrouped()) {
+    row.toggleExpanded()
+  } else {
+    await navigateTo({
+      name: "event",
+      params: { id: row.original.tournament.id, name: kebabCase(row.original.tournament.name), year: row.original.year, eid: row.original.id }
+    })
+  }
 }
 </script>
 
 <template>
   <player-wrapper>
     <template #toolbar>
-      <u-button
-        label="Reset Sorting"
-        :icon="icons.sortAlpha"
-        @click="table?.tableApi.resetSorting()"
-        size="sm"
-      />
-
       <u-radio-group
         v-model="selection"
         :items="['Titles', 'Finals']"
@@ -174,10 +110,26 @@ const handleSelectRow = async (row: TableRow<EventInterface>) => {
       />
 
       <u-button
+        label="Reset Sorting"
+        :icon="ICONS.sortAlpha"
+        @click="table?.tableApi.resetSorting()"
+        size="sm"
+      />
+      <u-button
         label="Reset Grouping"
-        :icon="icons.ungroup"
+        :icon="ICONS.ungroup"
         @click="table?.tableApi.resetGrouping()"
         size="sm"
+      />
+      <u-button
+        label="Reset Filters"
+        :icon="ICONS.noFilter"
+        @click="table?.tableApi.resetColumnFilters()"
+        size="sm"
+      />
+      <table-visibility
+        v-if="table"
+        :table="table!"
       />
     </template>
 
@@ -187,7 +139,6 @@ const handleSelectRow = async (row: TableRow<EventInterface>) => {
       :columns
       :loading="['idle', 'pending'].includes(status)"
       sticky
-      v-model:column-filters="columnFilters"
       :faceted-options="{
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -200,79 +151,14 @@ const handleSelectRow = async (row: TableRow<EventInterface>) => {
       :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer', td: 'empty:p-0' }"
     >
       <template #loading>
-        <u-icon
-          :name="uIcons.loading"
-          class="size-8"
-        />
+        <table-loading-icon />
       </template>
 
       <template #empty>
-        <div class="flex justify-center items-center w-full gap-2 text-error">
-          <u-icon
-            :name="icons.noTournament"
-            class="text-base"
-          />
-          No tournaments found
-        </div>
-      </template>
-
-      <template #type-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'type'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <coloured-badge
-            v-if="(row.getIsGrouped() && row.groupingColumnId === 'type') || (!grouping.includes('type') && !row.getIsGrouped())"
-            :label="row.getValue('type')"
-            class="mx-auto"
-          />
-        </div>
-      </template>
-
-      <template #level-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'level'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <coloured-badge
-            v-if="(row.getIsGrouped() && row.groupingColumnId === 'level') || (!grouping.includes('level') && !row.getIsGrouped())"
-            :label="row.getValue('level')"
-            class="mx-auto"
-          />
-        </div>
-      </template>
-
-      <template #category-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'category'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <u-link
-            v-if="(row.getIsGrouped() && row.groupingColumnId === 'category') || (!grouping.includes('category') && !row.getIsGrouped())"
-            :to="{ name: 'category', params: { id: kebabCase(row.getValue('category') as string) } }"
-            class="hover-link default-link w-fit mx-auto"
-          >
-            {{ row.getValue("category") }}
-          </u-link>
-        </div>
+        <table-empty-message
+          :icon="ICONS.noTournament"
+          :message="`No ${selection === 'Titles' ? 'titles won' : 'finals reached'} by ${playerName}`"
+        />
       </template>
     </u-table>
   </player-wrapper>

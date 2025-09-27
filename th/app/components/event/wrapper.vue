@@ -6,8 +6,7 @@ const {
   params: { id, name, year, eid }
 } = useRoute("match")
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
 
 // API call
@@ -75,11 +74,11 @@ watch(
 )
 
 const toc = [
-  { label: "Details", to: "#details", icon: icons.overview },
-  { label: "Awards", to: "#awards", icon: icons.awards },
-  { label: "Seeds", to: "#seeds", icon: icons.seeds },
-  { label: "Entry Information", to: "#entry-info", icon: uIcons.info },
-  { label: "Entries", to: "#entries", icon: icons.player }
+  { label: "Details", to: "#details", icon: ICONS.overview },
+  { label: "Awards", to: "#awards", icon: ICONS.awards },
+  { label: "Seeds", to: "#seeds", icon: ICONS.seeds },
+  { label: "Entry Information", to: "#entry-info", icon: icons.info },
+  { label: "Entries", to: "#entries", icon: ICONS.player }
 ]
 </script>
 
@@ -98,13 +97,13 @@ const toc = [
               :items="EVENT_PAGES.map(page => ({ ...page, to: { name: page.name, params: { year, eid, name, id } } }) as DropdownMenuItem)"
             >
               <u-button
-                :icon="icons.layers"
+                :icon="ICONS.layers"
                 variant="ghost"
               />
             </u-dropdown-menu>
             <u-dropdown-menu :items="otherLinks">
               <u-button
-                :icon="uIcons.ellipsis"
+                :icon="icons.ellipsis"
                 variant="ghost"
                 :ui="{ leadingIcon: 'rotate-90' }"
               />
@@ -115,7 +114,7 @@ const toc = [
               :items="toc"
             >
               <u-button
-                :icon="icons.toc"
+                :icon="ICONS.toc"
                 variant="ghost"
               />
             </u-dropdown-menu>

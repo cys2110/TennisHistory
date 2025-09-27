@@ -21,10 +21,11 @@ export default defineEventHandler(async query => {
           CASE
             WHEN z IS NULL THEN null
             ELSE
-              apoc.map.merge(
+              apoc.map.mergeList([
                 properties(z),
-                properties(x)
-              )
+                properties(x),
+                {labels: labels(z)}
+              ])
           END AS coach
         RETURN COLLECT(DISTINCT coach) AS coaches
       }
@@ -34,10 +35,11 @@ export default defineEventHandler(async query => {
           CASE
             WHEN z IS NULL THEN null
             ELSE
-              apoc.map.merge(
+              apoc.map.mergeList([
                 properties(z),
-                properties(x)
-              )
+                properties(x),
+                {labels: labels(z)}
+              ])
           END AS coach
         RETURN COLLECT(DISTINCT coach) AS coached
       }

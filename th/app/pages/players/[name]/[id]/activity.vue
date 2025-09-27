@@ -1,6 +1,19 @@
 <script setup lang="ts">
-import { FilterTableHeader, MatchScoreItem, NameTableHeader, PlayerLink, SortTableHeader, UButton, UIcon } from "#components"
-import type { TableColumn } from "@nuxt/ui"
+import {
+  ColouredBadge,
+  CountryLink,
+  MatchScoreItem,
+  PlayerLink,
+  TableCellGroup,
+  TableHeaderFilter,
+  TableHeaderGroup,
+  TableHeaderName,
+  TableHeaderSort,
+  UButton,
+  UIcon,
+  ULink
+} from "#components"
+import type { TableColumn, TableRow } from "@nuxt/ui"
 import {
   type Column,
   getFacetedRowModel,
@@ -15,9 +28,9 @@ const {
   params: { id, name }
 } = useRoute("activity")
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
+const playerName = useState<string>("player-name")
 const playerYears = useState<number[]>("player-years")
 const year = useRouteQuery<number>("year", playerYears.value?.length ? playerYears.value[playerYears.value.length - 1] : new Date().getFullYear())
 
@@ -31,85 +44,43 @@ const { data: yearActivity, status } = await useFetch<ActivityType>(() => `/api/
 
 const columns: TableColumn<ActivityInterface>[] = [
   {
+    id: "tournament",
     accessorKey: "tournament.name",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Tournament",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Tournament" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "tournament" }, () =>
+        h(
+          ULink,
+          {
+            to: { name: "tournament", params: { id: row.original.tournament.id, name: kebabCase(row.original.tournament.name) } },
+            class: "hover-link default-link w-fit mx-auto"
+          },
+          () => row.getValue("tournament")
+        )
       )
   },
   {
     accessorKey: "level",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Level",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Level" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "level" }, () =>
+        h(ColouredBadge, { class: "mx-auto", label: row.getValue("level") as string })
       )
   },
   {
     accessorKey: "category",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     sortUndefined: "last",
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Category",
-            type: "alpha"
-          })
-        ]
-      )
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Category" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "category" }, () => row.original.category)
   },
   {
     id: "dates",
-    accessorFn: row => `${row.start_date.year}-${row.start_date.month}-${row.start_date.day}`,
-    header: ({ column }) => h(SortTableHeader, { column: column as Column<unknown>, label: "Dates", type: "alpha" }),
+    accessorFn: row => getDate(row.start_date),
+    header: ({ column }) => h(TableHeaderSort, { column: column as Column<unknown>, label: "Dates", type: "number" }),
     cell: ({ row }) => {
       if (!row.getIsGrouped() || grouping.value.length === 0) {
         return dateTimeFormat.formatRange(getDate(row.original.start_date), getDate(row.original.end_date))
@@ -117,131 +88,50 @@ const columns: TableColumn<ActivityInterface>[] = [
     }
   },
   {
+    id: "surface",
     accessorKey: "surface.id",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     sortUndefined: "last",
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Surface",
-            type: "alpha"
-          })
-        ]
-      )
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Surface" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "surface" }, () => row.original.surface.id)
   },
   {
     id: "country",
     accessorFn: row => row.venues[0]?.country.name,
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Country",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Country" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "country" }, () =>
+        row.original.venues[0] ? h(CountryLink, { country: row.original.venues[0].country, iconOnly: true, class: "mx-auto" }) : undefined
       )
   },
   {
     accessorKey: "type",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "S/D",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "S/D" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "type" }, () =>
+        h(ColouredBadge, { class: "mx-auto", label: row.getValue("type") as string })
       )
   },
   {
+    id: "draw",
     accessorKey: "match.draw",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Draw",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Draw" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "draw" }, () =>
+        h(ColouredBadge, { class: "mx-auto", label: row.getValue("draw") as string })
       )
   },
   {
+    id: "round",
     accessorKey: "match.round",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Round",
-            type: "alpha"
-          })
-        ]
-      )
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Round" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "round" }, () => row.original.match.round)
   },
   {
     accessorKey: "player.rank",
@@ -273,12 +163,12 @@ const columns: TableColumn<ActivityInterface>[] = [
     header: "Prize Money",
     cell: ({ row, cell }) => {
       if (!row.getIsGrouped() || grouping.value.length === 0) {
-        return row.original.player.pm ?
-            row.original.player.pm.toLocaleString("en-GB", { style: "currency", currency: row.original.currency })
+        return row.original.player.pm
+          ? row.original.player.pm.toLocaleString("en-GB", { style: "currency", currency: row.original.currency })
           : undefined
       } else {
-        return cell.getValue() ?
-            (cell.getValue() as number).toLocaleString("en-GB", { style: "currency", currency: row.original.currency })
+        return cell.getValue()
+          ? (cell.getValue() as number).toLocaleString("en-GB", { style: "currency", currency: row.original.currency })
           : undefined
       }
     }
@@ -288,7 +178,7 @@ const columns: TableColumn<ActivityInterface>[] = [
     accessorFn: row => (row.partner ? `${row.partner.last_name}, ${row.partner.first_name}` : undefined),
     sortUndefined: "last",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Partner", type: "alpha" }),
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Partner", type: "alpha" }),
     cell: ({ row }) => {
       if ((!row.getIsGrouped() || grouping.value.length === 0) && row.original.partner) {
         return h(
@@ -310,7 +200,7 @@ const columns: TableColumn<ActivityInterface>[] = [
     id: "opponents",
     accessorFn: row => row.match.opponents.map(opponent => `${opponent.last_name}, ${opponent.first_name}`),
     filterFn: (row, columnId, filterValue) => filterIncludesName(row, columnId, filterValue),
-    header: ({ column }) => h(NameTableHeader, { column: column as Column<unknown>, label: "Opponents" }),
+    header: ({ column }) => h(TableHeaderName, { column: column as Column<unknown>, label: "Opponents" }),
     cell: ({ row }) => {
       if (!row.getIsGrouped() || grouping.value.length === 0) {
         return h(
@@ -344,6 +234,7 @@ const columns: TableColumn<ActivityInterface>[] = [
     }
   },
   {
+    id: "winner",
     accessorKey: "match.winner_id",
     header: "",
     cell: ({ row }) => {
@@ -353,12 +244,12 @@ const columns: TableColumn<ActivityInterface>[] = [
           row.original.match.incomplete === "B"
         ) {
           return h(UIcon, {
-            name: uIcons.success,
+            name: icons.success,
             class: "text-success size-4"
           })
         } else {
           return h(UIcon, {
-            name: uIcons.error,
+            name: icons.error,
             class: "text-error size-4"
           })
         }
@@ -376,7 +267,7 @@ const columns: TableColumn<ActivityInterface>[] = [
           return h(MatchScoreItem, {
             draw: row.original.match.draw,
             tour: row.original.match.tour,
-            type: row.original.match.type,
+            type: row.original.type,
             match_no: row.original.match.match_no,
             sets: row.original.match.sets,
             tournament: row.original.tournament,
@@ -394,17 +285,17 @@ const columns: TableColumn<ActivityInterface>[] = [
     id: "h2h",
     header: "",
     cell: ({ row }) => {
-      if ((!row.getIsGrouped() || grouping.value.length === 0) && row.original.type !== "Doubles" && row.original.match.incomplete !== "B") {
+      if ((!row.getIsGrouped() || grouping.value.length === 0) && row.original.match.incomplete !== "B") {
         return h(UButton, {
-          icon: icons.h2h,
+          icon: ICONS.h2h,
           size: "xs",
           to: {
-            name: "h2h-players",
+            name: "head-to-head",
             params: {
-              p1Id: id,
-              p2Id: row.original.match.opponents[0]?.id as string,
-              p1Name: name,
-              p2Name: kebabCase(`${row.original.match.opponents[0]?.first_name} ${row.original.match.opponents[0]?.last_name}`)
+              p1Id: row.original.partner ? `${id}+${row.original.partner.id}` : id,
+              p2Id: row.original.match.opponents.map(opponent => opponent.id).join("+"),
+              p1Name: row.original.partner ? `${name}+${kebabCase(`${row.original.partner.first_name} ${row.original.partner.last_name}`)}` : name,
+              p2Name: row.original.match.opponents.map(opponent => kebabCase(`${opponent.first_name} ${opponent.last_name}`)).join("+")
             }
           },
           label: "H2H"
@@ -414,10 +305,8 @@ const columns: TableColumn<ActivityInterface>[] = [
   }
 ]
 
-const columnFilters = ref([])
-
+const sorting = ref([{ id: "dates", desc: true }])
 const grouping = ref<string[]>([])
-
 const grouping_options = ref<GroupingOptions>({
   getGroupedRowModel: getGroupedRowModel()
 })
@@ -428,24 +317,33 @@ const table = useTemplateRef("table")
 <template>
   <player-wrapper>
     <template #toolbar>
+      <filter-select-years
+        v-if="playerYears.length"
+        :items="playerYears"
+        v-model="year"
+      />
+
       <u-button
         label="Reset Sorting"
-        :icon="icons.sortAlpha"
+        :icon="ICONS.sortAlpha"
         @click="table?.tableApi.resetSorting()"
         size="sm"
       />
-      <!--
-      <u-radio-group
-        v-model="selection"
-        :items="['Titles', 'Finals']"
-        orientation="horizontal"
-      /> -->
-
       <u-button
         label="Reset Grouping"
-        :icon="icons.ungroup"
+        :icon="ICONS.ungroup"
         @click="table?.tableApi.resetGrouping()"
         size="sm"
+      />
+      <u-button
+        label="Reset Filters"
+        :icon="ICONS.noFilter"
+        @click="table?.tableApi.resetColumnFilters()"
+        size="sm"
+      />
+      <table-visibility
+        v-if="table"
+        :table="table!"
       />
     </template>
 
@@ -474,222 +372,34 @@ const table = useTemplateRef("table")
       </u-card>
     </div>
 
-    <u-table
-      ref="table"
-      :data="yearActivity.activity"
-      :columns
-      :loading="['idle', 'pending'].includes(status)"
-      sticky
-      v-model:column-filters="columnFilters"
-      :faceted-options="{
-        getFacetedRowModel: getFacetedRowModel(),
-        getFacetedMinMaxValues: getFacetedMinMaxValues(),
-        getFacetedUniqueValues: getFacetedUniqueValues()
-      }"
-      :grouping="grouping"
-      v-on:update:grouping="grouping = $event"
-      :grouping-options="grouping_options"
-      :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer', td: 'empty:p-0' }"
-    >
-      <template #loading>
-        <u-icon
-          :name="uIcons.loading"
-          class="size-8"
-        />
-      </template>
-
-      <template #empty>
-        <div class="flex justify-center items-center w-full gap-2 text-error">
-          <u-icon
-            :name="icons.noCalendar"
-            class="text-base"
+    <client-only>
+      <u-table
+        ref="table"
+        :data="yearActivity.activity"
+        :columns
+        :loading="['idle', 'pending'].includes(status)"
+        sticky
+        :faceted-options="{
+          getFacetedRowModel: getFacetedRowModel(),
+          getFacetedMinMaxValues: getFacetedMinMaxValues(),
+          getFacetedUniqueValues: getFacetedUniqueValues()
+        }"
+        :grouping="grouping"
+        v-on:update:grouping="grouping = $event"
+        :grouping-options="grouping_options"
+        v-model:sorting="sorting"
+        :ui="{ td: 'empty:p-0' }"
+      >
+        <template #loading>
+          <table-loading-icon />
+        </template>
+        <template #empty>
+          <table-empty-message
+            :icon="ICONS.noCalendar"
+            :message="`${playerName} had no activity in ${year}`"
           />
-          No events found
-        </div>
-      </template>
-
-      <template #tournament_name-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'tournament_name'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <u-link
-            v-if="
-              (row.getIsGrouped() && grouping.includes('tournament_name') && row.depth === grouping.findIndex(x => x === 'tournament_name')) ||
-              (!grouping.includes('tournament_name') && !row.getIsGrouped())
-            "
-            :to="{ name: 'tournament', params: { id: row.original.tournament.id, name: kebabCase(row.original.tournament.name) } }"
-            class="hover-link default-link w-fit mx-auto"
-          >
-            {{ row.getValue("tournament_name") }}
-          </u-link>
-        </div>
-      </template>
-
-      <template #match_round-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'match_round'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <div
-            v-if="
-              (row.getIsGrouped() && grouping.includes('match_round') && row.depth === grouping.findIndex(x => x === 'match_round')) ||
-              (!grouping.includes('match_round') && !row.getIsGrouped())
-            "
-            class="text-center"
-          >
-            {{ row.getValue("match_round") }}
-          </div>
-        </div>
-      </template>
-
-      <template #type-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'type'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <coloured-badge
-            v-if="
-              (row.getIsGrouped() && grouping.includes('type') && row.depth === grouping.findIndex(x => x === 'type')) ||
-              (!grouping.includes('type') && !row.getIsGrouped())
-            "
-            :label="row.getValue('type')"
-            class="mx-auto"
-          />
-        </div>
-      </template>
-
-      <template #match_draw-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'match_draw'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <coloured-badge
-            v-if="
-              (row.getIsGrouped() && grouping.includes('match_draw') && row.depth === grouping.findIndex(x => x === 'match_draw')) ||
-              (!grouping.includes('match_draw') && !row.getIsGrouped())
-            "
-            :label="row.getValue('match_draw')"
-            class="mx-auto"
-          />
-        </div>
-      </template>
-
-      <template #level-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'level'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <coloured-badge
-            v-if="
-              (row.getIsGrouped() && grouping.includes('level') && row.depth === grouping.findIndex(x => x === 'level')) ||
-              (!grouping.includes('level') && !row.getIsGrouped())
-            "
-            :label="row.getValue('level')"
-            class="mx-auto"
-          />
-        </div>
-      </template>
-
-      <template #category-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'category'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <u-link
-            v-if="
-              (row.getIsGrouped() && grouping.includes('category') && row.depth === grouping.findIndex(x => x === 'category')) ||
-              (!grouping.includes('category') && !row.getIsGrouped())
-            "
-            :to="{ name: 'category', params: { id: kebabCase(row.getValue('category') as string) } }"
-            class="hover-link default-link w-fit mx-auto"
-          >
-            {{ row.getValue("category") }}
-          </u-link>
-        </div>
-      </template>
-
-      <template #surface_id-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'surface_id'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <u-link
-            v-if="
-              (row.getIsGrouped() && grouping.includes('surface_id') && row.depth === grouping.findIndex(x => x === 'surface_id')) ||
-              (!grouping.includes('surface_id') && !row.getIsGrouped())
-            "
-            :to="{ name: 'surface', params: { id: kebabCase(row.getValue('surface_id') as string) } }"
-            class="hover-link default-link w-fit mx-auto"
-          >
-            {{ row.getValue("surface_id") }}
-          </u-link>
-        </div>
-      </template>
-
-      <template #country-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'country'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <country-link
-            v-if="
-              (row.getIsGrouped() && grouping.includes('country') && row.depth === grouping.findIndex(x => x === 'country')) ||
-              (!grouping.includes('country') && !row.getIsGrouped())
-            "
-            :country="row.original.venues[0]!.country"
-            class="mx-auto"
-          />
-        </div>
-      </template>
-    </u-table>
+        </template>
+      </u-table>
+    </client-only>
   </player-wrapper>
 </template>

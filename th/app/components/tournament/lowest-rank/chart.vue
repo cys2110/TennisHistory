@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const { events } = defineProps<{ events: TournamentLowestRankedType[] }>()
-const { icons, colours } = useAppConfig()
 const tours = inject<TourType[]>("tours", [])
 const tournamentName = inject<string>("tournamentName", "")
 const colorMode = useColorMode()
@@ -14,7 +13,7 @@ const formattedEvents = computed(() =>
 
 const option = computed(() => ({
   backgroundColor: "transparent",
-  textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+  textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
   grid: { containLabel: true },
   dataset: [
     {
@@ -46,12 +45,12 @@ const option = computed(() => ({
   ],
   xAxis: {
     type: "category",
-    axisLabel: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+    axisLabel: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
     name: "Round"
   },
   yAxis: {
     type: "value",
-    axisLabel: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+    axisLabel: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
     name: "Lowest Rank"
   },
   tooltip: {
@@ -59,7 +58,7 @@ const option = computed(() => ({
     axisPointer: { type: "shadow" }
   },
   legend: {
-    textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+    textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
     top: "middle",
     right: "right"
   },
@@ -68,14 +67,14 @@ const option = computed(() => ({
       name: `${tour} Singles`,
       type: "bar",
       encode: { x: "round", y: "rank" },
-      itemStyle: { color: index === 0 ? colours.emerald700 : colours.fuchsia300, borderRadius: [25, 25, 0, 0] },
+      itemStyle: { color: index === 0 ? COLOURS.emerald700 : COLOURS.fuchsia300, borderRadius: [25, 25, 0, 0] },
       datasetIndex: index + 1
     })),
     ...tours.map((tour, index) => ({
       name: `${tour} Doubles`,
       type: "bar",
       encode: { x: "round", y: "rank" },
-      itemStyle: { color: index === 0 ? colours.indigo700 : colours.amber300, borderRadius: [25, 25, 0, 0] },
+      itemStyle: { color: index === 0 ? COLOURS.indigo700 : COLOURS.amber300, borderRadius: [25, 25, 0, 0] },
       datasetIndex: index + tours.length + 1
     }))
   ]
@@ -90,7 +89,7 @@ const option = computed(() => ({
   >
     <u-button
       label="Chart"
-      :icon="icons.barChart"
+      :icon="ICONS.barChart"
     />
 
     <template #body>

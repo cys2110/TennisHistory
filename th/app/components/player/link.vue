@@ -7,7 +7,10 @@ defineProps<{ player: PersonInterface; centred?: boolean }>()
     class="flex items-center gap-2"
     :class="{ 'justify-center': centred }"
   >
-    <country-link :country="player.country" />
+    <country-link
+      :country="player.country"
+      icon-only
+    />
     <u-link
       :to="{ name: 'player', params: { id: player.id, name: kebabCase(`${player.first_name} ${player.last_name}`) } }"
       class="hover-link default-link"

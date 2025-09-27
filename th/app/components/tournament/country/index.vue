@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CountryLink, FilterTableHeader, SortTableHeader, UBadge } from "#components"
+import { CountryLink, TableHeaderFilter, TableHeaderSort, UBadge } from "#components"
 import type { TableColumn, TableRow } from "@nuxt/ui"
 import { type Column, createColumnHelper, getFacetedRowModel, getFacetedMinMaxValues, getFacetedUniqueValues } from "@tanstack/vue-table"
 
@@ -7,8 +7,7 @@ const {
   params: { id }
 } = useRoute("tournament")
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const mdAndUp = breakpoints.greaterOrEqual("md")
@@ -30,7 +29,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
     accessorKey: "country.name",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
-      h(FilterTableHeader, {
+      h(TableHeaderFilter, {
         column: column as Column<unknown>,
         label: "Country",
         type: "alpha"
@@ -58,7 +57,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -79,7 +78,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -101,7 +100,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -128,7 +127,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -149,7 +148,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -171,7 +170,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -199,7 +198,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -221,7 +220,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -243,7 +242,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -275,7 +274,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -296,7 +295,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -318,7 +317,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -345,7 +344,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -366,7 +365,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -388,7 +387,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -416,7 +415,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -438,7 +437,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -460,7 +459,7 @@ const columns: TableColumn<TournamentCountryType>[] = [
                   class: "flex items-center gap-2"
                 },
                 [
-                  h(SortTableHeader, {
+                  h(TableHeaderSort, {
                     column: column as Column<unknown>,
                     type: "number"
                   }),
@@ -478,10 +477,10 @@ const columns: TableColumn<TournamentCountryType>[] = [
   })
 ]
 
+const table = useTemplateRef("table")
 const columnVisibility = ref({
   tour: tours.length > 1
 })
-const columnFilters = ref([])
 
 const handleSelectRow = async (row: TableRow<TournamentCountryType>) => {
   await navigateTo({
@@ -500,7 +499,26 @@ const handleSelectRow = async (row: TableRow<TournamentCountryType>) => {
       <tournament-country-chart v-if="mdAndUp" />
     </teleport>
   </client-only>
+  <div class="flex items-center justify-between mb-5">
+    <u-button
+      label="Reset Sorting"
+      :icon="ICONS.sortAlpha"
+      @click="table?.tableApi.resetSorting()"
+      size="sm"
+    />
+    <u-button
+      label="Reset Filters"
+      :icon="ICONS.noFilter"
+      @click="table?.tableApi.resetColumnFilters()"
+      size="sm"
+    />
+    <table-visibility
+      v-if="table"
+      :table="table!"
+    />
+  </div>
   <u-table
+    ref="table"
     :data="countries"
     :columns
     :loading="['idle', 'pending'].includes(status)"
@@ -510,26 +528,19 @@ const handleSelectRow = async (row: TableRow<TournamentCountryType>) => {
       getFacetedMinMaxValues: getFacetedMinMaxValues(),
       getFacetedUniqueValues: getFacetedUniqueValues()
     }"
-    v-model:columnFilters="columnFilters"
     v-model:column-visibility="columnVisibility"
     @select="handleSelectRow"
     :ui="{ root: '2xl:max-w-19/20', tbody: '[&>tr]:cursor-pointer' }"
   >
     <template #loading>
-      <u-icon
-        :name="uIcons.loading"
-        class="size-8"
-      />
+      <table-loading-icon />
     </template>
 
     <template #empty>
-      <div class="flex justify-center items-center w-full gap-2 text-error">
-        <u-icon
-          :name="icons.noCountries"
-          class="text-base"
-        />
-        No countries represented by winners of {{ tournamentName }}
-      </div>
+      <table-empty-message
+        :icon="ICONS.noCountries"
+        :message="`No countries represented by winners of ${tournamentName}`"
+      />
     </template>
   </u-table>
 </template>

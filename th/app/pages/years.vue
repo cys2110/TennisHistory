@@ -1,16 +1,10 @@
 <script setup lang="ts">
-import { FilterTableHeader, UIcon } from "#components"
+import { TableHeaderFilter, UIcon } from "#components"
 import type { TableColumn, TableRow } from "@nuxt/ui"
 import { type Column, getFacetedRowModel, getFacetedUniqueValues } from "@tanstack/vue-table"
 
-// @ts-ignore
-// const id = useRouteQuery<number>("year", new Date().getFullYear().toString(), { transform: Number })
-const id = ref(2025)
+const id = useRouteQuery<number>("year", new Date().getFullYear(), { transform: Number })
 useHead({ title: () => id.value })
-const {
-  icons,
-  ui: { icons: uIcons }
-} = useAppConfig()
 
 interface APIResponse {
   type: string
@@ -33,7 +27,7 @@ const columns: TableColumn<APIResponse>[] = [
     accessorFn: row => capitalCase(row.type),
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
-      h(FilterTableHeader, {
+      h(TableHeaderFilter, {
         column: column as Column<unknown>,
         label: "Type",
         type: "alpha"
@@ -46,7 +40,7 @@ const columns: TableColumn<APIResponse>[] = [
         return h(
           "div",
           {
-            class: "flex items-center gap-2"
+            class: "flex justify-center items-center gap-2 w-full"
           },
           [h(UIcon, { name: getFlagCode(row.original.country) }), h("div", {}, `${row.original.first_name} ${row.original.last_name}`)]
         )
@@ -61,10 +55,10 @@ const handleSelectRow = async (row: TableRow<APIResponse>) => {
   const pageName = row.original.first_name ? "player" : "tournaament"
 
   const params =
-    pageName === "player" ?
-      { id: row.original.id, name: kebabCase(`${row.original.first_name} ${row.original.last_name}`) }
-      // @ts-ignore
-    : { id: row.original.id.low, name: kebabCase(row.original.name) }
+    pageName === "player"
+      ? { id: row.original.id, name: kebabCase(`${row.original.first_name} ${row.original.last_name}`) }
+      : // @ts-ignore
+        { id: row.original.id.low, name: kebabCase(row.original.name) }
 
   // @ts-ignore
   await navigateTo({
@@ -84,9 +78,9 @@ const handleSelectRow = async (row: TableRow<APIResponse>) => {
           </template>
         </u-dashboard-navbar>
 
-        <!-- <u-dashboard-toolbar>
-          <filter-select-all-years v-model="id as number" />
-        </u-dashboard-toolbar> -->
+        <u-dashboard-toolbar>
+          <filter-select-all-years v-model="id" />
+        </u-dashboard-toolbar>
       </template>
 
       <template #body>
@@ -103,20 +97,14 @@ const handleSelectRow = async (row: TableRow<APIResponse>) => {
           :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer', td: 'empty:p-0' }"
         >
           <template #loading>
-            <u-icon
-              :name="uIcons.loading"
-              class="size-8"
-            />
+            <table-loading-icon />
           </template>
 
           <template #empty>
-            <div class="flex justify-center items-center w-full gap-2 text-error">
-              <u-icon
-                :name="icons.noSearch"
-                class="text-base"
-              />
-              No results found
-            </div>
+            <table-empty-message
+              :icon="ICONS.noSearch"
+              :message="`No results found for ${id}`"
+            />
           </template>
         </u-table>
       </template>

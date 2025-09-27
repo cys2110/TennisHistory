@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrayFilterTableHeader, CountryLink, FilterTableHeader, NameTableHeader, RangeTableHeader, UBadge, ULink } from "#components"
+import { ColouredBadge, CountryLink, TableHeaderFilter, TableHeaderName, TableHeaderRange, ULink } from "#components"
 import type { TableColumn } from "@nuxt/ui"
 import { type Column, createColumnHelper, getFacetedRowModel, getFacetedMinMaxValues, getFacetedUniqueValues } from "@tanstack/vue-table"
 
@@ -7,8 +7,7 @@ const {
   params: { id, name }
 } = useRoute("tournament")
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
 const tours = inject<TourType[]>("tours", [])
 const tournamentName = inject<string>("tournamentName", "")
@@ -32,34 +31,18 @@ const gridColumns: TableColumn<TournamentSeedType["teams"][number]>[] = [
         id: "country",
         accessorFn: row => row.players.map(p => p.country.name),
         filterFn: "arrIncludesSome",
-        header: ({ column }) =>
-          h(ArrayFilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Country"
-          }),
-        cell: ({ row }) =>
-          row.original.players.map(p =>
-            h(CountryLink, {
-              country: p.country,
-              class: "mx-auto"
-            })
-          )
+        header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Country" }),
+        cell: ({ row }) => row.original.players.map(p => h(CountryLink, { country: p.country, class: "mx-auto" }))
       },
       {
         id: "name",
         accessorFn: row => row.players.map(p => `${p.last_name}, ${p.first_name}`),
         filterFn: (row, columnId, filterValue) => filterIncludesName(row, columnId, filterValue),
-        header: ({ column }) =>
-          h(NameTableHeader, {
-            column: column as Column<unknown>,
-            label: "Name"
-          }),
+        header: ({ column }) => h(TableHeaderName, { column: column as Column<unknown>, label: "Name" }),
         cell: ({ row }) =>
           h(
             "div",
-            {
-              class: "flex flex-col items-center"
-            },
+            { class: "flex flex-col items-center" },
             row.original.players.map(p =>
               h(
                 ULink,
@@ -80,63 +63,54 @@ const columns: TableColumn<TournamentSeedType>[] = [
   {
     accessorKey: "year",
     meta: { class: { td: "font-semibold" } },
-    header: ({ column }) =>
-      h(RangeTableHeader, {
-        column: column as Column<unknown>,
-        label: "Year"
-      })
+    header: ({ column }) => h(TableHeaderRange, { column: column as Column<unknown>, label: "Year" })
   },
   {
     accessorKey: "tour",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Tour",
-        type: "alpha"
-      }),
-    cell: ({ row }) =>
-      h(UBadge, {
-        label: row.original.tour,
-        color: getTourColour(row.original.tour)
-      })
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Tour" }),
+    cell: ({ row }) => h(ColouredBadge, { label: row.original.tour, class: "mx-auto" })
   },
   {
     accessorKey: "type",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Type",
-        type: "alpha"
-      }),
-    cell: ({ row }) =>
-      h(UBadge, {
-        label: row.original.type,
-        color: getMatchTypeColour(row.original.type)
-      })
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Type" }),
+    cell: ({ row }) => h(ColouredBadge, { label: row.original.type, class: "mx-auto" })
   },
   {
     accessorKey: "round",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Round",
-        type: "alpha"
-      })
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Round" })
   }
 ]
 
-const expanded = ref({})
+const table = useTemplateRef("table")
 const columnVisibility = ref({
   tour: tours.length > 1
 })
-const columnFilters = ref([])
 </script>
 
 <template>
+  <div class="flex items-center justify-between mb-5">
+    <u-button
+      label="Reset Sorting"
+      :icon="ICONS.sortAlpha"
+      @click="table?.tableApi.resetSorting()"
+      size="sm"
+    />
+    <u-button
+      label="Reset Filters"
+      :icon="ICONS.noFilter"
+      @click="table?.tableApi.resetColumnFilters()"
+      size="sm"
+    />
+    <table-visibility
+      v-if="table"
+      :table="table!"
+    />
+  </div>
   <u-table
+    ref="table"
     :data="useSorted(results, (a, b) => b.year - a.year).value"
     :columns
     :loading="['idle', 'pending'].includes(status)"
@@ -146,25 +120,18 @@ const columnFilters = ref([])
       getFacetedMinMaxValues: getFacetedMinMaxValues(),
       getFacetedUniqueValues: getFacetedUniqueValues()
     }"
-    v-model:columnFilters="columnFilters"
     v-model:column-visibility="columnVisibility"
     :ui="{ td: 'empty:p-0' }"
   >
     <template #loading>
-      <u-icon
-        :name="uIcons.loading"
-        class="size-8"
-      />
+      <table-loading-icon />
     </template>
 
     <template #empty>
-      <div class="flex justify-center items-center w-full gap-2 text-error">
-        <u-icon
-          :name="icons.noPlayer"
-          class="text-base"
-        />
-        No years when the top seeds reached the later rounds of {{ tournamentName }}
-      </div>
+      <table-empty-message
+        :icon="ICONS.noPlayer"
+        :message="`No years when the top seeds reached the later rounds of ${tournamentName}`"
+      />
     </template>
 
     <template #year-cell="{ row }">
@@ -174,7 +141,7 @@ const columnFilters = ref([])
           color="neutral"
           class="mr-2"
           size="xs"
-          :icon="uIcons.chevronDoubleRight"
+          :icon="icons.chevronDoubleRight"
           :ui="{
             leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200',
             label: 'font-semibold'
@@ -184,10 +151,10 @@ const columnFilters = ref([])
 
         <u-link
           :to="{ name: 'event', params: { id, name, year: row.original.year, eid: row.original.id } }"
-          class="hover-link font-semibold"
+          class="hover-link default-link font-semibold"
         >
-          {{ row.original.year }}</u-link
-        >
+          {{ row.original.year }}
+        </u-link>
       </div>
     </template>
 

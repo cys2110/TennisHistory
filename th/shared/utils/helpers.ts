@@ -9,11 +9,7 @@ export const destructureMid = (mid: string) => {
   const parts = mid.split("")
   const [drawPart, tourPart, typePart, ...numberParts] = parts
   const draw = drawPart === "m" ? "Main" : "Qualifying"
-  const tour =
-    tourPart === "l" ? "WTA"
-    : tourPart === "g" ? "ATP"
-    : tourPart === "w" ? "Women"
-    : "Men"
+  const tour = tourPart === "l" ? "WTA" : tourPart === "g" ? "ATP" : tourPart === "w" ? "Women" : "Men"
   const type = typePart === "d" ? "Doubles" : "Singles"
   const number = numberParts.join("").trim()
   return { draw, tour, type, match_no: Number(number) }

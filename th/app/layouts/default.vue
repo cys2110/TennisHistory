@@ -1,35 +1,23 @@
 <script setup lang="ts">
+import type { NavigationMenuItem } from "@nuxt/ui"
+
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const lgAndUp = breakpoints.greaterOrEqual("lg")
-const { setTableMode } = useDefaults()
 
-const navLinks = [
-  { label: "Results Archive", icon: icons.event, to: { name: "results-archive" } },
-  { label: "Tournaments", icon: icons.tournament, to: { name: "tournaments" } },
-  { label: "Players", icon: icons.player, to: { name: "players" } },
-  { label: "Head to Head", icon: icons.h2h, to: { name: "h2h" } },
-  {
-    label: "Other",
-    icon: "tabler:grid-dots",
-    children: [
-      { label: "Categories", to: { name: "categories" }, icon: icons.categories },
-      { label: "Coaches", to: { name: "coaches" }, icon: icons.coach },
-      { label: "Countries", to: { name: "countries" }, icon: icons.countries },
-      { label: "Supervisors", to: { name: "supervisors" }, icon: icons.supervisor },
-      { label: "Surfaces", to: { name: "surfaces" }, icon: icons.court },
-      { label: "Umpires", to: { name: "umpires" }, icon: icons.umpire },
-      { label: "Venues", to: { name: "venues" }, icon: icons.venue },
-      { label: "Years", to: { name: "years" }, icon: icons.year }
-    ]
-  },
-  { label: "Stats/Records", icon: icons.stats, to: { name: "statistics-and-records" } },
-  { label: "Ranking Rules", icon: icons.seeds, to: { name: "ranking-rules" } },
-  { label: "Search", icon: uIcons.search, to: { name: "search" } },
-  { label: "About", icon: uIcons.info, to: { name: "about" } }
+const searchTerm = ref("")
+
+const navLinks: NavigationMenuItem[] = [
+  { label: "Results Archive", to: { name: "results-archive" }, icon: ICONS.event },
+  { label: "Tournaments", to: { name: "tournaments" }, icon: ICONS.tournament },
+  { label: "Players", to: { name: "players" }, icon: ICONS.player },
+  { label: "Head to Head", to: { name: "h2h" }, icon: ICONS.h2h },
+  { label: "Countries", to: { name: "countries" }, icon: ICONS.countries },
+  { label: "Years", to: { name: "years" }, icon: ICONS.year },
+  // { label: "Stats/Records", icon: icons.stats, to: { name: "statistics-and-records" } },
+  { label: "About", to: { name: "about" }, icon: icons.info }
 ]
 
 const relatedLinks = [
@@ -60,29 +48,41 @@ const relatedLinks = [
   }
 ]
 
+const { data: results, status } = await useFetch("/api/search", {
+  key: `search-${searchTerm}`,
+  query: { searchTerm },
+  lazy: true,
+  server: false,
+  transform: (data: any) => {
+    return data.map((item: any) => ({
+      id: item.id?.low ?? item.id,
+      label: item.name ?? `${item.first_name} ${item.last_name}`,
+      to: {
+        name: item.labels.includes("Player") ? "player" : item.labels.includes("Country") ? "country" : "tournament",
+        params: {
+          id: item.id?.low ?? item.id,
+          name: kebabCase(item.name ?? `${item.first_name} ${item.last_name}`)
+        }
+      }
+    }))
+  }
+})
+
 const groups = computed(() => [
   {
-    id: "tableMode",
-    label: "Default table view",
-    items: [
-      {
-        label: "Grouped",
-        suffix: "View data in tables with grouping and aggregations where available",
-        onSelect: () => setTableMode("grouped")
-      },
-      {
-        label: "Ungrouped",
-        suffix: "View data in tables in a running list without aggregations",
-        onSelect: () => setTableMode("ungrouped")
-      }
-    ]
+    id: "results",
+    label: searchTerm.value ? `Results matching ${searchTerm.value}` : "Search players, tournaments or countries",
+    items: results.value || []
   }
 ])
 </script>
 
 <template>
   <u-dashboard-group>
-    <u-dashboard-search :groups />
+    <u-dashboard-search
+      :groups
+      :loading="status === 'pending'"
+    />
 
     <u-dashboard-sidebar
       :default-size="5"
@@ -96,9 +96,8 @@ const groups = computed(() => [
           size="sm"
           variant="ghost"
           :kbds="[]"
-          label="Shortcuts"
+          :icon="icons.search"
         />
-        <!--@vue-expect-error-->
         <u-navigation-menu
           orientation="vertical"
           :collapsed="lgAndUp"

@@ -1,19 +1,16 @@
 <script setup lang="ts">
-import { ArrayFilterTableHeader, FilterTableHeader, RangeTableHeader, UBadge } from "#components"
-import { type TableColumn, type TableRow } from "@nuxt/ui"
-import { type Column, getFacetedRowModel, getFacetedMinMaxValues, getFacetedUniqueValues } from "@tanstack/vue-table"
+import { TableCellGroup, TableHeaderFilter, TableHeaderGroup, TableHeaderRange, UBadge } from "#components"
+import type { TableColumn, TableRow } from "@nuxt/ui"
+import {
+  type Column,
+  getFacetedRowModel,
+  getFacetedMinMaxValues,
+  getFacetedUniqueValues,
+  getGroupedRowModel,
+  type GroupingOptions
+} from "@tanstack/vue-table"
 
 useHead({ title: "Tournaments" })
-useJsonld(() => ({
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  name: "Tournaments",
-  description: "A collection of tennis tournaments"
-}))
-const {
-  icons,
-  ui: { icons: uIcons }
-} = useAppConfig()
 
 // API call
 const { data: tournaments, status } = await useFetch<TournamentInterface[]>("/api/tournaments", {
@@ -28,18 +25,20 @@ const columns: TableColumn<TournamentInterface>[] = [
     sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
     filterFn: "arrIncludesSome",
     meta: { class: { td: "flex justify-center items-center gap-1" } },
-    header: ({ column }) =>
-      h(ArrayFilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Tours"
-      }),
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Tours" }),
     cell: ({ row }) =>
-      row.original.tours?.map(tour =>
-        h(UBadge, {
-          key: `${row.original.id}-${tour}`,
-          label: tour,
-          color: getTourColour(tour)
-        })
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "tours" }, () =>
+        h(
+          "div",
+          { class: "flex justify-center gap-1 w-full" },
+          row.original.tours?.map(tour =>
+            h(UBadge, {
+              key: `${row.original.id}-${tour}`,
+              label: tour,
+              color: getTourColour(tour)
+            })
+          )
+        )
       ),
     footer: ({ table }) => `Total: ${table.getRowCount()}`
   },
@@ -47,7 +46,7 @@ const columns: TableColumn<TournamentInterface>[] = [
     accessorKey: "name",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
-      h(FilterTableHeader, {
+      h(TableHeaderFilter, {
         column: column as Column<unknown>,
         label: "Name",
         type: "alpha"
@@ -56,25 +55,35 @@ const columns: TableColumn<TournamentInterface>[] = [
   {
     accessorKey: "established",
     sortUndefined: "last",
-    header: ({ column }) => h(RangeTableHeader, { column: column as Column<unknown>, label: "Established" })
+    aggregationFn: "min",
+    header: ({ column }) => h(TableHeaderRange, { column: column as Column<unknown>, label: "Established" })
   },
   {
     accessorKey: "abolished",
     sortUndefined: "last",
-    header: ({ column }) => h(RangeTableHeader, { column: column as Column<unknown>, label: "Abolished" })
+    aggregationFn: "max",
+    header: ({ column }) => h(TableHeaderRange, { column: column as Column<unknown>, label: "Abolished" })
   }
 ]
 
-const columnFilters = ref([])
+const table = useTemplateRef("table")
+const grouping = ref<string[]>([])
+const grouping_options = ref<GroupingOptions>({
+  getGroupedRowModel: getGroupedRowModel()
+})
 
 const handleSelectRow = async (row: TableRow<TournamentInterface>) => {
-  await navigateTo({
-    name: "tournament",
-    params: {
-      id: row.original.id,
-      name: kebabCase(row.original.name)
-    }
-  })
+  if (row.getIsGrouped()) {
+    row.toggleExpanded()
+  } else {
+    await navigateTo({
+      name: "tournament",
+      params: {
+        id: row.original.id,
+        name: kebabCase(row.original.name)
+      }
+    })
+  }
 }
 </script>
 
@@ -87,37 +96,58 @@ const handleSelectRow = async (row: TableRow<TournamentInterface>) => {
             <page-title />
           </template>
         </u-dashboard-navbar>
+        <u-dashboard-toolbar>
+          <u-button
+            label="Reset Sorting"
+            :icon="ICONS.sortAlpha"
+            @click="table?.tableApi.resetSorting()"
+            size="sm"
+          />
+          <u-button
+            label="Reset Grouping"
+            :icon="ICONS.ungroup"
+            @click="table?.tableApi.resetGrouping()"
+            size="sm"
+          />
+          <u-button
+            label="Reset Filters"
+            :icon="ICONS.noFilter"
+            @click="table?.tableApi.resetColumnFilters()"
+            size="sm"
+          />
+          <table-visibility
+            v-if="table"
+            :table="table!"
+          />
+        </u-dashboard-toolbar>
       </template>
       <template #body>
         <u-table
+          ref="table"
           :data="tournaments"
           :columns
           :loading="['idle', 'pending'].includes(status)"
           sticky
-          v-model:column-filters="columnFilters"
           :faceted-options="{
             getFacetedRowModel: getFacetedRowModel(),
             getFacetedMinMaxValues: getFacetedMinMaxValues(),
             getFacetedUniqueValues: getFacetedUniqueValues()
           }"
+          :grouping="grouping"
+          v-on:update:grouping="grouping = $event"
+          :grouping-options="grouping_options"
           @select="handleSelectRow"
-          :ui="{ tbody: '[&>tr]:cursor-pointer' }"
+          :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer', td: 'empty:p-0' }"
         >
           <template #loading>
-            <u-icon
-              :name="uIcons.loading"
-              class="size-8"
-            />
+            <table-loading-icon />
           </template>
 
           <template #empty>
-            <div class="flex justify-center items-center w-full gap-2 text-error">
-              <u-icon
-                :name="icons.noTournament"
-                class="text-base"
-              />
-              No tournaments found
-            </div>
+            <table-empty-message
+              :icon="ICONS.noTournament"
+              message="No tournaments found"
+            />
           </template>
         </u-table>
       </template>

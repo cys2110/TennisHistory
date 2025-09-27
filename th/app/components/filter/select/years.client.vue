@@ -1,8 +1,7 @@
 <script setup lang="ts">
 defineProps<{ items: number[] }>()
 const {
-  icons,
-  ui: { icons: appIcons }
+  ui: { icons }
 } = useAppConfig()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
 const middleSizes = breakpoints.between("md", "xl")
@@ -12,18 +11,18 @@ const modelValue = defineModel<number | undefined>()
 
 <template>
   <u-form-field
-    label="Years"
+    label="Year"
     :size="middleSizes ? 'sm' : 'md'"
   >
     <u-select
       v-model="modelValue"
       :items
-      :icon="icons.year"
+      :icon="ICONS.year"
       placeholder="Select year"
     >
       <template #content-bottom>
         <u-button
-          :trailing-icon="appIcons.close"
+          :trailing-icon="icons.close"
           color="neutral"
           variant="link"
           size="xs"

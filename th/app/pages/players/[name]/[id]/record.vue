@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { RangeTableHeader, SortTableHeader, UButton } from "#components"
+import { TableCellGroup, TableHeaderGroup, TableHeaderRange, TableHeaderSort, UButton } from "#components"
 import type { TableColumn, TableRow } from "@nuxt/ui"
 import {
   type Column,
+  createColumnHelper,
   getFacetedRowModel,
   getFacetedMinMaxValues,
   getFacetedUniqueValues,
@@ -10,13 +11,14 @@ import {
   type GroupingOptions
 } from "@tanstack/vue-table"
 
+const playerName = useState<string>("player-name")
+
 definePageMeta({ name: "record" })
 const {
   params: { id }
 } = useRoute("record")
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
 
 // API call
@@ -29,38 +31,21 @@ const { data: results, status } = await useFetch<RecordInterface[]>("/api/player
 
 const columns: TableColumn<RecordInterface>[] = [
   {
-    id: "expand",
-    cell: ({ row }) =>
-      h(UButton, {
-        variant: "link",
-        color: "neutral",
-        class: "mr-2",
-        size: "xs",
-        icon: uIcons.chevronDoubleRight,
-        onClick: () => row.toggleExpanded(),
-        ui: {
-          leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200"
-        }
-      })
-  },
-  {
+    id: "tournament",
     accessorKey: "tournament.name",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
     header: ({ column }) =>
-      h(SortTableHeader, {
+      h(TableHeaderGroup, {
         column: column as Column<unknown>,
-        label: "Tournament",
-        type: "alpha"
+        label: "Tournament"
       }),
-    cell: ({ row, cell }) => {
-      if (row.getIsGrouped()) {
-        return cell.getValue()
-      }
-    }
+    cell: ({ row, cell }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "tournament" }, () => cell.getValue() as string)
   },
   {
     accessorKey: "year",
     header: ({ column }) =>
-      h(RangeTableHeader, {
+      h(TableHeaderRange, {
         column: column as Column<unknown>,
         label: "Year"
       }),
@@ -73,7 +58,7 @@ const columns: TableColumn<RecordInterface>[] = [
   {
     accessorKey: "singles.number",
     header: ({ column }) =>
-      h(SortTableHeader, {
+      h(TableHeaderSort, {
         column: column as Column<unknown>,
         label: "Singles",
         type: "number"
@@ -93,7 +78,7 @@ const columns: TableColumn<RecordInterface>[] = [
   {
     accessorKey: "doubles.number",
     header: ({ column }) =>
-      h(SortTableHeader, {
+      h(TableHeaderSort, {
         column: column as Column<unknown>,
         label: "Doubles",
         type: "number"
@@ -112,12 +97,9 @@ const columns: TableColumn<RecordInterface>[] = [
   }
 ]
 
-const columnFilters = ref([])
-
-const grouping = ref<string[]>(["tournament_name"])
+const grouping = ref<string[]>([])
 
 const grouping_options = ref<GroupingOptions>({
-  groupedColumnMode: false,
   getGroupedRowModel: getGroupedRowModel()
 })
 
@@ -143,9 +125,25 @@ const handleSelectRow = async (row: TableRow<EventInterface>) => {
     <template #toolbar>
       <u-button
         label="Reset Sorting"
-        :icon="icons.sortAlpha"
+        :icon="ICONS.sortAlpha"
         @click="table?.tableApi.resetSorting()"
         size="sm"
+      />
+      <u-button
+        label="Reset Grouping"
+        :icon="ICONS.ungroup"
+        @click="table?.tableApi.resetGrouping()"
+        size="sm"
+      />
+      <u-button
+        label="Reset Filters"
+        :icon="ICONS.noFilter"
+        @click="table?.tableApi.resetColumnFilters()"
+        size="sm"
+      />
+      <table-visibility
+        v-if="table"
+        :table="table!"
       />
     </template>
 
@@ -155,32 +153,26 @@ const handleSelectRow = async (row: TableRow<EventInterface>) => {
       :columns
       :loading="['idle', 'pending'].includes(status)"
       sticky
-      v-model:column-filters="columnFilters"
       :faceted-options="{
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedMinMaxValues: getFacetedMinMaxValues(),
         getFacetedUniqueValues: getFacetedUniqueValues()
       }"
       :grouping="grouping"
+      v-on:update:grouping="grouping = $event"
       :grouping-options="grouping_options"
       @select="handleSelectRow"
       :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer', td: 'empty:p-0' }"
     >
       <template #loading>
-        <u-icon
-          :name="uIcons.loading"
-          class="size-8"
-        />
+        <table-loading-icon />
       </template>
 
       <template #empty>
-        <div class="flex justify-center items-center w-full gap-2 text-error">
-          <u-icon
-            :name="icons.noTournament"
-            class="text-base"
-          />
-          No results found
-        </div>
+        <table-empty-message
+          :message="`No record found for ${playerName}`"
+          :icon="ICONS.noTournament"
+        />
       </template>
     </u-table>
   </player-wrapper>

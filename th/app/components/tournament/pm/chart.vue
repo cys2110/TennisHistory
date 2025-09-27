@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const { rounds } = defineProps<{ rounds: TournamentPmType[] }>()
-const { icons, colours } = useAppConfig()
 const tours = inject<TourType[]>("tours", [])
 const tournamentName = inject<string>("tournamentName", "")
 const colorMode = useColorMode()
@@ -12,65 +11,65 @@ const roundNames = useArrayUnique(rounds.sort((a, b) => b.number - a.number).map
 
 const roundColourMapping = {
   "Qualifying round 1": {
-    line: colours.fuchsia600,
-    area: colours.fuchsia300,
-    scatter: colours.red300
+    line: COLOURS.fuchsia600,
+    area: COLOURS.fuchsia300,
+    scatter: COLOURS.red300
   },
   "Qualifying round 2": {
-    line: colours.purple600,
-    area: colours.purple300,
-    scatter: colours.violet700
+    line: COLOURS.purple600,
+    area: COLOURS.purple300,
+    scatter: COLOURS.violet700
   },
   Qualifier: {
-    line: colours.amber600,
-    area: colours.amber300,
-    scatter: colours.orange600
+    line: COLOURS.amber600,
+    area: COLOURS.amber300,
+    scatter: COLOURS.orange600
   },
   "Round of 128": {
-    line: colours.lime500,
-    area: colours.lime300,
-    scatter: colours.green600
+    line: COLOURS.lime500,
+    area: COLOURS.lime300,
+    scatter: COLOURS.green600
   },
   "Round of 64": {
-    line: colours.rose700,
-    area: colours.rose300,
-    scatter: colours.fuchsia600
+    line: COLOURS.rose700,
+    area: COLOURS.rose300,
+    scatter: COLOURS.fuchsia600
   },
   "Round of 32": {
-    line: colours.sky700,
-    area: colours.sky300,
-    scatter: colours.blue700
+    line: COLOURS.sky700,
+    area: COLOURS.sky300,
+    scatter: COLOURS.blue700
   },
   "Round of 16": {
-    line: colours.orange600,
-    area: colours.orange300,
-    scatter: colours.red700
+    line: COLOURS.orange600,
+    area: COLOURS.orange300,
+    scatter: COLOURS.red700
   },
   Quarterfinals: {
-    line: colours.violet700,
-    area: colours.violet300,
-    scatter: colours.purple300
+    line: COLOURS.violet700,
+    area: COLOURS.violet300,
+    scatter: COLOURS.purple300
   },
   Semifinals: {
-    line: colours.indigo700,
-    area: colours.indigo300,
-    scatter: colours.cyan300
+    line: COLOURS.indigo700,
+    area: COLOURS.indigo300,
+    scatter: COLOURS.cyan300
   },
   Final: {
-    line: colours.yellow600,
-    area: colours.yellow300,
-    scatter: colours.orange600
+    line: COLOURS.yellow600,
+    area: COLOURS.yellow300,
+    scatter: COLOURS.orange600
   },
   Win: {
-    line: colours.emerald700,
-    area: colours.emerald300,
-    scatter: colours.lime300
+    line: COLOURS.emerald700,
+    area: COLOURS.emerald300,
+    scatter: COLOURS.lime300
   }
 }
 
 const option = computed(() => ({
   backgroundColor: "transparent",
-  textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+  textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
   grid: { containLabel: true },
   dataset: [
     {
@@ -83,15 +82,15 @@ const option = computed(() => ({
         config: {
           and: [
             { dimension: "round", value: round },
-            { dimension: "tour", value: selectedTour.value },
-            { dimension: "type", value: selectedType.value }
+            { dimension: "tour", value: get(selectedTour) },
+            { dimension: "type", value: get(selectedType) }
           ]
         }
       }
     }))
   ],
   legend: {
-    textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+    textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
     top: "top"
   },
   tooltip: {
@@ -99,12 +98,10 @@ const option = computed(() => ({
     axisPointer: {
       type: "cross",
       label: {
-        backgroundColor: colorMode.value === "dark" ? colours.lightText : colours.darkText
+        backgroundColor: colorMode.value === "dark" ? COLOURS.lightText : COLOURS.darkText
       }
     },
-    textStyle: {
-      fontWeight: "bold"
-    }
+    textStyle: { fontWeight: "bold" }
   },
   xAxis: {
     type: "category",
@@ -180,7 +177,7 @@ const option = computed(() => ({
   >
     <u-button
       label="Chart"
-      :icon="icons.areaChart"
+      :icon="ICONS.areaChart"
     />
 
     <template #body>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FilterTableHeader, MatchScoreItem, NameTableHeader, PlayerLink, SortTableHeader, ULink } from "#components"
+import { MatchScoreItem, PlayerLink, TableHeaderFilter, TableHeaderName, TableHeaderSort, ULink } from "#components"
 import type { TableColumn } from "@nuxt/ui"
 import { type Column } from "@tanstack/vue-table"
 
@@ -7,10 +7,9 @@ const { h2h } = defineProps<{ h2h: { p1: PlayerInterface; p2: PlayerInterface; p
 
 const {
   params: { p1Id, p2Id }
-} = useRoute("h2h-players")
+} = useRoute("head-to-head")
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
 
 interface APIResponse extends EventInterface {
@@ -26,12 +25,7 @@ const { data: events, status } = await useFetch<APIResponse[]>("/api/h2h/matches
 const columns: TableColumn<APIResponse>[] = [
   {
     accessorKey: "year",
-    header: ({ column }) =>
-      h(SortTableHeader, {
-        column: column as Column<unknown>,
-        label: "Year",
-        type: "number"
-      }),
+    header: ({ column }) => h(TableHeaderSort, { column: column as Column<unknown>, label: "Year", type: "number" }),
     cell: ({ row }) =>
       h(
         ULink,
@@ -49,11 +43,7 @@ const columns: TableColumn<APIResponse>[] = [
     id: "winner",
     accessorFn: row => `${row.match.winner.last_name}, ${row.match.winner.first_name}`,
     filterFn: (row, columnId, filterValue) => filterIncludesNameString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(NameTableHeader, {
-        column: column as Column<unknown>,
-        label: "Winner"
-      }),
+    header: ({ column }) => h(TableHeaderName, { column: column as Column<unknown>, label: "Winner" }),
     cell: ({ row }) =>
       h(PlayerLink, {
         player: row.original.match.winner,
@@ -63,12 +53,7 @@ const columns: TableColumn<APIResponse>[] = [
   {
     accessorKey: "tournament.name",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Tournament",
-        type: "alpha"
-      }),
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Tournament" }),
     cell: ({ row }) =>
       h(
         ULink,
@@ -82,37 +67,19 @@ const columns: TableColumn<APIResponse>[] = [
   {
     accessorKey: "match.round",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Round",
-        type: "alpha"
-      })
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Round" })
   },
   {
     accessorKey: "surface.id",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(FilterTableHeader, {
-        column: column as Column<unknown>,
-        label: "Surface",
-        type: "alpha"
-      }),
-    cell: ({ row }) =>
-      h(
-        ULink,
-        {
-          to: { name: "surface", params: { id: kebabCase(row.original.surface.id) } },
-          class: "hover-link default-link w-fit mx-auto"
-        },
-        () => row.original.surface.id
-      )
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Surface" })
   },
   {
     id: "score",
     header: "Score",
     cell: ({ row }) =>
       h(MatchScoreItem, {
+        draw: row.original.match.draw,
         tour: h2h.p1.tour,
         type: "Singles",
         sets: row.original.match.sets,
@@ -131,7 +98,7 @@ const columns: TableColumn<APIResponse>[] = [
 <template>
   <dashboard-subpanel
     title="Matches"
-    :icon="icons.upcoming"
+    :icon="ICONS.upcoming"
   >
     <u-table
       :data="events"
@@ -141,7 +108,7 @@ const columns: TableColumn<APIResponse>[] = [
     >
       <template #loading>
         <u-icon
-          :name="uIcons.loading"
+          :name="icons.loading"
           class="size-8"
         />
       </template>
@@ -149,7 +116,7 @@ const columns: TableColumn<APIResponse>[] = [
       <template #empty>
         <div class="flex justify-center items-center w-full gap-2 text-error">
           <u-icon
-            :name="icons.noH2H"
+            :name="ICONS.noH2H"
             class="text-base"
           />
           No matches found between {{ h2h.p1.first_name }} {{ h2h.p1.last_name }} and {{ h2h.p2.first_name }} {{ h2h.p2.last_name }}.

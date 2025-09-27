@@ -204,6 +204,7 @@ declare global {
     tfc: (number | undefined)[]
     tournament: TournamentInterface
     tours: TourType[]
+    umpires: PersonInterface[]
     venues: VenueInterface[]
     wiki_link?: string
     women_link?: string
@@ -264,10 +265,12 @@ declare global {
 
   interface PersonInterface {
     country: CountryInterface
+    end_year: number
     first_name: string
     id: string
     labels: string[]
     last_name: string
+    start_year: number
     tour: TourType
     years?: number[]
   }
@@ -279,7 +282,7 @@ declare global {
     ch_singles?: number
     ch_doubles?: number
     coach: boolean
-    coaches?: CoachInterface[]
+    coaches: PersonInterface[]
     countries: CountryInterface[]
     current_doubles?: number
     current_singles?: number
@@ -302,7 +305,7 @@ declare global {
     wta_link?: string
 
     // WL
-    wl?: WinLossType[]
+    wl: WinLossType[]
     titles: {
       level: LevelType
       singles: number
@@ -310,7 +313,7 @@ declare global {
     }[]
 
     // h2h
-    h2h?: {
+    h2h: {
       opponent: PlayerInterface
       matches: number
       wins: number

@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "@nuxt/image", "nuxt-echarts", "nuxt-neo4j", "@vueuse/nuxt", "@nuxt/ui", "@nuxt/content", "nuxt-jsonld"],
+  modules: ["@nuxt/eslint", "@nuxt/image", "nuxt-echarts", "nuxt-neo4j", "@vueuse/nuxt", "@nuxt/ui"],
   // Set page transitions
   app: { pageTransition: { name: "page", mode: "out-in" } },
   // Set scroll behaviour
@@ -104,7 +104,7 @@ export default defineNuxtConfig({
     customCollections: [
       {
         prefix: "flags",
-        dir: "./assets/flags",
+        dir: "~/assets/flags",
         normalizeIconName: false
       }
     ]

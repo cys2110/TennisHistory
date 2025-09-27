@@ -5,8 +5,7 @@ const {
   params: { id, name: paramName }
 } = useRoute("player")
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons, colors }
 } = useAppConfig()
 
 // API call
@@ -21,24 +20,22 @@ const playerName = useState<string>("player-name", () => (player.value ? `${play
 const playerTour = useState<TourType | string>("player-tour", () => player.value?.tour || "")
 
 useHead({
-  title: `${PLAYER_PAGES.find(page => page.name === name)?.label} | ${player.value ? `${player.value.first_name} ${player.value.last_name}` : capitalCase(paramName)}`
+  title: () =>
+    `${PLAYER_PAGES.find(page => page.name === name)?.label} | ${
+      player.value ? `${player.value.first_name} ${player.value.last_name}` : capitalCase(paramName)
+    }`
 })
 
 const otherLinks = computed(() => {
   if (player.value) {
     const playerDetails = player.value
-    const colour = playerDetails.tour.toLowerCase() as "wta" | "atp" | "primary"
+    const colour = playerDetails.tour.toLowerCase() as keyof typeof colors
     return [
-      playerDetails.coach && {
-        label: "Coach Profile",
-        icon: icons.coach,
-        to: { name: "coach", params: { id } }
-      },
       playerDetails.atp_link && { label: "ATP Profile", color: colour, to: playerDetails.atp_link, target: "_blank" },
       playerDetails.wta_link && { label: "WTA Profile", color: colour, to: playerDetails.wta_link, target: "_blank" },
       playerDetails.official_link && { label: "Official Website", color: colour, to: playerDetails.official_link, target: "_blank" },
       playerDetails.wiki_link && { label: "Wikipedia", color: colour, to: playerDetails.wiki_link, target: "_blank" }
-    ].filter(Boolean) as { label: string; icon?: string; to?: string; color: "wta" | "atp" | "primary"; target?: string }[]
+    ].filter(Boolean) as DropdownMenuItem[]
   }
   return []
 })
@@ -59,13 +56,13 @@ const otherLinks = computed(() => {
               :items="PLAYER_PAGES.map(page => ({ ...page, to: { name: page.name, params: { name: paramName, id } } }) as DropdownMenuItem)"
             >
               <u-button
-                :icon="icons.layers"
+                :icon="ICONS.layers"
                 variant="ghost"
               />
             </u-dropdown-menu>
             <u-dropdown-menu :items="otherLinks">
               <u-button
-                :icon="uIcons.ellipsis"
+                :icon="icons.ellipsis"
                 variant="ghost"
                 :ui="{ leadingIcon: 'rotate-90' }"
               />

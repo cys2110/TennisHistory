@@ -10,8 +10,6 @@ import {
   TournamentStatuses
 } from "#components"
 
-const { icons } = useAppConfig()
-
 const selection = ref("pm")
 
 const options = [
@@ -42,49 +40,49 @@ const getStat = () => {
     case "age":
       return {
         label: "Winners By Age",
-        icon: icons.calendar,
+        icon: ICONS.calendar,
         component: TournamentAge
       }
     case "country":
       return {
         label: "Countries by No. of Winners",
-        icon: icons.countries,
+        icon: ICONS.countries,
         component: TournamentCountry
       }
     case "finalists":
       return {
         label: "Players by Number of Finals Played",
-        icon: icons.tournament,
+        icon: ICONS.tournament,
         component: TournamentFinalists
       }
     case "games-sets-lost":
       return {
         label: "Winners by Sets and Games Lost",
-        icon: icons.scores,
+        icon: ICONS.scores,
         component: TournamentScoresStats
       }
     case "lowest-ranked":
       return {
         label: "Lowest Ranked Player to Reach Later Rounds",
-        icon: icons.sortNumberDown,
+        icon: ICONS.sortNumberDown,
         component: TournamentLowestRank
       }
     case "pm":
       return {
         label: "Historical Prize Money",
-        icon: icons.awards,
+        icon: ICONS.awards,
         component: TournamentPm
       }
     case "seeds":
       return {
         label: "Years when the top seeds won and reach the final, semifinals or quarterfinals",
-        icon: icons.seeds,
+        icon: ICONS.seeds,
         component: TournamentSeeds
       }
     case "statuses":
       return {
         label: "Qualifiers / Lucky Losers / Alternates / Wild Cards Winners",
-        icon: icons.one,
+        icon: ICONS.one,
         component: TournamentStatuses
       }
     default:
@@ -105,7 +103,7 @@ const getStat = () => {
         <u-drawer>
           <u-button
             label="Select stat"
-            :icon="icons.filter"
+            :icon="ICONS.filter"
           />
           <template #body>
             <u-radio-group

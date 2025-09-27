@@ -13,27 +13,11 @@
 }
 
 :root {
-  --ui-primary: var(--ui-color-primary-600);
-  --ui-atp: var(--ui-color-atp-600);
-  --ui-wta: var(--ui-color-wta-600);
   --ui-bg: var(--ui-color-neutral-100);
-  --ui-text: var(--ui-color-neutral-600);
-  --ui-text-highlighted: var(--ui-color-neutral-600);
-  --ui-text-muted: var(--ui-color-neutral-500);
-  --ui-text-dimmed: var(--ui-color-neutral-500);
-  --ui-border: var(--ui-color-neutral-300);
 }
 
 .dark {
-  --ui-primary: var(--ui-color-primary-500);
-  --ui-atp: var(--ui-color-atp-400);
-  --ui-wta: var(--ui-color-wta-500);
   --ui-bg: var(--ui-color-neutral-950);
-  --ui-text: var(--ui-color-neutral-300);
-  --ui-text-highlighted: var(--ui-color-neutral-300);
-  --ui-text-muted: var(--ui-color-neutral-400);
-  --ui-text-dimmed: var(--ui-color-neutral-400);
-  --ui-border: var(--ui-color-neutral-700);
 }
 
 .hover-link {
@@ -62,28 +46,4 @@
 
 .primary-link {
   @apply from-[var(--ui-primary)] to-[var(--ui-primary)] text-primary hover:text-primary;
-}
-
-.gs {
-  @apply text-primary-600 dark:text-primary-400;
-}
-
-.a1000 {
-  @apply text-active-600 dark:text-active-400;
-}
-
-.a500 {
-  @apply text-success-600 dark:text-success-400;
-}
-
-.a250 {
-  @apply text-wta-600 dark:text-wta-400;
-}
-
-.OL {
-  @apply text-warning-600 dark:text-warning-400;
-}
-
-.aws {
-  @apply text-doubles-600 dark:text-doubles-400;
 }

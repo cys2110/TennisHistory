@@ -10,7 +10,7 @@ export default defineEventHandler(async event => {
         count(DISTINCT CASE WHEN s1:Loser  THEN m END) AS p2Wins
     RETURN apoc.map.merge(apoc.map.submap(p1, ['id', 'first_name', 'last_name'], null, false), {country: properties(c1)}) AS p1, apoc.map.merge(apoc.map.submap(p2, ['id', 'first_name', 'last_name'], null, false), {country: properties(c2)}) AS p2, p1Wins, p2Wins
     ORDER BY matches DESC
-    LIMIT 10
+    LIMIT 20
     `
   )
 

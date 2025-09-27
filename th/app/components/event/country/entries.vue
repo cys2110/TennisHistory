@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { CountryLink, FilterTableHeader, NameTableHeader, RangeTableHeader, UBadge, UButton, ULink } from "#components"
-import type { TableColumn } from "@nuxt/ui"
+import { ColouredBadge, CountryLink, TableCellGroup, TableHeaderGroup, TableHeaderName, TableHeaderRange, UButton, ULink } from "#components"
+import type { TableColumn, TableRow } from "@nuxt/ui"
 import {
   type Column,
   createColumnHelper,
@@ -15,8 +15,7 @@ const {
   params: { eid, year }
 } = useRoute("event")
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
 const tours = useState<TourType[]>("tours")
 const tournamentName = useState<string>("tournament-name")
@@ -40,63 +39,27 @@ const columns = computed<TableColumn<APIResponse>[]>(() => [
   {
     accessorKey: "tour",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Tour",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Tour" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "tour" }, () =>
+        h(ColouredBadge, { label: row.getValue("tour") as string, class: "mx-auto" })
       )
   },
   {
+    id: "country",
     accessorKey: "country.name",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Country",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Country" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "country" }, () =>
+        h(CountryLink, { country: row.original.country, class: "mx-auto", iconOnly: true })
       )
   },
   {
     id: "name",
     accessorFn: row => `${row.last_name}, ${row.first_name}`,
     filterFn: (row, columnId, filterValue) => filterIncludesNameString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(NameTableHeader, {
-        column: column as Column<unknown>,
-        label: "Name",
-        type: "alpha"
-      }),
+    header: ({ column }) => h(TableHeaderName, { column: column as Column<unknown>, label: "Name" }),
     cell: ({ row }) => {
       if (!row.getIsGrouped() || grouping.value.length === 0) {
         return h(
@@ -117,20 +80,12 @@ const columns = computed<TableColumn<APIResponse>[]>(() => [
   {
     accessorKey: "singles_rank",
     aggregationFn: "min",
-    header: ({ column }) =>
-      h(RangeTableHeader, {
-        column: column as Column<unknown>,
-        label: "Singles Rank"
-      })
+    header: ({ column }) => h(TableHeaderRange, { column: column as Column<unknown>, label: "Singles Rank" })
   },
   {
     accessorKey: "doubles_rank",
     aggregationFn: "min",
-    header: ({ column }) =>
-      h(RangeTableHeader, {
-        column: column as Column<unknown>,
-        label: "Doubles Rank"
-      })
+    header: ({ column }) => h(TableHeaderRange, { column: column as Column<unknown>, label: "Doubles Rank" })
   }
 ])
 
@@ -165,65 +120,14 @@ const table = useTemplateRef("table")
     :ui="{ td: 'empty:p-0' }"
   >
     <template #loading>
-      <u-icon
-        :name="uIcons.loading"
-        class="size-8"
-      />
+      <table-loading-icon />
     </template>
 
     <template #empty>
-      <div class="flex justify-center items-center w-full gap-2 text-error">
-        <u-icon
-          :name="icons.noPlayer"
-          class="text-base"
-        />
-        No entries available for {{ tournamentName }} {{ year }}
-      </div>
-    </template>
-
-    <template #country_name-cell="{ row }">
-      <div class="flex items-center gap-2">
-        <u-button
-          v-if="row.getIsGrouped() && grouping[0] === 'country'"
-          :icon="uIcons.chevronDoubleRight"
-          size="xs"
-          variant="link"
-          color="neutral"
-          @click="row.toggleExpanded()"
-          :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-        />
-        <country-link
-          v-if="
-            (row.getIsGrouped() && grouping.includes('country') && row.depth === grouping.findIndex(x => x === 'country')) ||
-            (!grouping.includes('country') && !row.getIsGrouped())
-          "
-          :country="row.original.country"
-          class="mx-auto"
-          :icon-only="false"
-        />
-      </div>
-    </template>
-
-    <template #tour-cell="{ row }">
-      <div class="flex items-center gap-2">
-        <u-button
-          v-if="row.getIsGrouped() && grouping[0] === 'tour'"
-          :icon="uIcons.chevronDoubleRight"
-          size="xs"
-          variant="link"
-          color="neutral"
-          @click="row.toggleExpanded()"
-          :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-        />
-        <coloured-badge
-          v-if="
-            (row.getIsGrouped() && grouping.includes('tour') && row.depth === grouping.findIndex(x => x === 'tour')) ||
-            (!grouping.includes('tour') && !row.getIsGrouped())
-          "
-          :label="row.getValue('tour')"
-          class="mx-auto"
-        />
-      </div>
+      <table-empty-message
+        :icon="ICONS.noPlayer"
+        :message="`No entries available for ${tournamentName} ${year}`"
+      />
     </template>
   </u-table>
 </template>

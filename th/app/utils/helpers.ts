@@ -5,17 +5,10 @@ export const arraySorting = (rowA: any, rowB: any, columnId: string) => {
 }
 
 export const constructMid = (match_no: number, tour: TourType, type: MatchType, draw: DrawType) => {
-  const genderPrefix =
-    tour === "WTA" ? "l"
-    : tour === "ATP" ? "g"
-    : tour === "Men" ? "m"
-    : "w"
+  const genderPrefix = tour === "WTA" ? "l" : tour === "ATP" ? "g" : tour === "Men" ? "m" : "w"
   const typePrefix = type === "Singles" ? "s" : "d"
   const drawTypePrefix = draw === "Main" ? "m" : "q"
-  const suffix =
-    match_no < 10 ? `00${match_no}`
-    : match_no < 100 ? `0${match_no}`
-    : match_no
+  const suffix = match_no < 10 ? `00${match_no}` : match_no < 100 ? `0${match_no}` : match_no
   return `${drawTypePrefix}${genderPrefix}${typePrefix}${suffix}`
 }
 
@@ -97,9 +90,7 @@ export const getFlagCode = (country: CountryInterface) => {
 export const getMatchTypeColour = (type: MatchType) => type.toLowerCase() as keyof typeof appConfig.ui.colors
 
 export const handedness = (handedness: boolean | undefined | null) =>
-  handedness === true ? "Right-Handed"
-  : handedness === false ? "Left-Handed"
-  : "Unknown"
+  handedness === true ? "Right-Handed" : handedness === false ? "Left-Handed" : "Unknown"
 
 export const shortDateFormat = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",

@@ -3,7 +3,6 @@ const { awards } = defineProps<{ awards: RoundInterface[] }>()
 const {
   params: { year }
 } = useRoute("event")
-const { icons, colours } = useAppConfig()
 const colorMode = useColorMode()
 const tours = useState<TourType[]>("tours")
 const tournamentName = useState<string>("tournament-name")
@@ -15,7 +14,7 @@ const currencies = computed(() => {
 
 const option = computed(() => ({
   backgroundColor: "transparent",
-  textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+  textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
   grid: { containLabel: true },
   dataset: [
     {
@@ -49,20 +48,20 @@ const option = computed(() => ({
     trigger: "axis"
   },
   legend: {
-    textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+    textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
     top: "middle",
     right: "right"
   },
   xAxis: {
     type: "category",
     inverse: true,
-    axisLabel: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText }
+    axisLabel: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText }
   },
   yAxis: [
     {
       type: "value",
       name: `Prize Money (${currencies.value})`,
-      axisLabel: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText }
+      axisLabel: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText }
     },
     {
       type: "value",
@@ -70,7 +69,7 @@ const option = computed(() => ({
       splitLine: { show: false },
       axisLabel: {
         formatter: (value: number) => value.toLocaleString("en-GB"),
-        color: colorMode.value === "dark" ? colours.darkText : colours.lightText
+        color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText
       }
     }
   ],
@@ -129,7 +128,7 @@ const option = computed(() => ({
   >
     <u-button
       label="Chart"
-      :icon="icons.scatterChart"
+      :icon="ICONS.scatterChart"
     />
 
     <template #body>

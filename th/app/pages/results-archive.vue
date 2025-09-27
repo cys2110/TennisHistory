@@ -1,23 +1,22 @@
 <script setup lang="ts">
-import { ArrayFilterTableHeader, ColouredBadge, CountryLink, FilterTableHeader, SortTableHeader, UButton, UDropdownMenu, ULink } from "#components"
-import type { TableColumn } from "@nuxt/ui"
-import { type Column, createColumnHelper, getFacetedRowModel, getFacetedUniqueValues } from "@tanstack/vue-table"
+import { ColouredBadge, CountryLink, TableCellGroup, TableHeaderFilter, TableHeaderGroup, TableHeaderName, TableHeaderSort, ULink } from "#components"
+import type { TableColumn, TableRow } from "@nuxt/ui"
+import {
+  type Column,
+  createColumnHelper,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getGroupedRowModel,
+  type GroupingOptions
+} from "@tanstack/vue-table"
+import type { RouteLocationRaw } from "vue-router"
 
-const {
-  icons,
-  ui: { icons: uIcons }
-} = useAppConfig()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const lgAndUp = breakpoints.greaterOrEqual("lg")
+const toast = useToast()
 
 const year = useRouteQuery("year", new Date().getFullYear(), { transform: Number })
 useHead({ title: () => `Results Archive ${get(year)}` })
-useJsonld(() => ({
-  "@context": "https://schema.org",
-  "@type": "ItemPage",
-  name: "Results Archive",
-  description: `Events which took place in ${get(year)}`
-}))
 
 // API call
 const { data: events, status } = await useFetch<EventInterface[]>("/api/results-archive", {
@@ -28,356 +27,220 @@ const { data: events, status } = await useFetch<EventInterface[]>("/api/results-
 })
 
 const columnHelper = createColumnHelper<EventInterface>()
-
 const columns = computed<TableColumn<EventInterface>[]>(() => [
-  columnHelper.group({
-    id: "tournament",
-    columns: [
-      {
-        accessorKey: "tournament.name",
-        meta: { class: { th: "z-40", td: "whitespace-normal md:whitespace-nowrap" } },
-        sortUndefined: "last",
-        filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-        header: ({ column }) =>
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Tournament",
-            type: "alpha"
-          }),
-        cell: ({ row, cell }) =>
+  {
+    id: "Tournament",
+    accessorKey: "tournament.name",
+    meta: { class: { th: "z-40" } },
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Tournament" }),
+    cell: ({ row, cell }) => {
+      if (!row.getIsGrouped() || grouping.value.length === 0) {
+        return h("div", { class: "flex flex-col items-center" }, [
           h(
-            "div",
+            ULink,
             {
-              class: "flex flex-col items-center"
-            },
-            [
-              h(
-                ULink,
-                {
-                  class: "hover-link default-link font-semibold",
-                  to: {
-                    name: "tournament",
-                    params: {
-                      id: row.original.tournament.id,
-                      name: kebabCase(cell.getValue() as string)
-                    }
-                  }
-                },
-                () => cell.getValue()
-              ),
-              ...(lgAndUp.value && row.original.sponsor_name ? [row.original.sponsor_name] : [])
-            ]
-          )
-      }
-    ],
-    footer: ({ table }) => "Total: " + table.getRowCount().toLocaleString()
-  }),
-  columnHelper.group({
-    id: "types",
-    columns: [
-      {
-        accessorKey: "levels",
-        sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
-        filterFn: "arrIncludesSome",
-        header: ({ column }) =>
-          h(ArrayFilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Level"
-          }),
-        cell: ({ row }) =>
-          h(
-            "div",
-            {
-              class: "flex flex-col items-center gap-1 lg:gap-2"
-            },
-            row.original.levels.map(level =>
-              h(ColouredBadge, {
-                label: level,
-                size: "md"
-              })
-            )
-          ),
-        footer: ({ table }) =>
-          h(
-            "div",
-            { class: "text-atp" },
-            `Tour: ${table.getFilteredRowModel().rows.filter(row => row.original.categories[0] || (row.original.categories[1] && !ATP_CHALLENGER_CATEGORIES.includes(row.original.categories[1]))).length}`
-          )
-      },
-      {
-        id: "categories",
-        accessorFn: row => row.categories.filter(Boolean),
-        sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
-        sortUndefined: "last",
-        filterFn: "arrIncludesSome",
-        header: ({ column }) =>
-          h(ArrayFilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Category"
-          }),
-        cell: ({ row }) =>
-          h(
-            "div",
-            {
-              class: "flex flex-col gap-1 items-center"
-            },
-            row.original.categories.map((category, index) => {
-              if (category) {
-                return h(
-                  ULink,
-                  {
-                    key: `${row.original.id}-${category}`,
-                    to: {
-                      name: "category",
-                      params: { id: kebabCase(category) }
-                    },
-                    class: `hover-link ${tourColourMapping[index]}-link`
-                  },
-                  () => category
-                )
+              class: "hover-link default-link font-semibold",
+              to: {
+                name: "tournament",
+                params: { id: row.original.tournament.id, name: kebabCase(cell.getValue() as string) }
               }
-            })
+            },
+            () => cell.getValue()
           ),
-        footer: ({ table }) =>
-          h(
-            "div",
-            { class: "text-atp" },
-            `Challenger: ${table.getFilteredRowModel().rows.filter(row => row.original.categories[1] && ATP_CHALLENGER_CATEGORIES.includes(row.original.categories[1])).length}`
-          )
+          ...(lgAndUp.value && row.original.sponsor_name ? [row.original.sponsor_name] : [])
+        ])
       }
-    ],
-    footer: ({ table }) =>
-      h(
-        "div",
-        {
-          class: "text-atp"
-        },
-        `ATP: ${table.getFilteredRowModel().rows.filter(row => row.original.tours.includes("ATP")).length}`
+    },
+    footer: ({ table }) => `Total: ${table.getRowCount()}`
+  },
+  {
+    id: "level",
+    accessorKey: "levels",
+    sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
+    filterFn: "arrIncludesSome",
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Level" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "level" }, () =>
+        h(
+          "div",
+          { class: "flex flex-col items-center gap-1 lg:gap-2" },
+          row.original.levels.map(level => h(ColouredBadge, { label: level }))
+        )
       )
-  }),
-  columnHelper.group({
+  },
+  {
+    id: "category",
+    accessorFn: row => row.categories.filter(Boolean),
+    sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
+    sortUndefined: "last",
+    filterFn: "arrIncludesSome",
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Category" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "category" }, () =>
+        h(
+          "div",
+          { class: "flex flex-col" },
+          row.original.categories.map((category, index) => {
+            if (category) {
+              return h("div", { key: `${row.original.id}-${category}`, class: `text-${tourColourMapping[index]}` }, category)
+            }
+          })
+        )
+      )
+  },
+  {
     id: "dates",
-    columns: [
-      {
-        id: "dates",
-        accessorFn: row =>
-          row.dates
-            .map(date => date[0])
-            .filter(Boolean)
-            .map(date => getDate(date!)),
-        sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
-        header: ({ column }) => h(SortTableHeader, { column: column as Column<unknown>, label: "Dates", type: "number" }),
-        cell: ({ row }) =>
-          h(
-            "div",
-            {
-              class: "flex flex-col items-center"
-            },
-            row.original.dates.map(([start, end], index) => {
-              if (start && end) {
-                const startDate = getDate(start)
-                const endDate = getDate(end)
+    accessorFn: row =>
+      row.dates
+        .map(date => date[0])
+        .filter(Boolean)
+        .map(date => getDate(date!)),
+    sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
+    header: ({ column }) => h(TableHeaderSort, { column: column as Column<unknown>, label: "Dates", type: "number" }),
+    cell: ({ row }) => {
+      if (!row.getIsGrouped() || grouping.value.length === 0) {
+        return row.original.dates.map(([start, end], index) => {
+          if (start && end) {
+            const startDate = getDate(start)
+            const endDate = getDate(end)
 
-                return h(
-                  "div",
-                  {
-                    key: `${row.original.id}-date-${index}`,
-                    class: `text-${tourColourMapping[index]}`
-                  },
-                  lgAndUp.value ? dateTimeFormat.formatRange(startDate, endDate) : shortDateFormat.formatRange(startDate, endDate)
-                )
-              }
-            })
-          ),
-        footer: ({ table }) => {
-          const filteredRows = table.getFilteredRowModel().rows
-
-          return h(
-            "div",
-            {
-              class: "flex items-center justify-evenly text-wta"
-            },
-            [
-              h(
-                "div",
-                `Tour: ${filteredRows.filter(row => row.original.categories[0] || (row.original.categories[2] && !WTA_CHALLENGER_CATEGORIES.includes(row.original.categories[2]))).length}`
-              ),
-              h(
-                "div",
-                `Challenger: ${filteredRows.filter(row => row.original.categories[2] && WTA_CHALLENGER_CATEGORIES.includes(row.original.categories[2])).length}`
-              )
-            ]
-          )
-        }
-      }
-    ],
-    footer: ({ table }) =>
-      h(
-        "div",
-        {
-          class: "text-wta"
-        },
-        `WTA: ${table.getFilteredRowModel().rows.filter(row => row.original.tours.includes("WTA")).length}`
-      )
-  }),
-  columnHelper.group({
-    id: "surface",
-    columns: [
-      {
-        accessorKey: "surface.id",
-        sortUndefined: "last",
-        filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-        header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Surface", type: "alpha" }),
-        cell: ({ row, cell }) => {
-          if (row.original.surface) {
             return h(
-              ULink,
-              {
-                class: "hover-link default-link",
-                to: {
-                  name: "surface",
-                  params: {
-                    id: kebabCase(row.original.surface.id)
-                  }
-                }
-              },
-              () => cell.renderValue()
+              "div",
+              { key: `${row.original.id}-date-${index}`, class: `text-${tourColourMapping[index]}` },
+              lgAndUp.value ? dateTimeFormat.formatRange(startDate, endDate) : shortDateFormat.formatRange(startDate, endDate)
             )
-          } else {
-            return cell.renderValue()
           }
-        }
+        })
       }
-    ],
-    footer: ({ table }) =>
-      h(
-        "div",
-        {
-          class: "text-men"
-        },
-        `ITF (M): ${table.getFilteredRowModel().rows.filter(row => row.original.tours.includes("ITF (M)")).length}`
-      )
-  }),
+    }
+  },
+  {
+    id: "Surface",
+    accessorKey: "surface.id",
+    sortUndefined: "last",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Surface" }),
+    cell: ({ row, cell }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "Surface" }, () => cell.renderValue())
+  },
   columnHelper.group({
     id: "location",
-    header: lgAndUp.value ? "Location" : "",
+    header: "Location",
     columns: [
       {
         id: "venue",
-        accessorFn: row => row.venues?.map(venue => venue.name),
+        accessorFn: row => row.venues?.map(venue => (venue.name ? `${venue.name}, ${venue.city}` : venue.city)),
         sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
         sortUndefined: "last",
         filterFn: "arrIncludesSome",
-        meta: { class: { td: "whitespace-normal" } },
-        header: ({ column }) =>
-          h(ArrayFilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Venue"
-          }),
+        header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Venue" }),
         cell: ({ row }) => {
-          if (row.original.venues.length) {
-            return h(
-              "div",
-              {
-                class: "flex flex-col items-center"
-              },
-              row.original.venues.map(venue =>
-                h(
-                  ULink,
-                  {
-                    class: "hover-link default-link",
-                    to: {
-                      name: "venue",
-                      params: {
-                        id: kebabCase(venue.id)
-                      }
-                    }
-                  },
-                  () => (venue.name ? `${venue.name}, ${venue.city}` : venue.city)
-                )
+          if (!row.getIsGrouped() || grouping.value.length === 0) {
+            if (row.original.venues.length) {
+              return row.original.venues.map(venue =>
+                h("div", { key: `${row.original.id}-${venue.id}` }, venue.name ? `${venue.name}, ${venue.city}` : venue.city)
               )
-            )
-          } else {
-            return "Various"
+            } else {
+              return "Various"
+            }
           }
         }
       },
       {
         id: "country",
-        accessorFn: row => row.venues?.map(venue => venue.country.name),
+        accessorFn: row => useArrayUnique(row.venues?.map(venue => venue.country.name)).value,
         sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
         sortUndefined: "last",
         filterFn: "arrIncludesSome",
-        header: ({ column }) =>
-          h(ArrayFilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Country"
-          }),
-        cell: ({ row }) => {
-          if (row.original.venues[0]) {
-            return h(CountryLink, {
-              country: row.original.venues[0].country,
-              class: "mx-auto"
-            })
-          } else {
-            return "Various"
-          }
-        }
+        header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Country" }),
+        cell: ({ row }) =>
+          h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "country" }, () => {
+            if (row.original.venues[0]) {
+              return h(CountryLink, {
+                country: row.original.venues[0].country,
+                class: "mx-auto",
+                iconOnly: false
+              })
+            } else {
+              return "Various"
+            }
+          })
       }
-    ],
-    footer: ({ table }) =>
-      h(
-        "div",
-        {
-          class: "text-women"
-        },
-        `ITF (W): ${table.getFilteredRowModel().rows.filter(row => row.original.tours.includes("ITF (W)")).length}`
-      )
+    ]
   }),
   {
-    id: "navigation",
+    id: "supervisors",
+    accessorFn: row => row.supervisors.map(s => `${s.first_name} ${s.last_name}`),
+    sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
+    filterFn: (row, columnId, filterValue) => filterIncludesName(row, columnId, filterValue),
+    header: ({ column }) => h(TableHeaderName, { column: column as Column<unknown>, label: "Supervisor(s)" }),
     cell: ({ row }) => {
-      const dropdownItems = EVENT_PAGES.map(page => ({
-        ...page,
-        to: {
-          name: page.name,
-          params: {
-            id: row.original.tournament.id,
-            name: kebabCase(row.original.tournament.name),
-            year: row.original.year,
-            eid: row.original.id
-          }
-        }
-      }))
-
-      return h(
-        // @ts-ignore
-        UDropdownMenu,
-        {
-          items: dropdownItems,
-          size: "sm"
-        },
-        {
-          default: () =>
-            h(UButton, {
-              icon: uIcons.ellipsis,
-              size: "lg",
-              variant: "link"
-            })
-        }
-      )
+      if (!row.getIsGrouped() || grouping.value.length === 0) {
+        return row.original.supervisors.map(supervisor =>
+          h("div", { key: `${row.original.id}-${supervisor.id}` }, `${supervisor.first_name} ${supervisor.last_name}`)
+        )
+      }
+    }
+  },
+  {
+    id: "umpires",
+    accessorFn: row => row.umpires.map(u => `${u.last_name}, ${u.first_name}`),
+    sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
+    filterFn: (row, columnId, filterValue) => filterIncludesName(row, columnId, filterValue),
+    header: ({ column }) => h(TableHeaderName, { column: column as Column<unknown>, label: "Umpire" }),
+    cell: ({ row }) => {
+      if (!row.getIsGrouped() || grouping.value.length === 0) {
+        return row.original.umpires.map(umpire => h("div", { key: `${row.original.id}-${umpire.id}` }, `${umpire.last_name}, ${umpire.first_name}`))
+      }
     }
   }
 ])
 
-const columnFilters = ref([])
-const columnVisibility = computed(() => ({
-  venue: get(lgAndUp)
-}))
+const handleRowSelect = (row: TableRow<EventInterface>) => {
+  toast.clear()
+
+  if (row.getIsGrouped()) {
+    row.toggleExpanded()
+  } else {
+    toast.add({
+      title: row.original.tournament.name,
+      description: row.original.sponsor_name,
+      duration: Infinity,
+      progress: false,
+      orientation: "horizontal",
+      actions: EVENT_PAGES.map(page => ({
+        icon: page.icon,
+        label: page.label,
+        onClick: e => {
+          toast.clear()
+          navigateTo({
+            name: page.name,
+            params: {
+              id: row.original.tournament.id,
+              name: kebabCase(row.original.tournament.name),
+              year: row.original.year,
+              eid: row.original.id
+            }
+          } as RouteLocationRaw)
+        }
+      }))
+    })
+  }
+}
+
+const table = useTemplateRef("table")
+const grouping = ref<string[]>([])
+const grouping_options = ref<GroupingOptions>({
+  getGroupedRowModel: getGroupedRowModel()
+})
 const columnPinning = ref({
-  left: ["tournament_name"],
+  left: ["Tournament"],
   right: []
 })
+
+onBeforeUnmount(() => toast.clear())
+onBeforeRouteLeave(() => toast.clear())
 </script>
 
 <template>
@@ -391,11 +254,34 @@ const columnPinning = ref({
         </u-dashboard-navbar>
         <u-dashboard-toolbar>
           <filter-select-all-years v-model="year" />
+          <u-button
+            label="Reset Sorting"
+            :icon="ICONS.sortAlpha"
+            @click="table?.tableApi.resetSorting()"
+            size="sm"
+          />
+          <u-button
+            label="Reset Grouping"
+            :icon="ICONS.ungroup"
+            @click="table?.tableApi.resetGrouping()"
+            size="sm"
+          />
+          <u-button
+            label="Reset Filters"
+            :icon="ICONS.noFilter"
+            @click="table?.tableApi.resetColumnFilters()"
+            size="sm"
+          />
+          <table-visibility
+            v-if="table"
+            :table="table!"
+          />
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
         <u-table
+          ref="table"
           :data="events"
           :columns
           :loading="['pending', 'idle'].includes(status)"
@@ -404,26 +290,23 @@ const columnPinning = ref({
             getFacetedRowModel: getFacetedRowModel(),
             getFacetedUniqueValues: getFacetedUniqueValues()
           }"
-          v-model:columnFilters="columnFilters"
-          v-model:column-visibility="columnVisibility"
+          :grouping="grouping"
+          v-on:update:grouping="grouping = $event"
+          :grouping-options="grouping_options"
           v-model:column-pinning="columnPinning"
+          @select="handleRowSelect"
           render-fallback-value="Various"
+          :ui="{ tbody: '[&>tr]:cursor-pointer', td: 'empty:p-0' }"
         >
           <template #loading>
-            <u-icon
-              :name="uIcons.loading"
-              class="size-8"
-            />
+            <table-loading-icon />
           </template>
 
           <template #empty>
-            <div class="flex justify-center items-center w-full gap-2 text-error">
-              <u-icon
-                :name="icons.noCalendar"
-                class="text-base"
-              />
-              No events took place in {{ year }}
-            </div>
+            <table-empty-message
+              :icon="ICONS.noCalendar"
+              :message="`No events took place in ${year}`"
+            />
           </template>
         </u-table>
       </template>

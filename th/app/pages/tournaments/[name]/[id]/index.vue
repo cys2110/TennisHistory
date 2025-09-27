@@ -6,8 +6,7 @@ const {
   params: { id, name }
 } = useRoute("tournament")
 const {
-  icons,
-  ui: { icons: appIcons }
+  ui: { icons }
 } = useAppConfig()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1280 })
 const mdAndDown = breakpoints.smallerOrEqual("md")
@@ -16,8 +15,8 @@ const xlAndUp = breakpoints.greaterOrEqual("xl")
 
 const selectedTab = ref("winners")
 const tabs = [
-  { label: "Winners", value: "winners", icon: icons.tournament },
-  { label: "By the Numbers", value: "numbers", icon: icons.stats }
+  { label: "Winners", value: "winners", icon: ICONS.tournament },
+  { label: "By the Numbers", value: "numbers", icon: ICONS.stats }
 ]
 
 // API call
@@ -47,7 +46,7 @@ provide<string>("tournamentName", tournament.value?.name || capitalCase(name as 
               :to="tournament.website"
               target="_blank"
               :label="mdAndUp ? 'Website' : undefined"
-              :icon="appIcons.external"
+              :icon="icons.external"
               size="xs"
             />
             <div id="navbar-right" />
@@ -61,7 +60,7 @@ provide<string>("tournamentName", tournament.value?.name || capitalCase(name as 
               v-for="tour in tournament.tours"
               :key="tour"
               :label="tour"
-              :color="getTourColour([tour])"
+              :color="getTourColour(tour)"
               :size="mdAndDown ? 'md' : 'lg'"
             />
           </div>

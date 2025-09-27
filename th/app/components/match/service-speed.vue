@@ -7,7 +7,6 @@ defineProps<{
 }>()
 const { params } = useRoute()
 const { year } = params as { year?: string }
-const { icons } = useAppConfig()
 </script>
 
 <template>
@@ -18,7 +17,7 @@ const { icons } = useAppConfig()
   >
     <u-button
       :label="label ?? 'Chart'"
-      :icon="icons.gauge"
+      :icon="ICONS.gauge"
       block
       color="active"
     />

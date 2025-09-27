@@ -5,7 +5,7 @@ const {
 } = useAppConfig()
 const {
   params: { p1Name, p2Name, p1Id, p2Id }
-} = useRoute("h2h-players")
+} = useRoute("head-to-head")
 
 const selectedPlayer = ref<{ label: string; value: string; country: CountryInterface }>({
   label: `${player.first_name} ${player.last_name}`,
@@ -29,7 +29,7 @@ watch(searchTerm, () => {
 
 watch(selectedPlayer, async () => {
   await navigateTo({
-    name: "h2h-players",
+    name: "head-to-head",
     params: {
       p1Name: index === 1 ? kebabCase(selectedPlayer.value?.label || "") : p1Name,
       p2Name: index === 2 ? kebabCase(selectedPlayer.value?.label || "") : p2Name,

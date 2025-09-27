@@ -4,14 +4,14 @@ const colorMode = useColorMode()
 const { colours } = useAppConfig()
 
 const formattedData = computed(() => [
-  { value: p1Wins, itemStyle: { color: colours.violet700 } },
-  { value: p2Wins, itemStyle: { color: colours.emerald700 } }
+  { value: p1Wins, itemStyle: { color: COLOURS.violet700 } },
+  { value: p2Wins, itemStyle: { color: COLOURS.emerald700 } }
 ])
 
 const option = computed(() => ({
   backgroundColor: "transparent",
   darkMode: colorMode.value === "dark",
-  textStyle: { color: colorMode.value === "dark" ? colours.lightText : colours.darkText },
+  textStyle: { color: colorMode.value === "dark" ? COLOURS.lightText : COLOURS.darkText },
   series: [
     {
       type: "pie",

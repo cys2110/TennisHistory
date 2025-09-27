@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { CountryLink, PlayerLink } from "#components"
+import type { TableColumn } from "@nuxt/ui"
+
 definePageMeta({ name: "player" })
 const {
   params: { id }
 } = useRoute("player")
+
 const playerYears = useState<string[]>("player-years")
 const playerTour = useState<TourType>("player-tour")
 const playerName = useState<string>("player-name")
-const currentYear = new Date().getFullYear()
 
 // Determine whether player is still active on tour
 const activeYears = computed(() => {
@@ -25,11 +28,192 @@ const activeYears = computed(() => {
 })
 
 // API call
-const { data: player, status } = await useFetch<PlayerInterface>("/api/players/details", {
+const { data, status } = await useFetch<PlayerInterface>("/api/players/details", {
   key: `player-${id}`,
   query: { id },
   server: false
 })
+
+const details = computed(() => {
+  if (data.value) {
+    const player = data.value
+    return [
+      { label: "Career Prize Money", value: (player.pm ?? 0).toLocaleString("en-US", { style: "currency", currency: "USD" }) },
+      { label: "Age", value: player.age },
+      { label: "Height", value: player.height },
+      { label: "Plays", value: isDefined(player.rh) ? handedness(player.rh) : "Unknown" },
+      { label: "Backhand", value: player.bh ? `${player.bh}-Handed` : "Unknown" },
+      {
+        label: player.turned_pro && player.retired ? "Career span" : player.turned_pro ? "Turned Pro" : player.retired ? "Retired" : "Career span",
+        value: player.turned_pro
+      },
+      { label: player.coaches?.length === 1 ? "Coach" : "Coaches", value: player.coaches },
+      { label: "Hall of Fame Induction", value: player.hof },
+      { label: player.countries?.length === 1 ? "Previous Representation" : "Previous Representations", value: player.countries }
+    ]
+  }
+  return []
+})
+
+const stats = computed(() => {
+  if (data.value) {
+    const player = data.value
+
+    return [
+      { category: "Ranking", rowspan: 3, label: "Current rank", singles: player.current_singles, doubles: player.current_doubles },
+      { label: "Career High", singles: player.ch_singles, doubles: player.ch_doubles },
+      {
+        label: "Career High Date",
+        singles: player.singles_ch_date ? dateTimeFormat.format(getDate(player.singles_ch_date)) : undefined,
+        doubles: player.doubles_ch_date ? dateTimeFormat.format(getDate(player.doubles_ch_date)) : undefined
+      },
+      { category: "Titles", rowspan: 4, label: "Total", singles: player.titles[3]?.singles, doubles: player.titles[3]?.doubles },
+      { label: "Tour", singles: player.titles[0]?.singles, doubles: player.titles[0]?.doubles },
+      { label: "Challenger", singles: player.titles[1]?.singles, doubles: player.titles[1]?.doubles },
+      { label: "ITF", singles: player.titles[2]?.singles, doubles: player.titles[2]?.doubles },
+      { category: "Win-Loss", rowspan: 1, colspan: 4 },
+      {
+        category: "Main draws",
+        rowspan: 4,
+        label: "Total",
+        singles: `${player.wl[3]?.singles.wins}-${player.wl[3]?.singles.losses}`,
+        doubles: `${player.wl[3]?.doubles.wins}-${player.wl[3]?.doubles.losses}`
+      },
+      {
+        label: "Tour",
+        singles: `${player.wl[0]?.singles.wins}-${player.wl[0]?.singles.losses}`,
+        doubles: `${player.wl[0]?.doubles.wins}-${player.wl[0]?.doubles.losses}`
+      },
+      {
+        label: "Challenger",
+        singles: `${player.wl[1]?.singles.wins}-${player.wl[1]?.singles.losses}`,
+        doubles: `${player.wl[1]?.doubles.wins}-${player.wl[1]?.doubles.losses}`
+      },
+      {
+        label: "ITF",
+        singles: `${player.wl[2]?.singles.wins}-${player.wl[2]?.singles.losses}`,
+        doubles: `${player.wl[2]?.doubles.wins}-${player.wl[2]?.doubles.losses}`
+      },
+      {
+        category: "Qualifying draws",
+        rowspan: 4,
+        label: "Total",
+        singles: `${player.wl[3]?.singles.q_wins}-${player.wl[3]?.singles.q_losses}`,
+        doubles: `${player.wl[3]?.doubles.q_wins}-${player.wl[3]?.doubles.q_losses}`
+      },
+      {
+        label: "Tour",
+        singles: `${player.wl[0]?.singles.q_wins}-${player.wl[0]?.singles.q_losses}`,
+        doubles: `${player.wl[0]?.doubles.q_wins}-${player.wl[0]?.doubles.q_losses}`
+      },
+      {
+        label: "Challenger",
+        singles: `${player.wl[1]?.singles.q_wins}-${player.wl[1]?.singles.q_losses}`,
+        doubles: `${player.wl[1]?.doubles.q_wins}-${player.wl[1]?.doubles.q_losses}`
+      },
+      {
+        label: "ITF",
+        singles: `${player.wl[2]?.singles.q_wins}-${player.wl[2]?.singles.q_losses}`,
+        doubles: `${player.wl[2]?.doubles.q_wins}-${player.wl[2]?.doubles.q_losses}`
+      }
+    ]
+  }
+  return []
+})
+
+const detailsColumns: TableColumn<(typeof details.value)[number]>[] = [
+  { accessorKey: "label", header: "", meta: { class: { td: "font-medium text-right" } } },
+  {
+    accessorKey: "value",
+    header: "",
+    cell: ({ row }) => {
+      const label = row.original.label
+      const value = row.original.value
+      switch (label) {
+        case "Age":
+          return h("div", {}, [
+            h("div", {}, value ? `${value} years` : "Unknown"),
+            data.value?.dob || data.value?.dod
+              ? h(
+                  "div",
+                  {},
+                  data.value?.dob && data.value?.dod
+                    ? dateTimeFormat.formatRange(getDate(data.value.dob), getDate(data.value.dod))
+                    : data.value?.dob
+                    ? dateTimeFormat.format(getDate(data.value.dob))
+                    : undefined
+                )
+              : null
+          ])
+        case "Height":
+          return h("div", {}, [h("div", {}, value ? `${value} cm` : "Unknown"), value ? h("div", {}, `${convertToFt(value as number)}`) : null])
+        case "Coach":
+        case "Coaches":
+          if (Array.isArray(value)) {
+            return value?.map((coach: any) => h("div", {}, `${coach.first_name} ${coach.last_name}`))
+          }
+        case "Previous Representation":
+        case "Previous Representations":
+          if (Array.isArray(value)) {
+            if (value.length === 0) return "—"
+            return value?.map((country: any) =>
+              h(
+                "div",
+                {
+                  class: "flex items-center gap-1"
+                },
+                [
+                  h(CountryLink, { country }),
+                  country.start_date && country.end_date
+                    ? `(${dateTimeFormat.formatRange(getDate(country.start_date), getDate(country.end_date))})`
+                    : undefined
+                ]
+              )
+            )
+          }
+        default:
+          return value ?? "—"
+      }
+    }
+  }
+]
+
+const statsColumns: TableColumn<(typeof stats.value)[number]>[] = [
+  {
+    accessorKey: "category",
+    header: "",
+    meta: {
+      rowspan: {
+        // @ts-ignore
+        td: ({ row }) => {
+          if (row.original.rowspan) {
+            return String(row.original.rowspan)
+          }
+        }
+      },
+      colspan: {
+        td: ({ row }) => String(row.original.colspan ? row.original.colspan : 1)
+      },
+      class: { td: ({ row }) => (row.original.colspan ? "font-semibold" : row.original.rowspan ? "" : "hidden") }
+    }
+  },
+  { accessorKey: "label", header: "" },
+  { accessorKey: "singles", header: "Singles" },
+  { accessorKey: "doubles", header: "Doubles" }
+]
+
+const h2hColumns: TableColumn<PlayerInterface["h2h"][number]>[] = [
+  {
+    id: "opponent",
+    header: "Opponent",
+    cell: ({ row }) => h(PlayerLink, { player: row.original.opponent })
+  },
+  {
+    id: "wl",
+    header: "Win-Loss",
+    cell: ({ row }) => `${row.original.wins} - ${row.original.matches - row.original.wins}`
+  }
+]
 </script>
 
 <template>
@@ -39,7 +223,10 @@ const { data: player, status } = await useFetch<PlayerInterface>("/api/players/d
       :description="`Years Active: ${activeYears.activeYears} (${activeYears.numberOfYears} ${activeYears.numberOfYears === 1 ? 'year' : 'years'})`"
     >
       <template #headline>
-        <country-link :country />
+        <country-link
+          :country
+          icon-only
+        />
         <u-badge
           :color="activeYears.active ? 'active' : 'inactive'"
           :label="activeYears.active ? 'Active' : 'Inactive'"
@@ -51,222 +238,55 @@ const { data: player, status } = await useFetch<PlayerInterface>("/api/players/d
       </template>
     </u-page-header>
 
-    <div
-      v-if="player"
-      class="flex justify-evenly"
-    >
-      <div>
-        <table>
-          <tbody class="[&>tr>td]:!border-y [&>tr>td]:!border-muted [&>tr>th]:!border-y [&>tr>th]:!border-muted [&>tr>td]:!py-2">
-            <tr>
-              <th>Career Prize Money</th>
-              <td>{{ player.pm?.toLocaleString("en-US", { style: "currency", currency: "USD" }) }}</td>
-            </tr>
-            <tr>
-              <th>Age</th>
-              <td>
-                <div>{{ player.age ? `${player.age} years` : "Unknown" }}</div>
-                <div>{{
-                  player.dod && player.dob ? `${dateTimeFormat.formatRange(getDate(player.dob), getDate(player.dod))}`
-                  : player.dob ? dateTimeFormat.format(getDate(player.dob))
-                  : undefined
-                }}</div>
-              </td>
-            </tr>
-            <tr>
-              <th>Height</th>
-              <td>
-                <div>{{ player.height ? `${player.height} cm` : "Unknown" }}</div>
-                <div>{{ player.height ? convertToFt(player.height) : undefined }}</div>
-              </td>
-            </tr>
-            <tr>
-              <th>Plays</th>
-              <td>{{ isDefined(player.rh) ? handedness(player.rh) : "Unknown" }}</td>
-            </tr>
-            <tr>
-              <th>Backhand</th>
-              <td>{{ player.bh ? `${player.bh}-Handed` : "Unknown" }}</td>
-            </tr>
-            <tr v-if="player.turned_pro || player.retired">
-              <th>{{
-                player.turned_pro && player.retired ? "Turned pro"
-                : player.turned_pro ? "Turned pro"
-                : "Retired"
-              }}</th>
-              <td>
-                <div>{{ player.turned_pro ? player.turned_pro : "Unknown" }}</div>
-                <div>{{
-                  player.turned_pro && player.retired ? `${player.retired - player.turned_pro} years`
-                  : player.turned_pro && activeYears.active ? `${currentYear - player.turned_pro} years`
-                  : undefined
-                }}</div>
-              </td>
-            </tr>
-            <tr v-if="player.hof">
-              <th>Hall of Fame Induction</th>
-              <td>{{ player.hof }}</td>
-            </tr>
-            <tr v-if="player.coaches?.length">
-              <th>{{ player.coaches.length === 1 ? "Coach" : "Coaches" }}</th>
-              <td class="flex flex-col">
-                <div
-                  v-for="coach in player.coaches"
-                  :key="coach.id"
-                  class="flex flex-col gap-0"
-                >
-                  <u-link
-                    :to="{ name: 'coach', params: { id: kebabCase(coach.id) } }"
-                    class="hover-link font-semibold w-fit mx-auto"
-                  >
-                    {{ coach.first_name ? `${coach.first_name} ${coach.last_name}` : coach.id }}
-                  </u-link>
-                  <span class="text-sm text-dimmed">({{ coach.dates.join(", ") }})</span>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="player.countries.length">
-              <th>{{ player.countries.length === 1 ? "Previous Representation" : "Previous Representations" }}</th>
-              <td class="flex flex-col">
-                <div
-                  v-for="country in player.countries"
-                  :key="country.id"
-                  class="my-2"
-                >
-                  <country-link
-                    :country
-                    :icon-only="false"
-                    class="text-sm font-semibold mx-auto w-fit"
-                  />
-                  <span
-                    v-if="country.start_date && country.end_date"
-                    class="text-sm text-dimmed"
-                  >
-                    {{ dateTimeFormat.formatRange(getDate(country.start_date), getDate(country.end_date)) }}
-                  </span>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th :colspan="2"></th>
-              <th>Singles</th>
-              <th>Doubles</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th
-                :rowspan="3"
-                class="rotate-270"
-              >
-                Ranking
-              </th>
-              <th>Current</th>
-              <td>{{ player.current_singles || "—" }}</td>
-              <td>{{ player.current_doubles || "—" }}</td>
-            </tr>
-            <tr>
-              <th>Career High</th>
-              <td>{{ player.ch_singles || "—" }}</td>
-              <td>{{ player.ch_doubles || "—" }}</td>
-            </tr>
-            <tr>
-              <th>Date</th>
-              <td>{{ player.singles_ch_date ? useDateFormat(getDate(player.singles_ch_date), "DD MMM YYYY") : "—" }}</td>
-              <td>{{ player.doubles_ch_date ? useDateFormat(getDate(player.doubles_ch_date), "DD MMM YYYY") : "—" }}</td>
-            </tr>
-            <tr
-              v-for="(level, index) in player.titles"
-              :key="`title-${level.level}`"
-            >
-              <th
-                v-if="index === 0"
-                :rowspan="player.titles.length"
-                class="rotate-270"
-              >
-                Titles
-              </th>
-              <th>{{ level.level }}</th>
-              <td>{{ level.singles }}</td>
-              <td>{{ level.doubles }}</td>
-            </tr>
-            <tr
-              v-for="(level, index) in player.wl"
-              :key="`title-${level.level}`"
-            >
-              <th
-                v-if="index === 0"
-                :rowspan="player.wl!.length"
-                class="rotate-270"
-              >
-                Win-Loss (M)
-              </th>
-              <th>{{ level.level }}</th>
-              <td>{{ level.singles.wins }}-{{ level.singles.losses }}</td>
-              <td>{{ level.doubles.wins }}-{{ level.doubles.losses }}</td>
-            </tr>
-            <tr
-              v-for="(level, index) in player.wl"
-              :key="`title-${level.level}`"
-            >
-              <th
-                v-if="index === 0"
-                :rowspan="player.wl!.length"
-                class="rotate-270"
-              >
-                Win-Loss (Q)
-              </th>
-              <th>{{ level.level }}</th>
-              <td>{{ level.singles.q_wins }}-{{ level.singles.q_losses }}</td>
-              <td>{{ level.doubles.q_wins }}-{{ level.doubles.q_losses }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th
-                :colspan="2"
-                class="uppercase"
-                >Most Frequent H2H</th
-              >
-            </tr>
-            <tr>
-              <th class="!text-left !pl-5">Player</th>
-              <th>Win-Loss</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="h2h in player.h2h"
-              :key="h2h.opponent.id"
-            >
-              <td><player-link :player="h2h.opponent" /></td>
-              <td>{{ h2h.wins }}-{{ h2h.matches - h2h.wins }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="flex flex-wrap justify-evenly gap-4">
+      <u-table
+        :data="details || []"
+        :columns="detailsColumns"
+        :loading="['idle', 'pending'].includes(status)"
+        class="my-5"
+      >
+        <template #loading>
+          <table-loading-icon />
+        </template>
+
+        <template #empty>
+          <table-empty-message :message="`No bio found for ${playerName}`" />
+        </template>
+      </u-table>
+
+      <u-table
+        :data="stats || []"
+        :columns="statsColumns"
+        :loading="['idle', 'pending'].includes(status)"
+      >
+        <template #loading>
+          <table-loading-icon />
+        </template>
+
+        <template #empty>
+          <table-empty-message
+            :icon="ICONS.noChart"
+            :message="`No stat details found for ${playerName}`"
+          />
+        </template>
+      </u-table>
+
+      <u-table
+        :data="data?.h2h || []"
+        :columns="h2hColumns"
+        :loading="['idle', 'pending'].includes(status)"
+      >
+        <template #loading>
+          <table-loading-icon />
+        </template>
+
+        <template #empty>
+          <table-empty-message
+            :icon="ICONS.noH2H"
+            :message="`No head-to-head records found for ${playerName}`"
+          />
+        </template>
+      </u-table>
     </div>
   </player-wrapper>
 </template>
-
-<style scoped>
-@reference "../../../../assets/css/main.css";
-
-td {
-  @apply py-1 px-5 text-sm text-center;
-}
-
-th {
-  @apply text-sm text-muted;
-}
-</style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FilterTableHeader, SortTableHeader, UButton } from "#components"
+import { TableCellGroup, TableHeaderGroup, TableHeaderSort } from "#components"
 import type { TableColumn, TableRow } from "@nuxt/ui"
 import {
   type Column,
@@ -9,15 +9,16 @@ import {
   getGroupedRowModel,
   type GroupingOptions
 } from "@tanstack/vue-table"
+import ColouredBadge from "~/components/coloured-badge.vue"
 
 definePageMeta({ name: "wl-index" })
 const {
   params: { id }
 } = useRoute("wl-index")
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
+const playerName = useState<string>("player-name")
 
 // API call
 const { data, status } = await useFetch<WLIndexInterface[]>("/api/players/wl-index", {
@@ -31,130 +32,92 @@ const columns = computed<TableColumn<WLIndexInterface>[]>(() => [
   {
     accessorKey: "category",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Category",
-            type: "alpha"
-          })
-        ]
-      )
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Category" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "category" }, () => row.original.category)
   },
   {
     accessorKey: "stat",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Stat",
-            type: "alpha"
-          })
-        ]
-      )
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Stat" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "stat" }, () => row.getValue("stat"))
   },
   {
     accessorKey: "level",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) =>
-      h(
-        "div",
-        {
-          class: "flex items-center gap-1 w-fit"
-        },
-        [
-          h(UButton, {
-            icon: column.getIsGrouped() ? icons.ungroup : icons.group,
-            size: "xs",
-            variant: "link",
-            color: "neutral",
-            onClick: () => column.toggleGrouping()
-          }),
-          h(FilterTableHeader, {
-            column: column as Column<unknown>,
-            label: "Level",
-            type: "alpha"
-          })
-        ]
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Level" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "level" }, () =>
+        h(ColouredBadge, { label: row.getValue("level") as string, class: "mx-auto" })
+      )
+  },
+  {
+    accessorKey: "draw",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Draw" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "draw" }, () =>
+        h(ColouredBadge, { label: row.getValue("draw") as string, class: "mx-auto" })
       )
   },
   {
     accessorKey: "wins",
     aggregationFn: "mean",
-    header: ({ column }) => h(SortTableHeader, { column: column as Column<unknown>, label: "Wins", type: "number" }),
+    header: ({ column }) => h(TableHeaderSort, { column: column as Column<unknown>, label: "Wins", type: "number" }),
     cell: ({ row }) => {
       if (row.getIsGrouped()) {
         if (row.original.category === "Match Record") {
-          return `Overall: ${data.value?.[0]?.wins.toFixed(3)}`
+          return `Overall: ${data.value?.[0]?.wins}`
         } else {
-          return `Avg: ${(row.getValue("wins") as number).toFixed(3)}`
+          return `Avg: ${Math.round(row.getValue("wins"))}`
         }
       } else {
-        return (row.getValue("wins") as number).toFixed(3)
+        return row.getValue("wins")
       }
     }
   },
   {
     accessorKey: "losses",
     aggregationFn: "mean",
-    header: ({ column }) => h(SortTableHeader, { column: column as Column<unknown>, label: "Losses", type: "number" }),
+    header: ({ column }) => h(TableHeaderSort, { column: column as Column<unknown>, label: "Losses", type: "number" }),
     cell: ({ row }) => {
       if (row.getIsGrouped()) {
         if (row.original.category === "Match Record") {
-          return `Overall: ${data.value?.[0]?.losses.toFixed(3)}`
+          return `Overall: ${data.value?.[0]?.losses}`
         } else {
-          return `Avg: ${(row.getValue("losses") as number).toFixed(3)}`
+          return `Avg: ${Math.round(row.getValue("losses"))}`
         }
       } else {
-        return (row.getValue("losses") as number).toFixed(3)
+        return row.getValue("losses")
       }
     }
   },
   {
-    accessorKey: "value",
+    id: "index",
+    accessorFn: row => {
+      const { wins, losses } = row
+      return wins + losses > 0 ? wins / (wins + losses) : 0
+    },
     aggregationFn: "mean",
-    header: ({ column }) => h(SortTableHeader, { column: column as Column<unknown>, label: "Value", type: "number" }),
+    header: ({ column }) => h(TableHeaderSort, { column: column as Column<unknown>, label: "Value", type: "number" }),
     cell: ({ row }) => {
       if (row.getIsGrouped()) {
+        const { wins, losses } = data.value?.[0] || { wins: 0, losses: 0 }
         if (row.original.category === "Match Record") {
-          return `Overall: ${data.value?.[0]?.value.toFixed(3)}`
+          return `Overall: ${(wins + losses > 0 ? wins / (wins + losses) : 0).toFixed(3)}`
         } else {
-          return `Avg: ${(row.getValue("value") as number).toFixed(3)}`
+          return `Avg: ${(row.getValue("index") as number).toFixed(3)}`
         }
       } else {
-        return (row.getValue("value") as number).toFixed(3)
+        return (row.getValue("index") as number).toFixed(3)
       }
     }
   },
   {
     accessorKey: "titles",
     aggregationFn: "mean",
-    header: ({ column }) => h(SortTableHeader, { column: column as Column<unknown>, label: "Titles", type: "number" }),
+    header: ({ column }) => h(TableHeaderSort, { column: column as Column<unknown>, label: "Titles", type: "number" }),
     cell: ({ row }) => {
       if (row.getIsGrouped()) {
         if (row.original.category === "Match Record") {
@@ -170,39 +133,41 @@ const columns = computed<TableColumn<WLIndexInterface>[]>(() => [
   {
     accessorKey: "ytd_wins",
     aggregationFn: "mean",
-    header: ({ column }) => h(SortTableHeader, { column: column as Column<unknown>, label: "YTD Wins", type: "number" }),
+    header: ({ column }) => h(TableHeaderSort, { column: column as Column<unknown>, label: "YTD Wins", type: "number" }),
     cell: ({ row }) => {
       if (row.getIsGrouped()) {
         if (row.original.category === "Match Record") {
-          return `Overall: ${data.value?.[0]?.ytd_wins.toFixed(3)}`
+          const { wins, losses } = data.value?.[0] || { wins: 0, losses: 0 }
+          return `Overall: ${(wins + losses > 0 ? wins / (wins + losses) : 0).toFixed(3)}`
         } else {
-          return `Avg: ${(row.getValue("ytd_wins") as number).toFixed(3)}`
+          return `Avg: ${Math.round(row.getValue("ytd_wins"))}`
         }
       } else {
-        return (row.getValue("ytd_wins") as number).toFixed(3)
+        return row.getValue("ytd_wins")
       }
     }
   },
   {
     accessorKey: "ytd_losses",
     aggregationFn: "mean",
-    header: ({ column }) => h(SortTableHeader, { column: column as Column<unknown>, label: "YTD Losses", type: "number" }),
+    header: ({ column }) => h(TableHeaderSort, { column: column as Column<unknown>, label: "YTD Losses", type: "number" }),
     cell: ({ row }) => {
       if (row.getIsGrouped()) {
         if (row.original.category === "Match Record") {
-          return `Overall: ${data.value?.[0]?.ytd_losses.toFixed(3)}`
+          const { wins, losses } = data.value?.[0] || { wins: 0, losses: 0 }
+          return `Overall: ${(wins + losses > 0 ? wins / (wins + losses) : 0).toFixed(3)}`
         } else {
-          return `Avg: ${(row.getValue("ytd_losses") as number).toFixed(3)}`
+          return `Avg: ${Math.round(row.getValue("ytd_losses"))}`
         }
       } else {
-        return (row.getValue("ytd_losses") as number).toFixed(3)
+        return row.getValue("ytd_losses")
       }
     }
   },
   {
     accessorKey: "ytd_value",
     aggregationFn: "mean",
-    header: ({ column }) => h(SortTableHeader, { column: column as Column<unknown>, label: "YTD Value", type: "number" }),
+    header: ({ column }) => h(TableHeaderSort, { column: column as Column<unknown>, label: "YTD Value", type: "number" }),
     cell: ({ row }) => {
       if (row.getIsGrouped()) {
         if (row.original.category === "Match Record") {
@@ -218,7 +183,7 @@ const columns = computed<TableColumn<WLIndexInterface>[]>(() => [
   {
     accessorKey: "ytd_titles",
     aggregationFn: "mean",
-    header: ({ column }) => h(SortTableHeader, { column: column as Column<unknown>, label: "YTD Titles", type: "number" }),
+    header: ({ column }) => h(TableHeaderSort, { column: column as Column<unknown>, label: "YTD Titles", type: "number" }),
     cell: ({ row }) => {
       if (row.getIsGrouped()) {
         if (row.original.category === "Match Record") {
@@ -233,8 +198,6 @@ const columns = computed<TableColumn<WLIndexInterface>[]>(() => [
   }
 ])
 
-const columnFilters = ref([])
-
 const grouping = ref<string[]>([])
 
 const grouping_options = ref<GroupingOptions>({
@@ -247,23 +210,31 @@ const table = useTemplateRef("table")
 <template>
   <player-wrapper>
     <template #toolbar>
-      <u-button
-        label="Reset Sorting"
-        :icon="icons.sortAlpha"
-        @click="table?.tableApi.resetSorting()"
-        size="sm"
-      />
-
       <player-wl-index-chart
         v-if="data"
         :index="data"
       />
-
+      <u-button
+        label="Reset Sorting"
+        :icon="ICONS.sortAlpha"
+        @click="table?.tableApi.resetSorting()"
+        size="sm"
+      />
       <u-button
         label="Reset Grouping"
-        :icon="icons.ungroup"
+        :icon="ICONS.ungroup"
         @click="table?.tableApi.resetGrouping()"
         size="sm"
+      />
+      <u-button
+        label="Reset Filters"
+        :icon="ICONS.noFilter"
+        @click="table?.tableApi.resetColumnFilters()"
+        size="sm"
+      />
+      <table-visibility
+        v-if="table"
+        :table="table!"
       />
     </template>
 
@@ -273,7 +244,6 @@ const table = useTemplateRef("table")
       :columns
       :loading="['idle', 'pending'].includes(status)"
       sticky
-      v-model:column-filters="columnFilters"
       :faceted-options="{
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -285,73 +255,14 @@ const table = useTemplateRef("table")
       :ui="{ root: 'w-fit min-w-1/3 mx-auto', td: 'empty:p-0' }"
     >
       <template #loading>
-        <u-icon
-          :name="uIcons.loading"
-          class="size-8"
-        />
+        <table-loading-icon />
       </template>
 
       <template #empty>
-        <div class="flex justify-center items-center w-full gap-2 text-error">
-          <u-icon
-            :name="icons.noChart"
-            class="text-base"
-          />
-          No win-loss index found
-        </div>
-      </template>
-
-      <template #category-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'category'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <div v-if="(row.getIsGrouped() && row.groupingColumnId === 'category') || (!grouping.includes('category') && !row.getIsGrouped())">
-            {{ row.getValue("category") }}
-          </div>
-        </div>
-      </template>
-
-      <template #stat-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'stat'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <div v-if="(row.getIsGrouped() && row.groupingColumnId === 'stat') || (!grouping.includes('stat') && !row.getIsGrouped())">
-            {{ row.getValue("stat") }}
-          </div>
-        </div>
-      </template>
-
-      <template #level-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <u-button
-            v-if="row.getIsGrouped() && grouping[0] === 'level'"
-            :icon="uIcons.chevronDoubleRight"
-            size="xs"
-            variant="link"
-            color="neutral"
-            @click="row.toggleExpanded()"
-            :ui="{ leadingIcon: row.getIsExpanded() ? 'rotate-90 transition-transform duration-200' : 'transition-transform duration-200' }"
-          />
-          <coloured-badge
-            v-if="(row.getIsGrouped() && row.groupingColumnId === 'level') || (!grouping.includes('level') && !row.getIsGrouped())"
-            :label="row.getValue('level')"
-            class="mx-auto"
-          />
-        </div>
+        <table-empty-message
+          :icon="ICONS.noChart"
+          :message="`No win-loss index found for ${playerName}`"
+        />
       </template>
     </u-table>
   </player-wrapper>

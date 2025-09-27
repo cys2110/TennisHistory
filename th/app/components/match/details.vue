@@ -20,19 +20,14 @@ const duration = computed(() => {
       <tr>
         <th>Surface</th>
         <td>
-          <u-link
-            :to="{ name: 'surface', params: { id: kebabCase(match.surface.id) } }"
-            class="hover-link default-link"
-          >
-            {{ match.surface.id }}
-          </u-link>
+          {{ match.surface.id }}
         </td>
         <th>{{ match.date ? "Date" : "Dates" }}</th>
         <td>
           {{
-            match.date ?
-              useDateFormat(getDate(match.date), "dddd DD MMMM, YYYY")
-            : dateTimeFormat.formatRange(getDate(match.start_date), getDate(match.end_date))
+            match.date
+              ? useDateFormat(getDate(match.date), "dddd DD MMMM, YYYY")
+              : dateTimeFormat.formatRange(getDate(match.start_date), getDate(match.end_date))
           }}
         </td>
       </tr>
@@ -62,21 +57,13 @@ const duration = computed(() => {
       </tr>
       <tr>
         <th>Umpire</th>
-        <td>
-          <u-link
-            v-if="match.umpire"
-            :to="{ name: 'umpire', params: { id: kebabCase(match.umpire) } }"
-            class="hover-link default-link"
-          >
-            {{ match.umpire }}
-          </u-link>
-          <template v-else>—</template>
-        </td>
+        <td>{{ match.umpire ?? "—" }}</td>
         <th>Score</th>
         <td>
           <match-score-item
-            :tour="tour"
-            :type="type"
+            :draw
+            :tour
+            :type
             :sets="match.sets"
             :id="parseInt(eid)"
             :year="parseInt(year)"

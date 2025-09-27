@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const { icons } = useAppConfig()
 const viewType = ref("By Player")
 </script>
 
@@ -7,7 +6,7 @@ const viewType = ref("By Player")
   <dashboard-subpanel
     id="entries"
     title="Entries"
-    :icon="icons.player"
+    :icon="ICONS.player"
     class="max-h-200"
   >
     <template #right>

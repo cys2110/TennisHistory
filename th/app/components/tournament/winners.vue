@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import {
-  ArrayFilterTableHeader,
+  ColouredBadge,
   CountryLink,
-  FilterTableHeader,
   MatchScoreItem,
-  NameTableHeader,
-  RangeTableHeader,
-  UBadge,
+  TableCellGroup,
+  TableHeaderFilter,
+  TableHeaderGroup,
+  TableHeaderName,
   UButton,
   ULink
 } from "#components"
-import type { TableColumn } from "@nuxt/ui"
+import type { TableColumn, TableRow } from "@nuxt/ui"
 import {
   type Column,
   createColumnHelper,
@@ -18,18 +18,14 @@ import {
   getFacetedMinMaxValues,
   getFacetedUniqueValues,
   getGroupedRowModel,
-  type GroupingOptions,
-  type Row
+  type GroupingOptions
 } from "@tanstack/vue-table"
+import type { RouteLocationRaw } from "vue-router"
 
 const {
-  params: { id }
+  params: { id, name: paramName }
 } = useRoute("tournament")
-const {
-  icons,
-  ui: { icons: uIcons }
-} = useAppConfig()
-const { tableMode } = useDefaults()
+const toast = useToast()
 const tours = inject<TourType[]>("tours", [])
 const name = inject<string>("tournamentName", "")
 
@@ -45,35 +41,10 @@ const columnHelper = createColumnHelper<TournamentWinnerEventType>()
 
 const columns = computed<TableColumn<TournamentWinnerEventType>[]>(() => [
   {
-    id: "expand",
-    cell: ({ row }: { row: Row<TournamentWinnerEventType> }) => {
-      if (row.getIsGrouped()) {
-        return h(UButton, {
-          icon: uIcons.chevronDoubleRight,
-          size: "xs",
-          variant: "link",
-          color: "neutral",
-          onClick: () => row.toggleExpanded(),
-          ui: { leadingIcon: row.getIsExpanded() ? "rotate-90 transition-transform duration-200" : "transition-transform duration-200" }
-        })
-      }
-    }
-  },
-  {
     accessorKey: "year",
-    header: ({ column }) => h(RangeTableHeader, { column: column as Column<unknown>, label: "Year" }),
-    cell: ({ row, cell }) => {
-      if (tableMode.value === "ungrouped" || COUNTRY_DRAWS.includes(id as string) || (row.getIsGrouped() && row.groupingColumnId === "year")) {
-        return h(
-          ULink,
-          {
-            to: { name: "event", params: { id, name, year: row.original.year, eid: row.original.id } },
-            class: "hover-link default-link font-semibold"
-          },
-          () => cell.getValue()
-        )
-      }
-    },
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Year", type: "number" }),
+    cell: ({ row, cell }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "year" }, () => cell.getValue()),
     footer: ({ table }) => {
       const filteredRows = table.getFilteredRowModel().rows
       const uniqueYears = new Set(filteredRows.map(row => row.original.year))
@@ -83,28 +54,20 @@ const columns = computed<TableColumn<TournamentWinnerEventType>[]>(() => [
   {
     accessorKey: "tour",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Tour", type: "alpha" }),
-    cell: ({ row }) => {
-      if (tableMode.value === "ungrouped" || (row.getIsGrouped() && row.depth === 1)) {
-        return h(UBadge, {
-          label: row.original.tour,
-          color: getTourColour(row.original.tour)
-        })
-      }
-    }
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Tour" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "tour" }, () =>
+        h(ColouredBadge, { label: row.original.tour, class: "mx-auto" })
+      )
   },
   {
     accessorKey: "type",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "S/D", type: "alpha" }),
-    cell: ({ row }) => {
-      if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
-        return h(UBadge, {
-          label: row.original.type,
-          color: getMatchTypeColour(row.original.type)
-        })
-      }
-    }
+    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "S/D" }),
+    cell: ({ row }) =>
+      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "type" }, () =>
+        h(ColouredBadge, { label: row.original.type, class: "mx-auto" })
+      )
   },
   columnHelper.group({
     id: "winners",
@@ -113,20 +76,18 @@ const columns = computed<TableColumn<TournamentWinnerEventType>[]>(() => [
       {
         id: "winner_country",
         accessorFn: row =>
-          Array.isArray(row.winner) ? row.winner.map(player => player.country.name)
-          : typeof row.winner === "string" ? undefined
-          : [row.winner.name],
+          Array.isArray(row.winner) ? row.winner.map(player => player.country.name) : typeof row.winner === "string" ? undefined : [row.winner.name],
         sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
         filterFn: "arrIncludesSome",
         sortUndefined: "last",
         header: ({ column }) =>
-          h(ArrayFilterTableHeader, {
+          h(TableHeaderFilter, {
             column: column as Column<unknown>,
             label: COUNTRY_DRAWS.includes(id as string) ? "Winner" : "Country",
             type: "alpha"
           }),
         cell: ({ row }) => {
-          if (tableMode.value === "ungrouped" || COUNTRY_DRAWS.includes(id as string) || !row.getIsGrouped()) {
+          if (COUNTRY_DRAWS.includes(id as string) || !row.getIsGrouped() || grouping.value.length === 0) {
             if (Array.isArray(row.original.winner)) {
               return row.original.winner.map(player =>
                 h(CountryLink, {
@@ -151,9 +112,9 @@ const columns = computed<TableColumn<TournamentWinnerEventType>[]>(() => [
         sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
         filterFn: (row, columnId, filterValue) => filterIncludesName(row, columnId, filterValue),
         sortUndefined: "last",
-        header: ({ column }) => h(NameTableHeader, { column: column as Column<unknown>, label: "Name" }),
+        header: ({ column }) => h(TableHeaderName, { column: column as Column<unknown>, label: "Name" }),
         cell: ({ row }) => {
-          if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
+          if (!row.getIsGrouped() || grouping.value.length === 0) {
             if (Array.isArray(row.original.winner)) {
               return h(
                 "div",
@@ -185,20 +146,14 @@ const columns = computed<TableColumn<TournamentWinnerEventType>[]>(() => [
       {
         id: "finalist_country",
         accessorFn: row =>
-          Array.isArray(row.loser) ? row.loser.map(player => player.country.name)
-          : typeof row.loser === "string" ? undefined
-          : [row.loser?.name],
+          Array.isArray(row.loser) ? row.loser.map(player => player.country.name) : typeof row.loser === "string" ? undefined : [row.loser?.name],
         sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
         filterFn: "arrIncludesSome",
         sortUndefined: "last",
         header: ({ column }) =>
-          h(ArrayFilterTableHeader, {
-            column: column as Column<unknown>,
-            label: COUNTRY_DRAWS.includes(id as string) ? "Finalist" : "Country",
-            type: "alpha"
-          }),
+          h(TableHeaderFilter, { column: column as Column<unknown>, label: COUNTRY_DRAWS.includes(id as string) ? "Finalist" : "Country" }),
         cell: ({ row }) => {
-          if (tableMode.value === "ungrouped" || COUNTRY_DRAWS.includes(id as string) || !row.getIsGrouped()) {
+          if (COUNTRY_DRAWS.includes(id as string) || !row.getIsGrouped() || grouping.value.length === 0) {
             if (Array.isArray(row.original.loser)) {
               return row.original.loser.map(player =>
                 h(CountryLink, {
@@ -223,9 +178,9 @@ const columns = computed<TableColumn<TournamentWinnerEventType>[]>(() => [
         sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
         filterFn: (row, columnId, filterValue) => filterIncludesName(row, columnId, filterValue),
         sortUndefined: "last",
-        header: ({ column }) => h(NameTableHeader, { column: column as Column<unknown>, label: "Name" }),
+        header: ({ column }) => h(TableHeaderName, { column: column as Column<unknown>, label: "Name" }),
         cell: ({ row }) => {
-          if (tableMode.value === "ungrouped" || !row.getIsGrouped()) {
+          if (!row.getIsGrouped() || grouping.value.length === 0) {
             if (Array.isArray(row.original.loser)) {
               return h(
                 "div",
@@ -254,7 +209,7 @@ const columns = computed<TableColumn<TournamentWinnerEventType>[]>(() => [
     id: "score",
     header: "Score",
     cell: ({ row }) => {
-      if (tableMode.value === "ungrouped" || COUNTRY_DRAWS.includes(id as string) || !row.getIsGrouped()) {
+      if (COUNTRY_DRAWS.includes(id as string) || !row.getIsGrouped() || grouping.value.length === 0) {
         if (row.original.score) {
           return row.original.score
         } else if (typeof row.original.winner === "string") {
@@ -263,10 +218,11 @@ const columns = computed<TableColumn<TournamentWinnerEventType>[]>(() => [
           const { tour, type, sets, id: eid, year, incomplete, stats } = row.original
 
           return h(MatchScoreItem, {
+            draw: "Main",
             tour,
             type,
             sets,
-            tournament: { id: parseInt(id), name },
+            tournament: { id: parseInt(id), name: paramName },
             id: eid,
             year,
             match_no: 1,
@@ -280,27 +236,82 @@ const columns = computed<TableColumn<TournamentWinnerEventType>[]>(() => [
   }
 ])
 
+const table = useTemplateRef("table")
 const columnFilters = ref([])
-const grouping = computed(() =>
-  tableMode.value === "ungrouped" || COUNTRY_DRAWS.includes(id as string) ? []
-  : tours.length === 1 ? ["year"]
-  : ["year", "tour"]
-)
+const grouping = ref<string[]>([])
 const grouping_options = ref<GroupingOptions>({
-  groupedColumnMode: false,
   getGroupedRowModel: getGroupedRowModel()
 })
 const columnVisibility = ref({
-  expand: tableMode.value === "grouped",
   tour: tours.length > 1 && !COUNTRY_DRAWS.includes(id as string),
   type: !COUNTRY_DRAWS.includes(id as string),
   winner_name: !COUNTRY_DRAWS.includes(id as string),
   finalist_name: !COUNTRY_DRAWS.includes(id as string)
 })
+
+const handleSelectRow = async (row: TableRow<TournamentWinnerEventType>) => {
+  toast.clear()
+
+  if (row.getIsGrouped()) {
+    row.toggleExpanded()
+  } else {
+    toast.add({
+      title: String(row.original.year),
+      duration: Infinity,
+      orientation: "horizontal",
+      progress: false,
+      actions: EVENT_PAGES.map(page => ({
+        icon: page.icon,
+        label: page.label,
+        onClick: e => {
+          toast.clear()
+          navigateTo({
+            name: page.name,
+            params: {
+              id,
+              name: paramName,
+              year: row.original.year,
+              eid: row.original.id
+            }
+          } as RouteLocationRaw)
+        }
+      }))
+    })
+  }
+}
+
+onBeforeUnmount(() => toast.clear())
+onBeforeRouteLeave(() => toast.clear())
 </script>
 
 <template>
+  <div class="flex justify-between items-center">
+    <u-button
+      label="Reset Sorting"
+      :icon="ICONS.sortAlpha"
+      @click="table?.tableApi.resetSorting()"
+      size="sm"
+    />
+    <u-button
+      label="Reset Grouping"
+      :icon="ICONS.ungroup"
+      @click="table?.tableApi.resetGrouping()"
+      size="sm"
+    />
+    <u-button
+      label="Reset Filters"
+      :icon="ICONS.noFilter"
+      @click="table?.tableApi.resetColumnFilters()"
+      size="sm"
+    />
+    <table-visibility
+      v-if="table"
+      :table="table!"
+    />
+  </div>
+
   <u-table
+    ref="table"
     :data="finals"
     :columns
     :loading="['idle', 'pending'].includes(status)"
@@ -313,24 +324,20 @@ const columnVisibility = ref({
       getFacetedUniqueValues: getFacetedUniqueValues()
     }"
     :grouping="grouping"
+    v-on:update:grouping="grouping = $event"
     :grouping-options="grouping_options"
-    :ui="{ root: 'lg:max-w-full', td: 'empty:p-0' }"
+    @select="handleSelectRow"
+    :ui="{ tbody: '[&>tr]:cursor-pointer', td: 'empty:p-0' }"
   >
     <template #loading>
-      <u-icon
-        :name="uIcons.loading"
-        class="size-8"
-      />
+      <table-loading-icon />
     </template>
 
     <template #empty>
-      <div class="flex justify-center items-center w-full gap-2 text-error">
-        <u-icon
-          :name="icons.noTournament"
-          class="text-base"
-        />
-        No finals found for {{ name }}
-      </div>
+      <table-empty-message
+        :icon="ICONS.noTournament"
+        :message="`${name} has no finals played.`"
+      />
     </template>
   </u-table>
 </template>

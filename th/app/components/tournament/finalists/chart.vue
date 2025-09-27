@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const { finalists } = defineProps<{ finalists: TournamentFinalistType[] }>()
-const { icons, colours } = useAppConfig()
 const tours = inject<TourType[]>("tours", [])
 const tournamentName = inject<string>("tournamentName", "")
 const colorMode = useColorMode()
@@ -26,7 +25,7 @@ watch(selectedTour, () => {
 
 const option = computed(() => ({
   backgroundColor: "transparent",
-  textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+  textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
   grid: { containLabel: true },
   tooltip: {
     trigger: "axis",
@@ -46,12 +45,12 @@ const option = computed(() => ({
   ],
   xAxis: {
     type: "value",
-    axisLabel: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText }
+    axisLabel: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText }
   },
   yAxis: {
     type: "category",
     inverse: true,
-    axisLabel: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText }
+    axisLabel: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText }
   },
   series: [
     {
@@ -60,7 +59,7 @@ const option = computed(() => ({
       encode: { x: "singles_wins", y: "player" },
       stack: "singles",
       datasetIndex: datasetIndex.value,
-      itemStyle: { color: colours.orange600 }
+      itemStyle: { color: COLOURS.orange600 }
     },
     {
       name: "Singles Losses",
@@ -68,7 +67,7 @@ const option = computed(() => ({
       encode: { x: "singles_losses", y: "player" },
       stack: "singles",
       datasetIndex: datasetIndex.value,
-      itemStyle: { color: colours.orange300 }
+      itemStyle: { color: COLOURS.orange300 }
     },
     {
       name: "Doubles Wins",
@@ -76,7 +75,7 @@ const option = computed(() => ({
       encode: { x: "doubles_wins", y: "player" },
       stack: "doubles",
       datasetIndex: datasetIndex.value,
-      itemStyle: { color: colours.indigo700 }
+      itemStyle: { color: COLOURS.indigo700 }
     },
     {
       name: "Doubles Losses",
@@ -84,7 +83,7 @@ const option = computed(() => ({
       encode: { x: "doubles_losses", y: "player" },
       stack: "doubles",
       datasetIndex: datasetIndex.value,
-      itemStyle: { color: colours.indigo300 }
+      itemStyle: { color: COLOURS.indigo300 }
     }
   ]
 }))
@@ -98,7 +97,7 @@ const option = computed(() => ({
   >
     <u-button
       label="Chart"
-      :icon="icons.barChart"
+      :icon="ICONS.barChart"
     />
 
     <template #body>
@@ -113,28 +112,28 @@ const option = computed(() => ({
         <div class="flex items-center gap-2">
           <div class="flex items-center gap-1">
             <u-icon
-              :name="icons.colours"
+              :name="ICONS.colours"
               class="text-orange-600"
             />
             <span class="text-sm">Singles Wins</span>
           </div>
           <div class="flex items-center gap-1">
             <u-icon
-              :name="icons.colours"
+              :name="ICONS.colours"
               class="text-orange-300"
             />
             <span class="text-sm">Singles Losses</span>
           </div>
           <div class="flex items-center gap-1">
             <u-icon
-              :name="icons.colours"
+              :name="ICONS.colours"
               class="text-indigo-700"
             />
             <span class="text-sm">Doubles Wins</span>
           </div>
           <div class="flex items-center gap-1">
             <u-icon
-              :name="icons.colours"
+              :name="ICONS.colours"
               class="text-indigo-300"
             />
             <span class="text-sm">Doubles Losses</span>

@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { CountryLink } from "#components"
+import { PlayerLink } from "#components"
 import type { TableColumn, TableRow } from "@nuxt/ui"
-import { createColumnHelper } from "@tanstack/vue-table"
 
 useHead({ title: "H2H" })
 const {
-  icons,
   ui: { icons: uIcons }
 } = useAppConfig()
 
@@ -23,52 +21,34 @@ const { data, status } = await useFetch<APIResponse[]>("/api/h2h", {
   server: false
 })
 
-const columnHelper = createColumnHelper<APIResponse>()
-
 const columns: TableColumn<APIResponse>[] = [
-  columnHelper.group({
+  {
+    id: "p1",
     header: "Player 1",
-    columns: [
-      {
-        id: "p1Country",
-        header: "Country",
-        cell: ({ row }) => h(CountryLink, { country: row.original.p1.country, class: "mx-auto" })
-      },
-      {
-        id: "p1Name",
-        header: "Name",
-        accessorFn: row => `${row.p1.first_name} ${row.p1.last_name}`
-      },
-      {
-        accessorKey: "p1Wins",
-        header: "Wins"
-      }
-    ]
-  }),
-  columnHelper.group({
+    cell: ({ row }) =>
+      h(PlayerLink, { player: row.original.p1, centred: true, class: row.original.p1Wins > row.original.p2Wins ? "font-semibold" : "" })
+  },
+  {
+    id: "wl",
+    header: "",
+    cell: ({ row }) =>
+      h("div", { class: "text-center" }, [
+        h("span", { class: row.original.p1Wins > row.original.p2Wins ? "font-semibold" : "" }, row.original.p1Wins),
+        h("span", " - "),
+        h("span", { class: row.original.p2Wins > row.original.p1Wins ? "font-semibold" : "" }, row.original.p2Wins)
+      ])
+  },
+  {
+    id: "p2",
     header: "Player 2",
-    columns: [
-      {
-        accessorKey: "p2Wins",
-        header: "Wins"
-      },
-      {
-        id: "p2Country",
-        header: "Country",
-        cell: ({ row }) => h(CountryLink, { country: row.original.p2.country, class: "mx-auto" })
-      },
-      {
-        id: "p2Name",
-        header: "Name",
-        accessorFn: row => `${row.p2.first_name} ${row.p2.last_name}`
-      }
-    ]
-  })
+    cell: ({ row }) =>
+      h(PlayerLink, { player: row.original.p2, centred: true, class: row.original.p1Wins < row.original.p2Wins ? "font-semibold" : "" })
+  }
 ]
 
 const handleSelectRow = async (row: TableRow<APIResponse>) => {
   await navigateTo({
-    name: "h2h-players",
+    name: "head-to-head",
     params: {
       p1Id: row.original.p1.id,
       p2Id: row.original.p2.id,
@@ -100,20 +80,11 @@ const handleSelectRow = async (row: TableRow<APIResponse>) => {
           :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer' }"
         >
           <template #loading>
-            <u-icon
-              :name="uIcons.loading"
-              class="size-8"
-            />
+            <table-loading-icon />
           </template>
 
           <template #empty>
-            <div class="flex justify-center items-center w-full gap-2 text-error">
-              <u-icon
-                :name="uIcons.caution"
-                class="text-base"
-              />
-              No results found
-            </div>
+            <table-empty-message message="No head to head records found." />
           </template>
         </u-table>
       </template>

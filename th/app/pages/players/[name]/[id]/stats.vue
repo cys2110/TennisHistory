@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { FilterTableHeader, UButton, UProgress } from "#components"
-import { MATCH_STATS } from "#imports"
-import type { TableColumn } from "@nuxt/ui"
+import { ColouredBadge, TableCellGroup, TableHeaderFilter, TableHeaderGroup, UBadge, UProgress } from "#components"
+import type { TableColumn, TableRow } from "@nuxt/ui"
 import {
   type Column,
   getFacetedRowModel,
@@ -13,18 +12,14 @@ import {
 
 definePageMeta({ name: "stats" })
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
 const {
   params: { id }
 } = useRoute("stats")
 
+const playerName = useState<string>("player-name")
 const playerYears = useState<number[]>("player-years")
-const year = ref<number>()
-const surface = ref<SurfaceType>()
-const draw = ref<DrawType>("Main")
-const level = ref<"Tour" | "Challenger" | "ITF">("Tour")
 
 interface APIResponse {
   surface: SurfaceInterface
@@ -67,7 +62,7 @@ const stats = computed<TableInterface[]>(() => {
           value: s[statLabel.key as keyof APIResponse],
           low: statLabel.low,
           percent: statLabel.percent,
-          surface: s.surface?.id,
+          surface: s.surface?.surface,
           event_category: s.category,
           draw: s.draw,
           level: s.level,
@@ -87,7 +82,7 @@ const stats = computed<TableInterface[]>(() => {
             value: denominator === 0 ? 0 : Math.round((numerator / denominator) * 100),
             low: statLabel.low,
             percent: statLabel.percent,
-            surface: s.surface?.id,
+            surface: s.surface?.surface,
             event_category: s.category,
             draw: s.draw,
             level: s.level,
@@ -110,7 +105,7 @@ const stats = computed<TableInterface[]>(() => {
             value: denominator === 0 ? 0 : Math.round((numerator / denominator) * 100),
             low: statLabel.low,
             percent: true,
-            surface: s.surface?.id,
+            surface: s.surface?.surface,
             event_category: s.category,
             draw: s.draw,
             level: s.level,
@@ -130,16 +125,88 @@ const columns: TableColumn<TableInterface>[] = [
   {
     accessorKey: "category",
     filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
-    header: ({ column }) => h(FilterTableHeader, { column: column as Column<unknown>, label: "Category", type: "alpha" }),
-    cell: ({ row }) => row.original.category
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Category", type: "alpha" }),
+    cell: ({ row }) => {
+      if (row.getIsGrouped()) {
+        return row.original.category
+      }
+    }
   },
   {
+    id: "stat",
     accessorKey: "label",
-    header: ""
+    header: "Stat"
+  },
+  {
+    accessorKey: "level",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Level", type: "alpha" }),
+    cell: ({ row, table }) => {
+      if (row.getIsGrouped()) {
+        const columnFilter = table.getColumn("level")?.getFilterValue() as string[]
+        if (columnFilter) {
+          return columnFilter.map(filter => h(ColouredBadge, { label: filter, class: "mx-1" }))
+        } else {
+          return h(UBadge, {
+            color: "primary",
+            label: "All"
+          })
+        }
+      }
+    }
+  },
+  {
+    accessorKey: "surface",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Surface", type: "alpha" }),
+    cell: ({ row, table }) => {
+      if (row.getIsGrouped()) {
+        const columnFilter = table.getColumn("surface")?.getFilterValue() as string[]
+        if (columnFilter) {
+          return columnFilter.join(", ")
+        } else {
+          return "All"
+        }
+      }
+    }
+  },
+  {
+    accessorKey: "draw",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Draw", type: "alpha" }),
+    cell: ({ row, table }) => {
+      if (row.getIsGrouped()) {
+        const columnFilter = table.getColumn("draw")?.getFilterValue() as string[]
+        if (columnFilter) {
+          return columnFilter.map(filter => h(ColouredBadge, { label: filter, class: "mx-1" }))
+        } else {
+          return h(UBadge, {
+            color: "primary",
+            label: "All"
+          })
+        }
+      }
+    }
+  },
+  {
+    accessorKey: "year",
+    filterFn: (row, columnId, filterValue) => filterIncludesString(row, columnId, filterValue),
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Year", type: "number" }),
+    cell: ({ row, table }) => {
+      if (row.getIsGrouped()) {
+        const columnFilter = table.getColumn("year")?.getFilterValue() as string[]
+        if (columnFilter) {
+          return columnFilter.join(", ")
+        } else {
+          return "All"
+        }
+      }
+    }
   },
   {
     accessorKey: "value",
     aggregationFn: "mean",
+    meta: { class: { td: "min-w-100" } },
     header: "",
     cell: ({ row, cell, table }) => {
       if (row.original.percent) {
@@ -167,28 +234,11 @@ const columns: TableColumn<TableInterface>[] = [
         return sumOfValues
       }
     }
-  },
-  { accessorKey: "surface" },
-  { accessorKey: "draw" },
-  { accessorKey: "level" },
-  { accessorKey: "year" }
+  }
 ]
 
-const columnFilters = computed(() => [
-  ...(year.value ? [{ id: "year", value: year.value }] : []),
-  ...(surface.value ? [{ id: "surface", value: surface.value }] : []),
-  ...(draw.value ? [{ id: "draw", value: draw.value }] : []),
-  ...(level.value ? [{ id: "level", value: level.value }] : [])
-])
-const columnVisibility = ref({
-  surface: false,
-  draw: false,
-  level: false,
-  year: false
-})
-
-const grouping = ref<string[]>(["label"])
-
+const table = useTemplateRef("table")
+const grouping = ref<string[]>(["stat"])
 const grouping_options = ref<GroupingOptions>({
   groupedColumnMode: false,
   getGroupedRowModel: getGroupedRowModel()
@@ -198,44 +248,24 @@ const grouping_options = ref<GroupingOptions>({
 <template>
   <player-wrapper>
     <template #toolbar>
-      <filter-select-years
-        v-model="year"
-        :items="playerYears"
+      <u-button
+        label="Reset Sorting"
+        :icon="ICONS.sortAlpha"
+        @click="table?.tableApi.resetSorting()"
+        size="sm"
       />
-      <u-form-field label="Surface">
-        <u-select
-          v-model="surface"
-          :items="SURFACES_LIST.map(s => s.id)"
-          placeholder="Select surface"
-          :icon="icons.court"
-        >
-          <template #content-bottom>
-            <u-button
-              :trailing-icon="uIcons.close"
-              color="neutral"
-              variant="link"
-              size="xs"
-              @click="surface = undefined"
-              label="Clear"
-              block
-              class="border-t rounded-t-none border-muted"
-            />
-          </template>
-        </u-select>
-      </u-form-field>
-      <u-radio-group
-        legend="Level"
-        v-model="level"
-        :items="['Tour', 'Challenger', 'ITF']"
-        orientation="horizontal"
+      <u-button
+        label="Reset Filters"
+        :icon="ICONS.noFilter"
+        @click="table?.tableApi.resetColumnFilters()"
+        size="sm"
       />
-      <u-radio-group
-        legend="Draw Type"
-        v-model="draw"
-        :items="['Main', 'Qualifying']"
-        orientation="horizontal"
+      <table-visibility
+        v-if="table"
+        :table="table!"
       />
     </template>
+
     <client-only>
       <u-table
         ref="table"
@@ -243,30 +273,24 @@ const grouping_options = ref<GroupingOptions>({
         :columns
         :loading="['idle', 'pending'].includes(status)"
         sticky
-        v-model:column-filters="columnFilters"
         :faceted-options="{
           getFacetedRowModel: getFacetedRowModel(),
           getFacetedMinMaxValues: getFacetedMinMaxValues(),
           getFacetedUniqueValues: getFacetedUniqueValues()
         }"
         :grouping="grouping"
+        v-on:update:grouping="grouping = $event"
         :grouping-options="grouping_options"
-        v-model:column-visibility="columnVisibility"
+        :ui="{ td: 'empty:p-0' }"
       >
         <template #loading>
-          <u-icon
-            :name="uIcons.loading"
-            class="size-8"
-          />
+          <table-loading-icon />
         </template>
         <template #empty>
-          <div class="flex justify-center items-center w-full gap-2 text-error">
-            <u-icon
-              :name="icons.noChart"
-              class="text-base"
-            />
-            No stats found
-          </div>
+          <table-empty-message
+            :icon="ICONS.noChart"
+            :message="`No stats available for ${playerName}`"
+          />
         </template>
       </u-table>
     </client-only>

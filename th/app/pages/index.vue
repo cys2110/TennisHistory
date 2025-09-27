@@ -1,23 +1,22 @@
 <script setup lang="ts">
 definePageMeta({ name: "home" })
 useHead({ title: "Home" })
-const { icons } = useAppConfig()
 
 // Features
 const features = [
   {
     title: "Results",
-    icon: icons.event,
+    icon: ICONS.event,
     description: "Explore tournament results starting from the Open Era"
   },
   {
     title: "Head to Head",
-    icon: icons.h2h,
+    icon: ICONS.h2h,
     description: "Examine match ups between players"
   },
   {
     title: "Statistics and Records",
-    icon: icons.stats,
+    icon: ICONS.stats,
     description: "Charge up your tennis trivia with fun facts and figures"
   }
 ]
@@ -27,23 +26,21 @@ const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.p
 </script>
 
 <template>
-  <div class="w-full">
-    <u-dashboard-panel>
-      <template #header>
-        <u-dashboard-navbar>
-          <template #title>
-            <page-title />
-          </template>
-        </u-dashboard-navbar>
-      </template>
-
-      <template #body>
-        <u-page-section
-          title="Tennis History in the Open Era"
-          description="Explore tennis since 1968"
-          :features
-        />
-        <div class="relative w-full h-[400px] overflow-hidden">
+  <u-container>
+    <u-page>
+      <u-page-header
+        title="Tennis History in the Open Era"
+        description="Explore tennis since 1968"
+      />
+      <u-page-body>
+        <u-page-grid>
+          <u-page-feature
+            v-for="feature in features"
+            :key="feature.title"
+            v-bind="feature"
+          />
+        </u-page-grid>
+        <div class="relative w-full h-[400px] overflow-hidden rounded-lg">
           <u-marquee
             reverse
             orientation="vertical"
@@ -95,7 +92,7 @@ const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.p
             />
           </u-marquee>
         </div>
-      </template>
-    </u-dashboard-panel>
-  </div>
+      </u-page-body>
+    </u-page>
+  </u-container>
 </template>

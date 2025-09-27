@@ -202,90 +202,33 @@ export default defineEventHandler(async query => {
   const stats = []
 
   for (const stat of MATCH_STATS) {
-    if (stat.key) {
-      if (stat.key.length === 1) {
-        const key = stat.key[0]
-        if (match.p1[key] && match.p2[key]) {
-          const p1 = match.p1[key]
-          const p2 = match.p2[key]
-          stats.push({
-            label: stat.label,
-            category: stat.category,
-            low: stat.low,
-            percent: stat.percent,
-            p1,
-            p2,
-            p1_pc: p1 + p2 === 0 ? 0 : percentage(p1, p1 + p2),
-            p2_pc: p1 + p2 === 0 ? 0 : percentage(p2, p1 + p2)
-          })
-        }
-      } else {
-        const [baseKey, totalKey] = stat.key
-        if (match.p1[baseKey] && match.p2[baseKey] && match.p1[totalKey] && match.p2[totalKey]) {
-          const p1Base = match.p1[baseKey]
-          const p2Base = match.p2[baseKey]
-          const p1Total = match.p1[totalKey]
-          const p2Total = match.p2[totalKey]
-
-          stats.push({
-            label: stat.label,
-            category: stat.category,
-            low: stat.low,
-            percent: stat.percent,
-            p1: `${p1Base}/${p1Total}`,
-            p2: `${p2Base}/${p2Total}`,
-            p1_pc: p1Base + p1Total === 0 ? 0 : percentage(p1Base, p1Total),
-            p2_pc: p2Base + p2Total === 0 ? 0 : percentage(p2Base, p2Total)
-          })
-        }
+    if (stat.key || ["Service games won", "Return games won"].includes(stat.label)) {
+      const p1 = stat.key ? match.p1[stat.key] : match.p1[stat.denominators![0]]
+      const p2 = stat.key ? match.p2[stat.key] : match.p2[stat.denominators![0]]
+      if (p1 !== undefined && p2 !== undefined) {
+        stats.push({
+          label: stat.label.replace(" won", ""),
+          category: stat.category,
+          low: stat.low,
+          percent: false,
+          p1,
+          p2,
+          p1_pc: p1 + p2 === 0 ? 0 : percentage(p1, p1 + p2),
+          p2_pc: p1 + p2 === 0 ? 0 : percentage(p2, p1 + p2)
+        })
       }
-    } else if (stat.label === "First serve") {
-      const baseKey = "serve1"
-      const totalKeys = ["serve1", "serve2"]
-
-      const p1Base = match.p1[baseKey]
-      const p2Base = match.p2[baseKey]
-      const p1Total = match.p1[totalKeys[0]] + match.p1[totalKeys[1]]
-      const p2Total = match.p2[totalKeys[0]] + match.p2[totalKeys[1]]
+    } else {
+      const p1Numerator = stat.numerators!.reduce((acc, key) => acc + (match.p1[key] ?? 0), 0)
+      const p1Denominator = stat.denominators!.reduce((acc, key) => acc + (match.p1[key] ?? 0), 0)
+      const p2Numerator = stat.numerators!.reduce((acc, key) => acc + (match.p2[key] ?? 0), 0)
+      const p2Denominator = stat.denominators!.reduce((acc, key) => acc + (match.p2[key] ?? 0), 0)
 
       stats.push({
         ...stat,
-        p1: `${p1Base}/${p1Total}`,
-        p2: `${p2Base}/${p2Total}`,
-        p1_pc: p1Base + p1Total === 0 ? 0 : percentage(p1Base, p1Total),
-        p2_pc: p2Base + p2Total === 0 ? 0 : percentage(p2Base, p2Total)
-      })
-    } else if (["Service points won", "Return points won"].includes(stat.label)) {
-      const baseKeys = stat.label === "Service points won" ? ["serve1_w", "serve2_w"] : ["ret1_w", "ret2_w"]
-      const totalKeys = stat.label === "Service points won" ? ["serve1", "serve2"] : ["ret1", "ret2"]
-
-      const p1Base = match.p1[baseKeys[0]] + match.p1[baseKeys[1]]
-      const p2Base = match.p2[baseKeys[0]] + match.p2[baseKeys[1]]
-      const p1Total = match.p1[totalKeys[0]] + match.p1[totalKeys[1]]
-      const p2Total = match.p2[totalKeys[0]] + match.p2[totalKeys[1]]
-
-      stats.push({
-        ...stat,
-        p1: `${p1Base}/${p1Total}`,
-        p2: `${p2Base}/${p2Total}`,
-        p1_pc: p1Base + p1Total === 0 ? 0 : percentage(p1Base, p1Total),
-        p2_pc: p2Base + p2Total === 0 ? 0 : percentage(p2Base, p2Total)
-      })
-    } else if (stat.label === "Total points won") {
-      const baseKeys = ["serve1_w", "serve2_w", "ret1_w", "ret2_w"]
-      const totalKeys = ["serve1", "serve2", "ret1", "ret2"]
-
-      const p1Base = match.p1[baseKeys[0]] + match.p1[baseKeys[1]] + match.p1[baseKeys[2]] + match.p1[baseKeys[3]]
-      const p2Base = match.p2[baseKeys[0]] + match.p2[baseKeys[1]] + match.p2[baseKeys[2]] + match.p2[baseKeys[3]]
-      const p1Total = match.p1[totalKeys[0]] + match.p1[totalKeys[1]] + match.p1[totalKeys[2]] + match.p1[totalKeys[3]]
-      const p2Total = match.p2[totalKeys[0]] + match.p2[totalKeys[1]] + match.p2[totalKeys[2]] + match.p2[totalKeys[3]]
-
-      stats.push({
-        ...stat,
-        p1: `${p1Base}/${p1Total}`,
-        p2: `${p2Base}/${p2Total}`,
-        p1_pc: p1Base + p1Total === 0 ? 0 : percentage(p1Base, p1Total),
-        p2_pc: p2Base + p2Total === 0 ? 0 : percentage(p2Base, p2Total)
+        p1: `${p1Numerator}/${p1Denominator}`,
+        p2: `${p2Numerator}/${p2Denominator}`,
+        p1_pc: p1Denominator === 0 ? 0 : percentage(p1Numerator, p1Denominator),
+        p2_pc: p2Denominator === 0 ? 0 : percentage(p2Numerator, p2Denominator)
       })
     }
   }

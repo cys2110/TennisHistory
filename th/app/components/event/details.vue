@@ -5,8 +5,7 @@ const {
   params: { eid, year }
 } = useRoute("event")
 const {
-  icons,
-  ui: { icons: uIcons }
+  ui: { icons }
 } = useAppConfig()
 const tournamentName = useState<string>("tournament-name")
 
@@ -28,7 +27,7 @@ const columns: TableColumn<{ label: string; value: string }>[] = [
   <dashboard-subpanel
     id="details"
     title="Details"
-    :icon="icons.overview"
+    :icon="ICONS.overview"
   >
     <client-only>
       <u-table
@@ -39,26 +38,17 @@ const columns: TableColumn<{ label: string; value: string }>[] = [
         class="lg:max-w-1/3 mx-auto"
       >
         <template #loading>
-          <u-icon
-            :name="uIcons.loading"
-            class="size-8"
-          />
+          <table-loading-icon />
         </template>
         <template #empty>
-          <div class="flex justify-center items-center w-full gap-2 text-error">
-            <u-icon
-              :name="uIcons.caution"
-              class="text-base"
-            />
-            No details found for {{ tournamentName }} {{ year }}
-          </div>
+          <table-empty-message :message="`No details found for ${tournamentName} ${year}`" />
         </template>
       </u-table>
       <table
         v-else
-        class="w-1/3 min-w-fit mx-auto"
+        class="w-1/3 min-w-fit mx-auto text-sm"
       >
-        <tbody>
+        <tbody class="[&>tr]:border-y [&>tr]:border-muted [&>tr>td]:p-2 [&>tr>td]:text-sm [&>tr>th]:text-sm [&>tr>th]:text-muted">
           <tr v-if="event?.sponsor_name || event?.atp_sponsor_name || event?.wta_sponsor_name">
             <th>Sponsor Name</th>
             <td class="flex flex-col gap-1">
@@ -82,14 +72,12 @@ const columns: TableColumn<{ label: string; value: string }>[] = [
                 v-for="(category, index) in event.categories"
                 :key="category"
               >
-                <u-link
+                <div
                   v-if="category"
-                  :to="{ name: 'category', params: { id: kebabCase(category) } }"
-                  class="hover-link w-fit"
-                  :class="`${tourColourMapping[index]}-link`"
+                  :class="`text-${tourColourMapping[index]}`"
                 >
                   {{ category }}
-                </u-link>
+                </div>
               </template>
             </td>
           </tr>
@@ -112,12 +100,7 @@ const columns: TableColumn<{ label: string; value: string }>[] = [
           <tr v-if="event?.surface">
             <th>Surface</th>
             <td>
-              <u-link
-                :to="{ name: 'surface', params: { id: kebabCase(event.surface.id) } }"
-                class="hover-link default-link w-fit"
-              >
-                {{ event.surface.id }}
-              </u-link>
+              {{ event.surface.id }}
             </td>
           </tr>
           <tr v-if="event?.venues.length">
@@ -128,27 +111,25 @@ const columns: TableColumn<{ label: string; value: string }>[] = [
                 :key="venue.id"
                 class="flex items-center gap-2"
               >
-                <u-link
-                  :to="{ name: 'venue', params: { id: kebabCase(venue.id) } }"
-                  class="hover-link default-link w-fit"
-                >
+                <div>
                   {{ venue.name ? `${venue.name}, ${venue.city}` : venue.city }}
-                </u-link>
-                <country-link :country="venue.country" />
+                </div>
+                <country-link
+                  :country="venue.country"
+                  icon-only
+                />
               </div>
             </td>
           </tr>
           <tr v-if="event?.supervisors.length">
             <th>Supervisors</th>
             <td class="flex flex-col gap-1">
-              <u-link
+              <div
                 v-for="supervisor in event.supervisors"
                 :key="supervisor.id"
-                class="hover-link default-link w-fit"
-                :to="{ name: 'supervisor', params: { id: kebabCase(supervisor.id) } }"
               >
                 {{ supervisor.id }}
-              </u-link>
+              </div>
             </td>
           </tr>
           <tr v-if="useArraySome(event?.pm, (p: number | undefined) => isDefined(p))">
@@ -197,14 +178,14 @@ const columns: TableColumn<{ label: string; value: string }>[] = [
                 >
                   <u-icon
                     v-if="draw[0]"
-                    :name="icons.person"
+                    :name="ICONS.person"
                     class="size-4"
                   />
                   <span v-if="draw[0]">{{ draw[0] }}</span>
                   <span v-if="draw.length === 2"> | </span>
                   <u-icon
                     v-if="draw[1]"
-                    :name="icons.people"
+                    :name="ICONS.people"
                     class="size-5"
                   />
                   <span v-if="draw[1]">{{ draw[1] }}</span>
@@ -217,19 +198,3 @@ const columns: TableColumn<{ label: string; value: string }>[] = [
     </client-only>
   </dashboard-subpanel>
 </template>
-
-<style scoped>
-@reference "../../assets/css/main.css";
-
-tr {
-  @apply border-y border-muted;
-}
-
-td {
-  @apply p-2 text-sm;
-}
-
-th {
-  @apply text-sm text-muted;
-}
-</style>

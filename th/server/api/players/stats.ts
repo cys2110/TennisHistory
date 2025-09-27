@@ -56,9 +56,10 @@ export default defineEventHandler(async event => {
     const { surface, draw, category, ...rest } = stat
     const numberKeys = Object.keys(rest)
 
-    const level =
-      CHALLENGER_CATEGORIES.includes(category) ? "Tour"
-      : ITF_MEN_CATEGORIES.includes(category) || ITF_WOMEN_CATEGORIES.includes(category) ? "ITF"
+    const level = CHALLENGER_CATEGORIES.includes(category)
+      ? "Tour"
+      : ITF_MEN_CATEGORIES.includes(category) || ITF_WOMEN_CATEGORIES.includes(category)
+      ? "ITF"
       : "Tour"
 
     for (const key of numberKeys) {

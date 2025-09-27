@@ -12,7 +12,6 @@ const {
   p2: EntryInterface[]
   tournament: string
 }>()
-const { colours, icons } = useAppConfig()
 const colorMode = useColorMode()
 const { params } = useRoute()
 const { year } = params as { year?: string }
@@ -20,7 +19,7 @@ const { year } = params as { year?: string }
 const option = ref({
   backgroundColor: "transparent",
   grid: { containLabel: true },
-  textStyle: { color: colorMode.value === "dark" ? colours.darkText : colours.lightText },
+  textStyle: { color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText },
   dataset: {
     source: stats,
     dimensions: ["label", "p1", "p1_pc", "p2", "p2_pc"]
@@ -55,10 +54,10 @@ const option = ref({
       name: p1.map(player => `${player.first_name} ${player.last_name}`).join(" | "),
       type: "bar",
       encode: { x: "p1_pc", y: "label" },
-      itemStyle: { color: colours.indigo700 },
+      itemStyle: { color: COLOURS.indigo700 },
       label: {
         show: true,
-        color: colorMode.value === "dark" ? colours.darkText : colours.lightText,
+        color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText,
         formatter: "{a}"
       }
     },
@@ -66,10 +65,10 @@ const option = ref({
       name: p2.map(player => `${player.first_name} ${player.last_name}`).join(" | "),
       type: "bar",
       encode: { x: "p2_pc", y: "label" },
-      itemStyle: { color: colours.fuchsia600 },
+      itemStyle: { color: COLOURS.fuchsia600 },
       label: {
         show: true,
-        color: colorMode.value === "dark" ? colours.darkText : colours.lightText,
+        color: colorMode.value === "dark" ? COLOURS.darkText : COLOURS.lightText,
         formatter: "{a}"
       }
     }
@@ -100,7 +99,7 @@ const getButtonColour = (category: string) => {
   >
     <u-button
       :label
-      :icon="icons.barChart"
+      :icon="ICONS.barChart"
       block
       :color="getButtonColour(category)"
     />

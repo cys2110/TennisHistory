@@ -16,7 +16,7 @@ export default defineEventHandler(async query => {
       }
       RETURN DISTINCT result
         UNION
-      MATCH (y:Year {id: 2001})
+      MATCH (y:Year {id: $id})
       OPTIONAL MATCH (c:Country)<-[:REPRESENTS]-(p:Player)
       WHERE
         p.dob.year = y.id OR
@@ -38,7 +38,7 @@ export default defineEventHandler(async query => {
                     WHEN p1 IS NOT NULL THEN type(p1)
                     WHEN p.dob.year = y.id THEN 'born'
                     WHEN p.dod.year = y.id THEN 'Died'
-                    ELSE 'Hall of Fame'
+                    ELSE 'Hall of Fame Induction'
                   END
               }
             ) AS result }

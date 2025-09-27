@@ -5,12 +5,12 @@ const { tours } = defineProps<{
 }>()
 const modelValue = defineModel<TourType>()
 
-watch(
-  () => tours,
-  () => {
-    modelValue.value = tours[0]
-  }
-)
+// watch(
+//   () => tours,
+//   () => {
+//     modelValue.value = tours[0]
+//   }
+// )
 </script>
 
 <template>

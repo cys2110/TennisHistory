@@ -18,8 +18,10 @@ export default defineEventHandler(async event => {
           NULL)-
           [:EDITION_OF]->
         (t:Tournament)
+      OPTIONAL MATCH (sup:Supervisor)-[:SUPERVISED]->(e)
       OPTIONAL MATCH (e)-[:ON_SURFACE]->(s:Surface)
       OPTIONAL MATCH (e)-[:TOOK_PLACE_IN]->(v:Venue)-[:LOCATED_IN]->(c:Country)
+      OPTIONAL MATCH (u:Umpire)-[:UMPIRED]->(:Match)-[:PLAYED]->(:Round)-[:ROUND_OF]->(e)
       WITH DISTINCT
         *,
         apoc.coll.min([
@@ -31,9 +33,15 @@ export default defineEventHandler(async event => {
         ]) AS start_date
       ORDER BY start_date
       WITH
+      CASE WHEN COUNT(u) = 0 THEN [] ELSE COLLECT(DISTINCT properties(u)) END AS umpires,
+        CASE
+          WHEN COUNT(sup) = 0 THEN []
+          ELSE COLLECT(DISTINCT properties(sup))
+        END AS supervisors,
         CASE
           WHEN COUNT(v) = 0 THEN []
-          ELSE COLLECT(apoc.map.merge(properties(v), {country: properties(c)}))
+          ELSE
+            COLLECT(DISTINCT apoc.map.merge(properties(v), {country: properties(c)}))
         END AS venues,
         properties(s) AS surface,
         properties(t) AS tournament,
@@ -80,7 +88,9 @@ export default defineEventHandler(async event => {
               venues: venues,
               tournament: tournament,
               year: year,
-              tours: tours
+              tours: tours,
+              supervisors: supervisors,
+      umpires: umpires
             }
           ),
           [],
