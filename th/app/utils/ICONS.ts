@@ -53,6 +53,7 @@ export default {
   supervisor: "solar:clipboard-bold-duotone",
   table: "tabler:table",
   toc: "line-md:list-indented",
+  tour: "tabler:friends",
   tournament: "game-icons:trophy",
   umpire: "game-icons:whistle",
   ungroup: "solar:maximize-square-2-bold-duotone",

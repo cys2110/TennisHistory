@@ -1,14 +1,7 @@
 <script setup lang="ts">
-import { TableCellGroup, TableHeaderFilter, TableHeaderGroup, TableHeaderRange, UBadge } from "#components"
+import { TableHeaderFilter, TableHeaderRange, UBadge } from "#components"
 import type { TableColumn, TableRow } from "@nuxt/ui"
-import {
-  type Column,
-  getFacetedRowModel,
-  getFacetedMinMaxValues,
-  getFacetedUniqueValues,
-  getGroupedRowModel,
-  type GroupingOptions
-} from "@tanstack/vue-table"
+import { type Column, getFacetedRowModel, getFacetedMinMaxValues, getFacetedUniqueValues } from "@tanstack/vue-table"
 
 useHead({ title: "Tournaments" })
 
@@ -25,20 +18,14 @@ const columns: TableColumn<TournamentInterface>[] = [
     sortingFn: (rowA, rowB, columnId) => arraySorting(rowA, rowB, columnId),
     filterFn: "arrIncludesSome",
     meta: { class: { td: "flex justify-center items-center gap-1" } },
-    header: ({ column }) => h(TableHeaderGroup, { column: column as Column<unknown>, label: "Tours" }),
+    header: ({ column }) => h(TableHeaderFilter, { column: column as Column<unknown>, label: "Tours" }),
     cell: ({ row }) =>
-      h(TableCellGroup, { row: row as TableRow<unknown>, grouping: get(grouping), groupingColumnId: "tours" }, () =>
-        h(
-          "div",
-          { class: "flex justify-center gap-1 w-full" },
-          row.original.tours?.map(tour =>
-            h(UBadge, {
-              key: `${row.original.id}-${tour}`,
-              label: tour,
-              color: getTourColour(tour)
-            })
-          )
-        )
+      row.original.tours?.map(tour =>
+        h(UBadge, {
+          key: `${row.original.id}-${tour}`,
+          label: tour,
+          color: getTourColour(tour)
+        })
       ),
     footer: ({ table }) => `Total: ${table.getRowCount()}`
   },
@@ -67,10 +54,6 @@ const columns: TableColumn<TournamentInterface>[] = [
 ]
 
 const table = useTemplateRef("table")
-const grouping = ref<string[]>([])
-const grouping_options = ref<GroupingOptions>({
-  getGroupedRowModel: getGroupedRowModel()
-})
 
 const handleSelectRow = async (row: TableRow<TournamentInterface>) => {
   if (row.getIsGrouped()) {
@@ -104,12 +87,6 @@ const handleSelectRow = async (row: TableRow<TournamentInterface>) => {
             size="sm"
           />
           <u-button
-            label="Reset Grouping"
-            :icon="ICONS.ungroup"
-            @click="table?.tableApi.resetGrouping()"
-            size="sm"
-          />
-          <u-button
             label="Reset Filters"
             :icon="ICONS.noFilter"
             @click="table?.tableApi.resetColumnFilters()"
@@ -133,9 +110,6 @@ const handleSelectRow = async (row: TableRow<TournamentInterface>) => {
             getFacetedMinMaxValues: getFacetedMinMaxValues(),
             getFacetedUniqueValues: getFacetedUniqueValues()
           }"
-          :grouping="grouping"
-          v-on:update:grouping="grouping = $event"
-          :grouping-options="grouping_options"
           @select="handleSelectRow"
           :ui="{ root: 'w-fit min-w-1/3 mx-auto', tbody: '[&>tr]:cursor-pointer', td: 'empty:p-0' }"
         >
