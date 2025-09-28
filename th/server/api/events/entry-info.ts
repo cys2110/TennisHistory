@@ -47,17 +47,17 @@ export default defineEventHandler(async query => {
         WHEN relationship IN quals THEN
           RETURN 'Qualifying' AS draw
         WHEN relationship = 'RETIRED' THEN {
-          MATCH (f)-[:SCORED]->(s:Score {incomplete: 'R'})
+          MATCH (f)-[:SCORED]->(s1:Score {incomplete: 'R'})
           RETURN
             CASE
-              WHEN s:Qualifying THEN 'Qualifying'
+              WHEN s1:Qualifying THEN 'Qualifying'
               ELSE 'Main'
             END AS draw }
         WHEN relationship = 'WALKOVER' THEN {
-          MATCH (f)-[:SCORED]->(s:Score {incomplete: 'WO'})
+          MATCH (f)-[:SCORED]->(s1:Score {incomplete: 'WO'})
           RETURN
             CASE
-              WHEN s:Qualifying THEN 'Qualifying'
+              WHEN s1:Qualifying THEN 'Qualifying'
               ELSE 'Main'
             END AS draw }
         ELSE
