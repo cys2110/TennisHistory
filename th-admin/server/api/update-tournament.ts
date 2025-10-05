@@ -1,0 +1,51 @@
+export default defineEventHandler(async event => {
+  const { id, name, established, abolished, website, tours } = getQuery(event)
+
+  const { summary } = await useDriver().executeQuery(
+    `/* cypher */
+      CYPHER 25
+      MATCH (t:Tournament {id: toInteger($id)})
+      SET t.name = $name, t.website = $website
+      CALL (t) {
+        WHEN $established IS NOT NULL THEN {
+          MATCH (y:Year {id: toInteger($established)})
+          OPTIONAL MATCH (t)-[z:ESTABLISHED]->(y1:Year)
+          CALL (*) {
+            WHEN y1 IS NOT NULL AND y1.id <> y.id THEN DELETE z
+          ELSE MERGE (t)-[:ESTABLISHED]->(y)
+          }
+        }
+      }
+      CALL (t) {
+        WHEN $abolished IS NOT NULL THEN {
+          MATCH (y:Year {id: toInteger($abolished)})
+          OPTIONAL MATCH (t)-[z:ABOLISHED]->(y1:Year)
+          CALL (*) {
+            WHEN y1 IS NOT NULL AND y1.id <> y.id THEN DELETE z
+            ELSE MERGE (t)-[:ABOLISHED]->(y)
+          }
+        }
+      }
+      CALL (t) {
+        UNWIND $tours AS tour
+        WITH tour, t WHERE NOT tour IN labels(t)
+        SET t:$(tour)
+      }
+      CALL (t) {
+        UNWIND labels(t) AS label
+        WITH label, t WHERE NOT label IN $tours AND label <> 'Tournament'
+        REMOVE t:$(label)
+      }
+    `,
+    {
+      id,
+      name: name || null,
+      established: established ?? null,
+      abolished: abolished ?? null,
+      website: website || null,
+      tours: tours || []
+    }
+  )
+
+  return summary
+})

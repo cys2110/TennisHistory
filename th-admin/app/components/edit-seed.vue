@@ -1,0 +1,119 @@
+<script setup lang="ts">
+import type { FormSubmitEvent } from "@nuxt/ui"
+import * as z from "zod"
+
+const { seed } = defineProps<{ seed: any }>()
+const toast = useToast()
+
+const schema = z.object({
+  id: z.string(),
+  type: z.string(),
+  seed: z.number().optional(),
+  q_seed: z.number().optional(),
+  rank: z.number().optional()
+})
+
+type Schema = z.output<typeof schema>
+
+const state = reactive<Partial<Schema>>({
+  id: seed.id,
+  type: seed.type,
+  seed: seed.seed,
+  q_seed: seed.q_seed,
+  rank: seed.rank
+})
+
+const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  try {
+    await $fetch("/api/update-seed", {
+      query: event.data
+    })
+    toast.add({
+      title: "Seed updated",
+      icon: "lucide:circle-check",
+      color: "success"
+    })
+  } catch (e) {
+    toast.add({
+      title: "Error updating seed",
+      description: (e as Error).message,
+      icon: "lucide:circle-x",
+      color: "error"
+    })
+  }
+}
+</script>
+
+<template>
+  <u-form
+    :schema
+    :state
+    @submit="onSubmit"
+  >
+    <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-0.5">
+      <u-form-field label="Player">
+        <u-link
+          v-if="!seed.first_name"
+          :to="{ name: 'edit-player', query: { id: seed.id } }"
+        >
+          {{ seed.id }}
+        </u-link>
+        <u-input
+          v-else
+          :model-value="`${seed.first_name} ${seed.last_name}`"
+          disabled
+          size="sm"
+        />
+      </u-form-field>
+
+      <div class="flex items-center gap-1">
+        <u-badge
+          :label="seed.tour"
+          :color="seed.tour"
+        />
+        <u-badge
+          :label="seed.type"
+          :color="seed.type"
+        />
+      </div>
+
+      <u-form-field
+        name="seed"
+        label="Seed"
+      >
+        <u-input
+          type="number"
+          v-model="state.seed"
+        />
+      </u-form-field>
+
+      <u-form-field
+        name="q_seed"
+        label="Qualifying Seed"
+      >
+        <u-input
+          type="number"
+          v-model="state.q_seed"
+        />
+      </u-form-field>
+
+      <u-form-field
+        name="rank"
+        label="Rank"
+      >
+        <u-input
+          type="number"
+          v-model="state.rank"
+        />
+      </u-form-field>
+
+      <div class="flex justify-center items-center">
+        <u-button
+          type="submit"
+          label="Save"
+          size="sm"
+        />
+      </div>
+    </div>
+  </u-form>
+</template>
