@@ -1,6 +1,5 @@
 export default defineEventHandler(async query => {
   const { id } = getQuery<{ id: string }>(query)
-  // countries, coaches
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
@@ -39,13 +38,14 @@ export default defineEventHandler(async query => {
     current_doubles: result.player.current_doubles?.toInt() || undefined,
     ch_singles: result.player.ch_singles?.toInt() || undefined,
     ch_doubles: result.player.ch_doubles?.toInt() || undefined,
-    singles_ch_date: result.player.singles_ch_date?.toStandardDate() || undefined,
-    doubles_ch_date: result.player.doubles_ch_date?.toStandardDate() || undefined,
-    dob: result.player.dob?.toStandardDate() || undefined,
-    dod: result.player.dod?.toStandardDate() || undefined,
+    singles_ch_date: result.player.singles_ch_date?.toStandardDate().toISOString().slice(0, 10) || undefined,
+    doubles_ch_date: result.player.doubles_ch_date?.toStandardDate().toISOString().slice(0, 10) || undefined,
+    dob: result.player.dob?.toStandardDate().toISOString().slice(0, 10) || undefined,
+    dod: result.player.dod?.toStandardDate().toISOString().slice(0, 10) || undefined,
     height: result.player.height?.toInt() || undefined,
     official_link: result.player.official_link || undefined,
-    pm: result.player.pm?.toInt() || undefined,
-    hof: result.player.hof?.toInt() || undefined
+    pm: result.player.pm?.toNumber() || undefined,
+    hof: result.player.hof?.toInt() || undefined,
+    updated_at: result.player.updated_at?.toStandardDate().toISOString().slice(0, 10) || undefined
   }
 })

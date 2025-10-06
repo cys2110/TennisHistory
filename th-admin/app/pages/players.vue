@@ -84,10 +84,8 @@ const toc = computed(() => [
       </template>
 
       <template #body>
-        <div v-if="['idle', 'pending'].includes(status)">Loading...</div>
-
         <u-page-list
-          v-else-if="players.length"
+          v-if="players?.length"
           class="*:my-2"
         >
           <u-link
@@ -95,10 +93,13 @@ const toc = computed(() => [
             :key="player.id"
             :to="{ name: 'edit-player', query: { id: player.id } }"
             :id="player.id"
+            class="text-sm"
           >
             {{ player.first_name ? `${player.first_name} ${player.last_name}` : player.id }}
           </u-link>
         </u-page-list>
+
+        <div v-else-if="['idle', 'pending'].includes(status)">Loading...</div>
 
         <div v-else>
           Error loading players.

@@ -64,6 +64,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             <u-input
               type="number"
               v-model="state.id"
+              placeholder="Enter Tournament ID"
+              class="w-full"
             />
           </u-form-field>
 
@@ -71,14 +73,22 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             name="name"
             label="Name"
           >
-            <u-input v-model="state.name" />
+            <u-input
+              v-model="state.name"
+              placeholder="Enter Tournament Name"
+              class="w-full"
+            />
           </u-form-field>
 
           <u-form-field
             name="tours"
             label="Tours"
           >
-            <u-input-tags v-model="state.tours" />
+            <u-input-tags
+              v-model="state.tours"
+              placeholder="Enter Tournament Tours"
+              class="w-full"
+            />
           </u-form-field>
 
           <u-form-field
@@ -88,6 +98,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             <u-input
               v-model="state.established"
               type="number"
+              placeholder="Enter Year Established"
+              class="w-full"
             />
           </u-form-field>
 
@@ -98,6 +110,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             <u-input
               v-model="state.abolished"
               type="number"
+              placeholder="Enter Year Abolished"
+              class="w-full"
             />
           </u-form-field>
 
@@ -108,6 +122,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             >
               <u-textarea
                 v-model="state.website"
+                placeholder="Enter Website URL"
                 class="w-full"
               />
             </u-form-field>

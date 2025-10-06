@@ -59,7 +59,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :schema="withdrawalSchema"
     @submit="onSubmit"
   >
-    <div class="flex items-center justify-evenly border-t border-muted pt-1.5">
+    <div class="grid grid-cols-10 border-t border-muted pt-1.5 gap-2">
       <u-form-field
         name="id"
         label="Player"
@@ -71,6 +71,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           value-key="id"
           label-key="label"
           placeholder="Select player"
+          class="w-full"
         />
       </u-form-field>
 
@@ -82,6 +83,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-model="state.type"
           :items="['Singles', 'Doubles']"
           placeholder="Select type"
+          class="w-full"
         />
       </u-form-field>
       <u-form-field
@@ -92,6 +94,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-model="state.draw"
           :items="['Main', 'Qualifying']"
           placeholder="Select draw"
+          class="w-full"
         />
       </u-form-field>
 
@@ -102,6 +105,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         <u-input
           v-model="state.reason"
           placeholder="Reason"
+          class="w-full"
         />
       </u-form-field>
 
@@ -112,6 +116,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         <u-input
           v-model="state.team_reason"
           placeholder="Team Reason"
+          class="w-full"
         />
       </u-form-field>
 
@@ -126,6 +131,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           value-key="id"
           label-key="label"
           placeholder="Select team mate"
+          class="w-full"
         />
       </u-form-field>
 
@@ -137,6 +143,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-model="state.seed"
           placeholder="Seed"
           orientation="vertical"
+          class="w-full"
         />
       </u-form-field>
 
@@ -148,6 +155,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-model="state.status"
           :items="['AL', 'WC', 'Q', 'SE', 'PR', 'LL']"
           placeholder="Select status"
+          class="w-full"
         />
       </u-form-field>
 
@@ -159,14 +167,16 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-model="state.rank"
           placeholder="Rank"
           orientation="vertical"
+          class="w-full"
         />
       </u-form-field>
 
-      <div class="flex items-center justify-center">
+      <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
           size="sm"
+          block
         />
       </div>
     </div>

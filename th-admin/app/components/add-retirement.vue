@@ -2,6 +2,7 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
+const { type } = defineProps<{ type: "Retirement" | "Walkover" }>()
 const { query } = useRoute()
 const toast = useToast()
 
@@ -23,17 +24,18 @@ const state = reactive<Partial<Schema>>({
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   try {
-    await $fetch("/api/add-retirement", {
+    const apiRoute = type === "Retirement" ? "/api/add-retirement" : "/api/add-walkover"
+    await $fetch(apiRoute, {
       query: event.data
     })
     toast.add({
-      title: "Retirement created",
+      title: `${type} created`,
       icon: "lucide:circle-check",
       color: "success"
     })
   } catch (e) {
     toast.add({
-      title: "Error creating retirement",
+      title: `Error creating ${type}`,
       description: (e as Error).message,
       icon: "lucide:circle-x",
       color: "error"
@@ -48,7 +50,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :schema="retirementSchema"
     @submit="onSubmit"
   >
-    <div class="flex items-center justify-evenly border-t border-muted pt-1.5">
+    <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-2">
       <u-form-field
         name="id"
         label="Player"
@@ -60,6 +62,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           value-key="fid"
           label-key="label"
           placeholder="Select player"
+          class="w-full"
         />
       </u-form-field>
 
@@ -71,6 +74,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-model="state.type"
           :items="['Singles', 'Doubles']"
           placeholder="Select type"
+          class="w-full"
         />
       </u-form-field>
       <u-form-field
@@ -81,6 +85,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-model="state.draw"
           :items="['Main', 'Qualifying']"
           placeholder="Select draw"
+          class="w-full"
         />
       </u-form-field>
 
@@ -91,6 +96,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         <u-input
           v-model="state.reason"
           placeholder="Reason"
+          class="w-full"
         />
       </u-form-field>
 
@@ -101,13 +107,15 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         <u-input
           v-model="state.team_reason"
           placeholder="Team Reason"
+          class="w-full"
         />
       </u-form-field>
-      <div class="flex items-end justify-center">
+      <div class="flex items-end">
         <u-button
           type="submit"
           label="Save"
           size="sm"
+          block
         />
       </div>
     </div>

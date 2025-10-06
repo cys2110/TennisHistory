@@ -1,9 +1,11 @@
+import { int } from "neo4j-driver"
+
 export default defineEventHandler(async query => {
   const { id } = getQuery<{ id: string }>(query)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (p:Player)-[:ENTERED]->(f:Entry)-[t:LDA|Q_LDA]->(e:Event {id: toInteger($id)})
+      MATCH (p:Player)-[:ENTERED]->(f:Entry)-[t:LDA|Q_LDA]->(e:Event {id: $id})
       WITH
         CASE WHEN f:Singles THEN 'Singles' ELSE 'Doubles' END AS type,
         CASE WHEN type(t) = 'LDA' THEN 'Main' ELSE 'Qualifying' END AS draw,
@@ -13,16 +15,13 @@ export default defineEventHandler(async query => {
       RETURN DISTINCT apoc.map.merge(player, {draw: draw, type: type, rank: rank, fid: f.id}) AS entry
       ORDER BY entry.type DESC, entry.draw
     `,
-    { id }
+    { id: int(id) }
   )
 
   const entries = records.map(record => {
     const entry = record.get("entry")
-    const numberKeys = ["rank"]
 
-    for (const key of numberKeys) {
-      if (entry[key]) entry[key] = entry[key]?.toInt()
-    }
+    if (entry["rank"]) entry["rank"] = entry["rank"].toInt()
 
     return entry
   })

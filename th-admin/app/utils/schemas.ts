@@ -77,16 +77,16 @@ export const eventSchema = z.object({
   tfc: z.number().optional(),
   atp_tfc: z.number().optional(),
   wta_tfc: z.number().optional(),
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
-  atp_start_date: z.string().optional(),
-  atp_end_date: z.string().optional(),
-  wta_start_date: z.string().optional(),
-  wta_end_date: z.string().optional(),
-  men_start_date: z.string().optional(),
-  men_end_date: z.string().optional(),
-  women_start_date: z.string().optional(),
-  women_end_date: z.string().optional()
+  start_date: z.unknown().optional(),
+  end_date: z.unknown().optional(),
+  atp_start_date: z.unknown().optional(),
+  atp_end_date: z.unknown().optional(),
+  wta_start_date: z.unknown().optional(),
+  wta_end_date: z.unknown().optional(),
+  men_start_date: z.unknown().optional(),
+  men_end_date: z.unknown().optional(),
+  women_start_date: z.unknown().optional(),
+  women_end_date: z.unknown().optional()
 })
 
 export const roundSchema = z.object({
@@ -158,10 +158,10 @@ export const playerSchema = z.object({
   current_doubles: z.number().optional(),
   ch_singles: z.number().optional(),
   ch_doubles: z.number().optional(),
-  singles_ch_date: z.string().optional(),
-  doubles_ch_date: z.string().optional(),
-  dob: z.string().optional(),
-  dod: z.string().optional(),
+  singles_ch_date: z.any().optional(),
+  doubles_ch_date: z.any().optional(),
+  dob: z.any().optional(),
+  dod: z.any().optional(),
   height: z.number().optional(),
   pm: z.number().optional(),
   hof: z.number().optional()

@@ -20,7 +20,7 @@ const toc = computed(() => [
       <template #header>
         <u-dashboard-navbar title="Supervisors">
           <template #right>
-            <create-supervisor />
+            <create-person type="Supervisor" />
             <u-popover>
               <u-button
                 icon="lucide:table-of-contents"
@@ -53,10 +53,11 @@ const toc = computed(() => [
         </div>
 
         <u-page-list class="*:my-2">
-          <edit-supervisor
+          <edit-person
             v-for="supervisor in supervisors"
             :key="supervisor.id"
-            :supervisor
+            :person="supervisor"
+            type="Supervisor"
           />
         </u-page-list>
       </template>

@@ -2,8 +2,8 @@
 const { query } = useRoute()
 const addWalkovers = ref<number[]>([])
 
-const { data: entries, status } = await useFetch("/api/get-walkovers", {
-  query: { id: query.id },
+const { data: entries, status } = await useFetch("/api/get-retirements", {
+  query: { id: query.id, type: "WALKOVER" },
   default: () => []
 })
 
@@ -19,16 +19,18 @@ function handleAddWalkover() {
       @click="handleAddWalkover"
     />
     <client-only>
-      <add-walkover
+      <add-retirement
         v-for="n in addWalkovers"
         :key="`add-walkover-${n}`"
+        type="Walkover"
       />
     </client-only>
     <div v-if="['pending', 'idle'].includes(status)">Loading...</div>
-    <edit-walkover
+    <edit-retirement
       v-for="(entry, index) in entries"
       :key="`walkover-${index}`"
       :entry
+      type="Walkover"
     />
   </u-page-list>
 </template>

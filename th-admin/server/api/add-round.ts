@@ -1,10 +1,23 @@
+import { int } from "neo4j-driver"
+
 export default defineEventHandler(async event => {
-  const { id, type, draw, tour, pm, points, number, round, eid } = getQuery(event)
+  interface QueryProps {
+    id: string
+    type: "Singles" | "Doubles"
+    draw: "Main" | "Qualifying"
+    tour: "ATP" | "WTA" | "Challenger" | "ITF"
+    pm: string
+    points: string
+    number: string
+    round: string
+    eid: string
+  }
+  const { id, type, draw, tour, pm, points, number, round, eid } = getQuery<QueryProps>(event)
 
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (e:Event {id: toInteger($eid)})
-      MERGE (r:Round:$($type):$($draw):$($tour) {id: $id, pm: toInteger($pm), points: toInteger($points), number: toInteger($number), round: $round})
+      MATCH (e:Event {id: $eid})
+      MERGE (r:Round:$($type):$($draw):$($tour) {id: $id, pm: $pm, points: $points, number: $number, round: $round})
       MERGE (r)-[:ROUND_OF]->(e)
       RETURN r
     `,
@@ -13,11 +26,11 @@ export default defineEventHandler(async event => {
       type,
       tour,
       draw,
-      points: points ?? null,
-      pm: pm ?? null,
-      number,
+      points: points ? int(points) : null,
+      pm: pm ? (Number.isInteger(Number(pm)) ? int(pm) : Number(pm)) : null,
+      number: int(number),
       round,
-      eid
+      eid: int(eid)
     }
   )
 

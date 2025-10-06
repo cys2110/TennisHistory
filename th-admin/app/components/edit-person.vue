@@ -2,30 +2,30 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
-const { umpire } = defineProps<{ umpire: any }>()
+const { person, type } = defineProps<{ person: any; type: "Coach" | "Umpire" | "Supervisor" }>()
 const toast = useToast()
 
 type Schema = z.output<typeof personSchema>
 
 const state = reactive<Partial<Schema>>({
-  id: umpire.id,
-  first_name: umpire.first_name,
-  last_name: umpire.last_name
+  id: person.id,
+  first_name: person.first_name,
+  last_name: person.last_name
 })
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   try {
-    await $fetch("/api/update-umpire", {
-      query: event.data
+    await $fetch("/api/update-person", {
+      query: { ...event.data, type }
     })
     toast.add({
-      title: "Umpire updated",
+      title: `${type} updated`,
       icon: "lucide:circle-check",
       color: "success"
     })
   } catch (e) {
     toast.add({
-      title: "Error updating umpire",
+      title: `Error updating ${type}`,
       description: (e as Error).message,
       icon: "lucide:circle-x",
       color: "error"
@@ -52,6 +52,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         <u-input
           v-model="state.first_name"
           placeholder="First Name"
+          class="w-full"
         />
       </u-form-field>
 
@@ -59,13 +60,15 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         <u-input
           v-model="state.last_name"
           placeholder="Last Name"
+          class="w-full"
         />
       </u-form-field>
-      <div class="flex items-center justify-center">
+      <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
           size="sm"
+          block
         />
       </div>
     </div>

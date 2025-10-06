@@ -157,6 +157,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             <u-input
               type="number"
               v-model="state.id"
+              placeholder="Enter Event ID"
+              class="w-full"
             />
           </u-form-field>
 
@@ -171,6 +173,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               label-key="name"
               value-key="id"
               placeholder="Select tournament"
+              class="w-full"
             />
           </u-form-field>
 
@@ -182,6 +185,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               v-model="state.year"
               :items="ALL_YEARS"
               placeholder="Select year"
+              class="w-full"
             />
           </u-form-field>
 
@@ -189,7 +193,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             name="tours"
             label="Tours"
           >
-            <u-input-tags v-model="state.tours" />
+            <u-input-tags
+              v-model="state.tours"
+              placeholder="Enter event tours"
+              class="w-full"
+            />
           </u-form-field>
 
           <div class="col-span-2">
@@ -197,7 +205,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               label="Sponsor Names"
               name="sponsor_names"
             >
-              <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
+              <div class="grid grid-cols-3 gap-2 *:flex *:flex-col *:gap-1">
                 <div>
                   <label for="sponsor_name">
                     <u-badge label="General" />
@@ -326,12 +334,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   <label for="start_date">
                     <u-badge label="General" />
                   </label>
-                  <u-input
+                  <date-picker
                     id="start_date"
                     v-model="state.start_date"
                     placeholder="Enter start date"
                   />
-                  <u-input
+                  <date-picker
                     id="end_date"
                     v-model="state.end_date"
                     placeholder="Enter end date"
@@ -345,12 +353,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       color="ATP"
                     />
                   </label>
-                  <u-input
+                  <date-picker
                     id="atp_start_date"
                     v-model="state.atp_start_date"
                     placeholder="Enter ATP start date"
                   />
-                  <u-input
+                  <date-picker
                     id="atp_end_date"
                     v-model="state.atp_end_date"
                     placeholder="Enter ATP end date"
@@ -364,12 +372,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       color="WTA"
                     />
                   </label>
-                  <u-input
+                  <date-picker
                     id="wta_start_date"
                     v-model="state.wta_start_date"
                     placeholder="Enter WTA start date"
                   />
-                  <u-input
+                  <date-picker
                     id="wta_end_date"
                     v-model="state.wta_end_date"
                     placeholder="Enter WTA end date"
@@ -383,12 +391,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       color="Men"
                     />
                   </label>
-                  <u-input
+                  <date-picker
                     id="men_start_date"
                     v-model="state.men_start_date"
                     placeholder="Enter Men start date"
                   />
-                  <u-input
+                  <date-picker
                     id="men_end_date"
                     v-model="state.men_end_date"
                     placeholder="Enter Men end date"
@@ -402,12 +410,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       color="Women"
                     />
                   </label>
-                  <u-input
+                  <date-picker
                     id="women_start_date"
                     v-model="state.women_start_date"
                     placeholder="Enter Women start date"
                   />
-                  <u-input
+                  <date-picker
                     id="women_end_date"
                     v-model="state.women_end_date"
                     placeholder="Enter Women end date"
@@ -425,6 +433,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               v-model="state.surface"
               :items="surfaces"
               placeholder="Select surface"
+              class="w-full"
             />
           </u-form-field>
 
@@ -440,7 +449,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               multiple
               label-key="label"
               value-key="id"
-              class="max-w-sm"
+              class="w-full"
               placeholder="Select venues"
               @update:open="
                 () => {
@@ -468,7 +477,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               :loading="supervisorStatus === 'pending'"
               :items="supervisors.map(s => s.id) || []"
               multiple
-              class="max-w-md"
+              class="w-full"
               placeholder="Select supervisors"
               @update:open="
                 () => {
@@ -481,7 +490,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               "
             >
               <template #content-bottom>
-                <create-supervisor />
+                <create-person type="Supervisor" />
               </template>
             </u-select-menu>
           </u-form-field>
@@ -510,6 +519,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       v-model="state.pm"
                       orientation="vertical"
                       placeholder="Enter prize money"
+                      class="w-full"
                       :format-options="{
                         style: 'currency',
                         currency: state.currency || 'USD'
@@ -548,6 +558,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       v-model="state.atp_pm"
                       orientation="vertical"
                       placeholder="Enter ATP prize money"
+                      class="w-full"
                       :format-options="{
                         style: 'currency',
                         currency: state.atp_currency || 'USD'
@@ -586,6 +597,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       v-model="state.wta_pm"
                       orientation="vertical"
                       placeholder="Enter WTA prize money"
+                      class="w-full"
                       :format-options="{
                         style: 'currency',
                         currency: state.wta_currency || 'USD'
@@ -624,6 +636,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       v-model="state.men_pm"
                       orientation="vertical"
                       placeholder="Enter Men prize money"
+                      class="w-full"
                       :format-options="{
                         style: 'currency',
                         currency: state.men_currency || 'USD'
@@ -653,6 +666,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       v-model="state.women_pm"
                       orientation="vertical"
                       placeholder="Enter Women prize money"
+                      class="w-full"
                       :format-options="{
                         style: 'currency',
                         currency: state.women_currency || 'USD'

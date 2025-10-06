@@ -8,9 +8,7 @@ export default defineEventHandler(async event => {
       ORDER BY toLower(p.last_name), toLower(p.first_name)
       LIMIT 40
     `,
-    {
-      search
-    }
+    { search }
   )
 
   return records.map(record => record.get("player"))

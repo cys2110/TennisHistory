@@ -3,7 +3,7 @@ const { query } = useRoute()
 const addRetirements = ref<number[]>([])
 
 const { data: entries, status } = await useFetch("/api/get-retirements", {
-  query: { id: query.id },
+  query: { id: query.id, type: "RETIRED" },
   default: () => []
 })
 
@@ -22,6 +22,7 @@ function handleAddRetirement() {
       <add-retirement
         v-for="n in addRetirements"
         :key="`add-retirement-${n}`"
+        type="Retirement"
       />
     </client-only>
     <div v-if="['pending', 'idle'].includes(status)">Loading...</div>
@@ -29,6 +30,7 @@ function handleAddRetirement() {
       v-for="(entry, index) in entries"
       :key="`retirement-${index}`"
       :entry
+      type="Retirement"
     />
   </u-page-list>
 </template>

@@ -41,7 +41,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-4 border-t border-muted pt-1.5">
+    <div class="grid grid-cols-4 border-t border-muted pt-1.5 gap-2">
       <u-form-field label="Player">
         <u-link
           v-if="!entry.first_name"
@@ -51,11 +51,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         </u-link>
         <u-input
           :model-value="`${entry.first_name} ${entry.last_name}`"
+          class="w-full"
           disabled
         />
       </u-form-field>
 
-      <div class="flex items-center gap-1">
+      <div class="flex justify-center items-center gap-1">
         <u-badge
           :label="entry.type"
           :color="entry.type"
@@ -70,17 +71,19 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         name="rank"
         label="Rank"
       >
-        <u-input
-          type="number"
+        <u-input-number
           v-model="state.rank"
+          orientation="vertical"
+          class="w-full"
         />
       </u-form-field>
 
-      <div class="flex items-center justify-center">
+      <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
           size="sm"
+          block
         />
       </div>
     </div>

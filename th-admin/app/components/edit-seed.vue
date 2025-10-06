@@ -50,7 +50,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-0.5">
+    <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-2">
       <u-form-field label="Player">
         <u-link
           v-if="!seed.first_name"
@@ -62,11 +62,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-else
           :model-value="`${seed.first_name} ${seed.last_name}`"
           disabled
-          size="sm"
+          class="w-full"
         />
       </u-form-field>
 
-      <div class="flex items-center gap-1">
+      <div class="flex justify-center items-center gap-1">
         <u-badge
           :label="seed.tour"
           :color="seed.tour"
@@ -81,9 +81,10 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         name="seed"
         label="Seed"
       >
-        <u-input
-          type="number"
+        <u-input-number
           v-model="state.seed"
+          orientation="vertical"
+          class="w-full"
         />
       </u-form-field>
 
@@ -91,9 +92,10 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         name="q_seed"
         label="Qualifying Seed"
       >
-        <u-input
-          type="number"
+        <u-input-number
           v-model="state.q_seed"
+          orientation="vertical"
+          class="w-full"
         />
       </u-form-field>
 
@@ -101,17 +103,19 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         name="rank"
         label="Rank"
       >
-        <u-input
-          type="number"
+        <u-input-number
           v-model="state.rank"
+          orientation="vertical"
+          class="w-full"
         />
       </u-form-field>
 
-      <div class="flex justify-center items-center">
+      <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
           size="sm"
+          block
         />
       </div>
     </div>

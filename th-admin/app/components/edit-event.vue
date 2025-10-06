@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui"
+import { parseDate } from "@internationalized/date"
 import * as z from "zod"
 
 const { query } = useRoute()
@@ -93,54 +94,16 @@ const state = reactive<Partial<Schema>>({
   women_pm: event.value?.women_pm,
   atp_tfc: event.value?.atp_tfc,
   wta_tfc: event.value?.wta_tfc,
-  start_date: event.value?.start_date
-    ? `${new Date(event.value.start_date).getFullYear()}-${new Date(event.value.start_date).getMonth() + 1}-${new Date(
-        event.value.start_date
-      ).getDate()}`
-    : undefined,
-  end_date: event.value?.end_date
-    ? `${new Date(event.value.end_date).getFullYear()}-${new Date(event.value.end_date).getMonth() + 1}-${new Date(event.value.end_date).getDate()}`
-    : undefined,
-  atp_start_date: event.value?.atp_start_date
-    ? `${new Date(event.value.atp_start_date).getFullYear()}-${new Date(event.value.atp_start_date).getMonth() + 1}-${new Date(
-        event.value.atp_start_date
-      ).getDate()}`
-    : undefined,
-  atp_end_date: event.value?.atp_end_date
-    ? `${new Date(event.value.atp_end_date).getFullYear()}-${new Date(event.value.atp_end_date).getMonth() + 1}-${new Date(
-        event.value.atp_end_date
-      ).getDate()}`
-    : undefined,
-  wta_start_date: event.value?.wta_start_date
-    ? `${new Date(event.value.wta_start_date).getFullYear()}-${new Date(event.value.wta_start_date).getMonth() + 1}-${new Date(
-        event.value.wta_start_date
-      ).getDate()}`
-    : undefined,
-  wta_end_date: event.value?.wta_end_date
-    ? `${new Date(event.value.wta_end_date).getFullYear()}-${new Date(event.value.wta_end_date).getMonth() + 1}-${new Date(
-        event.value.wta_end_date
-      ).getDate()}`
-    : undefined,
-  men_start_date: event.value?.men_start_date
-    ? `${new Date(event.value.men_start_date).getFullYear()}-${new Date(event.value.men_start_date).getMonth() + 1}-${new Date(
-        event.value.men_start_date
-      ).getDate()}`
-    : undefined,
-  men_end_date: event.value?.men_end_date
-    ? `${new Date(event.value.men_end_date).getFullYear()}-${new Date(event.value.men_end_date).getMonth() + 1}-${new Date(
-        event.value.men_end_date
-      ).getDate()}`
-    : undefined,
-  women_start_date: event.value?.women_start_date
-    ? `${new Date(event.value.women_start_date).getFullYear()}-${new Date(event.value.women_start_date).getMonth() + 1}-${new Date(
-        event.value.women_start_date
-      ).getDate()}`
-    : undefined,
-  women_end_date: event.value?.women_end_date
-    ? `${new Date(event.value.women_end_date).getFullYear()}-${new Date(event.value.women_end_date).getMonth() + 1}-${new Date(
-        event.value.women_end_date
-      ).getDate()}`
-    : undefined
+  start_date: event.value?.start_date ? parseDate(event.value?.start_date) : undefined,
+  end_date: event.value?.end_date ? parseDate(event.value?.end_date) : undefined,
+  atp_start_date: event.value?.atp_start_date ? parseDate(event.value?.atp_start_date) : undefined,
+  atp_end_date: event.value?.atp_end_date ? parseDate(event.value?.atp_end_date) : undefined,
+  wta_start_date: event.value?.wta_start_date ? parseDate(event.value?.wta_start_date) : undefined,
+  wta_end_date: event.value?.wta_end_date ? parseDate(event.value?.wta_end_date) : undefined,
+  men_start_date: event.value?.men_start_date ? parseDate(event.value?.men_start_date) : undefined,
+  men_end_date: event.value?.men_end_date ? parseDate(event.value?.men_end_date) : undefined,
+  women_start_date: event.value?.women_start_date ? parseDate(event.value?.women_start_date) : undefined,
+  women_end_date: event.value?.women_end_date ? parseDate(event.value?.women_end_date) : undefined
 })
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
@@ -171,13 +134,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="flex justify-end mb-3">
-      <u-button
-        type="submit"
-        label="Save"
-      />
-    </div>
-    <div class="grid grid-cols-3 gap-2">
+    <u-button
+      type="submit"
+      label="Save"
+      block
+      class="mb-3"
+    />
+    <div class="grid grid-cols-3 gap-5">
       <u-form-field
         name="id"
         label="ID"
@@ -185,6 +148,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         <u-input
           type="number"
           v-model="state.id"
+          class="w-full"
         />
       </u-form-field>
 
@@ -200,7 +164,10 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         name="tours"
         label="Tours"
       >
-        <u-input-tags v-model="state.tours" />
+        <u-input-tags
+          v-model="state.tours"
+          class="w-full"
+        />
       </u-form-field>
 
       <div class="col-span-3">
@@ -208,7 +175,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           label="Sponsor Names"
           name="sponsor_names"
         >
-          <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
+          <div class="grid grid-cols-3 gap-2 *:flex *:flex-col *:gap-1">
             <div>
               <label for="sponsor_name">
                 <u-badge label="General" />
@@ -217,6 +184,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                 id="sponsor_name"
                 v-model="state.sponsor_name"
                 placeholder="Enter sponsor name"
+                class="w-full"
               />
             </div>
 
@@ -231,6 +199,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                 id="atp_sponsor_name"
                 v-model="state.atp_sponsor_name"
                 placeholder="Enter ATP sponsor name"
+                class="w-full"
               />
             </div>
 
@@ -245,6 +214,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                 id="wta_sponsor_name"
                 v-model="state.wta_sponsor_name"
                 placeholder="Enter WTA sponsor name"
+                class="w-full"
               />
             </div>
           </div>
@@ -337,12 +307,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               <label for="start_date">
                 <u-badge label="General" />
               </label>
-              <u-input
+              <date-picker
                 id="start_date"
                 v-model="state.start_date"
-                placeholder="Enter start date"
+                placeholder="Select start date"
               />
-              <u-input
+              <date-picker
                 id="end_date"
                 v-model="state.end_date"
                 placeholder="Enter end date"
@@ -356,12 +326,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   color="ATP"
                 />
               </label>
-              <u-input
+              <date-picker
                 id="atp_start_date"
                 v-model="state.atp_start_date"
                 placeholder="Enter ATP start date"
               />
-              <u-input
+              <date-picker
                 id="atp_end_date"
                 v-model="state.atp_end_date"
                 placeholder="Enter ATP end date"
@@ -375,12 +345,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   color="WTA"
                 />
               </label>
-              <u-input
+              <date-picker
                 id="wta_start_date"
                 v-model="state.wta_start_date"
                 placeholder="Enter WTA start date"
               />
-              <u-input
+              <date-picker
                 id="wta_end_date"
                 v-model="state.wta_end_date"
                 placeholder="Enter WTA end date"
@@ -394,12 +364,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   color="Men"
                 />
               </label>
-              <u-input
+              <date-picker
                 id="men_start_date"
                 v-model="state.men_start_date"
                 placeholder="Enter Men start date"
               />
-              <u-input
+              <date-picker
                 id="men_end_date"
                 v-model="state.men_end_date"
                 placeholder="Enter Men end date"
@@ -413,12 +383,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   color="Women"
                 />
               </label>
-              <u-input
+              <date-picker
                 id="women_start_date"
                 v-model="state.women_start_date"
                 placeholder="Enter Women start date"
               />
-              <u-input
+              <date-picker
                 id="women_end_date"
                 v-model="state.women_end_date"
                 placeholder="Enter Women end date"
@@ -436,6 +406,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-model="state.surface"
           :items="surfaces"
           placeholder="Select surface"
+          class="w-full"
         />
       </u-form-field>
 
@@ -443,7 +414,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         name="venues"
         label="Venues"
       >
-        {{ state.venues?.join(", ") }}
+        <div>{{ state.venues?.join(", ") }}</div>
         <u-select-menu
           v-model="state.venues"
           :loading="venueStatus === 'pending'"
@@ -451,7 +422,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           multiple
           label-key="label"
           value-key="id"
-          class="max-w-sm"
+          class="w-full"
           placeholder="Select venues"
           @update:open="
             () => {
@@ -479,7 +450,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           :loading="supervisorStatus === 'pending'"
           :items="supervisors.map(s => s.id) || []"
           multiple
-          class="max-w-md"
+          class="w-full"
           placeholder="Select supervisors"
           @update:open="
             () => {
@@ -492,7 +463,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           "
         >
           <template #content-bottom>
-            <create-supervisor />
+            <create-person type="Supervisor" />
           </template>
         </u-select-menu>
       </u-form-field>
@@ -521,6 +492,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   v-model="state.pm"
                   orientation="vertical"
                   placeholder="Enter prize money"
+                  class="w-full"
                   :format-options="{
                     style: 'currency',
                     currency: state.currency || 'USD'
@@ -559,6 +531,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   v-model="state.atp_pm"
                   orientation="vertical"
                   placeholder="Enter ATP prize money"
+                  class="w-full"
                   :format-options="{
                     style: 'currency',
                     currency: state.atp_currency || 'USD'
@@ -597,6 +570,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   v-model="state.wta_pm"
                   orientation="vertical"
                   placeholder="Enter WTA prize money"
+                  class="w-full"
                   :format-options="{
                     style: 'currency',
                     currency: state.wta_currency || 'USD'
@@ -635,6 +609,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   v-model="state.men_pm"
                   orientation="vertical"
                   placeholder="Enter Men prize money"
+                  class="w-full"
                   :format-options="{
                     style: 'currency',
                     currency: state.men_currency || 'USD'
@@ -664,6 +639,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   v-model="state.women_pm"
                   orientation="vertical"
                   placeholder="Enter Women prize money"
+                  class="w-full"
                   :format-options="{
                     style: 'currency',
                     currency: state.women_currency || 'USD'

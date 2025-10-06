@@ -12,12 +12,14 @@ export default defineEventHandler(async query => {
 
   const tournaments = records.map(r => {
     const tournament = r.get("tournament")
-    return {
-      ...tournament,
-      id: tournament.id.toInt(),
-      established: tournament.established?.toInt() || undefined,
-      abolished: tournament.abolished?.toInt() || undefined
+
+    const numberKeys = ["id", "established", "abolished"]
+
+    for (const key of numberKeys) {
+      if (tournament[key]) tournament[key] = tournament[key]?.toInt()
     }
+
+    return tournament
   })
 
   return tournaments

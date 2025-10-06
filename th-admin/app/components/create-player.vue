@@ -69,6 +69,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             <u-input
               v-model="state.id"
               placeholder="ID"
+              class="w-full"
             />
           </u-form-field>
 
@@ -80,6 +81,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               v-model="state.tour"
               :items="['ATP', 'WTA']"
               placeholder="Select tour"
+              class="w-full"
             />
           </u-form-field>
         </div>

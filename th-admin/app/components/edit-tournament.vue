@@ -48,8 +48,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     <u-button
       :label="tournament.name ?? tournament.id.toString()"
       :id="`tournament-${tournament.id}`"
-      block
       variant="link"
+      color="neutral"
     />
 
     <template #body>
@@ -64,13 +64,19 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             name="name"
             label="Name"
           >
-            <u-input v-model="state.name" />
+            <u-input
+              v-model="state.name"
+              class="w-full"
+            />
           </u-form-field>
           <u-form-field
             name="tours"
             label="Tours"
           >
-            <u-input-tags v-model="state.tours" />
+            <u-input-tags
+              v-model="state.tours"
+              class="w-full"
+            />
           </u-form-field>
           <u-form-field
             name="established"
@@ -79,6 +85,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             <u-input
               v-model="state.established"
               type="number"
+              placeholder="Enter Year Established"
+              class="w-full"
             />
           </u-form-field>
           <u-form-field
@@ -86,8 +94,10 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             label="Abolished"
           >
             <u-input
-              v-model="state.abolished"
               type="number"
+              v-model="state.abolished"
+              placeholder="Enter Year Abolished"
+              class="w-full"
             />
           </u-form-field>
           <div class="col-span-2">
@@ -97,6 +107,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             >
               <u-textarea
                 v-model="state.website"
+                placeholder="Enter Website URL"
                 class="w-full"
               />
             </u-form-field>

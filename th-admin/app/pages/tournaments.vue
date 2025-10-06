@@ -52,7 +52,7 @@ const toc = computed(() => [
           />
         </div>
 
-        <u-page-list class="*:my-2">
+        <u-page-list class="*:my-1">
           <edit-tournament
             v-for="tournament in tournaments"
             :key="tournament.id"

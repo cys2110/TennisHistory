@@ -29,7 +29,7 @@ const toc = computed(() => [
       <template #header>
         <u-dashboard-navbar title="Coaches">
           <template #right>
-            <create-coach />
+            <create-person type="Coach" />
             <u-popover>
               <u-button
                 icon="lucide:table-of-contents"
@@ -90,10 +90,11 @@ const toc = computed(() => [
           v-else-if="coaches.length"
           class="*:my-2"
         >
-          <edit-coach
+          <edit-person
             v-for="coach in coaches"
             :key="coach.id"
-            :coach
+            :person="coach"
+            type="Coach"
           />
         </u-page-list>
 

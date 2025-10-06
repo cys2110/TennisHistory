@@ -69,6 +69,7 @@ const toc = computed(() => [
             :key="event.id"
             :to="{ name: 'edit-event', query: { id: event.id } }"
             :id="`event-${event.id}`"
+            class="text-sm"
           >
             {{ event.name ?? event.id }}
           </u-link>

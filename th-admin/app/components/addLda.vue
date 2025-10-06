@@ -47,7 +47,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :schema="ldaSchema"
     @submit="onSubmit"
   >
-    <div class="flex items-center justify-evenly border-t border-muted pt-1.5">
+    <div class="grid grid-cols-5 border-t border-muted pt-1.5 gap-2">
       <u-form-field
         name="id"
         label="Player"
@@ -59,6 +59,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           value-key="fid"
           label-key="label"
           placeholder="Select player"
+          class="w-full"
         />
       </u-form-field>
 
@@ -70,6 +71,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-model="state.type"
           :items="['Singles', 'Doubles']"
           placeholder="Select type"
+          class="w-full"
         />
       </u-form-field>
       <u-form-field
@@ -80,6 +82,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-model="state.draw"
           :items="['Main', 'Qualifying']"
           placeholder="Select draw"
+          class="w-full"
         />
       </u-form-field>
       <u-form-field
@@ -90,13 +93,15 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-model="state.rank"
           orientation="vertical"
           placeholder="Rank"
+          class="w-full"
         />
       </u-form-field>
-      <div class="flex items-end justify-center">
+      <div class="flex items-end">
         <u-button
           type="submit"
           label="Save"
           size="sm"
+          block
         />
       </div>
     </div>

@@ -1,14 +1,25 @@
+import { int } from "neo4j-driver"
+
 export default defineEventHandler(async event => {
-  const { id, name, established, abolished, website, tours } = getQuery(event)
+  interface QueryProps {
+    id: string
+    name?: string
+    established?: string
+    abolished?: string
+    website?: string
+    tours: ("ATP" | "WTA" | "Challenger" | "ITF" | "Junior" | "Wheelchair")[]
+  }
+
+  const { id, name, established, abolished, website, tours } = getQuery<QueryProps>(event)
 
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
       CYPHER 25
-      MATCH (t:Tournament {id: toInteger($id)})
+      MATCH (t:Tournament {id: $id})
       SET t.name = $name, t.website = $website
       CALL (t) {
         WHEN $established IS NOT NULL THEN {
-          MATCH (y:Year {id: toInteger($established)})
+          MATCH (y:Year {id: $established})
           OPTIONAL MATCH (t)-[z:ESTABLISHED]->(y1:Year)
           CALL (*) {
             WHEN y1 IS NOT NULL AND y1.id <> y.id THEN DELETE z
@@ -18,7 +29,7 @@ export default defineEventHandler(async event => {
       }
       CALL (t) {
         WHEN $abolished IS NOT NULL THEN {
-          MATCH (y:Year {id: toInteger($abolished)})
+          MATCH (y:Year {id: $abolished})
           OPTIONAL MATCH (t)-[z:ABOLISHED]->(y1:Year)
           CALL (*) {
             WHEN y1 IS NOT NULL AND y1.id <> y.id THEN DELETE z
@@ -38,10 +49,10 @@ export default defineEventHandler(async event => {
       }
     `,
     {
-      id,
+      id: int(id),
       name: name || null,
-      established: established ?? null,
-      abolished: abolished ?? null,
+      established: established ? int(established) : null,
+      abolished: abolished ? int(abolished) : null,
       website: website || null,
       tours: tours || []
     }

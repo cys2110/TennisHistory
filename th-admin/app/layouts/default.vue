@@ -11,7 +11,8 @@ const items: NavigationMenuItem[][] = [
     { label: "Players", to: { name: "players" } },
     { label: "Coaches", to: { name: "coaches" } },
     { label: "Supervisors", to: { name: "supervisors" } },
-    { label: "Umpires", to: { name: "umpires" } }
+    { label: "Umpires", to: { name: "umpires" } },
+    { label: "Merge Nodes", to: { name: "merge-nodes" } }
   ]
 ]
 
@@ -35,10 +36,7 @@ const groups = computed(() => [
 
 <template>
   <u-dashboard-group>
-    <u-dashboard-search
-      v-model:search-term="id"
-      :groups
-    >
+    <u-dashboard-search :groups>
       <template #footer>
         <u-input
           v-model="id"

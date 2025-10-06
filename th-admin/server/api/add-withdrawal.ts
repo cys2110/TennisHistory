@@ -1,5 +1,19 @@
+import { int } from "neo4j-driver"
+
 export default defineEventHandler(async event => {
-  const { id, type, draw, reason, team_reason, eid, team_mate, seed, status, rank } = getQuery(event)
+  interface QueryProps {
+    id: string
+    type: "Singles" | "Doubles"
+    draw: "Main" | "Qualifying"
+    reason: string
+    team_reason: string
+    team_mate: string
+    eid: string
+    seed: string
+    status: string
+    rank: string
+  }
+  const { id, type, draw, reason, team_reason, eid, team_mate, seed, status, rank } = getQuery<QueryProps>(event)
 
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
@@ -23,11 +37,11 @@ export default defineEventHandler(async event => {
         WHEN $seed IS NOT NULL THEN {
           WHEN $draw = 'Main' THEN {
             MERGE (f)-[:SEEDED]->(e)
-            SET f.seed = toInteger($seed)
+            SET f.seed = $seed
           }
           ELSE {
             MERGE (f)-[:Q_SEEDED]->(e)
-            SET f.q_seed = toInteger($seed)
+            SET f.q_seed = $seed
           }
         }
       }
@@ -40,9 +54,9 @@ export default defineEventHandler(async event => {
       team_reason: team_reason || null,
       draw,
       eid,
-      seed: seed || null,
+      seed: seed ? int(seed) : null,
       status: status || null,
-      rank,
+      rank: rank ? int(rank) : null,
       team_mate: team_mate || null
     }
   )

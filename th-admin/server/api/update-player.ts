@@ -1,4 +1,29 @@
+import { int, Date as NeoDate } from "neo4j-driver"
+
 export default defineEventHandler(async event => {
+  interface QueryProps {
+    id: string
+    first_name?: string
+    last_name?: string
+    tours?: string | string[]
+    country?: string
+    previous_countries?: string | string[]
+    turned_pro?: string
+    retired?: string
+    coaches?: string | string[]
+    former_coaches?: string | string[]
+    atp_link?: string
+    wta_link?: string
+    wiki_link?: string
+    official_link?: string
+    bh?: string
+    rh?: string
+    dob?: string
+    dod?: string
+    height?: string
+    hof?: string
+  }
+
   const {
     id,
     first_name,
@@ -20,19 +45,23 @@ export default defineEventHandler(async event => {
     dod,
     height,
     hof
-  } = getQuery(event)
+  } = getQuery<QueryProps>(event)
+
+  const dobDate = dob ? JSON.parse(dob) : null
+  const dodDate = dod ? JSON.parse(dod) : null
 
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
       CYPHER 25
       MATCH (p:Player {id: $id})
       MATCH (c:Country {id: $country})
-      SET p.first_name = $first_name, p.last_name = $last_name, p.atp_link = $atp_link, p.wta_link = $wta_link, p.wiki_link = $wiki_link, p.official_link = $official_link, p.bh = $bh, p.rh = $rh, p.height = CASE WHEN $height IS NULL THEN NULL ELSE toInteger($height) END, p.hof = CASE WHEN $hof IS NULL THEN NULL ELSE toInteger($hof) END, p.dob = CASE WHEN $dob IS NOT NULL THEN date($dob) ELSE NULL END, p.dod = CASE WHEN $dod IS NOT NULL THEN date($dod) ELSE NULL END
+      SET p.first_name = $first_name, p.last_name = $last_name, p.atp_link = $atp_link, p.wta_link = $wta_link, p.wiki_link = $wiki_link, p.official_link = $official_link, p.bh = $bh, p.rh = $rh, p.height = $height, p.hof = $hof, p.dob = $dob, p.dod = $dod, p.updated_at = date()
       MERGE (p)-[:REPRESENTS]->(c)
       CALL (p) {
-        UNWIND $tours AS tour
-        WITH tour, p WHERE NOT tour IN labels(p)
-        SET p:$(tour)
+        WITH [x IN $tours WHERE NOT x IN labels(p)] AS add, [x IN labels(p) WHERE NOT x IN $tours AND NOT x IN ['Player', 'Coach']] AS remove
+        // UNWIND $tours AS tour
+        // WITH tour, p WHERE NOT tour IN labels(p)
+        SET p:$(add) REMOVE p:$(remove)
       }
       CALL (p) {
         UNWIND labels(p) AS label
@@ -48,13 +77,13 @@ export default defineEventHandler(async event => {
       }
       CALL (p) {
         WHEN $turned_pro IS NOT NULL THEN {
-          MATCH (y:Year {id: toInteger($turned_pro)})
+          MATCH (y:Year {id: $turned_pro})
           MERGE (p)-[:TURNED_PRO]->(y)
         }
       }
       CALL (p) {
         WHEN $retired IS NOT NULL THEN {
-          MATCH (y:Year {id: toInteger($retired)})
+          MATCH (y:Year {id: $retired})
           MERGE (p)-[:RETIRED]->(y)
         }
       }
@@ -91,14 +120,14 @@ export default defineEventHandler(async event => {
       last_name: last_name || null,
       wiki_link: wiki_link || null,
       country: country || null,
-      turned_pro: turned_pro || null,
-      retired: retired || null,
+      turned_pro: turned_pro ? int(turned_pro) : null,
+      retired: retired ? int(retired) : null,
       bh: bh || null,
       rh: rh || null,
-      dob: dob || null,
-      dod: dod || null,
-      height: height || null,
-      hof: hof || null
+      dob: dob ? NeoDate.fromStandardDate(new Date(dobDate.year, dobDate.month - 1, dobDate.day)) : null,
+      dod: dod ? NeoDate.fromStandardDate(new Date(dodDate.year, dodDate.month - 1, dodDate.day)) : null,
+      height: height ? int(height) : null,
+      hof: hof ? int(hof) : null
     }
   )
 

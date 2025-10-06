@@ -6,7 +6,10 @@ const { entry } = defineProps<{ entry: any }>()
 const { query } = useRoute()
 const toast = useToast()
 
-const { data: currency, status } = await useFetch("/api/get-currency", { query: { id: query.id }, default: () => "USD" })
+const { data: currency, status } = await useFetch("/api/get-currency", {
+  query: { id: query.id, tour: isNaN(Number(entry.id)) ? "ATP" : "WTA" },
+  default: () => "USD"
+})
 
 const schema = z.object({
   fid: z.string(),
@@ -35,7 +38,6 @@ const state = reactive<Partial<Schema>>({
 })
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
-  console.log("submitting")
   try {
     await $fetch("/api/update-entry", {
       query: event.data
@@ -54,6 +56,24 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     })
   }
 }
+
+const handleCopy = async () => {
+  try {
+    await navigator.clipboard.writeText(entry.id)
+    toast.add({
+      title: "Copied to clipboard",
+      icon: "lucide:circle-check",
+      color: "success"
+    })
+  } catch (e) {
+    console.error("Failed to copy text: ", e)
+    toast.add({
+      title: "Error copying to clipboard",
+      icon: "lucide:circle-x",
+      color: "error"
+    })
+  }
+}
 </script>
 
 <template>
@@ -63,8 +83,16 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     :id="`${entry.id}-${entry.type}`"
   >
-    <div class="grid grid-cols-10 justify-items-center border-t border-muted pt-1.5 gap-0.5">
+    <div class="grid grid-cols-10 border-t border-muted pt-1.5 gap-1">
       <u-form-field label="Player">
+        <template #hint>
+          <div
+            class="cursor-pointer"
+            @click="handleCopy"
+          >
+            {{ entry.id }}
+          </div>
+        </template>
         <u-link
           v-if="!entry.first_name"
           :to="{ name: 'edit-player', query: { id: entry.id } }"
@@ -76,13 +104,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           :model-value="`${entry.first_name} ${entry.last_name}`"
           disabled
           size="sm"
+          class="w-full"
         />
       </u-form-field>
       <div class="flex items-center justify-center">
         <u-badge
           :label="entry.type"
           :color="entry.type"
-          size="sm"
         />
       </div>
       <u-form-field label="Rank">
@@ -127,6 +155,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           :items="['AL', 'WC', 'Q', 'SE', 'PR', 'LL']"
           placeholder="Select status"
           size="sm"
+          class="w-full"
         />
       </u-form-field>
       <u-form-field label="Q Seed">
@@ -143,13 +172,15 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           :items="['AL', 'WC', 'Q', 'SE', 'PR', 'LL']"
           placeholder="Select status"
           size="sm"
+          class="w-full"
         />
       </u-form-field>
-      <div class="flex items-center justify-center">
+      <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
           size="sm"
+          block
         />
       </div>
     </div>

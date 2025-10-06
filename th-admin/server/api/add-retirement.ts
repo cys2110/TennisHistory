@@ -1,10 +1,21 @@
+import { int } from "neo4j-driver"
+
 export default defineEventHandler(async event => {
-  const { id, type, draw, reason, team_reason, eid } = getQuery(event)
+  interface QueryProps {
+    id: string
+    type: "Singles" | "Doubles"
+    draw: "Main" | "Qualifying"
+    reason: string
+    team_reason: string
+    eid: string
+  }
+
+  const { id, type, draw, reason, team_reason, eid } = getQuery<QueryProps>(event)
 
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
       CYPHER 25
-      MATCH (e:Event {id: toInteger($eid)})
+      MATCH (e:Event {id: $eid})
       MATCH (f:Entry:$($type) {id: $id})-[:SCORED]->(s:Loser:$($draw))
       MERGE (f)-[t:RETIRED]->(e)
       SET t.reason = $reason, t.team_reason = $team_reason, s.incomplete = 'R'
@@ -16,7 +27,7 @@ export default defineEventHandler(async event => {
       reason: reason || null,
       team_reason: team_reason || null,
       draw,
-      eid
+      eid: int(eid)
     }
   )
 

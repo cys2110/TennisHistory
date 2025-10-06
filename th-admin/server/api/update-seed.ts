@@ -1,5 +1,12 @@
+import { int } from "neo4j-driver"
+
 export default defineEventHandler(async event => {
-  const { id, type, rank } = getQuery(event)
+  interface QueryProps {
+    id: string
+    type: "Singles" | "Doubles"
+    rank: string
+  }
+  const { id, type, rank } = getQuery<QueryProps>(event)
 
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
@@ -10,7 +17,7 @@ export default defineEventHandler(async event => {
     {
       id,
       type,
-      rank
+      rank: int(rank)
     }
   )
 

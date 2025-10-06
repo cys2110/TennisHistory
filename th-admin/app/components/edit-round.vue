@@ -45,15 +45,15 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-0.5">
+    <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-2">
       <u-form-field label="Round">
         <u-input
           :model-value="round.round"
           disabled
-          size="sm"
+          class="w-full"
         />
       </u-form-field>
-      <div class="flex items-center gap-1">
+      <div class="flex justify-center items-center gap-1">
         <u-badge
           :label="round.tour"
           :color="round.tour"
@@ -73,8 +73,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       >
         <u-input-number
           v-model="state.number"
-          size="sm"
           orientation="vertical"
+          class="w-full"
         />
       </u-form-field>
       <u-form-field
@@ -83,8 +83,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       >
         <u-input-number
           v-model="state.points"
-          size="sm"
           orientation="vertical"
+          class="w-full"
         />
       </u-form-field>
 
@@ -94,19 +94,20 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       >
         <u-input-number
           v-model="state.pm"
-          size="sm"
           orientation="vertical"
+          class="w-full"
           :format-options="{
             style: 'currency',
             currency: round.currency || 'USD'
           }"
         />
       </u-form-field>
-      <div class="flex items-center justify-center">
+      <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
           size="sm"
+          block
         />
       </div>
     </div>

@@ -1,3 +1,5 @@
+import { int, Date as NeoDate } from "neo4j-driver"
+
 export default defineEventHandler(async event => {
   const {
     id,
@@ -76,10 +78,21 @@ export default defineEventHandler(async event => {
     women_end_date
   } = getQuery(event)
 
+  const startDate = start_date ? JSON.parse(start_date as string) : null
+  const endDate = end_date ? JSON.parse(end_date as string) : null
+  const atpStartDate = atp_start_date ? JSON.parse(atp_start_date as string) : null
+  const atpEndDate = atp_end_date ? JSON.parse(atp_end_date as string) : null
+  const wtaStartDate = wta_start_date ? JSON.parse(wta_start_date as string) : null
+  const wtaEndDate = wta_end_date ? JSON.parse(wta_end_date as string) : null
+  const menStartDate = men_start_date ? JSON.parse(men_start_date as string) : null
+  const menEndDate = men_end_date ? JSON.parse(men_end_date as string) : null
+  const womenStartDate = women_start_date ? JSON.parse(women_start_date as string) : null
+  const womenEndDate = women_end_date ? JSON.parse(women_end_date as string) : null
+
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
       CYPHER 25
-      MATCH (e:Event {id: toInteger($id)})
+      MATCH (e:Event {id: $id})
       SET e.atp_link = $atp_link, e.wta_link = $wta_link, e.men_link = $men_link, e.women_link = $women_link,
       e.wiki_link = $wiki_link, e.category = $category, e.atp_category = $atp_category, e.wta_category = $wta_category,
       e.men_category = $men_category, e.women_category = $women_category, e.sponsor_name = $sponsor_name,
@@ -94,17 +107,11 @@ export default defineEventHandler(async event => {
       e.men_draw_d_link = $men_draw_d_link, e.men_draw_qs_link = $men_draw_qs_link, e.men_draw_qd_link = $men_draw_qd_link,
       e.women_draw_s_link = $women_draw_s_link, e.women_draw_d_link = $women_draw_d_link, e.women_draw_qs_link = $women_draw_qs_link,
       e.women_draw_qd_link = $women_draw_qd_link, e.currency = $currency, e.atp_currency = $atp_currency, e.wta_currency = $wta_currency,
-      e.men_currency = $men_currency, e.women_currency = $women_currency, e.pm = CASE WHEN $pm IS NULL THEN NULL ELSE toInteger($pm) END, e.atp_pm = CASE WHEN $atp_pm IS NULL THEN NULL ELSE toInteger($atp_pm) END, e.wta_pm = CASE WHEN $wta_pm IS NULL THEN NULL ELSE toInteger($wta_pm) END,
-      e.men_pm = CASE WHEN $men_pm IS NULL THEN NULL ELSE toInteger($men_pm) END, e.women_pm = CASE WHEN $women_pm IS NULL THEN NULL ELSE toInteger($women_pm) END, e.tfc = CASE WHEN $tfc IS NULL THEN NULL ELSE toInteger($tfc) END, e.atp_tfc = CASE WHEN $atp_tfc IS NULL THEN NULL ELSE toInteger($atp_tfc) END, e.wta_tfc = CASE WHEN $wta_tfc IS NULL THEN NULL ELSE toInteger($wta_tfc) END, e.start_date = CASE WHEN $start_date IS NOT NULL THEN date($start_date) ELSE NULL END,
-      e.end_date = CASE WHEN $end_date IS NOT NULL THEN date($end_date) ELSE NULL END,
-      e.atp_start_date = CASE WHEN $atp_start_date IS NOT NULL THEN date($atp_start_date) ELSE NULL END,
-      e.atp_end_date = CASE WHEN $atp_end_date IS NOT NULL THEN date($atp_end_date) ELSE NULL END,
-      e.wta_start_date = CASE WHEN $wta_start_date IS NOT NULL THEN date($wta_start_date) ELSE NULL END,
-      e.wta_end_date = CASE WHEN $wta_end_date IS NOT NULL THEN date($wta_end_date) ELSE NULL END,
-      e.men_start_date = CASE WHEN $men_start_date IS NOT NULL THEN date($men_start_date) ELSE NULL END,
-      e.men_end_date = CASE WHEN $men_end_date IS NOT NULL THEN date($men_end_date) ELSE NULL END,
-      e.women_start_date = CASE WHEN $women_start_date IS NOT NULL THEN date($women_start_date) ELSE NULL END,
-      e.women_end_date = CASE WHEN $women_end_date IS NOT NULL THEN date($women_end_date) ELSE NULL END
+      e.men_currency = $men_currency, e.women_currency = $women_currency, e.pm = $pm, e.atp_pm = $atp_pm, e.wta_pm = $wta_pm,
+      e.men_pm = $men_pm, e.women_pm = $women_pm, e.tfc = $tfc, e.atp_tfc = $atp_tfc, e.wta_tfc = $wta_tfc, e.start_date = $start_date,
+      e.end_date = $end_date, e.atp_start_date = $atp_start_date, e.atp_end_date = $atp_end_date, e.wta_start_date = $wta_start_date,
+      e.wta_end_date = $wta_end_date, e.men_start_date = $men_start_date, e.men_end_date = $men_end_date, e.women_start_date = $women_start_date,
+      e.women_end_date = $women_end_date
       CALL (e) {
         UNWIND $tours AS tour
         WITH tour, e WHERE NOT tour IN labels(e)
@@ -137,8 +144,8 @@ export default defineEventHandler(async event => {
       }
     `,
     {
-      id,
-      tours,
+      id: int(id as string),
+      tours: tours ? (Array.isArray(tours) ? tours : [tours]) : null,
       surface: surface || null,
       supervisors: supervisors ? (Array.isArray(supervisors) ? supervisors : [supervisors]) : null,
       venues: venues ? (Array.isArray(venues) ? venues : [venues]) : null,
@@ -193,24 +200,26 @@ export default defineEventHandler(async event => {
       wta_currency: wta_currency || null,
       men_currency: men_currency || null,
       women_currency: women_currency || null,
-      pm: pm ?? null,
-      atp_pm: atp_pm ?? null,
-      wta_pm: wta_pm ?? null,
-      men_pm: men_pm ?? null,
-      women_pm: women_pm ?? null,
-      tfc: tfc ?? null,
-      atp_tfc: atp_tfc ?? null,
-      wta_tfc: wta_tfc ?? null,
-      start_date: start_date || null,
-      end_date: end_date || null,
-      atp_start_date: atp_start_date || null,
-      atp_end_date: atp_end_date || null,
-      wta_start_date: wta_start_date || null,
-      wta_end_date: wta_end_date || null,
-      men_start_date: men_start_date || null,
-      men_end_date: men_end_date || null,
-      women_start_date: women_start_date || null,
-      women_end_date: women_end_date || null
+      pm: pm ? int(pm as string) : null,
+      atp_pm: atp_pm ? int(atp_pm as string) : null,
+      wta_pm: wta_pm ? int(wta_pm as string) : null,
+      men_pm: men_pm ? int(men_pm as string) : null,
+      women_pm: women_pm ? int(women_pm as string) : null,
+      tfc: tfc ? int(tfc as string) : null,
+      atp_tfc: atp_tfc ? int(atp_tfc as string) : null,
+      wta_tfc: wta_tfc ? int(wta_tfc as string) : null,
+      start_date: start_date ? NeoDate.fromStandardDate(new Date(startDate.year, startDate.month - 1, startDate.day)) : null,
+      end_date: end_date ? NeoDate.fromStandardDate(new Date(endDate.year, endDate.month - 1, endDate.day)) : null,
+      atp_start_date: atp_start_date ? NeoDate.fromStandardDate(new Date(atpStartDate.year, atpStartDate.month - 1, atpStartDate.day)) : null,
+      atp_end_date: atp_end_date ? NeoDate.fromStandardDate(new Date(atpEndDate.year, atpEndDate.month - 1, atpEndDate.day)) : null,
+      wta_start_date: wta_start_date ? NeoDate.fromStandardDate(new Date(wtaStartDate.year, wtaStartDate.month - 1, wtaStartDate.day)) : null,
+      wta_end_date: wta_end_date ? NeoDate.fromStandardDate(new Date(wtaEndDate.year, wtaEndDate.month - 1, wtaEndDate.day)) : null,
+      men_start_date: men_start_date ? NeoDate.fromStandardDate(new Date(menStartDate.year, menStartDate.month - 1, menStartDate.day)) : null,
+      men_end_date: men_end_date ? NeoDate.fromStandardDate(new Date(menEndDate.year, menEndDate.month - 1, menEndDate.day)) : null,
+      women_start_date: women_start_date
+        ? NeoDate.fromStandardDate(new Date(womenStartDate.year, womenStartDate.month - 1, womenStartDate.day))
+        : null,
+      women_end_date: women_end_date ? NeoDate.fromStandardDate(new Date(womenEndDate.year, womenEndDate.month - 1, womenEndDate.day)) : null
     }
   )
 

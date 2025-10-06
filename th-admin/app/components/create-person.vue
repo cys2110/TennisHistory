@@ -2,6 +2,8 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
+const { type } = defineProps<{ type: "Coach" | "Umpire" | "Supervisor" }>()
+
 const open = ref(false)
 const toast = useToast()
 
@@ -14,18 +16,18 @@ const state = reactive<Partial<Schema>>({
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   try {
-    await $fetch("/api/create-supervisor", {
-      query: event.data
+    await $fetch("/api/create-person", {
+      query: { ...event.data, type }
     })
     toast.add({
-      title: "Supervisor created",
+      title: `${type} created`,
       icon: "lucide:circle-check",
       color: "success"
     })
     set(open, false)
   } catch (e) {
     toast.add({
-      title: "Error creating supervisor",
+      title: `Error creating ${type}`,
       description: (e as Error).message,
       icon: "lucide:circle-x",
       color: "error"
@@ -36,18 +38,18 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
 
 <template>
   <u-modal
-    title="Create Supervisor"
+    :title="`Create ${type}`"
     v-model:open="open"
     :ui="{ body: '*:my-2', footer: 'justify-end' }"
   >
     <u-button
-      label="Create Supervisor"
+      :label="`Create ${type}`"
       size="sm"
     />
 
     <template #body>
       <u-form
-        id="supervisor-form"
+        id="person-form"
         :schema="personSchema"
         :state
         @submit="onSubmit"
@@ -57,6 +59,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             <u-input
               v-model="state.first_name"
               placeholder="First Name"
+              class="w-full"
             />
           </u-form-field>
 
@@ -67,6 +70,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             <u-input
               v-model="state.last_name"
               placeholder="Last Name"
+              class="w-full"
             />
           </u-form-field>
         </div>
@@ -75,7 +79,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
 
     <template #footer="{ close }">
       <u-button
-        form="supervisor-form"
+        form="person-form"
         type="submit"
         label="Save"
       />

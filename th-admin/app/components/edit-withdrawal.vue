@@ -49,22 +49,25 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-6 border-t border-muted pt-1.5">
+    <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-3">
       <u-form-field label="Player">
-        <u-link
-          v-if="!entry.first_name"
-          :to="{ name: 'edit-player', query: { id: entry.pid } }"
-        >
-          {{ entry.id }}
-        </u-link>
-        <u-input
-          v-else
-          :value="`${entry.first_name} ${entry.last_name}`"
-          disabled
-        />
+        <div class="flex items-center gap-2">
+          <u-link
+            v-if="!entry.first_name"
+            :to="{ name: 'edit-player', query: { id: entry.pid } }"
+          >
+            {{ entry.id }}
+          </u-link>
+          <u-input
+            v-else
+            :value="`${entry.first_name} ${entry.last_name}`"
+            disabled
+            class="w-full"
+          />
+        </div>
       </u-form-field>
 
-      <div class="flex items-center gap-1">
+      <div class="flex justify-center items-center gap-1">
         <u-badge
           :label="entry.type"
           :color="entry.type"
@@ -82,6 +85,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         <u-input
           v-model="state.reason"
           placeholder="Reason"
+          class="w-full"
         />
       </u-form-field>
 
@@ -92,6 +96,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         <u-input
           v-model="state.team_reason"
           placeholder="Team Reason"
+          class="w-full"
         />
       </u-form-field>
 
@@ -106,6 +111,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           value-key="id"
           label-key="label"
           placeholder="Select team mate"
+          class="w-full"
         />
       </u-form-field>
 
@@ -114,6 +120,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           type="submit"
           label="Save"
           size="sm"
+          block
         />
       </div>
     </div>

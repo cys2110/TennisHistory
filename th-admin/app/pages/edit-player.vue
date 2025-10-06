@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui"
+import { parseDate } from "@internationalized/date"
 import * as z from "zod"
 
 useHead({ title: "Edit Player - TH Admin" })
@@ -8,11 +9,7 @@ const { query } = useRoute()
 const toast = useToast()
 const searchCoach = ref("")
 
-const {
-  data: player,
-  status,
-  refresh
-} = await useFetch<any>("/api/get-player", {
+const { data: player, status } = await useFetch<any>("/api/get-player", {
   query: { id: query.id }
 })
 
@@ -50,22 +47,10 @@ const state = reactive<Partial<Schema>>({
   current_doubles: player.value?.current_doubles,
   ch_singles: player.value?.ch_singles,
   ch_doubles: player.value?.ch_doubles,
-  singles_ch_date: player.value?.singles_ch_date
-    ? `${new Date(player.value.singles_ch_date).getFullYear()}-${new Date(player.value.singles_ch_date).getMonth() + 1}-${new Date(
-        player.value.singles_ch_date
-      ).getDate()}`
-    : undefined,
-  doubles_ch_date: player.value?.doubles_ch_date
-    ? `${new Date(player.value.doubles_ch_date).getFullYear()}-${new Date(player.value.doubles_ch_date).getMonth() + 1}-${new Date(
-        player.value.doubles_ch_date
-      ).getDate()}`
-    : undefined,
-  dob: player.value?.dob
-    ? `${new Date(player.value.dob).getFullYear()}-${new Date(player.value.dob).getMonth() + 1}-${new Date(player.value.dob).getDate()}`
-    : undefined,
-  dod: player.value?.dod
-    ? `${new Date(player.value.dod).getFullYear()}-${new Date(player.value.dod).getMonth() + 1}-${new Date(player.value.dod).getDate()}`
-    : undefined,
+  singles_ch_date: player.value?.singles_ch_date ? parseDate(player.value?.singles_ch_date) : undefined,
+  doubles_ch_date: player.value?.doubles_ch_date ? parseDate(player.value?.doubles_ch_date) : undefined,
+  dob: player.value?.dob ? parseDate(player.value?.dob) : undefined,
+  dod: player.value?.dod ? parseDate(player.value?.dod) : undefined,
   height: player.value?.height,
   pm: player.value?.pm,
   hof: player.value?.hof
@@ -108,7 +93,7 @@ const handleScrape = async () => {
         color: "error"
       })
     } finally {
-      refresh()
+      reloadNuxtApp()
     }
   } else {
     try {
@@ -137,7 +122,7 @@ const handleScrape = async () => {
         color: "error"
       })
     } finally {
-      refresh()
+      reloadNuxtApp()
     }
   }
 }
@@ -170,7 +155,7 @@ const handleUpdate = async () => {
         color: "error"
       })
     } finally {
-      refresh()
+      reloadNuxtApp()
     }
   } else {
     try {
@@ -211,17 +196,24 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
   <div class="w-full">
     <u-dashboard-panel>
       <template #header>
-        <u-dashboard-navbar :title="`Edit Player - ${query.id}`" />
+        <u-dashboard-navbar :title="`Edit Player - ${player.first_name ? `${player.first_name} ${player.last_name}` : query.id}`" />
         <u-dashboard-toolbar>
           <u-button
             label="Scrape player"
             @click="handleScrape"
             size="sm"
+            block
           />
+          <div
+            v-if="player?.updated_at"
+            class="text-sm min-w-xs flex justify-center items-center"
+          >
+            Updated at: {{ useDateFormat(player.updated_at, "DD MMMM YYYY") }}
+          </div>
           <u-button
             label="Update Player"
             @click="handleUpdate"
-            #
+            block
             size="sm"
           />
         </u-dashboard-toolbar>
@@ -233,13 +225,13 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
           :state
           @submit="onSubmit"
         >
-          <div class="flex justify-end">
-            <u-button
-              type="submit"
-              label="Save"
-              size="sm"
-            />
-          </div>
+          <u-button
+            type="submit"
+            label="Save"
+            size="sm"
+            block
+            class="mb-3"
+          />
           <div class="grid grid-cols-3 gap-2">
             <div
               v-if="['pending', 'idle'].includes(status)"
@@ -255,6 +247,7 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                 <u-input
                   v-model="state.first_name"
                   placeholder="First Name"
+                  class="w-full"
                 />
               </u-form-field>
               <u-form-field
@@ -264,13 +257,18 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                 <u-input
                   v-model="state.last_name"
                   placeholder="Last Name"
+                  class="w-full"
                 />
               </u-form-field>
               <u-form-field
                 name="tours"
                 label="Tours"
               >
-                <u-input-tags v-model="state.tours" />
+                <u-input-tags
+                  v-model="state.tours"
+                  placeholder="Enter tour"
+                  class="w-full"
+                />
               </u-form-field>
               <u-form-field
                 name="country"
@@ -278,14 +276,19 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
               >
                 <u-input
                   v-model="state.country"
-                  placeholder="Country"
+                  placeholder="Country code"
+                  class="w-full"
                 />
               </u-form-field>
               <u-form-field
                 name="previous_countries"
                 label="Previous countries"
               >
-                <u-input-tags v-model="state.previous_countries" />
+                <u-input-tags
+                  v-model="state.previous_countries"
+                  placeholder="Enter previous countries' codes"
+                  class="w-full"
+                />
               </u-form-field>
               <u-form-field
                 name="turned_pro"
@@ -295,6 +298,7 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                   type="number"
                   v-model="state.turned_pro"
                   placeholder="Turned pro"
+                  class="w-full"
                 />
               </u-form-field>
               <u-form-field
@@ -305,26 +309,10 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                   type="number"
                   v-model="state.retired"
                   placeholder="Retired"
+                  class="w-full"
                 />
               </u-form-field>
-              <u-form-field
-                name="bh"
-                label="Backhand"
-              >
-                <u-select
-                  v-model="state.bh"
-                  :items="['One', 'Back']"
-                  placeholder="Select backhand"
-                >
-                  <template #content-bottom>
-                    <u-button
-                      size="sm"
-                      label="Clear"
-                      @click="state.bh = undefined"
-                    />
-                  </template>
-                </u-select>
-              </u-form-field>
+
               <u-form-field
                 name="plays"
                 label="Plays"
@@ -332,6 +320,7 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                 <u-select
                   v-model="state.rh"
                   placeholder="Select handedness"
+                  class="w-full"
                   :items="[
                     { value: true, label: 'Right' },
                     { value: false, label: 'Left' }
@@ -346,22 +335,43 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                   </template>
                 </u-select>
               </u-form-field>
+
+              <u-form-field
+                name="bh"
+                label="Backhand"
+              >
+                <u-select
+                  v-model="state.bh"
+                  :items="['One', 'Two']"
+                  placeholder="Select backhand"
+                  class="w-full"
+                >
+                  <template #content-bottom>
+                    <u-button
+                      size="sm"
+                      label="Clear"
+                      @click="state.bh = undefined"
+                    />
+                  </template>
+                </u-select>
+              </u-form-field>
+
               <u-form-field
                 name="dob"
                 label="Date of Birth"
               >
-                <u-input
+                <date-picker
                   v-model="state.dob"
-                  placeholder="DOB"
+                  placeholder="Select date of birth"
                 />
               </u-form-field>
               <u-form-field
                 name="dod"
                 label="Date of Death"
               >
-                <u-input
+                <date-picker
                   v-model="state.dod"
-                  placeholder="DOD"
+                  placeholder="Select date of death"
                 />
               </u-form-field>
               <u-form-field
@@ -372,6 +382,7 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                   v-model="state.height"
                   placeholder="Height"
                   orientation="vertical"
+                  class="w-full"
                 />
               </u-form-field>
               <u-form-field
@@ -382,6 +393,7 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                   v-model="state.pm"
                   placeholder="Prize Money"
                   orientation="vertical"
+                  class="w-full"
                   :format-options="{
                     style: 'currency',
                     currency: 'USD'
@@ -394,45 +406,49 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                   label="Ranks"
                 >
                   <div class="grid grid-cols-4 gap-2">
-                    <div class="flex items-center">
+                    <div class="flex justify-center items-center">
                       <u-badge
                         label="Singles"
                         color="Singles"
                       />
                     </div>
-                    <u-input
-                      type="number"
+                    <u-input-number
                       placeholder="Current"
                       v-model="state.current_singles"
+                      orientation="vertical"
+                      class="w-full"
                     />
-                    <u-input
-                      type="number"
+                    <u-input-number
                       placeholder="Career high"
                       v-model="state.ch_singles"
+                      orientation="vertical"
+                      class="w-full"
                     />
-                    <u-input
-                      placeholder="Date"
+                    <date-picker
                       v-model="state.singles_ch_date"
+                      placeholder="Select date"
                     />
-                    <div class="flex items-center">
+                    <div class="flex justify-center items-center">
                       <u-badge
                         label="Doubles"
                         color="Doubles"
                       />
                     </div>
-                    <u-input
-                      type="number"
+                    <u-input-number
                       placeholder="Current"
                       v-model="state.current_doubles"
+                      orientation="vertical"
+                      class="w-full"
                     />
-                    <u-input
-                      type="number"
+                    <u-input-number
                       placeholder="Career high"
                       v-model="state.ch_doubles"
+                      orientation="vertical"
+                      class="w-full"
                     />
-                    <u-input
-                      placeholder="Date"
+                    <date-picker
                       v-model="state.doubles_ch_date"
+                      placeholder="Select date"
                     />
                   </div>
                 </u-form-field>
@@ -446,24 +462,25 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                   type="number"
                   v-model="state.hof"
                   placeholder="Hall of Fame Induction"
+                  class="w-full"
                 />
               </u-form-field>
               <u-form-field
                 name="coaches"
                 label="Coaches"
               >
-                {{ state.coaches?.join(", ") }}
+                <div>{{ state.coaches?.join(", ") }}</div>
                 <u-select-menu
                   v-model="state.coaches"
                   :loading="coachStatus === 'pending'"
                   :items="coaches || []"
                   multiple
-                  class="max-w-sm"
+                  class="w-full"
                   placeholder="Select coaches"
                   @update:open="onOpenCoaches"
                 >
                   <template #content-bottom>
-                    <create-coach />
+                    <create-person type="Coach" />
                   </template>
                 </u-select-menu>
               </u-form-field>
@@ -472,18 +489,18 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                 name="former_coaches"
                 label="Former coaches"
               >
-                {{ state.former_coaches?.join(", ") }}
+                <div>{{ state.former_coaches?.join(", ") }}</div>
                 <u-select-menu
                   v-model="state.former_coaches"
                   :loading="coachStatus === 'pending'"
                   :items="coaches || []"
                   multiple
-                  class="max-w-sm"
+                  class="w-full"
                   placeholder="Select coaches"
                   @update:open="onOpenCoaches"
                 >
                   <template #content-bottom>
-                    <create-coach />
+                    <create-person type="Coach" />
                   </template>
                 </u-select-menu>
               </u-form-field>

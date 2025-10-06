@@ -1,9 +1,11 @@
+import { int } from "neo4j-driver"
+
 export default defineEventHandler(async event => {
-  const { id } = getQuery(event)
+  const { id } = getQuery<{ id: string }>(event)
 
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (e:Event {id: toInteger($id)})
+      MATCH (e:Event {id: $id})
       CALL (*) {
         WITH [['Q', 'QUALIFIED'], ['WC', 'WILD_CARD'], ['LL', 'LUCKY_LOSER'], ['AL', 'ALTERNATE']] AS statuses
         UNWIND statuses AS status
@@ -22,7 +24,7 @@ export default defineEventHandler(async event => {
       }
       RETURN *
     `,
-    { id }
+    { id: int(id) }
   )
 
   return summary
