@@ -166,3 +166,14 @@ export const playerSchema = z.object({
   pm: z.number().optional(),
   hof: z.number().optional()
 })
+
+export const scrapeEventSchema = z.object({
+  tid: z.number(),
+  tid2: z.number().optional(),
+  year: z.number(),
+  year2: z.number().optional(),
+  draw_size: z.number().optional(),
+  type: z.enum(["Singles", "Doubles"]),
+  draw: z.enum(["Main", "Qualifying"]).optional(),
+  sets: z.string().optional()
+})

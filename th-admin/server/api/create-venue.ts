@@ -5,9 +5,9 @@ export default defineEventHandler(async event => {
     `/* cypher */
       MATCH (c:Country {id: $country})
       MERGE (v:Venue {city: $city})
-      ON CREATE SET v.id = CASE WHEN $name CONTAINS v.city THEN $nme ELSE $name || ' ' || $city END
+      ON CREATE SET v.id = CASE WHEN $name CONTAINS v.city THEN $name ELSE $name || ' ' || $city END
       MERGE (v)-[:LOCATED_IN]->(c)
-      SET v.name = $nme
+      SET v.name = $name
       RETURN v
     `,
     {

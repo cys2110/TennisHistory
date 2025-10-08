@@ -58,7 +58,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         <u-select-menu
           v-model="state.id"
           :loading="['pending', 'idle'].includes(status)"
-          :items="entries.map(e => ({ ...e, label: e.first_name ? `${e.last_name}, ${e.first_name}` : e.id }))"
+          :items="entries.map(e => ({ ...e, label: e.first_name ? `${e.last_name}, ${e.first_name} - ${e.type}` : `${e.id} - ${e.type}` }))"
           value-key="fid"
           label-key="label"
           placeholder="Select player"

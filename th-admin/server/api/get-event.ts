@@ -15,7 +15,7 @@ export default defineEventHandler(async query => {
     { id: int(id) }
   )
 
-  const event = records[0].toObject()
+  const event = records[0]?.toObject()
 
   return {
     ...event.event,

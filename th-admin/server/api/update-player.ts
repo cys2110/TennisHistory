@@ -59,14 +59,7 @@ export default defineEventHandler(async event => {
       MERGE (p)-[:REPRESENTS]->(c)
       CALL (p) {
         WITH [x IN $tours WHERE NOT x IN labels(p)] AS add, [x IN labels(p) WHERE NOT x IN $tours AND NOT x IN ['Player', 'Coach']] AS remove
-        // UNWIND $tours AS tour
-        // WITH tour, p WHERE NOT tour IN labels(p)
         SET p:$(add) REMOVE p:$(remove)
-      }
-      CALL (p) {
-        UNWIND labels(p) AS label
-        WITH label, p WHERE NOT label IN $tours AND NOT label IN ['Player', 'Coach']
-        REMOVE p:$(label)
       }
       CALL (p) {
         WHEN $previous_countries IS NOT NULL THEN {

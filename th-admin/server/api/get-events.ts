@@ -7,6 +7,7 @@ export default defineEventHandler(async query => {
     `/* cypher */
       MATCH (t:Tournament)<-[:EDITION_OF]-(e:Event)-[:IN_YEAR]->(:Year {id: $year})
       RETURN {name: t.name, id: e.id} AS event
+      ORDER BY t.name
     `,
     { year: int(year) }
   )

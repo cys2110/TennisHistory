@@ -68,7 +68,7 @@ const onOpenCoaches = () => {
 const handleScrape = async () => {
   if (isNaN(Number(query.id))) {
     try {
-      const response: any = await $fetch("http://127.0.0.1:5000/atp_player/" + query.id, {
+      const response: any = await $fetch("http://127.0.0.1:5001/atp_player/" + query.id, {
         method: "GET",
         timeout: 120_000
       })
@@ -97,7 +97,7 @@ const handleScrape = async () => {
     }
   } else {
     try {
-      const response: any = await $fetch("http://127.0.0.1:5000/wta_player/" + query.id, {
+      const response: any = await $fetch("http://127.0.0.1:5001/wta_player/" + query.id, {
         method: "GET",
         timeout: 120_000
       })
@@ -130,7 +130,7 @@ const handleScrape = async () => {
 const handleUpdate = async () => {
   if (isNaN(Number(query.id))) {
     try {
-      const response: any = await $fetch("http://127.0.0.1:5000/update_atp_player/" + query.id, {
+      const response: any = await $fetch("http://127.0.0.1:5001/atp_player/" + query.id, {
         method: "GET",
         timeout: 120_000
       })
@@ -204,17 +204,11 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
             size="sm"
             block
           />
-          <div
+          <u-badge
             v-if="player?.updated_at"
-            class="text-sm min-w-xs flex justify-center items-center"
-          >
-            Updated at: {{ useDateFormat(player.updated_at, "DD MMMM YYYY") }}
-          </div>
-          <u-button
-            label="Update Player"
-            @click="handleUpdate"
-            block
-            size="sm"
+            class="w-full py-1.5"
+            :label="`Updated at: ${useDateFormat(player.updated_at, 'DD MMMM YYYY').value}`"
+            color="success"
           />
         </u-dashboard-toolbar>
       </template>

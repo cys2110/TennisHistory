@@ -113,14 +113,8 @@ export default defineEventHandler(async event => {
       e.wta_end_date = $wta_end_date, e.men_start_date = $men_start_date, e.men_end_date = $men_end_date, e.women_start_date = $women_start_date,
       e.women_end_date = $women_end_date
       CALL (e) {
-        UNWIND $tours AS tour
-        WITH tour, e WHERE NOT tour IN labels(e)
-        SET e:$(tour)
-      }
-      CALL (e) {
-        UNWIND labels(e) AS label
-        WITH label, e WHERE NOT label IN $tours AND label <> 'Event'
-        REMOVE e:$(label)
+        WITH [x IN $tours WHERE NOT x IN labels(e)] AS add, [x IN labels(e) WHERE NOT x IN $tours AND x <> 'Event'] AS remove
+        SET e:$(add) REMOVE e:$(remove)
       }
       CALL (e) {
         WHEN $surface IS NOT NULL THEN {

@@ -38,14 +38,8 @@ export default defineEventHandler(async event => {
         }
       }
       CALL (t) {
-        UNWIND $tours AS tour
-        WITH tour, t WHERE NOT tour IN labels(t)
-        SET t:$(tour)
-      }
-      CALL (t) {
-        UNWIND labels(t) AS label
-        WITH label, t WHERE NOT label IN $tours AND label <> 'Tournament'
-        REMOVE t:$(label)
+        WITH [x IN $tours WHERE NOT x IN labels(t)] AS add, [x IN labels(t) WHERE NOT x IN $tours AND x <> 'Tournament'] AS remove
+        SET t:$(add) REMOVE t:$(remove)
       }
     `,
     {
@@ -54,7 +48,7 @@ export default defineEventHandler(async event => {
       established: established ? int(established) : null,
       abolished: abolished ? int(abolished) : null,
       website: website || null,
-      tours: tours || []
+      tours: tours ? (Array.isArray(tours) ? tours : [tours]) : []
     }
   )
 

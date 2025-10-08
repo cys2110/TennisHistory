@@ -1,5 +1,5 @@
 <script setup>
-defineProps(["placeholder"])
+defineProps(["placeholder", "size"])
 
 const modelValue = defineModel()
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -12,6 +12,7 @@ const months = ["January", "February", "March", "April", "May", "June", "July", 
       variant="outline"
       icon="lucide:calendar-days"
       block
+      :size="size || 'md'"
     >
       {{ modelValue ? `${modelValue.day} ${months[modelValue.month - 1]} ${modelValue.year}` : placeholder }}
     </u-button>

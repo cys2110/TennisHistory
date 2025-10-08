@@ -97,7 +97,7 @@ export default defineEventHandler(async event => {
       CYPHER 25
       MATCH (t:Tournament {id: toInteger($tournament)})
       MATCH (y:Year {id: toInteger($year)})
-      MERGE (e:Event {id: toInteger($id)})
+      MERGE (e:Event:$($tours) {id: toInteger($id)})
       MERGE (e)-[:EDITION_OF]->(t)
       MERGE (e)-[:IN_YEAR]->(y)
       SET e.atp_link = $atp_link, e.wta_link = $wta_link, e.men_link = $men_link, e.women_link = $women_link,
@@ -114,15 +114,11 @@ export default defineEventHandler(async event => {
       e.men_draw_d_link = $men_draw_d_link, e.men_draw_qs_link = $men_draw_qs_link, e.men_draw_qd_link = $men_draw_qd_link,
       e.women_draw_s_link = $women_draw_s_link, e.women_draw_d_link = $women_draw_d_link, e.women_draw_qs_link = $women_draw_qs_link,
       e.women_draw_qd_link = $women_draw_qd_link, e.currency = $currency, e.atp_currency = $atp_currency, e.wta_currency = $wta_currency,
-      e.men_currency = $men_currency, e.women_currency = $women_currency, $e.draw_link = $draw_link, e.pm = $pm, e.atp_pm = $atp_pm, e.wta_pm = $wta_pm,
+      e.men_currency = $men_currency, e.women_currency = $women_currency, e.draw_link = $draw_link, e.pm = $pm, e.atp_pm = $atp_pm, e.wta_pm = $wta_pm,
       e.men_pm = $men_pm, e.women_pm = $women_pm, e.tfc = $tfc, e.atp_tfc = $atp_tfc, e.wta_tfc = $wta_tfc, e.start_date = $start_date,
       e.end_date = $end_date, e.atp_start_date = $atp_start_date, e.atp_end_date = $atp_end_date, e.wta_start_date = $wta_start_date,
       e.wta_end_date = $wta_end_date, e.men_start_date = $men_start_date, e.men_end_date = $men_end_date, e.women_start_date = $women_start_date,
       e.women_end_date = $women_end_date
-      CALL (e) {
-        UNWIND $tours AS tour
-        SET e:$(tour)
-      }
       CALL (e) {
         WHEN $surface IS NOT NULL THEN {
           MATCH (s:Surface {id: $surface})
@@ -182,6 +178,7 @@ export default defineEventHandler(async event => {
       women_draw_d: women_draw_d || null,
       women_draw_qs: women_draw_qs || null,
       women_draw_qd: women_draw_qd || null,
+      draw_link: draw_link || null,
       atp_draw_s_link: atp_draw_s_link || null,
       atp_draw_d_link: atp_draw_d_link || null,
       atp_draw_qs_link: atp_draw_qs_link || null,

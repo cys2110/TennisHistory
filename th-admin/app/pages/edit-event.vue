@@ -8,13 +8,15 @@ const selectedTab = ref("details")
 const tabItems = [
   { label: "Details", value: "details" },
   { label: "Rounds", value: "rounds" },
+  { label: "Withdrawals", value: "withdrawals" },
   { label: "Seeds", value: "seeds" },
   { label: "LDA", value: "lda" },
   { label: "Retirements", value: "retirements" },
   { label: "Walkovers", value: "walkovers" },
   { label: "Defaults", value: "defaults" },
-  { label: "Withdrawals", value: "withdrawals" },
-  { label: "Entries", value: "entries" }
+  { label: "Entries", value: "entries" },
+  { label: "Match Stats", value: "stats" },
+  { label: "Draws", value: "draws" }
 ]
 
 const updateTiebreaks = async () => {
@@ -64,6 +66,9 @@ const updateEntryInfo = async () => {
         <u-dashboard-navbar :title="`Edit Event - ${query.id}`">
           <template #right>
             <div id="navbar" />
+            <scrape-draw />
+            <scrape-results />
+            <scrape-stats />
             <u-button
               label="Update entry info"
               @click="updateEntryInfo"
@@ -96,6 +101,8 @@ const updateEntryInfo = async () => {
         <defaults v-else-if="selectedTab === 'defaults'" />
         <withdrawals v-else-if="selectedTab === 'withdrawals'" />
         <entries v-else-if="selectedTab === 'entries'" />
+        <match-stats v-else-if="selectedTab === 'stats'" />
+        <draws v-else-if="selectedTab === 'draws'" />
       </template>
     </u-dashboard-panel>
   </div>

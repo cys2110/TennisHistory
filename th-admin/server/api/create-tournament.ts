@@ -14,7 +14,7 @@ export default defineEventHandler(async event => {
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
       CYPHER 25
-      MERGE (t:Tournament {id: $id, name: $name})
+      MERGE (t:Tournament:$($tours) {id: $id, name: $name})
       SET t.website = $website
       CALL (t) {
         WHEN $established IS NOT NULL THEN {
@@ -27,10 +27,6 @@ export default defineEventHandler(async event => {
           MATCH (y:Year {id: $abolished})
           MERGE (t)-[:ABOLISHED]->(y)
         }
-      }
-      CALL (t) {
-        UNWIND $tours AS tour
-        SET t:$(tour)
       }
     `,
     {

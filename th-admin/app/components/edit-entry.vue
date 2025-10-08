@@ -156,7 +156,15 @@ const handleCopy = async () => {
           placeholder="Select status"
           size="sm"
           class="w-full"
-        />
+        >
+          <template #content-bottom>
+            <u-button
+              size="sm"
+              @click="state.status = undefined"
+              label="Clear"
+            />
+          </template>
+        </u-select>
       </u-form-field>
       <u-form-field label="Q Seed">
         <u-input-number
@@ -173,7 +181,15 @@ const handleCopy = async () => {
           placeholder="Select status"
           size="sm"
           class="w-full"
-        />
+        >
+          <template #content-bottom>
+            <u-button
+              size="sm"
+              @click="state.q_status = undefined"
+              label="Clear"
+            />
+          </template>
+        </u-select>
       </u-form-field>
       <div class="flex items-center">
         <u-button
