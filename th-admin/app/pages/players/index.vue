@@ -1,23 +1,23 @@
 <script setup lang="ts">
-useHead({ title: "Coaches - TH Admin" })
+useHead({ title: "Players - TH Admin" })
 const selectedLetter = ref<string>("Update")
 
 const {
-  data: coaches,
+  data: players,
   status,
   refresh
-} = await useFetch<{ first_name: string; last_name: string; id: string }[]>("/api/coaches/get", {
+} = await useFetch<{ first_name: string; last_name: string; id: string }[]>("/api/players/get-players", {
   query: { letter: selectedLetter },
   default: () => []
 })
 
 const toc = computed(() => [
   {
-    id: "coaches",
-    label: "Coaches",
-    items: coaches.value.map(coach => ({
-      label: coach.first_name ? `${coach.first_name} ${coach.last_name}` : coach.id,
-      to: `#${coach.id}`
+    id: "players",
+    label: "Players",
+    items: players.value.map(player => ({
+      label: player.first_name ? `${player.first_name} ${player.last_name}` : player.id,
+      to: `#${player.id}`
     }))
   }
 ])
@@ -27,9 +27,9 @@ const toc = computed(() => [
   <div class="w-full">
     <u-dashboard-panel>
       <template #header>
-        <u-dashboard-navbar title="Coaches">
+        <u-dashboard-navbar title="Players">
           <template #right>
-            <create-person type="Coach" />
+            <players-create />
             <u-popover>
               <u-button
                 icon="lucide:table-of-contents"
@@ -38,7 +38,7 @@ const toc = computed(() => [
               />
               <template #content>
                 <u-command-palette
-                  placeholder="Search coaches"
+                  placeholder="Search players"
                   :groups="toc"
                   :loading="status === 'pending'"
                   :ui="{ content: 'max-h-80', root: 'border border-primary rounded-lg' }"
@@ -84,22 +84,25 @@ const toc = computed(() => [
       </template>
 
       <template #body>
-        <div v-if="['idle', 'pending'].includes(status)">Loading...</div>
-
         <u-page-list
-          v-else-if="coaches.length"
+          v-if="players?.length"
           class="*:my-2"
         >
-          <edit-person
-            v-for="coach in coaches"
-            :key="coach.id"
-            :person="coach"
-            type="Coach"
-          />
+          <u-link
+            v-for="player in players"
+            :key="player.id"
+            :to="{ name: 'player', params: { id: player.id } }"
+            :id="player.id"
+            class="text-sm"
+          >
+            {{ player.first_name ? `${player.first_name} ${player.last_name}` : player.id }}
+          </u-link>
         </u-page-list>
 
+        <div v-else-if="['idle', 'pending'].includes(status)">Loading...</div>
+
         <div v-else>
-          Error loading coaches.
+          Error loading players.
           <u-button
             @click="() => refresh()"
             label="Refresh"

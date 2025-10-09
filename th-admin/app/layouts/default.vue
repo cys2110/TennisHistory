@@ -23,11 +23,11 @@ const groups = computed(() => [
     items: [
       {
         label: "Edit Event",
-        to: { name: "edit-event", query: { id: get(id) } }
+        to: { name: "event", params: { id: get(id) } }
       },
       {
         label: "Edit Player",
-        to: { name: "edit-player", query: { id: get(id) } }
+        to: { name: "player", param: { id: get(id) } }
       }
     ]
   }

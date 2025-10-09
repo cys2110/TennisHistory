@@ -17,9 +17,9 @@ useHead({ title: "Merge Nodes - TH Admin" })
       </template>
 
       <template #body>
-        <merge-umpires />
+        <umpires-merge />
 
-        <merge-coaches />
+        <coaches-merge />
       </template>
     </u-dashboard-panel>
   </div>

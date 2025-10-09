@@ -1,14 +1,16 @@
 <script setup lang="ts">
-useHead({ title: "Tournaments - TH Admin" })
-const { data: tournaments, status } = await useFetch<TournamentInterface[]>("/api/tournaments/get", { default: () => [] })
+useHead({ title: "Events - TH Admin" })
+const year = ref(new Date().getFullYear())
+
+const { data: events, status } = await useFetch<{ name: string; id: number }[]>("/api/events/get-events", { query: { year }, default: () => [] })
 
 const toc = computed(() => [
   {
-    id: "tournaments",
-    label: "Tournaments",
-    items: tournaments.value.map(tournament => ({
-      label: tournament.name ?? tournament.id.toString(),
-      to: `#tournament-${tournament.id}`
+    id: "events",
+    label: "Events",
+    items: events.value.map(event => ({
+      label: event.name ?? event.id.toString(),
+      to: `#event-${event.id}`
     }))
   }
 ])
@@ -18,9 +20,9 @@ const toc = computed(() => [
   <div class="w-full">
     <u-dashboard-panel>
       <template #header>
-        <u-dashboard-navbar title="Tournaments">
+        <u-dashboard-navbar title="Events">
           <template #right>
-            <tournaments-create />
+            <events-create />
             <u-popover>
               <u-button
                 icon="lucide:table-of-contents"
@@ -29,7 +31,7 @@ const toc = computed(() => [
               />
               <template #content>
                 <u-command-palette
-                  placeholder="Search tournaments"
+                  placeholder="Search events"
                   :groups="toc"
                   :loading="status === 'pending'"
                   :ui="{ content: 'max-h-80', root: 'border border-primary rounded-lg' }"
@@ -38,13 +40,19 @@ const toc = computed(() => [
             </u-popover>
           </template>
         </u-dashboard-navbar>
+        <u-dashboard-toolbar>
+          <u-select-menu
+            v-model="year"
+            :items="ALL_YEARS"
+          />
+        </u-dashboard-toolbar>
       </template>
 
       <template #body>
         <div v-if="['idle', 'loading'].includes(status)">Loading...</div>
 
         <div v-else-if="status === 'error'">
-          Error loading tournaments.
+          Error loading events.
           <u-button
             @click="() => reloadNuxtApp()"
             label="Refresh"
@@ -52,12 +60,19 @@ const toc = computed(() => [
           />
         </div>
 
-        <u-page-list class="*:my-1">
-          <tournaments-edit
-            v-for="tournament in tournaments"
-            :key="tournament.id"
-            :tournament
-          />
+        <u-page-list
+          v-else
+          class="*:my-2"
+        >
+          <u-link
+            v-for="event in events"
+            :key="event.id"
+            :to="{ name: 'event', params: { id: event.id } }"
+            :id="`event-${event.id}`"
+            class="text-sm"
+          >
+            {{ event.name ?? event.id }}
+          </u-link>
         </u-page-list>
       </template>
     </u-dashboard-panel>

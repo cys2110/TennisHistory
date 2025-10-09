@@ -1,12 +1,12 @@
 <script setup lang="ts">
 useHead({ title: "Umpires - TH Admin" })
-const { data: umpires, status } = await useFetch("/api/get-umpires", { default: () => [] })
+const { data: umpires, status } = await useFetch<any>("/api/umpires/get", { default: () => [] })
 
 const toc = computed(() => [
   {
     id: "umpires",
     label: "Umpires",
-    items: umpires.value.map(umpire => ({
+    items: umpires.value.map((umpire: any) => ({
       label: umpire.id,
       to: `#${umpire.id}`
     }))
