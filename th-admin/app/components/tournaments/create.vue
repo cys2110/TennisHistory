@@ -57,6 +57,19 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         @submit="onSubmit"
       >
         <div class="grid grid-cols-2 gap-2">
+          <div class="col-span-2">
+            <u-form-field
+              name="name"
+              label="Name"
+            >
+              <u-input
+                v-model="state.name"
+                placeholder="Enter Tournament Name"
+                class="w-full"
+              />
+            </u-form-field>
+          </div>
+
           <u-form-field
             name="id"
             label="ID"
@@ -65,17 +78,6 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               type="number"
               v-model="state.id"
               placeholder="Enter Tournament ID"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field
-            name="name"
-            label="Name"
-          >
-            <u-input
-              v-model="state.name"
-              placeholder="Enter Tournament Name"
               class="w-full"
             />
           </u-form-field>
@@ -136,11 +138,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         form="tournament-form"
         type="submit"
         label="Save"
+        icon="lucide:square-check-big"
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
+        icon="lucide:circle-x"
       />
     </template>
   </u-modal>

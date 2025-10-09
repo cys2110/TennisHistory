@@ -16,7 +16,16 @@ const { data: seeds, status } = await useFetch("/api/seeds/get", {
   <div class="w-full">
     <u-dashboard-panel>
       <template #header>
-        <u-dashboard-navbar :title="`Seeds - ${id}`" />
+        <u-dashboard-navbar :title="`Seeds - ${id}`">
+          <template #right>
+            <u-dropdown-menu :items="routes">
+              <u-button
+                icon="lucide:layers-3"
+                size="sm"
+              />
+            </u-dropdown-menu>
+          </template>
+        </u-dashboard-navbar>
       </template>
 
       <template #body>
@@ -27,11 +36,12 @@ const { data: seeds, status } = await useFetch("/api/seeds/get", {
           :seed
         />
         <div v-else-if="status === 'pending'">Loading...</div>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 items-center">
           <div>No seeds found.</div>
           <u-button
             label="Refresh"
             @click="() => reloadNuxtApp()"
+            icon="lucide:refresh-ccw"
           />
         </div>
       </template>

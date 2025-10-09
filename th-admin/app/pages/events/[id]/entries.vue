@@ -49,11 +49,6 @@ const updateEntryInfo = async () => {
       <template #header>
         <u-dashboard-navbar :title="`Entries - ${id}`">
           <template #right>
-            <u-button
-              label="Update entry info"
-              @click="updateEntryInfo"
-              size="sm"
-            />
             <u-popover>
               <u-button
                 icon="lucide:table-of-contents"
@@ -69,8 +64,22 @@ const updateEntryInfo = async () => {
                 />
               </template>
             </u-popover>
+            <u-dropdown-menu :items="routes">
+              <u-button
+                icon="lucide:layers-3"
+                size="sm"
+              />
+            </u-dropdown-menu>
           </template>
         </u-dashboard-navbar>
+        <u-dashboard-toolbar>
+          <u-button
+            label="Update entry info"
+            @click="updateEntryInfo"
+            size="sm"
+            block
+          />
+        </u-dashboard-toolbar>
       </template>
 
       <template #body>
@@ -87,12 +96,13 @@ const updateEntryInfo = async () => {
         <div v-else-if="status === 'pending'">Loading...</div>
         <div
           v-else
-          class="flex flex-col gap-2"
+          class="flex flex-col gap-2 items-center"
         >
           <div>No entries found.</div>
           <u-button
             label="Refresh"
             @click="() => reloadNuxtApp()"
+            icon="lucide:refresh-ccw"
           />
         </div>
       </template>

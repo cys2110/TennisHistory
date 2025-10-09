@@ -2,13 +2,15 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
-const { query } = useRoute()
+const {
+  params: { id }
+} = useRoute("rounds")
 const toast = useToast()
 
 type Schema = z.output<typeof roundSchema>
 
 const state = reactive<Partial<Schema>>({
-  id: "",
+  id: id as string,
   tour: "",
   draw: "",
   type: "",
@@ -16,11 +18,11 @@ const state = reactive<Partial<Schema>>({
   number: 0,
   points: undefined,
   pm: undefined,
-  eid: query.id as string
+  eid: id as string
 })
 
 const params = computed(() => ({
-  id: query.id,
+  id,
   tour: state.tour
 }))
 
@@ -73,8 +75,9 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       >
         <u-input
           v-model="state.id"
-          placeholder="ID"
+          placeholder="Enter round ID"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
 
@@ -84,75 +87,64 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           :items="rounds"
           placeholder="Select round"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
-      <u-form-field
-        name="tour"
-        label="Tour"
-      >
+      <u-form-field label="Tour">
         <u-select
           v-model="state.tour"
           :items="['ATP', 'WTA', 'Men', 'Women']"
           placeholder="Select tour"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
 
-      <u-form-field
-        name="type"
-        label="Type"
-      >
+      <u-form-field label="Type">
         <u-select
           v-model="state.type"
           :items="['Singles', 'Doubles']"
           placeholder="Select type"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
 
-      <u-form-field
-        name="draw"
-        label="Draw"
-      >
+      <u-form-field label="Draw">
         <u-select
           v-model="state.draw"
           :items="['Main', 'Qualifying']"
           placeholder="Select draw"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
-      <u-form-field
-        name="number"
-        label="Number"
-      >
+      <u-form-field label="Number">
         <u-input-number
           v-model="state.number"
           orientation="vertical"
-          placeholder="Number"
+          placeholder="Enter round number"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
-      <u-form-field
-        name="points"
-        label="Points"
-      >
+      <u-form-field label="Points">
         <u-input-number
           v-model="state.points"
           orientation="vertical"
-          placeholder="Points"
+          placeholder="Enter points"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
 
-      <u-form-field
-        name="pm"
-        label="Prize Money"
-      >
+      <u-form-field label="Prize Money">
         <u-input-number
           v-model="state.pm"
           orientation="vertical"
-          placeholder="Prize Money"
+          placeholder="Enter prize money"
           class="w-full"
+          size="sm"
           :format-options="{
             style: 'currency',
             currency: currency || 'USD'
@@ -165,6 +157,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           label="Save"
           size="sm"
           block
+          icon="lucide:square-check-big"
         />
       </div>
     </div>

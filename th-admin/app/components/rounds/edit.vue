@@ -67,20 +67,14 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           :color="round.draw"
         />
       </div>
-      <u-form-field
-        name="number"
-        label="Number"
-      >
+      <u-form-field label="Number">
         <u-input-number
           v-model="state.number"
           orientation="vertical"
           class="w-full"
         />
       </u-form-field>
-      <u-form-field
-        name="points"
-        label="Points"
-      >
+      <u-form-field label="Points">
         <u-input-number
           v-model="state.points"
           orientation="vertical"
@@ -88,10 +82,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         />
       </u-form-field>
 
-      <u-form-field
-        name="pm"
-        label="Prize Money"
-      >
+      <u-form-field label="Prize Money">
         <u-input-number
           v-model="state.pm"
           orientation="vertical"
@@ -108,6 +99,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           label="Save"
           size="sm"
           block
+          icon="lucide:square-check-big"
         />
       </div>
     </div>

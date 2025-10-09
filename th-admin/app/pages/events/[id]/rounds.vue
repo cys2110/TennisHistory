@@ -21,13 +21,23 @@ function handleAddRound() {
   <div class="w-full">
     <u-dashboard-panel>
       <template #header>
-        <u-dashboard-navbar :title="`Rounds - ${id}`" />
+        <u-dashboard-navbar :title="`Rounds - ${id}`">
+          <template #right>
+            <u-dropdown-menu :items="routes">
+              <u-button
+                icon="lucide:layers-3"
+                size="sm"
+              />
+            </u-dropdown-menu>
+          </template>
+        </u-dashboard-navbar>
         <u-dashboard-toolbar>
           <u-button
             label="Add Round"
             @click="handleAddRound"
-            class="w-full"
+            block
             size="sm"
+            icon="lucide:square-plus"
           />
         </u-dashboard-toolbar>
       </template>
@@ -46,11 +56,12 @@ function handleAddRound() {
           :round="round"
         />
         <div v-else-if="status === 'pending'">Loading...</div>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 items-center">
           <div>No rounds found.</div>
           <u-button
             label="Refresh"
             @click="() => reloadNuxtApp()"
+            icon="lucide:refresh-ccw"
           />
         </div>
       </template>

@@ -9,81 +9,9 @@ type Schema = z.output<typeof eventSchema>
 
 const state = reactive<Partial<Schema>>({
   id: 0,
-  tournament: undefined,
-  year: undefined,
   tours: [],
-  surface: undefined,
   supervisors: [],
-  venues: [],
-  atp_link: undefined,
-  wta_link: undefined,
-  men_link: undefined,
-  women_link: undefined,
-  wiki_link: undefined,
-  category: undefined,
-  atp_category: undefined,
-  wta_category: undefined,
-  men_category: undefined,
-  women_category: undefined,
-  sponsor_name: undefined,
-  atp_sponsor_name: undefined,
-  wta_sponsor_name: undefined,
-  draw_type: undefined,
-  atp_draw_s: undefined,
-  atp_draw_d: undefined,
-  atp_draw_qs: undefined,
-  atp_draw_qd: undefined,
-  wta_draw_s: undefined,
-  wta_draw_d: undefined,
-  wta_draw_qs: undefined,
-  wta_draw_qd: undefined,
-  men_draw_s: undefined,
-  men_draw_d: undefined,
-  men_draw_qs: undefined,
-  men_draw_qd: undefined,
-  women_draw_s: undefined,
-  women_draw_d: undefined,
-  women_draw_qs: undefined,
-  women_draw_qd: undefined,
-  draw_link: undefined,
-  atp_draw_s_link: undefined,
-  atp_draw_d_link: undefined,
-  atp_draw_qs_link: undefined,
-  atp_draw_qd_link: undefined,
-  wta_draw_s_link: undefined,
-  wta_draw_d_link: undefined,
-  wta_draw_qs_link: undefined,
-  wta_draw_qd_link: undefined,
-  men_draw_s_link: undefined,
-  men_draw_d_link: undefined,
-  men_draw_qs_link: undefined,
-  men_draw_qd_link: undefined,
-  women_draw_s_link: undefined,
-  women_draw_d_link: undefined,
-  women_draw_qs_link: undefined,
-  women_draw_qd_link: undefined,
-  currency: undefined,
-  atp_currency: undefined,
-  wta_currency: undefined,
-  men_currency: undefined,
-  women_currency: undefined,
-  pm: undefined,
-  atp_pm: undefined,
-  wta_pm: undefined,
-  men_pm: undefined,
-  women_pm: undefined,
-  atp_tfc: undefined,
-  wta_tfc: undefined,
-  start_date: undefined,
-  end_date: undefined,
-  atp_start_date: undefined,
-  atp_end_date: undefined,
-  wta_start_date: undefined,
-  wta_end_date: undefined,
-  men_start_date: undefined,
-  men_end_date: undefined,
-  women_start_date: undefined,
-  women_end_date: undefined
+  venues: []
 })
 
 const {
@@ -149,23 +77,17 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         :state
         @submit="onSubmit"
       >
-        <div class="grid grid-cols-3 gap-2">
-          <u-form-field
-            name="id"
-            label="ID"
-          >
+        <div class="grid grid-cols-3 gap-2 items-center">
+          <u-form-field label="ID">
             <u-input
               type="number"
               v-model="state.id"
-              placeholder="Enter Event ID"
+              placeholder="Enter event ID"
               class="w-full"
             />
           </u-form-field>
 
-          <u-form-field
-            name="tournament"
-            label="Tournament"
-          >
+          <u-form-field label="Tournament">
             <u-select-menu
               v-model="state.tournament"
               :loading="['pending', 'idle'].includes(tournamentStatus)"
@@ -177,10 +99,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             />
           </u-form-field>
 
-          <u-form-field
-            name="year"
-            label="Year"
-          >
+          <u-form-field label="Year">
             <u-select-menu
               v-model="state.year"
               :items="ALL_YEARS"
@@ -189,22 +108,17 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             />
           </u-form-field>
 
-          <u-form-field
-            name="tours"
-            label="Tours"
-          >
+          <u-form-field label="Tours">
             <u-input-tags
               v-model="state.tours"
               placeholder="Enter event tours"
               class="w-full"
+              delimiter=","
             />
           </u-form-field>
 
           <div class="col-span-2">
-            <u-form-field
-              label="Sponsor Names"
-              name="sponsor_names"
-            >
+            <u-form-field label="Sponsor Names">
               <div class="grid grid-cols-3 gap-2 *:flex *:flex-col *:gap-1">
                 <div>
                   <label for="sponsor_name">
@@ -249,10 +163,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           </div>
 
           <div class="col-span-3">
-            <u-form-field
-              label="Categories"
-              name="categories"
-            >
+            <u-form-field label="Categories">
               <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
                 <div>
                   <label for="category">
@@ -325,10 +236,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           </div>
 
           <div class="col-span-3">
-            <u-form-field
-              label="Dates"
-              name="dates"
-            >
+            <u-form-field label="Dates">
               <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
                 <div>
                   <label for="start_date">
@@ -337,12 +245,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   <date-picker
                     id="start_date"
                     v-model="state.start_date"
-                    placeholder="Enter start date"
+                    placeholder="Select start date"
                   />
                   <date-picker
                     id="end_date"
                     v-model="state.end_date"
-                    placeholder="Enter end date"
+                    placeholder="Select end date"
                   />
                 </div>
 
@@ -356,12 +264,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   <date-picker
                     id="atp_start_date"
                     v-model="state.atp_start_date"
-                    placeholder="Enter ATP start date"
+                    placeholder="Select ATP start date"
                   />
                   <date-picker
                     id="atp_end_date"
                     v-model="state.atp_end_date"
-                    placeholder="Enter ATP end date"
+                    placeholder="Select ATP end date"
                   />
                 </div>
 
@@ -375,12 +283,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   <date-picker
                     id="wta_start_date"
                     v-model="state.wta_start_date"
-                    placeholder="Enter WTA start date"
+                    placeholder="Select WTA start date"
                   />
                   <date-picker
                     id="wta_end_date"
                     v-model="state.wta_end_date"
-                    placeholder="Enter WTA end date"
+                    placeholder="Select WTA end date"
                   />
                 </div>
 
@@ -394,12 +302,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   <date-picker
                     id="men_start_date"
                     v-model="state.men_start_date"
-                    placeholder="Enter Men start date"
+                    placeholder="Select Men start date"
                   />
                   <date-picker
                     id="men_end_date"
                     v-model="state.men_end_date"
-                    placeholder="Enter Men end date"
+                    placeholder="Select Men end date"
                   />
                 </div>
 
@@ -413,22 +321,19 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   <date-picker
                     id="women_start_date"
                     v-model="state.women_start_date"
-                    placeholder="Enter Women start date"
+                    placeholder="Select Women start date"
                   />
                   <date-picker
                     id="women_end_date"
                     v-model="state.women_end_date"
-                    placeholder="Enter Women end date"
+                    placeholder="Select Women end date"
                   />
                 </div>
               </div>
             </u-form-field>
           </div>
 
-          <u-form-field
-            name="surface"
-            label="Surface"
-          >
+          <u-form-field label="Surface">
             <u-select
               v-model="state.surface"
               :items="surfaces"
@@ -437,10 +342,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             />
           </u-form-field>
 
-          <u-form-field
-            name="venues"
-            label="Venues"
-          >
+          <u-form-field label="Venues">
             {{ state.venues?.join(", ") }}
             <u-select-menu
               v-model="state.venues"
@@ -467,10 +369,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             </u-select-menu>
           </u-form-field>
 
-          <u-form-field
-            name="supervisors"
-            label="Supervisors"
-          >
+          <u-form-field label="Supervisors">
             <div>{{ state.supervisors?.join(", ") }}</div>
             <u-select-menu
               v-model="state.supervisors"
@@ -496,10 +395,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           </u-form-field>
 
           <div class="col-span-3">
-            <u-form-field
-              name="money"
-              label="Money"
-            >
+            <u-form-field label="Money">
               <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
                 <div>
                   <label for="currency">
@@ -512,7 +408,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       placeholder="e.g. $"
                     >
                       <template #content-bottom>
-                        <button @click="state.currency = undefined">Clear</button>
+                        <u-button
+                          @click="state.currency = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-input-number
@@ -551,7 +451,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       placeholder="e.g. $"
                     >
                       <template #content-bottom>
-                        <button @click="state.atp_currency = undefined">Clear</button>
+                        <u-button
+                          @click="state.atp_currency = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-input-number
@@ -590,7 +494,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       placeholder="e.g. $"
                     >
                       <template #content-bottom>
-                        <button @click="state.wta_currency = undefined">Clear</button>
+                        <u-button
+                          @click="state.wta_currency = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-input-number
@@ -629,7 +537,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       placeholder="e.g. $"
                     >
                       <template #content-bottom>
-                        <button @click="state.men_currency = undefined">Clear</button>
+                        <u-button
+                          @click="state.men_currency = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-input-number
@@ -659,7 +571,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       placeholder="e.g. $"
                     >
                       <template #content-bottom>
-                        <button @click="state.women_currency = undefined">Clear</button>
+                        <u-button
+                          @click="state.women_currency = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-input-number
@@ -679,10 +595,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           </div>
 
           <div class="col-span-3">
-            <u-form-field
-              label="Links"
-              name="links"
-            >
+            <u-form-field label="Links">
               <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
                 <div>
                   <label for="wiki_link">
@@ -755,10 +668,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           </div>
 
           <div class="col-span-3">
-            <u-form-field
-              label="Draws"
-              name="draws"
-            >
+            <u-form-field label="Draws">
               <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
                 <div>
                   <label for="draw_link">
@@ -771,7 +681,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.draw_type = undefined">Clear</button>
+                      <u-button
+                        @click="state.draw_type = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
@@ -790,58 +704,74 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   <u-select
                     id="atp_draw_s"
                     v-model="state.atp_draw_s"
-                    placeholder="Enter ATP Singles draw"
+                    placeholder="Enter ATP singles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.atp_draw_s = undefined">Clear</button>
+                      <u-button
+                        @click="state.atp_draw_s = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.atp_draw_s_link"
-                    placeholder="Enter ATP Singles draw link"
+                    placeholder="Enter ATP singles draw link"
                   />
                   <u-select
                     id="atp_draw_d"
                     v-model="state.atp_draw_d"
-                    placeholder="Enter ATP Doubles draw"
+                    placeholder="Enter ATP doubles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.atp_draw_d = undefined">Clear</button>
+                      <u-button
+                        @click="state.atp_draw_d = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.atp_draw_d_link"
-                    placeholder="Enter ATP Doubles draw link"
+                    placeholder="Enter ATP doubles draw link"
                   />
                   <u-select
                     id="atp_draw_qs"
                     v-model="state.atp_draw_qs"
-                    placeholder="Enter ATP Qualifying Singles draw"
+                    placeholder="Enter ATP qualifying singles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.atp_draw_qs = undefined">Clear</button>
+                      <u-button
+                        @click="state.atp_draw_qs = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.atp_draw_qs_link"
-                    placeholder="Enter ATP Qualifying Singles draw link"
+                    placeholder="Enter ATP qualifying singles draw link"
                   />
                   <u-select
                     id="atp_draw_qd"
                     v-model="state.atp_draw_qd"
-                    placeholder="Enter ATP Qualifying Doubles draw"
+                    placeholder="Enter ATP qualifying doubles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.atp_draw_qd = undefined">Clear</button>
+                      <u-button
+                        @click="state.atp_draw_qd = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.atp_draw_qd_link"
-                    placeholder="Enter ATP Qualifying Doubles draw link"
+                    placeholder="Enter ATP qualifying doubles draw link"
                   />
                 </div>
 
@@ -855,58 +785,74 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   <u-select
                     id="wta_draw_s"
                     v-model="state.wta_draw_s"
-                    placeholder="Enter WTA Singles draw"
+                    placeholder="Enter WTA singles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.wta_draw_s = undefined">Clear</button>
+                      <u-button
+                        @click="state.wta_draw_s = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.wta_draw_s_link"
-                    placeholder="Enter WTA Singles draw link"
+                    placeholder="Enter WTA singles draw link"
                   />
                   <u-select
                     id="wta_draw_d"
                     v-model="state.wta_draw_d"
-                    placeholder="Enter WTA Doubles draw"
+                    placeholder="Enter WTA doubles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.wta_draw_d = undefined">Clear</button>
+                      <u-button
+                        @click="state.wta_draw_d = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.wta_draw_d_link"
-                    placeholder="Enter WTA Doubles draw link"
+                    placeholder="Enter WTA doubles draw link"
                   />
                   <u-select
                     id="wta_draw_qs"
                     v-model="state.wta_draw_qs"
-                    placeholder="Enter WTA Qualifying Singles draw"
+                    placeholder="Enter WTA qualifying singles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.wta_draw_qs = undefined">Clear</button>
+                      <u-button
+                        @click="state.wta_draw_qs = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.wta_draw_qs_link"
-                    placeholder="Enter WTA Qualifying Singles draw link"
+                    placeholder="Enter WTA qualifying singles draw link"
                   />
                   <u-select
                     id="wta_draw_qd"
                     v-model="state.wta_draw_qd"
-                    placeholder="Enter WTA Qualifying Doubles draw"
+                    placeholder="Enter WTA qualifying doubles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.wta_draw_qd = undefined">Clear</button>
+                      <u-button
+                        @click="state.wta_draw_qd = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.wta_draw_qd_link"
-                    placeholder="Enter WTA Qualifying Doubles draw link"
+                    placeholder="Enter WTA qualifying doubles draw link"
                   />
                 </div>
 
@@ -920,58 +866,74 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   <u-select
                     id="men_draw_s"
                     v-model="state.men_draw_s"
-                    placeholder="Enter Men Singles draw"
+                    placeholder="Enter Men singles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.men_draw_s = undefined">Clear</button>
+                      <u-button
+                        @click="state.men_draw_s = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.men_draw_s_link"
-                    placeholder="Enter Men Singles draw link"
+                    placeholder="Enter Men singles draw link"
                   />
                   <u-select
                     id="men_draw_d"
                     v-model="state.men_draw_d"
-                    placeholder="Enter Men Doubles draw"
+                    placeholder="Enter Men doubles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.men_draw_d = undefined">Clear</button>
+                      <u-button
+                        @click="state.men_draw_d = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.men_draw_d_link"
-                    placeholder="Enter Men Doubles draw link"
+                    placeholder="Enter Men doubles draw link"
                   />
                   <u-select
                     id="men_draw_qs"
                     v-model="state.men_draw_qs"
-                    placeholder="Enter Men Qualifying Singles draw"
+                    placeholder="Enter Men qualifying singles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.men_draw_qs = undefined">Clear</button>
+                      <u-button
+                        @click="state.men_draw_qs = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.men_draw_qs_link"
-                    placeholder="Enter Men Qualifying Singles draw link"
+                    placeholder="Enter Men qualifying singles draw link"
                   />
                   <u-select
                     id="men_draw_qd"
                     v-model="state.men_draw_qd"
-                    placeholder="Enter Men Qualifying Doubles draw"
+                    placeholder="Enter Men qualifying doubles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.men_draw_qd = undefined">Clear</button>
+                      <u-button
+                        @click="state.men_draw_qd = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.men_draw_qd_link"
-                    placeholder="Enter Men Qualifying Doubles draw link"
+                    placeholder="Enter Men qualifying doubles draw link"
                   />
                 </div>
 
@@ -985,58 +947,74 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                   <u-select
                     id="women_draw_s"
                     v-model="state.women_draw_s"
-                    placeholder="Enter Women Singles draw"
+                    placeholder="Enter Women singles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.women_draw_s = undefined">Clear</button>
+                      <u-button
+                        @click="state.women_draw_s = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.women_draw_s_link"
-                    placeholder="Enter Women Singles draw link"
+                    placeholder="Enter Women singles draw link"
                   />
                   <u-select
                     id="women_draw_d"
                     v-model="state.women_draw_d"
-                    placeholder="Enter Women Doubles draw"
+                    placeholder="Enter Women doubles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.women_draw_d = undefined">Clear</button>
+                      <u-button
+                        @click="state.women_draw_d = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.women_draw_d_link"
-                    placeholder="Enter Women Doubles draw link"
+                    placeholder="Enter Women doubles draw link"
                   />
                   <u-select
                     id="women_draw_qs"
                     v-model="state.women_draw_qs"
-                    placeholder="Enter Women Qualifying Singles draw"
+                    placeholder="Enter Women qualifying singles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.women_draw_qs = undefined">Clear</button>
+                      <u-button
+                        @click="state.women_draw_qs = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.women_draw_qs_link"
-                    placeholder="Enter Women Qualifying Singles draw link"
+                    placeholder="Enter Women qualifying singles draw link"
                   />
                   <u-select
                     id="women_draw_qd"
                     v-model="state.women_draw_qd"
-                    placeholder="Enter Women Qualifying Doubles draw"
+                    placeholder="Enter Women qualifying doubles draw"
                     :items="drawOptions"
                   >
                     <template #content-bottom>
-                      <button @click="state.women_draw_qd = undefined">Clear</button>
+                      <u-button
+                        @click="state.women_draw_qd = undefined"
+                        size="sm"
+                        label="Clear"
+                      />
                     </template>
                   </u-select>
                   <u-textarea
                     v-model="state.women_draw_qd_link"
-                    placeholder="Enter Women Qualifying Doubles draw link"
+                    placeholder="Enter Women qualifying doubles draw link"
                   />
                 </div>
               </div>
@@ -1051,11 +1029,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         form="event-form"
         type="submit"
         label="Save"
+        icon="lucide:square-check-big"
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
+        icon="lucide:circle-x"
       />
     </template>
   </u-modal>

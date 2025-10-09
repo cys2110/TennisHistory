@@ -19,7 +19,7 @@ const state = reactive<Partial<Schema>>({
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   try {
-    await $fetch("/api/tournaments/updte", {
+    await $fetch("/api/tournaments/update", {
       query: event.data
     })
     toast.add({
@@ -48,8 +48,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     <u-button
       :label="tournament.name ?? tournament.id.toString()"
       :id="`tournament-${tournament.id}`"
-      variant="link"
-      color="neutral"
+      block
     />
 
     <template #body>
@@ -60,24 +59,30 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         @submit="onSubmit"
       >
         <div class="grid grid-cols-2 gap-2">
-          <u-form-field
-            name="name"
-            label="Name"
-          >
-            <u-input
-              v-model="state.name"
-              class="w-full"
-            />
-          </u-form-field>
-          <u-form-field
-            name="tours"
-            label="Tours"
-          >
-            <u-input-tags
-              v-model="state.tours"
-              class="w-full"
-            />
-          </u-form-field>
+          <div class="col-span-2">
+            <u-form-field
+              name="name"
+              label="Name"
+            >
+              <u-input
+                v-model="state.name"
+                class="w-full"
+              />
+            </u-form-field>
+          </div>
+          <div class="col-span-2">
+            <u-form-field
+              name="tours"
+              label="Tours"
+            >
+              <u-input-tags
+                v-model="state.tours"
+                class="w-full"
+                placeholder="Enter tours"
+                add-on-tab
+              />
+            </u-form-field>
+          </div>
           <u-form-field
             name="established"
             label="Established"
@@ -121,11 +126,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         form="tournament-form"
         type="submit"
         label="Save"
+        icon="lucide:square-check-big"
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
+        icon="lucide:circle-x"
       />
     </template>
   </u-modal>

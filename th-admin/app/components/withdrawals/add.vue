@@ -60,10 +60,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     @submit="onSubmit"
   >
     <div class="grid grid-cols-10 border-t border-muted pt-1.5 gap-2">
-      <u-form-field
-        name="id"
-        label="Player"
-      >
+      <u-form-field label="Player">
         <u-select-menu
           v-model="state.id"
           v-model:search-term="searchTerm"
@@ -72,58 +69,48 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           label-key="label"
           placeholder="Select player"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
 
-      <u-form-field
-        name="type"
-        label="Type"
-      >
+      <u-form-field label="Type">
         <u-select
           v-model="state.type"
           :items="['Singles', 'Doubles']"
           placeholder="Select type"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
-      <u-form-field
-        name="draw"
-        label="Draw"
-      >
+      <u-form-field label="Draw">
         <u-select
           v-model="state.draw"
           :items="['Main', 'Qualifying']"
           placeholder="Select draw"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
 
-      <u-form-field
-        name="reason"
-        label="Reason"
-      >
+      <u-form-field label="Reason">
         <u-input
           v-model="state.reason"
-          placeholder="Reason"
+          placeholder="Enter reason"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
 
-      <u-form-field
-        name="team_reason"
-        label="Team Reason"
-      >
+      <u-form-field label="Team Reason">
         <u-input
           v-model="state.team_reason"
-          placeholder="Team Reason"
+          placeholder="Enter team reason"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
 
-      <u-form-field
-        name="team_mate"
-        label="Team Mate"
-      >
+      <u-form-field label="Team Mate">
         <u-select-menu
           v-model="state.team_mate"
           v-model:search-term="teamMateSearch"
@@ -132,42 +119,37 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           label-key="label"
           placeholder="Select team mate"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
 
-      <u-form-field
-        name="seed"
-        label="Seed"
-      >
+      <u-form-field label="Seed">
         <u-input-number
           v-model="state.seed"
-          placeholder="Seed"
+          placeholder="Enter seed"
           orientation="vertical"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
 
-      <u-form-field
-        name="status"
-        label="Status"
-      >
+      <u-form-field label="Status">
         <u-select
           v-model="state.status"
           :items="['AL', 'WC', 'Q', 'SE', 'PR', 'LL']"
           placeholder="Select status"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
 
-      <u-form-field
-        name="rank"
-        label="Rank"
-      >
+      <u-form-field label="Rank">
         <u-input-number
           v-model="state.rank"
-          placeholder="Rank"
+          placeholder="Enter rank"
           orientation="vertical"
           class="w-full"
+          size="sm"
         />
       </u-form-field>
 
@@ -177,6 +159,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           label="Save"
           size="sm"
           block
+          icon="lucide:square-check-big"
         />
       </div>
     </div>

@@ -40,7 +40,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-4 border-t border-muted pt-1.5 gap-2">
+    <div class="grid grid-cols-4 border-t border-indigo-800 pt-2 gap-2">
       <u-form-field label="ID">
         <u-input
           v-model="state.id"
@@ -69,6 +69,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           label="Save"
           size="sm"
           block
+          icon="lucide:square-check-big"
         />
       </div>
     </div>

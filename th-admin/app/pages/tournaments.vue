@@ -41,23 +41,27 @@ const toc = computed(() => [
       </template>
 
       <template #body>
-        <div v-if="['idle', 'loading'].includes(status)">Loading...</div>
-
-        <div v-else-if="status === 'error'">
-          Error loading tournaments.
-          <u-button
-            @click="() => reloadNuxtApp()"
-            label="Refresh"
-            icon="lucide:refresh-ccw"
-          />
-        </div>
-
         <u-page-list class="*:my-1">
           <tournaments-edit
+            v-if="tournaments.length"
             v-for="tournament in tournaments"
             :key="tournament.id"
             :tournament
           />
+
+          <div v-else-if="status === 'pending'">Loading...</div>
+
+          <div
+            v-else
+            class="flex flex-col items-center gap-1"
+          >
+            No tournaments found.
+            <u-button
+              @click="() => reloadNuxtApp()"
+              label="Refresh"
+              icon="lucide:refresh-ccw"
+            />
+          </div>
         </u-page-list>
       </template>
     </u-dashboard-panel>

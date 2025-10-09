@@ -78,32 +78,23 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         />
       </div>
 
-      <u-form-field
-        name="reason"
-        label="Reason"
-      >
+      <u-form-field label="Reason">
         <u-input
           v-model="state.reason"
-          placeholder="Reason"
+          placeholder="Enter reason"
           class="w-full"
         />
       </u-form-field>
 
-      <u-form-field
-        name="team_reason"
-        label="Team Reason"
-      >
+      <u-form-field label="Team Reason">
         <u-input
           v-model="state.team_reason"
-          placeholder="Team Reason"
+          placeholder="Enter team Reason"
           class="w-full"
         />
       </u-form-field>
 
-      <u-form-field
-        name="team_mate"
-        label="Team Mate"
-      >
+      <u-form-field label="Team Mate">
         <u-select-menu
           v-model="state.team_mate"
           v-model:search-term="searchTerm"
@@ -115,12 +106,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         />
       </u-form-field>
 
-      <div class="flex items-center justify-center">
+      <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
           size="sm"
           block
+          icon="lucide:square-check-big"
         />
       </div>
     </div>

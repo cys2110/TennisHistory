@@ -36,13 +36,22 @@ const updateTiebreaks = async () => {
       <template #header>
         <u-dashboard-navbar :title="`Matches - ${id}`">
           <template #right>
-            <u-button
-              @click="updateTiebreaks"
-              label="Update tiebreaks"
-              size="sm"
-            />
+            <u-dropdown-menu :items="routes">
+              <u-button
+                icon="lucide:layers-3"
+                size="sm"
+              />
+            </u-dropdown-menu>
           </template>
         </u-dashboard-navbar>
+        <u-dashboard-toolbar>
+          <u-button
+            @click="updateTiebreaks"
+            label="Update tiebreaks"
+            size="sm"
+            block
+          />
+        </u-dashboard-toolbar>
       </template>
 
       <template #body>
@@ -62,6 +71,7 @@ const updateTiebreaks = async () => {
             <u-button
               label="Refresh"
               @click="() => reloadNuxtApp()"
+              icon="lucide:refresh-ccw"
             />
           </div>
         </u-page-list>

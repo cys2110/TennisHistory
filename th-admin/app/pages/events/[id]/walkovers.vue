@@ -21,13 +21,23 @@ function handleAddWalkover() {
   <div class="w-full">
     <u-dashboard-panel>
       <template #header>
-        <u-dashboard-navbar :title="`Walkovers - ${id}`" />
+        <u-dashboard-navbar :title="`Walkovers - ${id}`">
+          <template #right>
+            <u-dropdown-menu :items="routes">
+              <u-button
+                icon="lucide:layers-3"
+                size="sm"
+              />
+            </u-dropdown-menu>
+          </template>
+        </u-dashboard-navbar>
         <u-dashboard-toolbar>
           <u-button
             label="Add Walkover"
             @click="handleAddWalkover"
-            class="w-full"
+            block
             size="sm"
+            icon="lucide:square-plus"
           />
         </u-dashboard-toolbar>
       </template>
@@ -48,11 +58,15 @@ function handleAddWalkover() {
           type="Walkover"
         />
         <div v-else-if="status === 'pending'">Loading...</div>
-        <div class="flex flex-col gap-2">
+        <div
+          v-else
+          class="flex flex-col gap-2 items-center"
+        >
           <div>No entries found.</div>
           <u-button
             label="Refresh"
             @click="() => reloadNuxtApp()"
+            icon="lucide:refresh-ccw"
           />
         </div>
       </template>

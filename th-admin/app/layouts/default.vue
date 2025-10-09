@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui"
 
-const id = ref<string>("")
+const id = ref<string>("Enter ID")
 
 const items: NavigationMenuItem[][] = [
   [
@@ -23,11 +23,11 @@ const groups = computed(() => [
     items: [
       {
         label: "Edit Event",
-        to: { name: "event", params: { id: get(id) } }
+        to: { name: "event", params: { id: id.value } }
       },
       {
         label: "Edit Player",
-        to: { name: "player", param: { id: get(id) } }
+        to: { name: "player", params: { id: id.value } }
       }
     ]
   }

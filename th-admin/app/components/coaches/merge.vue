@@ -29,12 +29,9 @@ const handleMerge = async (id1: number, id2: number) => {
 <template>
   <div>
     <div class="font-semibold">Coaches</div>
-    <div v-if="['pending', 'idle'].includes(status)">Loading...</div>
-    <u-page-list
-      v-else-if="data.length"
-      class="*:m-2"
-    >
+    <u-page-list class="*:m-2">
       <div
+        v-if="data.length"
         v-for="(result, index) in data"
         :key="`coach-${index}`"
         class="grid grid-cols-4 w-2xl"
@@ -49,13 +46,20 @@ const handleMerge = async (id1: number, id2: number) => {
           />
         </div>
       </div>
+
+      <div v-else-if="status === 'pending'">Loading...</div>
+
+      <div
+        v-else
+        class="flex flex-col gap-1 items-center"
+      >
+        <div>No coaches to merge</div>
+        <u-button
+          label="Refresh"
+          @click="refresh()"
+          icon="lucide:refresh-ccw"
+        />
+      </div>
     </u-page-list>
-    <div v-else>
-      <div>No coaches to merge</div>
-      <u-button
-        label="Refresh"
-        @click="refresh()"
-      />
-    </div>
   </div>
 </template>

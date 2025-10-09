@@ -10,6 +10,7 @@ useHead({ title: "Merge Nodes - TH Admin" })
           <template #right>
             <u-button
               label="Refresh"
+              icon="lucide:refresh-ccw"
               @click="reloadNuxtApp()"
             />
           </template>

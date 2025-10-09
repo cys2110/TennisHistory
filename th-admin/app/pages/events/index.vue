@@ -2,7 +2,15 @@
 useHead({ title: "Events - TH Admin" })
 const year = ref(new Date().getFullYear())
 
-const { data: events, status } = await useFetch<{ name: string; id: number }[]>("/api/events/get-events", { query: { year }, default: () => [] })
+const {
+  data: events,
+  status,
+  refresh
+} = await useFetch<{ name: string; id: number }[]>("/api/events/get-events", { query: { year }, default: () => [] })
+
+watch(year, () => {
+  refresh()
+})
 
 const toc = computed(() => [
   {
@@ -49,30 +57,31 @@ const toc = computed(() => [
       </template>
 
       <template #body>
-        <div v-if="['idle', 'loading'].includes(status)">Loading...</div>
-
-        <div v-else-if="status === 'error'">
-          Error loading events.
-          <u-button
-            @click="() => reloadNuxtApp()"
-            label="Refresh"
-            icon="lucide:refresh-ccw"
-          />
-        </div>
-
-        <u-page-list
-          v-else
-          class="*:my-2"
-        >
+        <u-page-list class="*:my-2">
           <u-link
+            v-if="events.length"
             v-for="event in events"
             :key="event.id"
             :to="{ name: 'event', params: { id: event.id } }"
             :id="`event-${event.id}`"
-            class="text-sm"
+            class="text-sm hover-link"
           >
             {{ event.name ?? event.id }}
           </u-link>
+
+          <div v-else-if="status === 'pending'">Loading...</div>
+
+          <div
+            v-else
+            class="flex flex-col gap-1 items-center"
+          >
+            Error loading events.
+            <u-button
+              @click="() => reloadNuxtApp()"
+              label="Refresh"
+              icon="lucide:refresh-ccw"
+            />
+          </div>
         </u-page-list>
       </template>
     </u-dashboard-panel>

@@ -97,7 +97,7 @@ const handleCopy = async () => {
         </template>
         <u-link
           v-if="!entry.first_name"
-          :to="{ name: 'edit-player', query: { id: entry.id } }"
+          :to="{ name: 'player', params: { id: entry.id } }"
         >
           {{ entry.fid }}
         </u-link>
@@ -199,6 +199,7 @@ const handleCopy = async () => {
           label="Save"
           size="sm"
           block
+          icon="lucide:square-check-big"
         />
       </div>
     </div>

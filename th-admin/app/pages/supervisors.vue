@@ -41,24 +41,28 @@ const toc = computed(() => [
       </template>
 
       <template #body>
-        <div v-if="['idle', 'loading'].includes(status)">Loading...</div>
-
-        <div v-else-if="status === 'error'">
-          Error loading supervisors.
-          <u-button
-            @click="() => reloadNuxtApp()"
-            label="Refresh"
-            icon="lucide:refresh-ccw"
-          />
-        </div>
-
         <u-page-list class="*:my-2">
           <edit-person
+            v-if="supervisors.length"
             v-for="supervisor in supervisors"
             :key="supervisor.id"
             :person="supervisor"
             type="Supervisor"
           />
+
+          <div v-else-if="status === 'pending'">Loading...</div>
+
+          <div
+            v-else
+            class="flex flex-col gap-1 items-center"
+          >
+            No supervisors found.
+            <u-button
+              @click="() => reloadNuxtApp()"
+              label="Refresh"
+              icon="lucide:refresh-ccw"
+            />
+          </div>
         </u-page-list>
       </template>
     </u-dashboard-panel>

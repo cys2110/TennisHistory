@@ -77,36 +77,30 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         />
       </div>
 
-      <u-form-field
-        name="seed"
-        label="Seed"
-      >
+      <u-form-field label="Seed">
         <u-input-number
           v-model="state.seed"
           orientation="vertical"
           class="w-full"
+          placeholder="Enter seed"
         />
       </u-form-field>
 
-      <u-form-field
-        name="q_seed"
-        label="Qualifying Seed"
-      >
+      <u-form-field label="Qualifying Seed">
         <u-input-number
           v-model="state.q_seed"
           orientation="vertical"
           class="w-full"
+          placeholder="Enter qualifying seed"
         />
       </u-form-field>
 
-      <u-form-field
-        name="rank"
-        label="Rank"
-      >
+      <u-form-field label="Rank">
         <u-input-number
           v-model="state.rank"
           orientation="vertical"
           class="w-full"
+          placeholder="Enter rank"
         />
       </u-form-field>
 
@@ -116,6 +110,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           label="Save"
           size="sm"
           block
+          icon="lucide:square-check-big"
         />
       </div>
     </div>

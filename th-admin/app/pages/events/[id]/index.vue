@@ -11,20 +11,7 @@ const {
 } = useRoute("event")
 const toast = useToast()
 
-const routes = [
-  { label: "Rounds", to: { name: "rounds" } },
-  { label: "Withdrawals", to: { name: "withdrawals" } },
-  { label: "Seeds", to: { name: "seeds" } },
-  { label: "LDA", to: { name: "lda" } },
-  { label: "Retirements", to: { name: "retirements" } },
-  { label: "Walkovers", to: { name: "walkovers" } },
-  { label: "Defaults", to: { name: "defaults" } },
-  { label: "Entries", to: { name: "entries" } },
-  { label: "Matches", to: { name: "matches" } },
-  { label: "Draws", to: { name: "draws" } }
-]
-
-const { data: event, status } = await useFetch<any>("/api/get-event", {
+const { data: event, status } = await useFetch<any>("/api/events/get-event", {
   query: { id }
 })
 const {
@@ -32,7 +19,7 @@ const {
   status: supervisorStatus,
   execute: executeSupervisors,
   refresh: refreshSupervisors
-} = await useFetch("/api/get-supervisors", {
+} = await useFetch("/api/supervisors/get", {
   default: () => [],
   immediate: false
 })
@@ -41,7 +28,7 @@ const {
   status: venueStatus,
   execute: executeVenues,
   refresh: refreshVenues
-} = await useFetch<{ country: { code: string; name: string }; id: string; label: string }[]>("/api/get-venues", {
+} = await useFetch<{ country: { code: string; name: string }; id: string; label: string }[]>("/api/venues/get", {
   default: () => [],
   immediate: false
 })
@@ -126,7 +113,7 @@ const state = reactive<Partial<Schema>>({
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   try {
-    await $fetch("/api/update-event", {
+    await $fetch("/api/events/update", {
       query: event.data
     })
     toast.add({
@@ -151,20 +138,18 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       <template #header>
         <u-dashboard-navbar :title="`Edit Event - ${id}`">
           <template #right>
-            <scraping-draw />
-            <scraping-results />
-            <scraping-stats />
+            <u-dropdown-menu :items="routes">
+              <u-button
+                icon="lucide:layers-3"
+                size="sm"
+              />
+            </u-dropdown-menu>
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar>
-          <u-field-group>
-            <u-button
-              v-for="route in routes"
-              :key="route.label"
-              :label="route.label"
-              :to="route.to"
-            />
-          </u-field-group>
+          <scraping-draw />
+          <scraping-results />
+          <scraping-stats />
         </u-dashboard-toolbar>
       </template>
 
@@ -180,12 +165,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             label="Save"
             block
             class="mb-3"
+            size="sm"
+            icon="lucide:square-check-big"
           />
-          <div class="grid grid-cols-3 gap-5">
-            <u-form-field
-              name="id"
-              label="ID"
-            >
+          <div class="grid grid-cols-3 gap-5 items-center">
+            <u-form-field label="ID">
               <u-input
                 type="number"
                 v-model="state.id"
@@ -201,10 +185,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               />
             </u-form-field>
 
-            <u-form-field
-              name="tours"
-              label="Tours"
-            >
+            <u-form-field label="Tours">
               <u-input-tags
                 v-model="state.tours"
                 class="w-full"
@@ -212,10 +193,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             </u-form-field>
 
             <div class="col-span-3">
-              <u-form-field
-                label="Sponsor Names"
-                name="sponsor_names"
-              >
+              <u-form-field label="Sponsor Names">
                 <div class="grid grid-cols-3 gap-2 *:flex *:flex-col *:gap-1">
                   <div>
                     <label for="sponsor_name">
@@ -263,10 +241,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             </div>
 
             <div class="col-span-3">
-              <u-form-field
-                label="Categories"
-                name="categories"
-              >
+              <u-form-field label="Categories">
                 <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
                   <div>
                     <label for="category">
@@ -339,10 +314,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             </div>
 
             <div class="col-span-3">
-              <u-form-field
-                label="Dates"
-                name="dates"
-              >
+              <u-form-field label="Dates">
                 <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
                   <div>
                     <label for="start_date">
@@ -439,10 +411,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               </u-form-field>
             </div>
 
-            <u-form-field
-              name="surface"
-              label="Surface"
-            >
+            <u-form-field label="Surface">
               <u-select
                 v-model="state.surface"
                 :items="surfaces"
@@ -451,10 +420,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               />
             </u-form-field>
 
-            <u-form-field
-              name="venues"
-              label="Venues"
-            >
+            <u-form-field label="Venues">
               <div>{{ state.venues?.join(", ") }}</div>
               <u-select-menu
                 v-model="state.venues"
@@ -481,10 +447,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               </u-select-menu>
             </u-form-field>
 
-            <u-form-field
-              name="supervisors"
-              label="Supervisors"
-            >
+            <u-form-field label="Supervisors">
               <div>{{ state.supervisors?.join(", ") }}</div>
               <u-select-menu
                 v-model="state.supervisors"
@@ -510,10 +473,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             </u-form-field>
 
             <div class="col-span-3">
-              <u-form-field
-                name="money"
-                label="Money"
-              >
+              <u-form-field label="Money">
                 <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
                   <div>
                     <label for="currency">
@@ -526,7 +486,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                         placeholder="e.g. $"
                       >
                         <template #content-bottom>
-                          <button @click="state.currency = undefined">Clear</button>
+                          <u-button
+                            @click="state.currency = undefined"
+                            size="sm"
+                            label="Clear"
+                          />
                         </template>
                       </u-select>
                       <u-input-number
@@ -565,7 +529,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                         placeholder="e.g. $"
                       >
                         <template #content-bottom>
-                          <button @click="state.atp_currency = undefined">Clear</button>
+                          <u-button
+                            @click="state.atp_currency = undefined"
+                            size="sm"
+                            label="Clear"
+                          />
                         </template>
                       </u-select>
                       <u-input-number
@@ -604,7 +572,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                         placeholder="e.g. $"
                       >
                         <template #content-bottom>
-                          <button @click="state.wta_currency = undefined">Clear</button>
+                          <u-button
+                            @click="state.wta_currency = undefined"
+                            size="sm"
+                            label="Clear"
+                          />
                         </template>
                       </u-select>
                       <u-input-number
@@ -643,7 +615,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                         placeholder="e.g. $"
                       >
                         <template #content-bottom>
-                          <button @click="state.men_currency = undefined">Clear</button>
+                          <u-button
+                            @click="state.men_currency = undefined"
+                            size="sm"
+                            label="Clear"
+                          />
                         </template>
                       </u-select>
                       <u-input-number
@@ -673,7 +649,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                         placeholder="e.g. $"
                       >
                         <template #content-bottom>
-                          <button @click="state.women_currency = undefined">Clear</button>
+                          <u-button
+                            @click="state.women_currency = undefined"
+                            size="sm"
+                            label="Clear"
+                          />
                         </template>
                       </u-select>
                       <u-input-number
@@ -693,10 +673,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             </div>
 
             <div class="col-span-3">
-              <u-form-field
-                label="Links"
-                name="links"
-              >
+              <u-form-field label="Links">
                 <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
                   <div>
                     <label for="wiki_link">
@@ -769,10 +746,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             </div>
 
             <div class="col-span-3">
-              <u-form-field
-                label="Draws"
-                name="draws"
-              >
+              <u-form-field label="Draws">
                 <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
                   <div>
                     <label for="draw_link">
@@ -785,7 +759,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.draw_type = undefined">Clear</button>
+                        <u-button
+                          @click="state.draw_type = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -808,7 +786,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.atp_draw_s = undefined">Clear</button>
+                        <u-button
+                          @click="state.atp_draw_s = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -822,7 +804,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.atp_draw_d = undefined">Clear</button>
+                        <u-button
+                          @click="state.atp_draw_d = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -836,7 +822,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.atp_draw_qs = undefined">Clear</button>
+                        <u-button
+                          @click="state.atp_draw_qs = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -850,7 +840,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.atp_draw_qd = undefined">Clear</button>
+                        <u-button
+                          @click="state.atp_draw_qd = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -873,7 +867,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.wta_draw_s = undefined">Clear</button>
+                        <u-button
+                          @click="state.wta_draw_s = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -887,7 +885,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.wta_draw_d = undefined">Clear</button>
+                        <u-button
+                          @click="state.wta_draw_d = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -901,7 +903,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.wta_draw_qs = undefined">Clear</button>
+                        <u-button
+                          @click="state.wta_draw_qs = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -915,7 +921,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.wta_draw_qd = undefined">Clear</button>
+                        <u-button
+                          @click="state.wta_draw_qd = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -938,7 +948,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.men_draw_s = undefined">Clear</button>
+                        <u-button
+                          @click="state.men_draw_s = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -952,7 +966,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.men_draw_d = undefined">Clear</button>
+                        <u-button
+                          @click="state.men_draw_d = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -966,7 +984,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.men_draw_qs = undefined">Clear</button>
+                        <u-button
+                          @click="state.men_draw_qs = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -980,7 +1002,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.men_draw_qd = undefined">Clear</button>
+                        <u-button
+                          @click="state.men_draw_qd = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea
@@ -1003,7 +1029,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       :items="drawOptions"
                     >
                       <template #content-bottom>
-                        <button @click="state.women_draw_s = undefined">Clear</button>
+                        <u-button
+                          @click="state.women_draw_s = undefined"
+                          size="sm"
+                          label="Clear"
+                        />
                       </template>
                     </u-select>
                     <u-textarea

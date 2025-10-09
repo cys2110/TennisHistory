@@ -21,13 +21,23 @@ function handleAddWithdrawal() {
   <div class="w-full">
     <u-dashboard-panel>
       <template #header>
-        <u-dashboard-navbar :title="`Withdrawals - ${id}`" />
+        <u-dashboard-navbar :title="`Withdrawals - ${id}`">
+          <template #right>
+            <u-dropdown-menu :items="routes">
+              <u-button
+                icon="lucide:layers-3"
+                size="sm"
+              />
+            </u-dropdown-menu>
+          </template>
+        </u-dashboard-navbar>
         <u-dashboard-toolbar>
           <u-button
             label="Add Withdrawal"
             @click="handleAddWithdrawal"
-            class="w-full"
+            block
             size="sm"
+            icon="lucide:square-plus"
           />
         </u-dashboard-toolbar>
       </template>
@@ -46,11 +56,15 @@ function handleAddWithdrawal() {
           :entry
         />
         <div v-else-if="status === 'pending'">Loading...</div>
-        <div class="flex flex-col gap-2">
+        <div
+          v-else
+          class="flex flex-col gap-1 items-center"
+        >
           <div>No entries found.</div>
           <u-button
             label="Refresh"
             @click="() => reloadNuxtApp()"
+            icon="lucide:refresh-ccw"
           />
         </div>
       </template>

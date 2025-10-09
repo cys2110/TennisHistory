@@ -11,6 +11,10 @@ const {
   default: () => []
 })
 
+watch(selectedLetter, () => {
+  refresh()
+})
+
 const toc = computed(() => [
   {
     id: "players",
@@ -93,15 +97,18 @@ const toc = computed(() => [
             :key="player.id"
             :to="{ name: 'player', params: { id: player.id } }"
             :id="player.id"
-            class="text-sm"
+            class="text-sm hover-link"
           >
             {{ player.first_name ? `${player.first_name} ${player.last_name}` : player.id }}
           </u-link>
         </u-page-list>
 
-        <div v-else-if="['idle', 'pending'].includes(status)">Loading...</div>
+        <div v-else-if="status === 'pending'">Loading...</div>
 
-        <div v-else>
+        <div
+          v-else
+          class="flex flex-col gap-1 items-center"
+        >
           Error loading players.
           <u-button
             @click="() => refresh()"

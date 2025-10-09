@@ -11,6 +11,10 @@ const {
   default: () => []
 })
 
+watch(selectedLetter, () => {
+  refresh()
+})
+
 const toc = computed(() => [
   {
     id: "coaches",
@@ -84,28 +88,29 @@ const toc = computed(() => [
       </template>
 
       <template #body>
-        <div v-if="['idle', 'pending'].includes(status)">Loading...</div>
-
-        <u-page-list
-          v-else-if="coaches.length"
-          class="*:my-2"
-        >
+        <u-page-list class="*:my-1">
           <edit-person
+            v-if="coaches.length"
             v-for="coach in coaches"
             :key="coach.id"
             :person="coach"
             type="Coach"
           />
-        </u-page-list>
 
-        <div v-else>
-          Error loading coaches.
-          <u-button
-            @click="() => refresh()"
-            label="Refresh"
-            icon="lucide:refresh-ccw"
-          />
-        </div>
+          <div v-else-if="status === 'pending'">Loading...</div>
+
+          <div
+            v-else
+            class="flex flex-col gap-1 items-center"
+          >
+            No coaches found.
+            <u-button
+              @click="() => refresh()"
+              label="Refresh"
+              icon="lucide:refresh-ccw"
+            />
+          </div>
+        </u-page-list>
       </template>
     </u-dashboard-panel>
   </div>

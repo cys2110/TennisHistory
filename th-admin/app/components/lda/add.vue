@@ -2,11 +2,13 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
-const { query } = useRoute()
+const {
+  params: { id }
+} = useRoute("lda")
 const toast = useToast()
 
-const { data: entries, status } = await useFetch("/api/get-entries", {
-  query: { id: query.id },
+const { data: entries, status } = await useFetch<any>("/api/entries/get", {
+  query: { id },
   default: () => []
 })
 
@@ -17,7 +19,7 @@ const state = reactive<Partial<Schema>>({
   draw: "",
   type: "",
   rank: undefined,
-  eid: query.id as string
+  eid: id as string
 })
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
@@ -48,14 +50,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     @submit="onSubmit"
   >
     <div class="grid grid-cols-5 border-t border-muted pt-1.5 gap-2">
-      <u-form-field
-        name="id"
-        label="Player"
-      >
+      <u-form-field label="Player">
         <u-select-menu
           v-model="state.id"
           :loading="['pending', 'idle'].includes(status)"
-          :items="entries.map(e => ({ ...e, label: e.first_name ? `${e.last_name}, ${e.first_name} - ${e.type}` : `${e.id} - ${e.type}` }))"
+          :items="entries.map((e: any) => ({ ...e, label: e.first_name ? `${e.first_name} ${e.last_name} - ${e.type}` : `${e.id} - ${e.type}` }))"
           value-key="fid"
           label-key="label"
           placeholder="Select player"
@@ -63,10 +62,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         />
       </u-form-field>
 
-      <u-form-field
-        name="type"
-        label="Type"
-      >
+      <u-form-field label="Type">
         <u-select
           v-model="state.type"
           :items="['Singles', 'Doubles']"
@@ -74,10 +70,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           class="w-full"
         />
       </u-form-field>
-      <u-form-field
-        name="type"
-        label="Draw"
-      >
+      <u-form-field label="Draw">
         <u-select
           v-model="state.draw"
           :items="['Main', 'Qualifying']"
@@ -85,23 +78,21 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           class="w-full"
         />
       </u-form-field>
-      <u-form-field
-        name="rank"
-        label="Rank"
-      >
+      <u-form-field label="Rank">
         <u-input-number
           v-model="state.rank"
           orientation="vertical"
-          placeholder="Rank"
+          placeholder="Enter rank"
           class="w-full"
         />
       </u-form-field>
-      <div class="flex items-end">
+      <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
           size="sm"
           block
+          icon="lucide:square-check-big"
         />
       </div>
     </div>

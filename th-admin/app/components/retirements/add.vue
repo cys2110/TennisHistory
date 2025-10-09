@@ -51,14 +51,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     @submit="onSubmit"
   >
     <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-2">
-      <u-form-field
-        name="id"
-        label="Player"
-      >
+      <u-form-field label="Player">
         <u-select-menu
           v-model="state.id"
           :loading="['pending', 'idle'].includes(status)"
-          :items="entries.map(e => ({ ...e, label: e.first_name ? `${e.last_name}, ${e.first_name} - ${e.type}` : `${e.id} - ${e.type}` }))"
+          :items="entries.map(e => ({ ...e, label: e.first_name ? `${e.first_name} ${e.last_name} - ${e.type}` : `${e.id} - ${e.type}` }))"
           value-key="fid"
           label-key="label"
           placeholder="Select player"
@@ -66,10 +63,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         />
       </u-form-field>
 
-      <u-form-field
-        name="type"
-        label="Type"
-      >
+      <u-form-field label="Type">
         <u-select
           v-model="state.type"
           :items="['Singles', 'Doubles']"
@@ -77,10 +71,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           class="w-full"
         />
       </u-form-field>
-      <u-form-field
-        name="draw"
-        label="Draw"
-      >
+      <u-form-field label="Draw">
         <u-select
           v-model="state.draw"
           :items="['Main', 'Qualifying']"
@@ -89,33 +80,28 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         />
       </u-form-field>
 
-      <u-form-field
-        name="reason"
-        label="Reason"
-      >
+      <u-form-field label="Reason">
         <u-input
           v-model="state.reason"
-          placeholder="Reason"
+          placeholder="Enter reason"
           class="w-full"
         />
       </u-form-field>
 
-      <u-form-field
-        name="team_reason"
-        label="Team Reason"
-      >
+      <u-form-field label="Team Reason">
         <u-input
           v-model="state.team_reason"
-          placeholder="Team Reason"
+          placeholder="Enter team reason"
           class="w-full"
         />
       </u-form-field>
-      <div class="flex items-end">
+      <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
           size="sm"
           block
+          icon="lucide:square-check-big"
         />
       </div>
     </div>

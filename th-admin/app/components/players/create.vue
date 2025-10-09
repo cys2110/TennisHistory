@@ -61,7 +61,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         :state
         @submit="onSubmit"
       >
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-2 gap-5">
           <u-form-field
             name="id"
             label="ID"
@@ -77,11 +77,10 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             name="tour"
             label="Tour"
           >
-            <u-select-menu
+            <u-radio-group
               v-model="state.tour"
               :items="['ATP', 'WTA']"
-              placeholder="Select tour"
-              class="w-full"
+              orientation="horizontal"
             />
           </u-form-field>
         </div>
@@ -93,11 +92,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         form="player-form"
         type="submit"
         label="Save"
+        icon="lucide:square-check-big"
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
+        icon="lucide:circle-x"
       />
     </template>
   </u-modal>

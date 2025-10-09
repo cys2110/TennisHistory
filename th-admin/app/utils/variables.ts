@@ -31,3 +31,16 @@ export const rounds = [
   "Qualifying round 2",
   "Qualifying round 1"
 ]
+
+export const routes = [
+  { label: "Rounds", to: { name: "rounds" } },
+  { label: "Withdrawals", to: { name: "withdrawals" } },
+  { label: "Seeds", to: { name: "seeds" } },
+  { label: "LDA", to: { name: "lda" } },
+  { label: "Retirements", to: { name: "retirements" } },
+  { label: "Walkovers", to: { name: "walkovers" } },
+  { label: "Defaults", to: { name: "defaults" } },
+  { label: "Entries", to: { name: "entries" } },
+  { label: "Matches", to: { name: "matches" } },
+  { label: "Draws", to: { name: "draws" } }
+]

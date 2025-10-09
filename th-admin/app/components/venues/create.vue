@@ -67,20 +67,14 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             />
           </u-form-field>
 
-          <u-form-field
-            name="city"
-            label="City"
-          >
+          <u-form-field label="City">
             <u-input
               v-model="state.city"
               placeholder="City"
             />
           </u-form-field>
 
-          <u-form-field
-            name="country"
-            label="Country"
-          >
+          <u-form-field label="Country">
             <u-input
               v-model="state.country"
               placeholder="Country"
@@ -95,11 +89,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         form="venue-form"
         type="submit"
         label="Save"
+        icon="lucide:square-check-big"
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
+        icon="lucide:circle-x"
       />
     </template>
   </u-modal>

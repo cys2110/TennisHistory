@@ -41,24 +41,28 @@ const toc = computed(() => [
       </template>
 
       <template #body>
-        <div v-if="['idle', 'loading'].includes(status)">Loading...</div>
-
-        <div v-else-if="status === 'error'">
-          Error loading umpires.
-          <u-button
-            @click="() => reloadNuxtApp()"
-            label="Refresh"
-            icon="lucide:refresh-ccw"
-          />
-        </div>
-
         <u-page-list class="*:my-2">
           <edit-person
+            v-if="umpires.length"
             v-for="umpire in umpires"
             :key="umpire.id"
             :person="umpire"
             type="Umpire"
           />
+
+          <div v-else-if="status === 'pending'">Loading...</div>
+
+          <div
+            v-else
+            class="flex flex-col gap-1 items-center"
+          >
+            No umpires found.
+            <u-button
+              @click="() => reloadNuxtApp()"
+              label="Refresh"
+              icon="lucide:refresh-ccw"
+            />
+          </div>
         </u-page-list>
       </template>
     </u-dashboard-panel>

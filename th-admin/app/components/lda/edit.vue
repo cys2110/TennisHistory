@@ -45,7 +45,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       <u-form-field label="Player">
         <u-link
           v-if="!entry.first_name"
-          :to="{ name: 'edit-player', query: { id: entry.id } }"
+          :to="{ name: 'player', params: { id: entry.id } }"
         >
           {{ entry.id }}
         </u-link>
@@ -67,10 +67,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         />
       </div>
 
-      <u-form-field
-        name="rank"
-        label="Rank"
-      >
+      <u-form-field label="Rank">
         <u-input-number
           v-model="state.rank"
           orientation="vertical"
@@ -84,6 +81,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           label="Save"
           size="sm"
           block
+          icon="lucide:square-check-big"
         />
       </div>
     </div>

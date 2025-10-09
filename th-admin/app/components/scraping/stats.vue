@@ -63,6 +63,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     <u-button
       label="Scrape matches"
       size="sm"
+      block
     />
 
     <template #body>

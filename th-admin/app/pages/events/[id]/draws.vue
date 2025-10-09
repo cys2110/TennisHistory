@@ -5,7 +5,6 @@ const {
   params: { id }
 } = useRoute("event")
 useHead({ title: () => `${id} Draws - TH Admin` })
-const toast = useToast()
 
 const selectedTour = ref<string>("ATP")
 const selectedType = ref<string>("Singles")

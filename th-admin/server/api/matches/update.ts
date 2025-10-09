@@ -1,4 +1,4 @@
-import { int, Duration } from "neo4j-driver"
+import { int } from "neo4j-driver"
 
 export default defineEventHandler(async event => {
   const { id, tour, draw, type, match_no, court, date, incomplete, duration, umpire } = getQuery(event)
