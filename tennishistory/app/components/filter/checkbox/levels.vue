@@ -7,8 +7,9 @@ const modelValue = defineModel<LevelType[]>()
   <u-checkbox-group
     legend="Level"
     v-model="modelValue"
-    :items="levels ?? LEVEL_OPTIONS"
+    :items="levels ?? ['Tour', 'Challenger', 'ITF']"
     :ui="{
+      root: 'my-2',
       item: 'ml-3'
     }"
   />

@@ -11,7 +11,7 @@ const environment = defineModel<EnvironmentType[]>("environment")
   <u-checkbox-group
     legend="Environment"
     v-model="environment"
-    :items="environments ?? ENVIRONMENTS"
+    :items="environments ?? ['Indoor', 'Outdoor']"
     orientation="vertical"
     :ui="{ item: 'ml-3' }"
     class="my-2"
@@ -19,7 +19,7 @@ const environment = defineModel<EnvironmentType[]>("environment")
   <u-checkbox-group
     legend="Surfaces"
     v-model="modelValue"
-    :items="surfaces ?? SURFACES"
+    :items="surfaces ?? ['Clay', 'Grass', 'Hard', 'Carpet']"
     orientation="vertical"
     :ui="{ item: 'ml-3', root: 'my-2' }"
     class="my-2"

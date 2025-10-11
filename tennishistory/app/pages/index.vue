@@ -1,23 +1,22 @@
 <script setup lang="ts">
 definePageMeta({ name: "home" })
 useHead({ title: "Home" })
-const { icons } = useAppConfig()
 
 // Features
 const features = [
   {
     title: "Results",
-    icon: icons.event,
+    icon: ICONS.event,
     description: "Explore tournament results starting from the Open Era"
   },
   {
     title: "Head to Head",
-    icon: icons.h2h,
+    icon: ICONS.h2h,
     description: "Examine match ups between players"
   },
   {
     title: "Statistics and Records",
-    icon: icons.stats,
+    icon: ICONS.stats,
     description: "Charge up your tennis trivia with fun facts and figures"
   }
 ]
@@ -27,7 +26,7 @@ const screenshots = ["./pages/archive.png", "./pages/player.png", "./pages/h2h.p
 </script>
 
 <template>
-  <u-container>
+  <u-container class="max-w-(--container-6xl)">
     <u-page>
       <u-page-header
         title="Tennis History in the Open Era"

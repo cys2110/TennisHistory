@@ -1,18 +1,11 @@
 <script setup lang="ts">
 import type { RouteLocationRaw } from "vue-router"
 
-const {
-  tournament,
-  year,
-  id,
-  start_date,
-  size = "xs"
-} = defineProps<{
+const { tournament, year, id, start_date } = defineProps<{
   tournament: TournamentInterface
   year: number
   id: number
   start_date?: DateType
-  size?: "xs" | "sm" | "md" | "lg" | "xl"
 }>()
 
 // Show tooltip/disabled button if event has not started yet
@@ -25,7 +18,7 @@ const isDisabled = computed(() => new Date() < startDate.value)
     :disabled="!isDisabled"
     text="Event has not started yet"
   >
-    <u-field-group :size>
+    <u-field-group size="sm">
       <u-button
         v-for="page in EVENT_PAGES"
         :key="page.name"

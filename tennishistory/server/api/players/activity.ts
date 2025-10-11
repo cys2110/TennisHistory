@@ -202,6 +202,7 @@ export default defineEventHandler(async event => {
           m,
           r,
           w,
+          CASE WHEN s.aces IS NULL THEN false ELSE true END AS stats,
           COLLECT(opponent) AS opponents
 
         WITH
@@ -217,7 +218,8 @@ export default defineEventHandler(async event => {
             ],
             opponents: opponents,
             draw: draw,
-            tour: tour
+            tour: tour,
+            stats: stats
           } AS match
 
         WITH matchKey, apoc.agg.first(match) AS match
@@ -228,7 +230,7 @@ export default defineEventHandler(async event => {
         t,
         surface,
         f,
-        COLLECT(DISTINCT match) AS matches,
+        match,
         venues,
         partner,
         [x IN labels(e) WHERE NOT x IN ['Update', 'Event']] AS tours,
@@ -265,7 +267,7 @@ export default defineEventHandler(async event => {
         venues: venues,
         surface: surface,
         currency: currency,
-        matches: matches,
+        match: match,
         player: properties(f),
         partner: partner
       } AS event
@@ -282,11 +284,15 @@ export default defineEventHandler(async event => {
     for (const key of numberKeys) {
       if (event.player[key]) event.player[key] = event.player[key].toInt()
       if (event.partner?.[key]) event.partner[key] = event.partner[key].toInt()
-      event.matches.forEach((match: any) => {
-        match.opponents.forEach((opponent: any) => {
-          if (opponent?.[key]) opponent[key] = opponent[key].toInt()
-        })
+      event.match.opponents.forEach((opponent: any) => {
+        if (opponent?.[key]) opponent[key] = opponent[key].toInt()
       })
+    }
+
+    for (let i = 0; i < 2; i++) {
+      for (let index = 0; index < event.match.sets[i].length; index++) {
+        event.match.sets[i][index] = event.match.sets[i][index].map((x: any) => (x ? x.toInt() : null))
+      }
     }
 
     if (CHALLENGER_CATEGORIES.includes(event.category)) {
@@ -316,10 +322,10 @@ export default defineEventHandler(async event => {
         ...event.tournament,
         id: event.tournament.id.toInt()
       },
-      matches: event.matches.map((match: any) => ({
-        ...match,
-        match_no: match.match_no.toInt()
-      }))
+      match: {
+        ...event.match,
+        match_no: event.match.match_no.toInt()
+      }
     }
   })
 

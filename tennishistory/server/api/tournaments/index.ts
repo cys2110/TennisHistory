@@ -29,7 +29,7 @@ export default defineEventHandler(async event => {
       }
     }
 
-    tournament["tours"] = tournament["tours"].map((tour: TourType) => tour.replace("Men", "ITF (M)").replace("Women", "ITF (W)"))
+    tournament["tours"] = getCorrectTours(tournament["tours"])
   }
 
   return results

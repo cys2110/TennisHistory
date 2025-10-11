@@ -7,8 +7,9 @@ const modelValue = defineModel<TourType[]>()
   <u-checkbox-group
     legend="Tour"
     v-model="modelValue"
-    :items="tours ?? TOUR_OPTIONS"
+    :items="tours ?? ['ATP', 'WTA', 'ITF (M)', 'ITF (W)']"
     :ui="{
+      root: 'my-2',
       item: 'ml-3'
     }"
   />

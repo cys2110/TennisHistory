@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { iconOnly = true } = defineProps<{ country: CountryInterface; iconOnly?: boolean }>()
+const { iconOnly = false } = defineProps<{ country: CountryInterface; iconOnly?: boolean }>()
 </script>
 
 <template>

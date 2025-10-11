@@ -113,6 +113,10 @@ export default defineEventHandler(async query => {
         END AS matchType,
         [x IN labels(r) WHERE x IN ['ATP', 'Women', 'Men', 'WTA']][0] AS tour,
         CASE
+          WHEN m:Main THEN 'Main'
+          ELSE 'Qualifying'
+        END AS draw,
+        CASE
           WHEN
             coalesce(min_winner_rank, 1e9) < coalesce(min_loser_rank, 1e9)
             THEN coalesce(min_winner_rank, 1e9)
@@ -124,6 +128,7 @@ export default defineEventHandler(async query => {
           properties(m),
           {
             tour: tour,
+            draw: draw,
             type: matchType,
             round: r.round,
             umpire: u.id,
@@ -137,7 +142,6 @@ export default defineEventHandler(async query => {
             incomplete: ls.incomplete
           }
         ) AS match
-      ORDER BY r.number DESC
     `,
     { id: Number(id) }
   )

@@ -200,6 +200,9 @@ export default defineAppConfig({
       },
       defaultVariants: { loadingAnimation: "swing" }
     },
-    progress: { slots: { status: "!w-full" } }
+    progress: { slots: { status: "!w-full" } },
+    pagination: { slots: { list: "justify-center" } },
+    pageList: { base: "scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent overflow-y-auto scroll-smooth" },
+    pageGrid: { base: "scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent overflow-y-auto scroll-smooth" }
   }
 })

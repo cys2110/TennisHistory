@@ -2,7 +2,7 @@ import appConfig from "~/app.config"
 
 export const ALL_YEARS = Array.from({ length: new Date().getFullYear() - 1968 + 1 }, (_, i) => 1968 + i)
 
-export const CATEGORY_COLOURS = Object.values(appConfig.colours)
+export const CATEGORY_COLOURS = Object.values(COLOURS)
 
 export const COUNTRY_DRAWS = ["8888", "615", "9900"]
 
@@ -14,103 +14,50 @@ export const CURRENCIES: Record<CurrencyType, string> = {
   USD: "US$"
 }
 
-export const ENVIRONMENTS = ["Indoor", "Outdoor"]
-
 export const EVENT_PAGES = [
   {
     label: "Details",
     name: "event",
-    icon: appConfig.icons.overview
+    icon: ICONS.overview
   },
   {
     label: "Results",
     name: "results",
-    icon: appConfig.icons.cards
+    icon: ICONS.cards
   },
   {
     label: "Draws",
     name: "draws",
-    icon: appConfig.icons.draw,
-    ui: {
-      itemLeadingIcon: "rotate-270"
-    }
+    icon: ICONS.draw,
+    ui: { itemLeadingIcon: "rotate-270" }
   }
 ]
 
-export const LETTERS = [
-  "A",
-  "B",
-  "C",
-  "D",
-  "E",
-  "F",
-  "G",
-  "H",
-  "I",
-  "J",
-  "K",
-  "L",
-  "M",
-  "N",
-  "O",
-  "P",
-  "Q",
-  "R",
-  "S",
-  "T",
-  "U",
-  "V",
-  "W",
-  "X",
-  "Y",
-  "Z"
-]
-
-export const LEVEL_OPTIONS: LevelType[] = ["Challenger", "ITF", "Tour"]
-
-export const MONTHS: MonthType[] = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
-]
+export const INCOMPLETES: Record<IncompleteType, string> = {
+  B: "Bye",
+  R: "Retired",
+  WO: "Walkover",
+  Def: "Defaulted"
+}
 
 export const PLAYER_PAGES = [
-  { label: "Details", name: "player", icon: appConfig.icons.overview },
-  { label: "Activity", name: "activity", icon: appConfig.icons.event },
-  { label: "Titles and Finals", name: "titles-and-finals", icon: appConfig.icons.one },
-  { label: "Win-Loss Index", name: "wl-index", icon: appConfig.icons.barChart },
-  { label: "Stats", name: "stats", icon: appConfig.icons.stats },
-  { label: "Record", name: "record", icon: appConfig.icons.tournament }
+  { label: "Details", name: "player", icon: ICONS.overview },
+  { label: "Activity", name: "activity", icon: ICONS.event },
+  { label: "Titles and Finals", name: "titles-and-finals", icon: ICONS.one },
+  { label: "Win-Loss Index", name: "wl-index", icon: ICONS.barChart },
+  { label: "Stats", name: "stats", icon: ICONS.stats },
+  { label: "Record", name: "record", icon: ICONS.tournament }
 ]
 
-export const SHORT_ROUNDS: Record<Partial<RoundType>, string> = {
-  Win: "W",
-  Final: "F",
-  Semifinals: "SF",
-  Quarterfinals: "QF",
-  "Round of 16": "R16",
-  "Round of 24": "R24",
-  "Round of 32": "R32",
-  "Round of 64": "R64",
-  "Round of 128": "R128",
-  "Group stages": "G",
-  "Round robin": "RR",
-  Qualifier: "Q",
-  "Qualifying round 1": "Q1",
-  "Qualifying round 2": "Q2",
-  "Qualifying round 3": "Q3",
-  "Day 1": "D1",
-  "Day 2": "D2",
-  "Day 3": "D3"
+export const SEARCH_CATEGORIES: Record<string, { label: string; icon: string; value: string; color: keyof typeof appConfig.ui.colors }> = {
+  Player: { label: "Players", icon: ICONS.player, value: "Player", color: "primary" },
+  Tournament: { label: "Tournaments", icon: ICONS.tournament, value: "Tournament", color: "active" },
+  Coach: { label: "Coaches", icon: ICONS.coach, value: "Coach", color: "singles" },
+  Country: { label: "Countries", icon: ICONS.countries, value: "Country", color: "doubles" },
+  Venue: { label: "Venues", icon: ICONS.venue, value: "Venue", color: "warning" },
+  Surface: { label: "Surfaces", icon: ICONS.court, value: "Surface", color: "tour" },
+  Supervisor: { label: "Supervisors", icon: ICONS.supervisor, value: "Supervisor", color: "inactive" },
+  Umpire: { label: "Umpires", icon: ICONS.umpire, value: "Umpire", color: "itf" }
 }
 
 export const STATUSES: Record<StatusType, { longName: string; class: string }> = {
@@ -121,8 +68,6 @@ export const STATUSES: Record<StatusType, { longName: string; class: string }> =
   SE: { longName: "Special Exempt", class: "bg-fuchsia-300 text-fuchsia-800" },
   PR: { longName: "Protected Ranking", class: "bg-yellow-300 text-yellow-800" }
 }
-
-export const SURFACES: SurfaceType[] = ["Clay", "Grass", "Hard", "Carpet"]
 
 export const SURFACES_LIST: SurfaceInterface[] = [
   { id: "Indoor Clay", environment: "Indoor", surface: "Clay" },
@@ -135,11 +80,9 @@ export const SURFACES_LIST: SurfaceInterface[] = [
 ]
 
 export const tourColourMapping: Record<number, string> = {
-  0: "default",
+  0: "muted",
   1: "atp",
   2: "wta",
   3: "men",
   4: "women"
 }
-
-export const TOUR_OPTIONS = ["ATP", "WTA", "ITF (M)", "ITF (W)"]

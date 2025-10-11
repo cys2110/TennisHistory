@@ -16,24 +16,41 @@ export default defineEventHandler(async query => {
             e.women_start_date
           ) IS
           NOT
-          NULL)<-
-          [:ROUND_OF]-
-        (r:Round {round: 'Final'})<-[:PLAYED]-
-        (m:Match)
-      MATCH (e)-[:IN_YEAR]->(y:Year)
-      OPTIONAL MATCH (x:Tie)-[:TIE_OF]->(r:Round {round: 'Final'})-[:ROUND_OF]->(e)
-      OPTIONAL MATCH (c1:Country {id: x.c1})
-      OPTIONAL MATCH (c2:Country {id: x.c2})
+          NULL)-
+          [:IN_YEAR]->
+        (y:Year)
       CALL (*) {
-        WHEN x IS NULL THEN {
+        WHEN e.draw_type = 'Country draw' THEN {
           OPTIONAL MATCH
+            (x:Tie)-[:TIE_OF]->(r:Round {round: 'Final'})-[:ROUND_OF]->(e)
+          MATCH (c1:Country {id: x.c1})
+          MATCH (c2:Country {id: x.c2})
+          WITH c1, c2, split(x.score, '-') AS scoreArray, x.score AS score
+          RETURN
+            CASE
+              WHEN
+                scoreArray[0] > scoreArray[1]
+                THEN {winner: properties(c1), loser: properties(c2), score: score}
+              ELSE
+                {
+                  winner: properties(c2),
+                  loser: properties(c1),
+                  score: toString(scoreArray[1]) || '-' || toString(scoreArray[0])
+                }
+            END AS final }
+        ELSE {
+          OPTIONAL MATCH
+            (m:Match)-[:PLAYED]->(r:Round {round: 'Final'})-[:ROUND_OF]->(e)
+          OPTIONAL MATCH
+            (q:Country)<-[:REPRESENTS]-
             (winner:Player)-[:ENTERED]->
             (:Entry)-[:SCORED]->
             (ws:Winner)-[:SCORED]->
             (m)<-[:SCORED]-
             (ls:Loser)<-[:SCORED]-
             (:Entry)<-[:ENTERED]-
-            (loser:Player)
+            (loser:Player)-[:REPRESENTS]->
+            (q1:Country)
           OPTIONAL MATCH
             (winner)-
               [f:REPRESENTED WHERE
@@ -45,7 +62,6 @@ export default defineEventHandler(async query => {
                   f.start_date <= coalesce(e.wta_start_date, e.women_start_date) AND
                   f.end_date > coalesce(e.wta_start_date, e.women_start_date))]->
             (z:Country)
-          OPTIONAL MATCH (winner)-[g:REPRESENTS]->(q:Country)
           OPTIONAL MATCH
             (loser)-
               [f1:REPRESENTED WHERE
@@ -57,16 +73,15 @@ export default defineEventHandler(async query => {
                   f1.start_date <= coalesce(e.wta_start_date, e.women_start_date) AND
                   f1.end_date > coalesce(e.wta_start_date, e.women_start_date))]->
             (z1:Country)
-          OPTIONAL MATCH (loser)-[g1:REPRESENTS]->(q1:Country)
           WITH
             *,
             CASE
-              WHEN f IS NOT NULL THEN properties(z)
-              ELSE properties(q)
+              WHEN f IS NULL THEN properties(q)
+              ELSE properties(z)
             END AS winner_country,
             CASE
-              WHEN f1 IS NOT NULL THEN properties(z1)
-              ELSE properties(q1)
+              WHEN f1 IS NULL THEN properties(q1)
+              ELSE properties(z1)
             END AS loser_country
           WITH
             COLLECT(
@@ -74,20 +89,23 @@ export default defineEventHandler(async query => {
               apoc.map.merge(
                 apoc.map.submap(winner, ['id', 'first_name', 'last_name']),
                 {country: winner_country}
-              )) AS w,
+              )) AS winner,
             COLLECT(
               DISTINCT
               apoc.map.merge(
                 apoc.map.submap(loser, ['id', 'first_name', 'last_name']),
                 {country: loser_country}
-              )) AS l,
-            ws,
-            ls,
-            m,
+              )) AS loser,
             CASE
               WHEN m:Singles THEN 'Singles'
               ELSE 'Doubles'
             END AS matchType,
+            CASE
+              WHEN m:ATP THEN 'ATP'
+              WHEN m:WTA THEN 'WTA'
+              WHEN m:Men THEN 'ITF (M)'
+              ELSE 'ITF (W)'
+            END AS tour,
             [
               [ws.s1, ws.t1],
               [ws.s2, ws.t2],
@@ -102,7 +120,14 @@ export default defineEventHandler(async query => {
               [ls.s4, ls.t4],
               [ls.s5, ls.t5]
             ] AS loser_sets,
-            [x IN labels(winner) WHERE NOT x IN ['Update', 'Player', 'Coach']][0] AS tour
+            ls.incomplete AS incomplete,
+            CASE
+              WHEN ws.serve1 IS NULL THEN false
+              ELSE true
+            END AS stats,
+            m,
+            ws
+          ORDER BY tour, matchType DESC
           RETURN
             CASE
               WHEN
@@ -111,74 +136,41 @@ export default defineEventHandler(async query => {
                   {
                     type: matchType,
                     tour: tour,
-                    winner: w,
-                    loser: l,
+                    winner: winner,
+                    loser: loser,
                     sets: [
                       [x IN winner_sets WHERE x[0] IS NOT NULL],
                       [x IN loser_sets WHERE x[0] IS NOT NULL]
                     ],
-                    incomplete: ls.incomplete,
-                    stats:
-                      CASE
-                        WHEN ws.serve1 IS NULL THEN false
-                        ELSE true
-                      END
+                    incomplete: incomplete,
+                    stats: stats
                   }
               WHEN
                 m IS NOT NULL
                 THEN {tour: tour, type: matchType, winner: 'No final played'}
               ELSE null
-            END AS final
-          ORDER BY final.type DESC, final.tour
-          }
-        ELSE {
-          WITH c1, c2, split(x.score, '-') AS scoreArray
-          RETURN
-            CASE
-              WHEN
-                scoreArray[0] > scoreArray[1]
-                THEN
-                  {
-                    winner: properties(c1),
-                    loser: properties(c2),
-                    score: toString(scoreArray[0] || '-' || toString(scoreArray[1]))
-                  }
-              ELSE
-                {
-                  winner: properties(c2),
-                  loser: properties(c1),
-                  score: toString(scoreArray[1] || '-' || scoreArray[0])
-                }
-            END AS final
-          }
+            END AS final }
       }
-      WITH
-        y.id AS year,
-        [x IN labels(e) WHERE NOT x IN ['Update', 'Event']] AS tours,
-        e.id AS id,
-        COLLECT(DISTINCT final) AS finals
-      RETURN {year: year, finals: finals, tours: tours, id: id} AS event
-      ORDER BY year DESC
+      RETURN apoc.map.merge(final, {year: y.id, id: e.id}) AS final
+      ORDER BY y.id DESC
     `,
     { id: Number(id) }
   )
 
   const results = records.map(record => {
-    const event = record.get("event")
-    event["id"] = event["id"].toInt()
-    event["year"] = event["year"].toInt()
+    const final = record.get("final")
+    final["id"] = final["id"].toInt()
+    final["year"] = final["year"].toInt()
 
-    for (const final of event["finals"]) {
-      if (final.sets) {
-        for (let i = 0; i < 2; i++) {
-          for (let index = 0; index < final.sets[i].length; index++) {
-            final.sets[i][index] = final.sets[i][index].map((item: any) => (item ? item.toInt() : null))
-          }
+    if (final["sets"]) {
+      for (let i = 0; i < 2; i++) {
+        for (let index = 0; index < final.sets[i].length; index++) {
+          final.sets[i][index] = final.sets[i][index].map((item: any) => (item ? item.toInt() : null))
         }
       }
     }
 
-    return event
+    return final
   })
 
   return results

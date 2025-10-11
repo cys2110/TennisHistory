@@ -1,115 +1,92 @@
 <script setup lang="ts">
-import { EventCardRegular, EventCardSmall } from "#components"
+import { CalendarDate } from "@internationalized/date"
+
+useHead({ title: "Results Archive" })
 
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: 1024 })
 const mdAndDown = breakpoints.smallerOrEqual("md")
 const smAndDown = breakpoints.smallerOrEqual("sm")
-const {
-  icons,
-  ui: { colors }
-} = useAppConfig()
 
-const year = useRouteQuery("year", new Date().getFullYear(), { transform: Number })
-const tours = ref<TourType[]>()
-const months = ref<MonthType[]>()
-const levels = ref<LevelType[]>()
-const categories = ref<CategoryType[]>()
-const environment = ref<EnvironmentType[]>()
-const surfaces = ref<SurfaceType[]>()
+const page = ref(1)
+const skip = ref(0)
 
-useHead({ title: () => `Results Archive ${get(year)}` })
-useJsonld(() => ({
-  "@context": "https://schema.org",
-  "@type": "ItemPage",
-  name: "Results Archive",
-  description: `Events which took place in ${get(year)}`
-}))
+// Filters
+const selectedTournaments = ref<string[]>([])
+const selectedLevels = ref<LevelType[]>([])
+const selectedTours = ref<TourType[]>([])
+const selectedCategories = ref<CategoryType[]>([])
+const dateRange = shallowRef<{ start: CalendarDate | undefined; end: CalendarDate | undefined }>({
+  start: undefined,
+  end: undefined
+})
+const selectedEnvironments = ref<EnvironmentType[]>([])
+const selectedSurfaces = ref<SurfaceType[]>([])
+const selectedVenues = ref<string[]>([])
+const selectedCountries = ref<string[]>([])
+const selectedSupervisors = ref<string[]>([])
+const selectedUmpires = ref<string[]>([])
+const resetFilters = () => {
+  set(selectedTournaments, [])
+  set(selectedLevels, [])
+  set(selectedCategories, [])
+  set(dateRange, { start: undefined, end: undefined })
+  set(selectedSurfaces, [])
+  set(selectedVenues, [])
+  set(selectedCountries, [])
+  set(selectedSupervisors, [])
+  set(selectedUmpires, [])
+}
+
+watch(
+  [
+    selectedTournaments,
+    selectedLevels,
+    selectedCategories,
+    dateRange,
+    selectedSurfaces,
+    selectedVenues,
+    selectedCountries,
+    selectedSupervisors,
+    selectedUmpires,
+    selectedTours,
+    selectedEnvironments
+  ],
+  () => {
+    set(skip, 0)
+    set(page, 1)
+  }
+)
 
 // API call
-const { data, status } = await useFetch<EventInterface[]>("/api/results-archive", {
-  key: `results-archive-${year}`,
-  query: { year },
-  default: () => [],
-  server: false
+const { data, status } = await useFetch<{ count: number; events: EventInterface[] }>("/api/archive", {
+  key: `results-archive-${selectedTournaments}-${skip}-${selectedUmpires}-${selectedSupervisors}-${selectedSurfaces}-${selectedCategories}-${selectedVenues}-${selectedCountries}-${selectedLevels}-${dateRange}-${selectedTours}-${selectedEnvironments}`,
+  query: {
+    skip,
+    tournaments: selectedTournaments,
+    umpires: selectedUmpires,
+    supervisors: selectedSupervisors,
+    surfaces: selectedSurfaces,
+    categories: selectedCategories,
+    venues: selectedVenues,
+    countries: selectedCountries,
+    levels: selectedLevels,
+    tours: selectedTours,
+    environments: selectedEnvironments,
+    dateRange
+  },
+  default: () => ({ count: 0, events: [] })
 })
-
-const events = computed(() =>
-  data.value.filter(event => {
-    const startMonths = event.dates
-      .map(d => d[0])
-      .filter(Boolean)
-      .map(date => date!.month)
-
-    if (
-      (tours.value?.length && !event.tours.some(tour => tours.value?.includes(tour))) ||
-      (categories.value?.length &&
-        (event.categories.length === 0 || event.categories.some(category => category && !categories.value?.includes(category)))) ||
-      (surfaces.value?.length && (!event.surface || !surfaces.value.includes(event.surface.surface))) ||
-      (environment.value?.length && (!event.surface || !environment.value.includes(event.surface.environment))) ||
-      (levels.value?.length && !event.levels.some(level => levels.value?.includes(level))) ||
-      (months.value?.length && (startMonths.length === 0 || startMonths.some(month => month && !months.value?.includes(MONTHS[month - 1]!))))
-    )
-      return false
-    return true
-  })
-)
-
-const levelOptions = computed<LevelType[]>(() => useArrayUnique(data.value.flatMap(event => event.levels)).value.sort((a, b) => a.localeCompare(b)))
-const environmentOptions = computed<EnvironmentType[]>(() =>
-  useArrayUnique(data.value.map(event => event.surface?.environment).filter(Boolean)).value.sort((a, b) => a!.localeCompare(b!))
-)
-const surfaceOptions = computed<SurfaceType[]>(
-  () => useArrayUnique(data.value.map(event => event.surface?.surface).filter(Boolean)).value.sort((a, b) => a!.localeCompare(b!)) as SurfaceType[]
-)
-const categoryOptions = computed<CategoryType[]>(
-  () => useArrayUnique(data.value.flatMap(event => event.categories).filter(Boolean)).value.sort((a, b) => a!.localeCompare(b!)) as CategoryType[]
-)
 
 const toc = computed(() => [
   {
     id: "tournaments",
     label: "Tournaments",
-    items: events.value.map(event => ({
-      label: event.tournament.name,
+    items: data.value.events.map(event => ({
+      label: `${event.tournament.name} ${event.year}`,
       to: `#event-${event.id}`
     }))
   }
 ])
-
-const eventCounts = computed<Record<string, { count: number; colour?: keyof typeof colors; brokenOut?: Record<string, number> }>>(() => {
-  const atpEvents = events.value.filter(event => event.tours?.includes("ATP"))
-  const wtaEvents = events.value.filter(event => event.tours?.includes("WTA"))
-
-  return {
-    Total: { count: events.value.length },
-    ATP: {
-      colour: "atp",
-      count: atpEvents.length,
-      brokenOut: {
-        Tour: atpEvents.filter(event => event.categories[0] || (event.categories[1] && !ATP_CHALLENGER_CATEGORIES.includes(event.categories[1])))
-          .length,
-        Challenger: atpEvents.filter(event => event.categories[1] && ATP_CHALLENGER_CATEGORIES.includes(event.categories[1])).length
-      }
-    },
-    WTA: {
-      colour: "wta",
-      count: wtaEvents.length,
-      brokenOut: {
-        Tour: wtaEvents.filter(event => event.categories[0] || (event.categories[2] && !WTA_CHALLENGER_CATEGORIES.includes(event.categories[2])))
-          .length,
-        Challenger: wtaEvents.filter(event => event.categories[2] && WTA_CHALLENGER_CATEGORIES.includes(event.categories[2])).length
-      }
-    },
-    ITF: {
-      colour: "itf",
-      count: events.value.filter(event => event.tours?.includes("ITF (M)") || event.tours?.includes("ITF (W)")).length,
-      brokenOut: {
-        "ITF (M)": events.value.filter(event => event.tours?.includes("ITF (M)")).length,
-        "ITF (W)": events.value.filter(event => event.tours?.includes("ITF (W)")).length
-      }
-    }
-  }
-})
 </script>
 
 <template>
@@ -117,60 +94,35 @@ const eventCounts = computed<Record<string, { count: number; colour?: keyof type
     <u-page>
       <template #left>
         <u-page-aside>
-          <filter-select-all-years
-            v-model="year"
-            class="my-2"
-          />
-          <filter-select-months
-            v-model="months"
-            class="my-2"
-          />
-          <filter-checkbox-levels
-            v-model="levels"
-            :levels="levelOptions"
-            class="my-2"
-          />
-          <filter-checkbox-tours
-            v-model="tours"
-            class="my-2"
-          />
-          <filter-select-categories
-            v-model="categories"
-            :categories="categoryOptions"
-            class="my-2"
-          />
+          <filter-date-picker v-model="dateRange" />
+
+          <filter-checkbox-levels v-model="selectedLevels" />
+
+          <filter-checkbox-tours v-model="selectedTours" />
+
+          <filter-select-categories v-model="selectedCategories" />
+
           <filter-checkbox-surfaces
-            v-model="surfaces"
-            v-model:environment="environment"
-            :environments="environmentOptions"
-            :surfaces="surfaceOptions"
+            v-model="selectedSurfaces"
+            v-model:environment="selectedEnvironments"
           />
+
+          <filter-select-venues v-model="selectedVenues" />
+
+          <filter-select-countries v-model="selectedCountries" />
+
+          <filter-select-supervisors v-model="selectedSupervisors" />
+
+          <filter-select-umpires v-model="selectedUmpires" />
         </u-page-aside>
       </template>
 
       <template #right>
         <u-page-aside>
-          <div class="flex flex-col gap-1 my-5 text-sm">
-            <div
-              v-for="[label, counts] in Object.entries(eventCounts)"
-              :key="label"
-              :class="`text-${counts.colour}`"
-            >
-              <div class="font-semibold">{{ label }}: {{ counts.count }}</div>
-              <div
-                v-if="counts.brokenOut"
-                v-for="[category, count] in Object.entries(counts.brokenOut)"
-                :key="`${label}-${category}`"
-                class="ml-2"
-                :class="{ 'text-men': category === 'ITF (M)', 'text-women': category === 'ITF (W)' }"
-              >
-                {{ category }}: {{ count }}
-              </div>
-            </div>
-          </div>
+          <div class="font-semibold">{{ data.count }} events</div>
           <u-command-palette
-            v-if="data.length"
-            placeholder="Search events"
+            v-if="data.count"
+            placeholder="Search events on this page"
             :groups="toc"
             :loading="status === 'pending'"
             :fuse="{ resultLimit: 1000 }"
@@ -179,10 +131,7 @@ const eventCounts = computed<Record<string, { count: number; colour?: keyof type
         </u-page-aside>
       </template>
 
-      <u-page-header
-        headline="Results Archive"
-        :title="year.toString()"
-      >
+      <u-page-header title="Results Archive">
         <template
           #links
           v-if="mdAndDown"
@@ -191,44 +140,40 @@ const eventCounts = computed<Record<string, { count: number; colour?: keyof type
             title="Filters"
             class="ml-auto"
           >
-            <u-button :icon="icons.filter" />
+            <u-button :icon="ICONS.filter" />
 
             <template #body>
-              <filter-select-all-years
-                v-model="year"
-                class="my-2"
-              />
-              <filter-select-months
-                v-model="months"
-                class="my-2"
-              />
-              <filter-checkbox-levels
-                v-model="levels"
-                :levels="levelOptions"
-                class="my-2"
-              />
-              <filter-checkbox-tours
-                v-model="tours"
-                class="my-2"
-              />
-              <filter-select-categories
-                v-model="categories"
-                :categories="categoryOptions"
-                class="my-2"
-              />
+              <filter-date-picker v-model="dateRange" />
+
+              <filter-checkbox-levels v-model="selectedLevels" />
+
+              <filter-checkbox-tours v-model="selectedTours" />
+
+              <filter-select-categories v-model="selectedCategories" />
+
               <filter-checkbox-surfaces
-                v-model="surfaces"
-                v-model:environment="environment"
-                :environments="environmentOptions"
-                :surfaces="surfaceOptions"
+                v-model="selectedSurfaces"
+                v-model:environment="selectedEnvironments"
               />
+
+              <filter-select-venues v-model="selectedVenues" />
+
+              <filter-select-countries v-model="selectedCountries" />
+
+              <filter-select-supervisors v-model="selectedSupervisors" />
+
+              <filter-select-umpires v-model="selectedUmpires" />
             </template>
           </u-slideover>
+          <u-button
+            :icon="ICONS.noFilter"
+            @click="resetFilters"
+          />
           <u-popover>
-            <u-button :icon="icons.toc" />
+            <u-button :icon="ICONS.toc" />
             <template #content>
               <u-command-palette
-                v-if="data.length"
+                v-if="data.count"
                 placeholder="Search events"
                 :groups="toc"
                 :loading="status === 'pending'"
@@ -241,14 +186,25 @@ const eventCounts = computed<Record<string, { count: number; colour?: keyof type
       </u-page-header>
 
       <u-page-body>
-        <u-page-columns
-          v-if="events.length || ['idle', 'pending'].includes(status)"
-          class="scroll-smooth overflow-y-auto p-5"
+        <u-pagination
+          v-model:page="page"
+          :total="data.count"
+          :items-per-page="40"
+          v-on:update:page="value => (skip = (value - 1) * 40)"
+          active-variant="subtle"
+          variant="ghost"
+          :sibling-count="smAndDown ? 1 : undefined"
+          :size="smAndDown ? 'xs' : 'md'"
+          :show-edges="smAndDown ? false : true"
+        />
+
+        <u-page-list
+          v-if="data.events.length || ['idle', 'pending'].includes(status)"
+          class="max-h-150 p-5"
         >
-          <component
-            v-if="events.length"
-            :is="smAndDown ? EventCardSmall : EventCardRegular"
-            v-for="event in events"
+          <event-card
+            v-if="data.events.length"
+            v-for="event in data.events"
             :key="event.id"
             :event
           />
@@ -258,10 +214,10 @@ const eventCounts = computed<Record<string, { count: number; colour?: keyof type
             v-for="_ in 6"
             :key="_"
           />
-        </u-page-columns>
+        </u-page-list>
         <error-message
           v-else
-          :message="`No events took place in ${year}`"
+          message="No events found"
         />
       </u-page-body>
     </u-page>
