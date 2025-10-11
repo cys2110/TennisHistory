@@ -14,9 +14,6 @@ import {
 const {
   params: { eid, year }
 } = useRoute("event")
-const {
-  ui: { icons }
-} = useAppConfig()
 const tours = useState<TourType[]>("tours")
 const tournamentName = useState<string>("tournament-name")
 

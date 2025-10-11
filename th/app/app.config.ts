@@ -61,7 +61,7 @@ export default defineAppConfig({
     dashboardSidebar: { slots: { header: "justify-center font-cursive lg:text-lg xl:text-xl 2xl:text-2xl" } },
     dashboardPanel: {
       slots: {
-        root: "h-screen max-w-screen lg:max-w-[calc(100vw-3rem)] xl:max-w-[calc(100vw-4rem)]",
+        root: "h-screen max-w-screen lg:max-w-[calc(100vw-3rem)] xl:max-w-[calc(100vw-4rem)] 2xl:max-w-[calc(100vw-5rem)]",
         body: "scroll-smooth"
       }
     },

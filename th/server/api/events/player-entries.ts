@@ -17,7 +17,7 @@ export default defineEventHandler(async query => {
             ('WTA' IN labels(p) AND
               z.end_date > coalesce(e.wta_start_date, e.women_start_date))))]->(o:Country)
       WITH
-        apoc.map.submap(p, ['id', 'first_name', 'last_name']) AS player,
+        apoc.map.submap(p, ['id', 'first_name', 'last_name'], null, false) AS player,
         CASE WHEN z IS NULL THEN properties(c) ELSE properties(o) END AS country,
         CASE WHEN f:Singles THEN 'Singles' ELSE 'Doubles' END AS matchType,
         CASE WHEN s:Main THEN 'Main' ELSE 'Qualifying' END AS drawType,

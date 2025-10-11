@@ -148,6 +148,7 @@ const columns = computed<TableColumn<EventInterface>[]>(() => [
     footer: () => `${data.value.count} ${data.value.count === 1 ? "event" : "events"}`
   },
   { accessorKey: "levels" },
+  { accessorKey: "tours" },
   { accessorKey: "categories" },
   { accessorKey: "dates" },
   { id: "surface", accessorKey: "surface.id" },
@@ -377,6 +378,16 @@ onBeforeRouteLeave(() => toast.clear())
                   v-for="level in row.original.levels"
                   :key="`${row.original.id}-${level}`"
                   :label="level"
+                  class="mx-auto"
+                />
+              </div>
+            </template>
+            <template #tours-cell="{ row }">
+              <div class="flex flex-col items-center gap-1">
+                <coloured-badge
+                  v-for="tour in row.original.tours"
+                  :key="`${row.original.id}-${tour}`"
+                  :label="tour"
                   class="mx-auto"
                 />
               </div>
