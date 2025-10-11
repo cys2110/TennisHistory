@@ -5,7 +5,7 @@ export default defineEventHandler(async query => {
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
-      MATCH (p:Player)-[:ENTERED]->(:Entry)-[:SCORED]->(s:Score)-[:SCORED]->(m:Match)-[:PLAYED]->(:Round)-[:ROUND_OF]->(:Event {id: $id})
+      MATCH (p:Player)-[:ENTERED]->(:Entry)-[:SCORED]->(s:Score)-[:SCORED]->(m:Match)-[:PLAYED]->(r:Round)-[:ROUND_OF]->(:Event {id: $id})
       OPTIONAL MATCH (u:Umpire)-[:UMPIRED]->(m)
       WITH
         CASE WHEN m:Singles THEN 'Singles' ELSE 'Doubles' END AS type,
@@ -14,8 +14,10 @@ export default defineEventHandler(async query => {
         COLLECT(DISTINCT p.first_name || ' ' || p.last_name) AS players,
         properties(m) AS match,
         u.id AS umpire,
-        CASE WHEN m.incomplete IS NULL AND s.serve1 IS NULL THEN FALSE ELSE TRUE END AS stats
-      RETURN DISTINCT apoc.map.merge(match, {tour: tour, draw: draw, type: type, players: players, umpire: umpire, stats: stats}) AS match
+        CASE WHEN m.incomplete IS NULL AND s.serve1 IS NULL THEN FALSE ELSE TRUE END AS stats,
+        CASE WHEN m:Best3 THEN 'Best3' WHEN m:Best5 THEN 'Best5' ELSE NULL END AS best_of,
+        r.round AS round
+      RETURN DISTINCT apoc.map.merge(match, {tour: tour, draw: draw, type: type, players: players, umpire: umpire, stats: stats, round: round, best_of: best_of}) AS match
       ORDER BY match.tour, match.type DESC, match.draw, match.number
     `,
     { id: int(id) }

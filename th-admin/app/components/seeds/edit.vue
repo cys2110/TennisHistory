@@ -4,6 +4,10 @@ import * as z from "zod"
 
 const { seed } = defineProps<{ seed: any }>()
 const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
+const uploading = ref(false)
 
 const schema = z.object({
   id: z.string(),
@@ -23,23 +27,32 @@ const state = reactive<Partial<Schema>>({
   rank: seed.rank
 })
 
+const formFields: { label: string; key: keyof Schema; type: "number" }[] = [
+  { label: "Seed", key: "seed", type: "number" },
+  { label: "Qualifying Seed", key: "q_seed", type: "number" },
+  { label: "Rank", key: "rank", type: "number" }
+]
+
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(uploading, true)
   try {
     await $fetch("/api/seeds/update", {
       query: event.data
     })
     toast.add({
       title: "Seed updated",
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
   } catch (e) {
     toast.add({
       title: "Error updating seed",
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons.close,
       color: "error"
     })
+  } finally {
+    set(uploading, false)
   }
 }
 </script>
@@ -50,11 +63,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-2">
+    <div class="grid grid-cols-5 border-b border-muted pb-2 gap-2">
       <u-form-field label="Player">
         <u-link
           v-if="!seed.first_name"
-          :to="{ name: 'player', params: { id: seed.id } }"
+          :to="{ name: 'player', params: { id: seed.pid } }"
         >
           {{ seed.id }}
         </u-link>
@@ -62,55 +75,35 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           v-else
           :model-value="`${seed.first_name} ${seed.last_name}`"
           disabled
-          class="w-full"
         />
+
+        <template #help>
+          <div class="flex justify-between items-center gap-1">
+            <u-badge
+              :label="seed.tour"
+              :color="seed.tour"
+            />
+            <u-badge
+              :label="seed.type"
+              :color="seed.type"
+            />
+          </div>
+        </template>
       </u-form-field>
 
-      <div class="flex justify-center items-center gap-1">
-        <u-badge
-          :label="seed.tour"
-          :color="seed.tour"
-        />
-        <u-badge
-          :label="seed.type"
-          :color="seed.type"
-        />
-      </div>
-
-      <u-form-field label="Seed">
-        <u-input-number
-          v-model="state.seed"
-          orientation="vertical"
-          class="w-full"
-          placeholder="Enter seed"
-        />
-      </u-form-field>
-
-      <u-form-field label="Qualifying Seed">
-        <u-input-number
-          v-model="state.q_seed"
-          orientation="vertical"
-          class="w-full"
-          placeholder="Enter qualifying seed"
-        />
-      </u-form-field>
-
-      <u-form-field label="Rank">
-        <u-input-number
-          v-model="state.rank"
-          orientation="vertical"
-          class="w-full"
-          placeholder="Enter rank"
-        />
-      </u-form-field>
+      <form-field
+        v-for="field in formFields"
+        :key="field.label"
+        :field
+        v-model="state[field.key]"
+      />
 
       <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
-          size="sm"
           block
-          icon="lucide:square-check-big"
+          :icon="uploading ? ICONS.uploading : icons.check"
         />
       </div>
     </div>

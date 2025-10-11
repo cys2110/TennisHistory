@@ -1,5 +1,8 @@
 <script setup lang="ts">
 useHead({ title: "Events - TH Admin" })
+const {
+  ui: { icons }
+} = useAppConfig()
 const year = ref(new Date().getFullYear())
 
 const {
@@ -16,7 +19,7 @@ const toc = computed(() => [
   {
     id: "events",
     label: "Events",
-    items: events.value.map(event => ({
+    items: get(events).map(event => ({
       label: event.name ?? event.id.toString(),
       to: `#event-${event.id}`
     }))
@@ -33,8 +36,7 @@ const toc = computed(() => [
             <events-create />
             <u-popover>
               <u-button
-                icon="lucide:table-of-contents"
-                size="sm"
+                :icon="icons.menu"
                 class="mx-2"
               />
               <template #content>
@@ -57,9 +59,11 @@ const toc = computed(() => [
       </template>
 
       <template #body>
-        <u-page-list class="*:my-2">
+        <u-page-grid
+          v-if="events.length"
+          class="gap-y-2 gap-x-5 2xl:grid-cols-4"
+        >
           <u-link
-            v-if="events.length"
             v-for="event in events"
             :key="event.id"
             :to="{ name: 'event', params: { id: event.id } }"
@@ -68,21 +72,13 @@ const toc = computed(() => [
           >
             {{ event.name ?? event.id }}
           </u-link>
+        </u-page-grid>
 
-          <div v-else-if="status === 'pending'">Loading...</div>
-
-          <div
-            v-else
-            class="flex flex-col gap-1 items-center"
-          >
-            Error loading events.
-            <u-button
-              @click="() => reloadNuxtApp()"
-              label="Refresh"
-              icon="lucide:refresh-ccw"
-            />
-          </div>
-        </u-page-list>
+        <loading v-else-if="status === 'pending'" />
+        <reload
+          v-else
+          message="events"
+        />
       </template>
     </u-dashboard-panel>
   </div>

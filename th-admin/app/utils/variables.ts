@@ -32,7 +32,10 @@ export const rounds = [
   "Qualifying round 1"
 ]
 
+export const tours = ["ATP", "WTA", "Men", "Women"]
+
 export const routes = [
+  { label: "Details", to: { name: "event" } },
   { label: "Rounds", to: { name: "rounds" } },
   { label: "Withdrawals", to: { name: "withdrawals" } },
   { label: "Seeds", to: { name: "seeds" } },
@@ -43,4 +46,39 @@ export const routes = [
   { label: "Entries", to: { name: "entries" } },
   { label: "Matches", to: { name: "matches" } },
   { label: "Draws", to: { name: "draws" } }
+]
+
+export const ICONS = {
+  download: "line-md:downloading",
+  downloading: "line-md:downloading",
+  uploading: "line-md:uploading-loop"
+}
+
+export const letters = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z"
 ]

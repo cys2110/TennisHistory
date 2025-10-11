@@ -2,13 +2,24 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
-const { type } = defineProps<{ type: "Retirement" | "Walkover" }>()
-const { query } = useRoute()
+const { type, refresh } = defineProps<{ type: "Retirement" | "Walkover"; refresh: () => void }>()
+const {
+  params: { id }
+} = useRoute("retirements")
 const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
+const uploading = ref(false)
 
 const { data: entries, status } = await useFetch("/api/entries/get", {
-  query: { id: query.id },
-  default: () => []
+  query: { id },
+  default: () => [],
+  transform: data =>
+    useArrayUnique(data, (a, b) => a.id === b.id).value.map(entry => ({
+      id: entry.id,
+      label: entry.first_name ? `${entry.first_name} ${entry.last_name}` : entry.id
+    }))
 })
 
 type Schema = z.output<typeof retirementSchema>
@@ -19,10 +30,21 @@ const state = reactive<Partial<Schema>>({
   draw: "",
   team_reason: undefined,
   reason: undefined,
-  eid: query.id as string
+  eid: id as string
 })
 
+const formFields = computed<
+  { label: string; key: keyof Schema; type: "selectMenu" | "select" | "text" | "player"; items?: any[]; loading?: boolean }[]
+>(() => [
+  { label: "Player", key: "id", type: "selectMenu", items: entries.value, loading: status.value === "pending" },
+  { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"] },
+  { label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"] },
+  { label: "Reason", key: "reason", type: "text" },
+  { label: "Team Reason", key: "team_reason", type: "text" }
+])
+
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(uploading, true)
   try {
     const apiRoute = type === "Retirement" ? "/api/retirements/add" : "/api/walkovers/add"
     await $fetch(apiRoute, {
@@ -30,16 +52,19 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     })
     toast.add({
       title: `${type} created`,
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
+    refresh()
   } catch (e) {
     toast.add({
       title: `Error creating ${type}`,
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons.close,
       color: "error"
     })
+  } finally {
+    set(uploading, false)
   }
 }
 </script>
@@ -51,57 +76,19 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     @submit="onSubmit"
   >
     <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-2">
-      <u-form-field label="Player">
-        <u-select-menu
-          v-model="state.id"
-          :loading="['pending', 'idle'].includes(status)"
-          :items="entries.map(e => ({ ...e, label: e.first_name ? `${e.first_name} ${e.last_name} - ${e.type}` : `${e.id} - ${e.type}` }))"
-          value-key="fid"
-          label-key="label"
-          placeholder="Select player"
-          class="w-full"
-        />
-      </u-form-field>
+      <form-field
+        v-for="field in formFields"
+        :key="field.label"
+        :field
+        v-model="state[field.key]"
+      />
 
-      <u-form-field label="Type">
-        <u-select
-          v-model="state.type"
-          :items="['Singles', 'Doubles']"
-          placeholder="Select type"
-          class="w-full"
-        />
-      </u-form-field>
-      <u-form-field label="Draw">
-        <u-select
-          v-model="state.draw"
-          :items="['Main', 'Qualifying']"
-          placeholder="Select draw"
-          class="w-full"
-        />
-      </u-form-field>
-
-      <u-form-field label="Reason">
-        <u-input
-          v-model="state.reason"
-          placeholder="Enter reason"
-          class="w-full"
-        />
-      </u-form-field>
-
-      <u-form-field label="Team Reason">
-        <u-input
-          v-model="state.team_reason"
-          placeholder="Enter team reason"
-          class="w-full"
-        />
-      </u-form-field>
       <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
-          size="sm"
           block
-          icon="lucide:square-check-big"
+          :icon="uploading ? ICONS.uploading : icons.check"
         />
       </div>
     </div>

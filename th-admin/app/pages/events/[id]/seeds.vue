@@ -5,6 +5,9 @@ const {
   params: { id }
 } = useRoute("seeds")
 useHead({ title: () => `${id} Seeds - TH Admin` })
+const {
+  ui: { icons }
+} = useAppConfig()
 
 const { data: seeds, status } = await useFetch("/api/seeds/get", {
   query: { id },
@@ -19,31 +22,26 @@ const { data: seeds, status } = await useFetch("/api/seeds/get", {
         <u-dashboard-navbar :title="`Seeds - ${id}`">
           <template #right>
             <u-dropdown-menu :items="routes">
-              <u-button
-                icon="lucide:layers-3"
-                size="sm"
-              />
+              <u-button :icon="icons.tip" />
             </u-dropdown-menu>
           </template>
         </u-dashboard-navbar>
       </template>
 
       <template #body>
-        <seeds-edit
-          v-if="seeds.length"
-          v-for="(seed, index) in seeds"
-          :key="`seed-${index}`"
-          :seed
-        />
-        <div v-else-if="status === 'pending'">Loading...</div>
-        <div class="flex flex-col gap-2 items-center">
-          <div>No seeds found.</div>
-          <u-button
-            label="Refresh"
-            @click="() => reloadNuxtApp()"
-            icon="lucide:refresh-ccw"
+        <u-page-list class="*:my-1">
+          <seeds-edit
+            v-if="seeds.length"
+            v-for="(seed, index) in seeds"
+            :key="`seed-${index}`"
+            :seed
           />
-        </div>
+          <loading v-else-if="status === 'pending'" />
+          <reload
+            v-else
+            message="seeds"
+          />
+        </u-page-list>
       </template>
     </u-dashboard-panel>
   </div>

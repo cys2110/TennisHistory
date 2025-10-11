@@ -4,12 +4,10 @@ import * as z from "zod"
 
 const { entry } = defineProps<{ entry: any }>()
 const toast = useToast()
-const searchTerm = ref("")
-
-const { data: players } = await useFetch("/api/players/search", {
-  query: { search: searchTerm },
-  default: () => []
-})
+const {
+  ui: { icons }
+} = useAppConfig()
+const uploading = ref(false)
 
 type Schema = z.output<typeof withdrawalSchema>
 
@@ -22,23 +20,32 @@ const state = reactive<Partial<Schema>>({
   team_mate: entry.team_mate?.id
 })
 
+const formFields: { label: string; key: keyof Schema; type: "text" | "player" }[] = [
+  { label: "Reason", key: "reason", type: "text" },
+  { label: "Team Reason", key: "team_reason", type: "text" },
+  { label: "Team Mate", key: "team_mate", type: "player" }
+]
+
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(uploading, true)
   try {
     await $fetch("/api/withdrawals/update", {
       query: event.data
     })
     toast.add({
       title: "Withdrawal updated",
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
   } catch (e) {
     toast.add({
       title: "Error updating withdrawal",
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons.error,
       color: "error"
     })
+  } finally {
+    set(uploading, false)
   }
 }
 </script>
@@ -49,7 +56,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-3">
+    <div class="grid grid-cols-5 border-b border-muted pb-2 gap-3">
       <u-form-field label="Player">
         <div class="flex items-center gap-2">
           <u-link
@@ -62,57 +69,38 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             v-else
             :value="`${entry.first_name} ${entry.last_name}`"
             disabled
-            class="w-full"
           />
         </div>
+
+        <template #help>
+          <div class="flex justify-between items-center">
+            <u-badge
+              :label="entry.type"
+              :color="entry.type"
+              size="sm"
+            />
+            <u-badge
+              :label="entry.draw"
+              :color="entry.draw"
+              size="sm"
+            />
+          </div>
+        </template>
       </u-form-field>
 
-      <div class="flex justify-center items-center gap-1">
-        <u-badge
-          :label="entry.type"
-          :color="entry.type"
-        />
-        <u-badge
-          :label="entry.draw"
-          :color="entry.draw"
-        />
-      </div>
-
-      <u-form-field label="Reason">
-        <u-input
-          v-model="state.reason"
-          placeholder="Enter reason"
-          class="w-full"
-        />
-      </u-form-field>
-
-      <u-form-field label="Team Reason">
-        <u-input
-          v-model="state.team_reason"
-          placeholder="Enter team Reason"
-          class="w-full"
-        />
-      </u-form-field>
-
-      <u-form-field label="Team Mate">
-        <u-select-menu
-          v-model="state.team_mate"
-          v-model:search-term="searchTerm"
-          :items="[entry.team_mate, ...players]"
-          value-key="id"
-          label-key="label"
-          placeholder="Select team mate"
-          class="w-full"
-        />
-      </u-form-field>
+      <form-field
+        v-for="field in formFields"
+        :key="field.label"
+        :field
+        v-model="state[field.key]"
+      />
 
       <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
-          size="sm"
           block
-          icon="lucide:square-check-big"
+          :icon="uploading ? ICONS.uploading : icons.check"
         />
       </div>
     </div>

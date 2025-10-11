@@ -2,25 +2,41 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
+const {
+  ui: { icons }
+} = useAppConfig()
+
 const open = ref(false)
+const selectedTour = ref<"ATP" | "WTA">("ATP")
 const toast = useToast()
+const scraping = ref(false)
 
 type Schema = z.output<typeof scrapeEventSchema>
 
 const state = reactive<Partial<Schema>>({
-  tid: 0,
-  tid2: undefined,
   year: new Date().getFullYear(),
-  year2: undefined,
-  draw_size: undefined,
   type: "Singles",
-  draw: "Main",
-  sets: undefined
+  draw: "Main"
 })
 
+const formFields = computed(
+  () =>
+    [
+      { label: "DB ID", key: "tid", type: "text", subType: "number", required: true },
+      { label: "Source ID", key: "tid2", type: "text", subType: "number" },
+      { label: "Year Slug", key: "year", type: "text", subType: "number", required: true },
+      { label: "Year", key: "year2", type: "text", subType: "number" },
+      ...(get(selectedTour) === "ATP" ? [{ label: "Draw Size", key: "draw_size", type: "number", required: true }] : []),
+      ...(get(selectedTour) === "ATP" ? [{ label: "Match Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true }] : []),
+      ...(get(selectedTour) === "ATP" ? [{ label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true }] : []),
+      ...(get(selectedTour) === "ATP" ? [{ label: "Best of", key: "sets", type: "select", items: ["Best3", "Best5"], required: true }] : [])
+    ] as FormFieldInterface<Schema>[]
+)
+
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(scraping, true)
   try {
-    const response: any = await $fetch("http://127.0.0.1:5001/atp_draw", {
+    const response: any = await $fetch(`http://127.0.0.1:5001/${get(selectedTour).toLowerCase()}_draw`, {
       method: "POST",
       timeout: 120_000,
       "Content-Type": "application/json",
@@ -29,13 +45,14 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     if (response.ok) {
       toast.add({
         title: "Draw scraped",
-        icon: "lucide:circle-check",
+        icon: icons.success,
         color: "success"
       })
+      set(open, false)
     } else {
       toast.add({
         title: "Error scraping draw",
-        icon: "lucide:circle-x",
+        icon: icons.error,
         color: "error"
       })
     }
@@ -43,9 +60,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     console.error(e)
     toast.add({
       title: "Error scraping draw",
-      icon: "lucide:circle-x",
+      icon: icons.error,
       color: "error"
     })
+  } finally {
+    set(scraping, false)
   }
 }
 </script>
@@ -58,11 +77,17 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   >
     <u-button
       label="Scrape draws"
-      size="sm"
+      :icon="scraping ? ICONS.downloading : ICONS.download"
       block
     />
 
     <template #body>
+      <u-radio-group
+        v-model="selectedTour"
+        :items="['ATP', 'WTA']"
+        orientation="horizontal"
+      />
+
       <u-form
         id="draw-form"
         :schema="scrapeEventSchema"
@@ -70,85 +95,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         @submit="onSubmit"
       >
         <div class="grid grid-cols-2 gap-2">
-          <u-form-field label="DB ID">
-            <u-input
-              type="number"
-              v-model="state.tid"
-              name="tid"
-              placeholder="Enter DB ID"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field label="Source ID">
-            <u-input
-              type="number"
-              v-model="state.tid2"
-              name="tid2"
-              placeholder="Enter Source ID"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field label="Year Slug">
-            <u-input
-              type="number"
-              v-model="state.year"
-              name="year"
-              placeholder="Enter Year Slug"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field label="Year">
-            <u-input
-              type="number"
-              v-model="state.year2"
-              name="year2"
-              placeholder="Enter Year"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field label="Draw Size">
-            <u-input-number
-              v-model="state.draw_size"
-              name="draw_size"
-              orientation="vertical"
-              placeholder="Enter Draw Size"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field label="Match Type">
-            <u-select
-              v-model="state.type"
-              :items="['Singles', 'Doubles']"
-              placeholder="Select Match Type"
-              name="match_type"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field label="Draw">
-            <u-select
-              v-model="state.draw"
-              :items="['Main', 'Qualifying']"
-              placeholder="Select Draw"
-              name="draw"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field label="Best of">
-            <u-select
-              v-model="state.sets"
-              :items="['Best3', 'Best5']"
-              placeholder="Select Best of"
-              name="sets"
-              class="w-full"
-            />
-          </u-form-field>
+          <form-field
+            v-for="field in formFields"
+            :key="field.key"
+            :field
+            v-model="state[field.key]"
+          />
         </div>
       </u-form>
     </template>
@@ -158,11 +110,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         form="draw-form"
         type="submit"
         label="Scrape"
+        :icon="scraping ? ICONS.downloading : ICONS.download"
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
+        :icon="icons.close"
       />
     </template>
   </u-modal>

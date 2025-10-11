@@ -12,9 +12,8 @@ const months = ["January", "February", "March", "April", "May", "June", "July", 
       variant="outline"
       icon="lucide:calendar-days"
       block
-      :size="size || 'md'"
     >
-      {{ modelValue ? `${modelValue.day} ${months[modelValue.month - 1]} ${modelValue.year}` : placeholder }}
+      {{ modelValue ? `${modelValue.day} ${months[modelValue.month - 1]} ${modelValue.year}` : `Select ${placeholder || date}` }}
     </u-button>
 
     <template #content>

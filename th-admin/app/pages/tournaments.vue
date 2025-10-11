@@ -1,6 +1,6 @@
 <script setup lang="ts">
 useHead({ title: "Tournaments - TH Admin" })
-const { data: tournaments, status } = await useFetch<TournamentInterface[]>("/api/tournaments/get", { default: () => [] })
+const { data: tournaments, status, refresh } = await useFetch<TournamentInterface[]>("/api/tournaments/get", { default: () => [] })
 
 const toc = computed(() => [
   {
@@ -20,7 +20,6 @@ const toc = computed(() => [
       <template #header>
         <u-dashboard-navbar title="Tournaments">
           <template #right>
-            <tournaments-create />
             <u-popover>
               <u-button
                 icon="lucide:table-of-contents"
@@ -41,28 +40,30 @@ const toc = computed(() => [
       </template>
 
       <template #body>
-        <u-page-list class="*:my-1">
+        <u-page-grid
+          v-if="tournaments.length"
+          class="gap-y-2 gap-x-5"
+        >
           <tournaments-edit
-            v-if="tournaments.length"
             v-for="tournament in tournaments"
             :key="tournament.id"
             :tournament
           />
+        </u-page-grid>
 
-          <div v-else-if="status === 'pending'">Loading...</div>
+        <div v-else-if="status === 'pending'">Loading...</div>
 
-          <div
-            v-else
-            class="flex flex-col items-center gap-1"
-          >
-            No tournaments found.
-            <u-button
-              @click="() => reloadNuxtApp()"
-              label="Refresh"
-              icon="lucide:refresh-ccw"
-            />
-          </div>
-        </u-page-list>
+        <div
+          v-else
+          class="flex flex-col items-center gap-1"
+        >
+          No tournaments found.
+          <u-button
+            @click="() => reloadNuxtApp()"
+            label="Refresh"
+            icon="lucide:refresh-ccw"
+          />
+        </div>
       </template>
     </u-dashboard-panel>
   </div>

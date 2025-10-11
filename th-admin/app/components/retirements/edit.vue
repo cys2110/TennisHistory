@@ -4,6 +4,10 @@ import * as z from "zod"
 
 const { entry, type } = defineProps<{ entry: any; type: "Retirement" | "Walkover" }>()
 const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
+const uploading = ref(false)
 
 type Schema = z.output<typeof retirementSchema>
 
@@ -14,23 +18,33 @@ const state = reactive<Partial<Schema>>({
   reason: entry.reason
 })
 
+const formFields = computed<
+  { label: string; key: keyof Schema; type: "selectMenu" | "select" | "text" | "player"; items?: any[]; loading?: boolean }[]
+>(() => [
+  { label: "Reason", key: "reason", type: "text" },
+  { label: "Team Reason", key: "team_reason", type: "text" }
+])
+
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(uploading, true)
   try {
     await $fetch("/api/retirements/update", {
       query: { ...event.data, relationship: type === "Retirement" ? "RETIRED" : "WALKOVER" }
     })
     toast.add({
       title: `${type} updated`,
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
   } catch (e) {
     toast.add({
       title: `Error updating ${type}`,
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons.close,
       color: "error"
     })
+  } finally {
+    set(uploading, false)
   }
 }
 </script>
@@ -55,38 +69,29 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           disabled
           class="w-full"
         />
+
+        <template #help>
+          <u-badge
+            :label="entry.type"
+            :color="entry.type"
+            size="sm"
+          />
+        </template>
       </u-form-field>
 
-      <div class="flex justify-center items-center">
-        <u-badge
-          :label="entry.type"
-          :color="entry.type"
-        />
-      </div>
-
-      <u-form-field label="Reason">
-        <u-input
-          v-model="state.reason"
-          placeholder="Enter reason"
-          class="w-full"
-        />
-      </u-form-field>
-
-      <u-form-field label="Team Reason">
-        <u-input
-          v-model="state.team_reason"
-          placeholder="Enter team reason"
-          class="w-full"
-        />
-      </u-form-field>
+      <form-field
+        v-for="field in formFields"
+        :key="field.label"
+        :field
+        v-model="state[field.key]"
+      />
 
       <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
-          size="sm"
           block
-          icon="lucide:square-check-big"
+          :icon="uploading ? ICONS.uploading : icons.check"
         />
       </div>
     </div>

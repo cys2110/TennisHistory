@@ -60,24 +60,29 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         @submit="onSubmit"
       >
         <div class="grid grid-cols-2 gap-2">
-          <u-form-field label="Name">
-            <u-input
-              v-model="state.name"
-              placeholder="Name"
-            />
-          </u-form-field>
+          <div class="col-span-2">
+            <u-form-field label="Name">
+              <u-input
+                v-model="state.name"
+                placeholder="Enter name"
+                class="w-full"
+              />
+            </u-form-field>
+          </div>
 
           <u-form-field label="City">
             <u-input
               v-model="state.city"
-              placeholder="City"
+              placeholder="Enter city"
+              class="w-full"
             />
           </u-form-field>
 
           <u-form-field label="Country">
             <u-input
               v-model="state.country"
-              placeholder="Country"
+              placeholder="Enter country code"
+              class="w-full"
             />
           </u-form-field>
         </div>

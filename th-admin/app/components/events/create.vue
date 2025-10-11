@@ -47,6 +47,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       color: "success"
     })
     set(open, false)
+
+    await navigateTo({
+      name: "rounds",
+      params: { id: state.id }
+    })
   } catch (e) {
     toast.add({
       title: "Error creating event",

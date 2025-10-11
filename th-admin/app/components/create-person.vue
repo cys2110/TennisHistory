@@ -44,6 +44,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   >
     <u-button
       :label="`Create ${type}`"
+      block
       size="sm"
     />
 

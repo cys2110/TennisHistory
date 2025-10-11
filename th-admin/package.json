@@ -22,6 +22,7 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
+    "@iconify-json/line-md": "^1.2.11",
     "@iconify-json/lucide": "^1.2.68"
   }
 }

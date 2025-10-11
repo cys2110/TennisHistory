@@ -2,20 +2,15 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
-const { query } = useRoute()
+const { refresh } = defineProps<{ refresh: () => void }>()
+const {
+  params: { id }
+} = useRoute("withdrawals")
 const toast = useToast()
-
-const searchTerm = ref("")
-const teamMateSearch = ref("")
-const { data: players } = await useFetch("/api/players/search", {
-  query: { search: searchTerm },
-  default: () => []
-})
-
-const { data: teammates } = await useFetch("/api/players/search", {
-  query: { search: teamMateSearch },
-  default: () => []
-})
+const {
+  ui: { icons }
+} = useAppConfig()
+const uploading = ref(false)
 
 type Schema = z.output<typeof withdrawalSchema>
 
@@ -25,30 +20,46 @@ const state = reactive<Partial<Schema>>({
   draw: "",
   team_reason: undefined,
   reason: undefined,
-  eid: query.id as string,
+  eid: id as string,
   team_mate: undefined,
   seed: undefined,
   status: undefined,
-  rank: 0
+  rank: undefined
 })
 
+const formFields: { label: string; key: keyof Schema; type: "select" | "text" | "player" | "number"; items?: string[] }[] = [
+  { label: "Player", key: "id", type: "player" },
+  { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"] },
+  { label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"] },
+  { label: "Reason", key: "reason", type: "text" },
+  { label: "Team Reason", key: "team_reason", type: "text" },
+  { label: "Team Mate", key: "team_mate", type: "player" },
+  { label: "Seed", key: "seed", type: "number" },
+  { label: "Status", key: "status", type: "select", items: ["AL", "WC", "Q", "SE", "PR", "LL"] },
+  { label: "Rank", key: "rank", type: "number" }
+]
+
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(uploading, true)
   try {
     await $fetch("/api/withdrawals/add", {
       query: event.data
     })
     toast.add({
       title: "Withdrawal created",
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
+    refresh()
   } catch (e) {
     toast.add({
       title: "Error creating withdrawal",
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons.close,
       color: "error"
     })
+  } finally {
+    set(uploading, false)
   }
 }
 </script>
@@ -59,107 +70,20 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :schema="withdrawalSchema"
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-10 border-t border-muted pt-1.5 gap-2">
-      <u-form-field label="Player">
-        <u-select-menu
-          v-model="state.id"
-          v-model:search-term="searchTerm"
-          :items="players"
-          value-key="id"
-          label-key="label"
-          placeholder="Select player"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-
-      <u-form-field label="Type">
-        <u-select
-          v-model="state.type"
-          :items="['Singles', 'Doubles']"
-          placeholder="Select type"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-      <u-form-field label="Draw">
-        <u-select
-          v-model="state.draw"
-          :items="['Main', 'Qualifying']"
-          placeholder="Select draw"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-
-      <u-form-field label="Reason">
-        <u-input
-          v-model="state.reason"
-          placeholder="Enter reason"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-
-      <u-form-field label="Team Reason">
-        <u-input
-          v-model="state.team_reason"
-          placeholder="Enter team reason"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-
-      <u-form-field label="Team Mate">
-        <u-select-menu
-          v-model="state.team_mate"
-          v-model:search-term="teamMateSearch"
-          :items="teammates"
-          value-key="id"
-          label-key="label"
-          placeholder="Select team mate"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-
-      <u-form-field label="Seed">
-        <u-input-number
-          v-model="state.seed"
-          placeholder="Enter seed"
-          orientation="vertical"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-
-      <u-form-field label="Status">
-        <u-select
-          v-model="state.status"
-          :items="['AL', 'WC', 'Q', 'SE', 'PR', 'LL']"
-          placeholder="Select status"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-
-      <u-form-field label="Rank">
-        <u-input-number
-          v-model="state.rank"
-          placeholder="Enter rank"
-          orientation="vertical"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
+    <div class="grid grid-cols-10 border-b border-muted pb-2 gap-2">
+      <form-field
+        v-for="field in formFields"
+        :key="field.label"
+        :field
+        v-model="state[field.key]"
+      />
 
       <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
-          size="sm"
           block
-          icon="lucide:square-check-big"
+          :icon="uploading ? ICONS.uploading : icons.check"
         />
       </div>
     </div>

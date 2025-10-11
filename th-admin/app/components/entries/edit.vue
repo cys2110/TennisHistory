@@ -7,6 +7,10 @@ const {
   params: { id }
 } = useRoute("entries")
 const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
+const uploading = ref(false)
 
 const { data: currency, status } = await useFetch("/api/get-currency", {
   query: { id, tour: isNaN(Number(entry.id)) ? "ATP" : "WTA" },
@@ -39,23 +43,36 @@ const state = reactive<Partial<Schema>>({
   q_status: entry.q_status
 })
 
+const formFields: { label: string; key: keyof Schema; type: "select" | "text" | "player" | "number" | "currency"; items?: string[] }[] = [
+  { label: "Rank", key: "rank", type: "number" },
+  { label: "Points", key: "points", type: "number" },
+  { label: "Prize Money", key: "pm", type: "currency" },
+  { label: "Seed", key: "seed", type: "number" },
+  { label: "Status", key: "status", type: "select", items: ["AL", "WC", "Q", "SE", "PR", "LL"] },
+  { label: "Qualifying Seed", key: "q_seed", type: "number" },
+  { label: "Qualifying Status", key: "q_status", type: "select", items: ["AL", "WC", "Q", "SE", "PR", "LL"] }
+]
+
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(uploading, true)
   try {
     await $fetch("/api/entries/update", {
       query: event.data
     })
     toast.add({
       title: "Entry updated",
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
   } catch (e) {
     toast.add({
       title: "Error updating entry",
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons.error,
       color: "error"
     })
+  } finally {
+    set(uploading, false)
   }
 }
 
@@ -85,15 +102,18 @@ const handleCopy = async () => {
     :state
     :id="`${entry.id}-${entry.type}`"
   >
-    <div class="grid grid-cols-10 border-t border-muted pt-1.5 gap-1">
-      <u-form-field label="Player">
+    <div class="grid grid-cols-9 border-b border-muted pb-2 gap-1">
+      <u-form-field
+        label="Player"
+        class="cursor-pointer"
+        @click="handleCopy"
+      >
         <template #hint>
-          <div
-            class="cursor-pointer"
-            @click="handleCopy"
-          >
-            {{ entry.id }}
-          </div>
+          <u-badge
+            :label="entry.type"
+            :color="entry.type"
+            size="sm"
+          />
         </template>
         <u-link
           v-if="!entry.first_name"
@@ -109,97 +129,21 @@ const handleCopy = async () => {
           class="w-full"
         />
       </u-form-field>
-      <div class="flex items-center justify-center">
-        <u-badge
-          :label="entry.type"
-          :color="entry.type"
-        />
-      </div>
-      <u-form-field label="Rank">
-        <u-input-number
-          v-model="state.rank"
-          orientation="vertical"
-          placeholder="Rank"
-          size="sm"
-        />
-      </u-form-field>
-      <u-form-field label="Points">
-        <u-input-number
-          v-model="state.points"
-          orientation="vertical"
-          placeholder="Points"
-          size="sm"
-        />
-      </u-form-field>
-      <u-form-field label="PM">
-        <u-input-number
-          v-model="state.pm"
-          orientation="vertical"
-          placeholder="Prize Money"
-          size="sm"
-          :format-options="{
-            style: 'currency',
-            currency: currency || 'USD'
-          }"
-        />
-      </u-form-field>
-      <u-form-field label="Seed">
-        <u-input-number
-          v-model="state.seed"
-          orientation="vertical"
-          size="sm"
-          placeholder="Seed"
-        />
-      </u-form-field>
-      <u-form-field label="Status">
-        <u-select
-          v-model="state.status"
-          :items="['AL', 'WC', 'Q', 'SE', 'PR', 'LL']"
-          placeholder="Select status"
-          size="sm"
-          class="w-full"
-        >
-          <template #content-bottom>
-            <u-button
-              size="sm"
-              @click="state.status = undefined"
-              label="Clear"
-            />
-          </template>
-        </u-select>
-      </u-form-field>
-      <u-form-field label="Q Seed">
-        <u-input-number
-          v-model="state.q_seed"
-          orientation="vertical"
-          size="sm"
-          placeholder="Q Seed"
-        />
-      </u-form-field>
-      <u-form-field label="Q Status">
-        <u-select
-          v-model="state.q_status"
-          :items="['AL', 'WC', 'Q', 'SE', 'PR', 'LL']"
-          placeholder="Select status"
-          size="sm"
-          class="w-full"
-        >
-          <template #content-bottom>
-            <u-button
-              size="sm"
-              @click="state.q_status = undefined"
-              label="Clear"
-            />
-          </template>
-        </u-select>
-      </u-form-field>
+
+      <form-field
+        v-for="field in formFields"
+        :key="field.label"
+        :field
+        v-model="state[field.key]"
+        :currency
+      />
+
       <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
-          size="sm"
           block
-          icon="lucide:square-check-big"
+          :icon="uploading ? ICONS.uploading : icons.check"
         />
       </div>
     </div>

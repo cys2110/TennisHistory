@@ -2,10 +2,16 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
+const { refresh } = defineProps<{ refresh: () => void }>()
+
 const {
   params: { id }
 } = useRoute("rounds")
 const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
+const uploading = ref(false)
 
 type Schema = z.output<typeof roundSchema>
 
@@ -26,7 +32,7 @@ const params = computed(() => ({
   tour: state.tour
 }))
 
-const { data: currency, refresh } = await useFetch("/api/get-currency", {
+const { data: currency, refresh: currencyRefresh } = await useFetch("/api/get-currency", {
   query: params,
   default: () => "USD",
   immediate: false
@@ -36,28 +42,43 @@ watch(
   () => state.tour,
   () => {
     if (state.tour) {
-      refresh()
+      currencyRefresh()
     }
   }
 )
 
+const formFields: { label: string; key: keyof Schema; type: "select" | "text" | "player" | "number" | "currency"; items?: string[] }[] = [
+  { label: "Round ID", key: "id", type: "text" },
+  { label: "Round", key: "round", type: "select", items: rounds },
+  { label: "Tour", key: "tour", type: "select", items: tours },
+  { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"] },
+  { label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"] },
+  { label: "Number", key: "number", type: "number" },
+  { label: "Points", key: "points", type: "number" },
+  { label: "Prize Money", key: "pm", type: "currency" }
+]
+
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(uploading, true)
   try {
     await $fetch("/api/rounds/add", {
       query: event.data
     })
     toast.add({
       title: "Round created",
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
+    refresh()
   } catch (e) {
     toast.add({
       title: "Error creating round",
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons.error,
       color: "error"
     })
+  } finally {
+    set(uploading, false)
   }
 }
 </script>
@@ -69,95 +90,20 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     @submit="onSubmit"
   >
     <div class="grid grid-cols-9 border-t border-muted pt-1.5 gap-1">
-      <u-form-field
-        name="id"
-        label="ID"
-      >
-        <u-input
-          v-model="state.id"
-          placeholder="Enter round ID"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
+      <form-field
+        v-for="field in formFields"
+        :key="field.label"
+        :field
+        v-model="state[field.key]"
+        :currency
+      />
 
-      <u-form-field label="Round">
-        <u-select
-          v-model="state.round"
-          :items="rounds"
-          placeholder="Select round"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-      <u-form-field label="Tour">
-        <u-select
-          v-model="state.tour"
-          :items="['ATP', 'WTA', 'Men', 'Women']"
-          placeholder="Select tour"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-
-      <u-form-field label="Type">
-        <u-select
-          v-model="state.type"
-          :items="['Singles', 'Doubles']"
-          placeholder="Select type"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-
-      <u-form-field label="Draw">
-        <u-select
-          v-model="state.draw"
-          :items="['Main', 'Qualifying']"
-          placeholder="Select draw"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-      <u-form-field label="Number">
-        <u-input-number
-          v-model="state.number"
-          orientation="vertical"
-          placeholder="Enter round number"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-      <u-form-field label="Points">
-        <u-input-number
-          v-model="state.points"
-          orientation="vertical"
-          placeholder="Enter points"
-          class="w-full"
-          size="sm"
-        />
-      </u-form-field>
-
-      <u-form-field label="Prize Money">
-        <u-input-number
-          v-model="state.pm"
-          orientation="vertical"
-          placeholder="Enter prize money"
-          class="w-full"
-          size="sm"
-          :format-options="{
-            style: 'currency',
-            currency: currency || 'USD'
-          }"
-        />
-      </u-form-field>
       <div class="flex items-end">
         <u-button
           type="submit"
           label="Save"
-          size="sm"
           block
-          icon="lucide:square-check-big"
+          :icon="uploading ? ICONS.uploading : icons.check"
         />
       </div>
     </div>

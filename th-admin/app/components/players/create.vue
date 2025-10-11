@@ -2,6 +2,7 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
+defineProps<{ block?: boolean }>()
 const open = ref(false)
 const toast = useToast()
 
@@ -52,6 +53,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     <u-button
       label="Create Player"
       size="sm"
+      :block="block"
     />
 
     <template #body>

@@ -10,143 +10,137 @@ const {
   params: { id }
 } = useRoute("player")
 const toast = useToast()
-const searchCoach = ref("")
+const {
+  ui: { icons, colors }
+} = useAppConfig()
+
+const scraping = ref(false)
+const submitting = ref(false)
 
 const { data: player, status } = await useFetch<any>("/api/players/get-player", {
   query: { id }
-})
-
-const {
-  data: coaches,
-  status: coachStatus,
-  execute: executeCoaches,
-  refresh: refreshCoaches
-} = await useFetch("/api/search-coaches", {
-  default: () => [],
-  immediate: false,
-  query: { search: searchCoach }
 })
 
 type Schema = z.output<typeof playerSchema>
 
 const state = reactive<Partial<Schema>>({
   id: id as string,
-  first_name: player.value?.first_name,
-  last_name: player.value?.last_name,
-  tours: player.value?.tours,
-  country: player.value?.country?.id,
-  previous_countries: player.value?.previous_countries?.map((c: any) => c.id),
-  turned_pro: player.value?.turned_pro,
-  retired: player.value?.retired,
-  coaches: player.value?.coaches?.map((c: any) => c.id),
-  former_coaches: player.value?.former_coaches?.map((c: any) => c.id),
-  atp_link: player.value?.atp_link,
-  wta_link: player.value?.wta_link,
-  wiki_link: player.value?.wiki_link,
-  official_link: player.value?.official_link,
-  bh: player.value?.bh,
-  rh: player.value?.rh,
-  current_singles: player.value?.current_singles,
-  current_doubles: player.value?.current_doubles,
-  ch_singles: player.value?.ch_singles,
-  ch_doubles: player.value?.ch_doubles,
-  singles_ch_date: player.value?.singles_ch_date ? parseDate(player.value?.singles_ch_date) : undefined,
-  doubles_ch_date: player.value?.doubles_ch_date ? parseDate(player.value?.doubles_ch_date) : undefined,
-  dob: player.value?.dob ? parseDate(player.value?.dob) : undefined,
-  dod: player.value?.dod ? parseDate(player.value?.dod) : undefined,
-  height: player.value?.height,
-  pm: player.value?.pm,
-  hof: player.value?.hof
+  first_name: get(player)?.first_name,
+  last_name: get(player)?.last_name,
+  tours: get(player)?.tours,
+  country: get(player)?.country?.id,
+  previous_countries: get(player)?.previous_countries?.map((c: any) => c.id),
+  turned_pro: get(player)?.turned_pro,
+  retired: get(player)?.retired,
+  coaches: get(player)?.coaches?.map((c: any) => c.id),
+  former_coaches: get(player)?.former_coaches?.map((c: any) => c.id),
+  atp_link: get(player)?.atp_link,
+  wta_link: get(player)?.wta_link,
+  wiki_link: get(player)?.wiki_link,
+  official_link: get(player)?.official_link,
+  bh: get(player)?.bh,
+  rh: get(player)?.rh,
+  current_singles: get(player)?.current_singles,
+  current_doubles: get(player)?.current_doubles,
+  ch_singles: get(player)?.ch_singles,
+  ch_doubles: get(player)?.ch_doubles,
+  singles_ch_date: get(player)?.singles_ch_date ? parseDate(get(player)?.singles_ch_date) : undefined,
+  doubles_ch_date: get(player)?.doubles_ch_date ? parseDate(get(player)?.doubles_ch_date) : undefined,
+  dob: get(player)?.dob ? parseDate(get(player)?.dob) : undefined,
+  dod: get(player)?.dod ? parseDate(get(player)?.dod) : undefined,
+  height: get(player)?.height,
+  pm: get(player)?.pm,
+  hof: get(player)?.hof
 })
 
-const onOpenCoaches = () => {
-  if ((coaches.value as any)?.length) {
-    set(searchCoach, "")
-    refreshCoaches()
-  } else {
-    executeCoaches()
-  }
-}
+const formFields: FormFieldInterface<Schema>[] = [
+  { label: "First Name", key: "first_name", type: "text", required: true },
+  { label: "Last Name", key: "last_name", type: "text", required: true },
+  { label: "Tours", key: "tours", type: "tags", required: true },
+  { label: "Country Code", key: "country", type: "text", required: true },
+  { label: "Previous Countries", key: "previous_countries", type: "tags" },
+  { label: "Turned Pro", key: "turned_pro", type: "text", subType: "number" },
+  { label: "Retired", key: "retired", type: "text", subType: "number" },
+  {
+    label: "Handedness",
+    key: "rh",
+    type: "select",
+    items: [
+      { value: true, label: "Right" },
+      { value: false, label: "Left" }
+    ]
+  },
+  { label: "Backhand", key: "bh", type: "select", items: ["One", "Two"] },
+  { label: "Date of Birth", key: "dob", type: "date" },
+  { label: "Date of Death", key: "dod", type: "date" },
+  { label: "Height (cm)", key: "height", type: "number" },
+  { label: "Prize Money", key: "pm", type: "currency", required: true },
+  { label: "Coach", key: "coaches", type: "coaches" },
+  { label: "Former Coaches", key: "former_coaches", type: "coaches" },
+  { label: "Hall of Fame Induction", key: "hof", type: "text", subType: "number" }
+]
+
+const linkFields: { label: string; key: keyof Schema; color: keyof typeof colors }[] = [
+  { label: "ATP", key: "atp_link", color: "ATP" },
+  { label: "WTA", key: "wta_link", color: "WTA" },
+  { label: "Wiki", key: "wiki_link", color: "primary" },
+  { label: "Official", key: "official_link", color: "success" }
+]
 
 const handleScrape = async () => {
-  if (isNaN(Number(id))) {
-    try {
-      const response: any = await $fetch("http://127.0.0.1:5001/atp_player/" + id, {
-        method: "GET",
-        timeout: 120_000
+  set(scraping, true)
+  try {
+    const apiSlug = isNaN(Number(id)) ? "atp_player" : "wta_player"
+    const response: any = await $fetch(`http://127.0.0.1:5001/${apiSlug}/` + id, {
+      method: "GET",
+      timeout: 120_000
+    })
+    if (response.ok) {
+      toast.add({
+        title: "Player updated",
+        icon: icons.success,
+        color: "success"
       })
-      if (response.ok) {
-        toast.add({
-          title: "Player updated",
-          icon: "lucide:circle-check",
-          color: "success"
-        })
-      } else {
-        toast.add({
-          title: "Error updating player",
-          icon: "lucide:circle-x",
-          color: "error"
-        })
-      }
-    } catch (e) {
-      console.error(e)
+    } else {
       toast.add({
         title: "Error updating player",
-        icon: "lucide:circle-x",
+        icon: icons.error,
         color: "error"
       })
-    } finally {
-      reloadNuxtApp()
     }
-  } else {
-    try {
-      const response: any = await $fetch("http://127.0.0.1:5001/wta_player/" + id, {
-        method: "GET",
-        timeout: 120_000
-      })
-      if (response.ok) {
-        toast.add({
-          title: "Player updated",
-          icon: "lucide:circle-check",
-          color: "success"
-        })
-      } else {
-        toast.add({
-          title: "Error updating player",
-          icon: "lucide:circle-x",
-          color: "error"
-        })
-      }
-    } catch (e) {
-      console.error(e)
-      toast.add({
-        title: "Error updating player",
-        icon: "lucide:circle-x",
-        color: "error"
-      })
-    } finally {
-      reloadNuxtApp()
-    }
+  } catch (e) {
+    console.error(e)
+    toast.add({
+      title: "Error updating player",
+      icon: icons.error,
+      color: "error"
+    })
+  } finally {
+    set(scraping, false)
+    reloadNuxtApp()
   }
 }
 
 const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
+  set(submitting, true)
   try {
     await $fetch("/api/players/update", {
       query: e.data
     })
     toast.add({
       title: "Player updated",
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
   } catch (e) {
     toast.add({
       title: "Error updating player",
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons.error,
       color: "error"
     })
+  } finally {
+    set(submitting, false)
   }
 }
 </script>
@@ -160,14 +154,15 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
           <u-button
             label="Scrape player"
             @click="handleScrape"
-            size="sm"
             block
+            :icon="scraping ? ICONS.downloading : ICONS.download"
           />
           <u-badge
             v-if="player?.updated_at"
             class="w-full py-1.5"
-            :label="`Updated at: ${useDateFormat(player.updated_at, 'DD MMMM YYYY').value}`"
+            :label="`Updated at: ${get(useDateFormat(player.updated_at, 'DD MMMM YYYY'))}`"
             color="success"
+            size="md"
           />
         </u-dashboard-toolbar>
       </template>
@@ -184,287 +179,98 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
             size="sm"
             block
             class="mb-3"
+            :icon="submitting ? ICONS.uploading : icons.check"
           />
-          <div class="grid grid-cols-3 gap-2">
-            <div
-              v-if="['pending', 'idle'].includes(status)"
-              class="my-5"
-            >
-              Loading...
+          <div
+            v-if="status === 'success'"
+            class="grid grid-cols-3 gap-2"
+          >
+            <form-field
+              v-for="field in formFields"
+              :key="field.label"
+              :field="field"
+              v-model="state[field.key]"
+            />
+
+            <div class="col-span-2">
+              <u-form-field label="Ranks">
+                <div class="grid grid-cols-4 gap-2">
+                  <div class="flex justify-center items-center">
+                    <u-badge
+                      label="Singles"
+                      color="Singles"
+                      size="md"
+                      class="w-full justify-center"
+                    />
+                  </div>
+                  <input-number
+                    label="current singles rank"
+                    v-model="state.current_singles"
+                  />
+                  <input-number
+                    label="singles career high rank"
+                    v-model="state.ch_singles"
+                  />
+                  <date-picker
+                    v-model="state.singles_ch_date"
+                    placeholder="singles career high date"
+                  />
+                  <div class="flex justify-center items-center">
+                    <u-badge
+                      label="Doubles"
+                      color="Doubles"
+                      size="md"
+                      class="w-full justify-center"
+                    />
+                  </div>
+                  <input-number
+                    label="doubles current rank"
+                    v-model="state.current_doubles"
+                  />
+                  <input-number
+                    label="doubles career high rank"
+                    v-model="state.ch_doubles"
+                  />
+                  <date-picker
+                    v-model="state.doubles_ch_date"
+                    placeholder="doubles career high date"
+                  />
+                </div>
+              </u-form-field>
             </div>
-            <template v-else>
-              <u-form-field label="First name">
-                <u-input
-                  v-model="state.first_name"
-                  placeholder="Enter first name"
-                  class="w-full"
-                />
-              </u-form-field>
-              <u-form-field label="Last name">
-                <u-input
-                  v-model="state.last_name"
-                  placeholder="Enter last name"
-                  class="w-full"
-                />
-              </u-form-field>
-              <u-form-field label="Tours">
-                <u-input-tags
-                  v-model="state.tours"
-                  placeholder="Enter tour"
-                  class="w-full"
-                  delimiter=","
-                />
-              </u-form-field>
-              <u-form-field label="Country">
-                <u-input
-                  v-model="state.country"
-                  placeholder="Enter country code"
-                  class="w-full"
-                />
-              </u-form-field>
-              <u-form-field label="Previous countries">
-                <u-input-tags
-                  v-model="state.previous_countries"
-                  placeholder="Enter previous countries' codes"
-                  class="w-full"
-                />
-              </u-form-field>
-              <u-form-field label="Turned pro">
-                <u-input
-                  type="number"
-                  v-model="state.turned_pro"
-                  placeholder="Enter year turned pro"
-                  class="w-full"
-                />
-              </u-form-field>
-              <u-form-field label="Retired">
-                <u-input
-                  type="number"
-                  v-model="state.retired"
-                  placeholder="Enter year retired"
-                  class="w-full"
-                />
-              </u-form-field>
 
-              <u-form-field label="Plays">
-                <u-select
-                  v-model="state.rh"
-                  placeholder="Select handedness"
-                  class="w-full"
-                  :items="[
-                    { value: true, label: 'Right' },
-                    { value: false, label: 'Left' }
-                  ]"
-                >
-                  <template #content-bottom>
-                    <u-button
-                      size="sm"
-                      label="Clear"
-                      @click="state.rh = undefined"
-                    />
-                  </template>
-                </u-select>
-              </u-form-field>
-
-              <u-form-field label="Backhand">
-                <u-select
-                  v-model="state.bh"
-                  :items="['One', 'Two']"
-                  placeholder="Select backhand"
-                  class="w-full"
-                >
-                  <template #content-bottom>
-                    <u-button
-                      size="sm"
-                      label="Clear"
-                      @click="state.bh = undefined"
-                    />
-                  </template>
-                </u-select>
-              </u-form-field>
-
-              <u-form-field label="Date of Birth">
-                <date-picker
-                  v-model="state.dob"
-                  placeholder="Select date of birth"
-                />
-              </u-form-field>
-              <u-form-field label="Date of Death">
-                <date-picker
-                  v-model="state.dod"
-                  placeholder="Select date of death"
-                />
-              </u-form-field>
-              <u-form-field label="Height (cm)">
-                <u-input-number
-                  v-model="state.height"
-                  placeholder="Enter height in cm"
-                  orientation="vertical"
-                  class="w-full"
-                />
-              </u-form-field>
-              <u-form-field label="Prize Money">
-                <u-input-number
-                  v-model="state.pm"
-                  placeholder="Enter prize money"
-                  orientation="vertical"
-                  class="w-full"
-                  :format-options="{
-                    style: 'currency',
-                    currency: 'USD'
-                  }"
-                />
-              </u-form-field>
-              <div class="col-span-2">
-                <u-form-field label="Ranks">
-                  <div class="grid grid-cols-4 gap-2">
-                    <div class="flex justify-center items-center">
+            <div class="col-span-3">
+              <u-form-field label="Links">
+                <div class="grid grid-cols-4 gap-2 *:flex *:flex-col *:gap-1">
+                  <div
+                    v-for="field in linkFields"
+                    :key="field.label"
+                  >
+                    <label :for="field.key">
                       <u-badge
-                        label="Singles"
-                        color="Singles"
+                        :label="field.label"
+                        :color="field.color"
+                        size="md"
+                        class="w-full justify-center"
                       />
-                    </div>
-                    <u-input-number
-                      placeholder="Enter current singles rank"
-                      v-model="state.current_singles"
-                      orientation="vertical"
-                      class="w-full"
-                    />
-                    <u-input-number
-                      placeholder="Enter singles career high rank"
-                      v-model="state.ch_singles"
-                      orientation="vertical"
-                      class="w-full"
-                    />
-                    <date-picker
-                      v-model="state.singles_ch_date"
-                      placeholder="Select singles career high date"
-                    />
-                    <div class="flex justify-center items-center">
-                      <u-badge
-                        label="Doubles"
-                        color="Doubles"
-                      />
-                    </div>
-                    <u-input-number
-                      placeholder="Enter doubles current rank"
-                      v-model="state.current_doubles"
-                      orientation="vertical"
-                      class="w-full"
-                    />
-                    <u-input-number
-                      placeholder="Enter doubles career high rank"
-                      v-model="state.ch_doubles"
-                      orientation="vertical"
-                      class="w-full"
-                    />
-                    <date-picker
-                      v-model="state.doubles_ch_date"
-                      placeholder="Select doubles career high date"
+                    </label>
+                    <u-textarea
+                      :id="field.key"
+                      v-model="state[field.key]"
+                      :placeholder="`Enter ${field.label.toLowerCase()} link`"
                     />
                   </div>
-                </u-form-field>
-              </div>
-
-              <u-form-field label="Hall of Fame Induction">
-                <u-input
-                  type="number"
-                  v-model="state.hof"
-                  placeholder="Enter year of induction"
-                  class="w-full"
-                />
+                </div>
               </u-form-field>
-              <u-form-field label="Coaches">
-                <div>{{ state.coaches?.join(", ") }}</div>
-                <u-select-menu
-                  v-model="state.coaches"
-                  :loading="coachStatus === 'pending'"
-                  :items="(coaches as any) || []"
-                  multiple
-                  class="w-full"
-                  placeholder="Select coaches"
-                  @update:open="onOpenCoaches"
-                >
-                  <template #content-bottom>
-                    <create-person type="Coach" />
-                  </template>
-                </u-select-menu>
-              </u-form-field>
-
-              <u-form-field label="Former coaches">
-                <div>{{ state.former_coaches?.join(", ") }}</div>
-                <u-select-menu
-                  v-model="state.former_coaches"
-                  :loading="coachStatus === 'pending'"
-                  :items="(coaches as any) || []"
-                  multiple
-                  class="w-full"
-                  placeholder="Select coaches"
-                  @update:open="onOpenCoaches"
-                >
-                  <template #content-bottom>
-                    <create-person type="Coach" />
-                  </template>
-                </u-select-menu>
-              </u-form-field>
-
-              <div class="col-span-3">
-                <u-form-field label="Links">
-                  <div class="grid grid-cols-4 gap-2 *:flex *:flex-col *:gap-1">
-                    <div>
-                      <label for="atp_link">
-                        <u-badge
-                          label="ATP"
-                          color="ATP"
-                        />
-                      </label>
-                      <u-textarea
-                        id="atp_link"
-                        v-model="state.atp_link"
-                        placeholder="Enter ATP link"
-                      />
-                    </div>
-                    <div>
-                      <label for="wta_link">
-                        <u-badge
-                          label="WTA"
-                          color="WTA"
-                        />
-                      </label>
-                      <u-textarea
-                        id="wta_link"
-                        v-model="state.wta_link"
-                        placeholder="Enter WTA link"
-                      />
-                    </div>
-                    <div>
-                      <label for="wiki_link">
-                        <u-badge label="Wiki" />
-                      </label>
-                      <u-textarea
-                        id="wiki_link"
-                        v-model="state.wiki_link"
-                        placeholder="Enter Wikipedia link"
-                      />
-                    </div>
-                    <div>
-                      <label for="official_link">
-                        <u-badge
-                          label="Official"
-                          color="success"
-                        />
-                      </label>
-                      <u-textarea
-                        id="official_link"
-                        v-model="state.official_link"
-                        placeholder="Enter official link"
-                      />
-                    </div>
-                  </div>
-                </u-form-field>
-              </div>
-            </template>
+            </div>
           </div>
+
+          <loading v-else-if="status === 'pending'" />
+
+          <reload
+            v-else
+            message="player"
+          />
         </u-form>
       </template>
     </u-dashboard-panel>

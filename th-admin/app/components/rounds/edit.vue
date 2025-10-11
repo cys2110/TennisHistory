@@ -4,6 +4,10 @@ import * as z from "zod"
 
 const { round } = defineProps<{ round: any }>()
 const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
+const uploading = ref(false)
 
 type Schema = z.output<typeof roundSchema>
 
@@ -18,23 +22,32 @@ const state = reactive<Partial<Schema>>({
   pm: round.pm
 })
 
+const formFields: { label: string; key: keyof Schema; type: "select" | "text" | "player" | "number" | "currency"; items?: string[] }[] = [
+  { label: "Number", key: "number", type: "number" },
+  { label: "Points", key: "points", type: "number" },
+  { label: "Prize Money", key: "pm", type: "currency" }
+]
+
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(uploading, true)
   try {
     await $fetch("/api/rounds/update", {
       query: event.data
     })
     toast.add({
       title: "Round updated",
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
   } catch (e) {
     toast.add({
       title: "Error updating round",
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons.error,
       color: "error"
     })
+  } finally {
+    set(uploading, false)
   }
 }
 </script>
@@ -45,61 +58,45 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-2">
+    <div class="grid grid-cols-5 border-t border-muted pt-1.5 gap-2">
       <u-form-field label="Round">
         <u-input
           :model-value="round.round"
           disabled
-          class="w-full"
         />
-      </u-form-field>
-      <div class="flex justify-center items-center gap-1">
-        <u-badge
-          :label="round.tour"
-          :color="round.tour"
-        />
-        <u-badge
-          :label="round.type"
-          :color="round.type"
-        />
-        <u-badge
-          :label="round.draw"
-          :color="round.draw"
-        />
-      </div>
-      <u-form-field label="Number">
-        <u-input-number
-          v-model="state.number"
-          orientation="vertical"
-          class="w-full"
-        />
-      </u-form-field>
-      <u-form-field label="Points">
-        <u-input-number
-          v-model="state.points"
-          orientation="vertical"
-          class="w-full"
-        />
+
+        <template #help>
+          <div class="flex justify-between items-center">
+            <u-badge
+              :label="round.tour"
+              :color="round.tour"
+            />
+            <u-badge
+              :label="round.type"
+              :color="round.type"
+            />
+            <u-badge
+              :label="round.draw"
+              :color="round.draw"
+            />
+          </div>
+        </template>
       </u-form-field>
 
-      <u-form-field label="Prize Money">
-        <u-input-number
-          v-model="state.pm"
-          orientation="vertical"
-          class="w-full"
-          :format-options="{
-            style: 'currency',
-            currency: round.currency || 'USD'
-          }"
-        />
-      </u-form-field>
+      <form-field
+        v-for="field in formFields"
+        :key="field.label"
+        :field
+        v-model="state[field.key]"
+        :currency="round.currency"
+      />
+
       <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
-          size="sm"
           block
-          icon="lucide:square-check-big"
+          :icon="uploading ? ICONS.uploading : icons.check"
         />
       </div>
     </div>

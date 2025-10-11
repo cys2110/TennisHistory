@@ -1,3 +1,5 @@
+import { isInt } from "neo4j-driver"
+
 export default defineEventHandler(async query => {
   const { id } = getQuery<{ id: string }>(query)
 
@@ -16,11 +18,13 @@ export default defineEventHandler(async query => {
 
   const entries = records.map(record => {
     const entry = record.get("entry")
-    const numberKeys = ["rank", "seed", "q_seed", "points", "pm"]
+    const numberKeys = ["rank", "seed", "q_seed", "points"]
 
     for (const key of numberKeys) {
       if (entry[key]) entry[key] = entry[key]?.toInt()
     }
+
+    if (entry.pm) entry.pm = isInt(entry.pm) ? entry.pm.toInt() : entry.pm
 
     return entry
   })

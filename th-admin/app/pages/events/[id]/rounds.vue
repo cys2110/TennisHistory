@@ -6,8 +6,15 @@ const {
 } = useRoute("rounds")
 useHead({ title: () => `${id} Rounds - TH Admin` })
 const addRounds = ref([])
+const {
+  ui: { icons }
+} = useAppConfig()
 
-const { data: rounds, status } = await useFetch("/api/rounds/get", {
+const {
+  data: rounds,
+  status,
+  refresh
+} = await useFetch("/api/rounds/get", {
   query: { id },
   default: () => []
 })
@@ -24,10 +31,7 @@ function handleAddRound() {
         <u-dashboard-navbar :title="`Rounds - ${id}`">
           <template #right>
             <u-dropdown-menu :items="routes">
-              <u-button
-                icon="lucide:layers-3"
-                size="sm"
-              />
+              <u-button :icon="icons.tip" />
             </u-dropdown-menu>
           </template>
         </u-dashboard-navbar>
@@ -36,8 +40,7 @@ function handleAddRound() {
             label="Add Round"
             @click="handleAddRound"
             block
-            size="sm"
-            icon="lucide:square-plus"
+            :icon="icons.plus"
           />
         </u-dashboard-toolbar>
       </template>
@@ -47,6 +50,7 @@ function handleAddRound() {
           <rounds-add
             v-for="n in addRounds"
             :key="`add-round-${n}`"
+            :refresh
           />
         </client-only>
         <rounds-edit
@@ -55,15 +59,11 @@ function handleAddRound() {
           :key="`round-${index}`"
           :round="round"
         />
-        <div v-else-if="status === 'pending'">Loading...</div>
-        <div class="flex flex-col gap-2 items-center">
-          <div>No rounds found.</div>
-          <u-button
-            label="Refresh"
-            @click="() => reloadNuxtApp()"
-            icon="lucide:refresh-ccw"
-          />
-        </div>
+        <loading v-else-if="status === 'pending'" />
+        <reload
+          v-else
+          message="rounds"
+        />
       </template>
     </u-dashboard-panel>
   </div>

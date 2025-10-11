@@ -5,6 +5,11 @@ const {
   params: { id }
 } = useRoute("entries")
 useHead({ title: () => `${id} Entries - TH Admin` })
+const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
+const updating = ref(false)
 
 const { data: entries, status } = await useFetch("/api/entries/get", {
   query: { id },
@@ -23,22 +28,25 @@ const toc = computed(() => [
 ])
 
 const updateEntryInfo = async () => {
+  set(uploading, true)
   try {
     await $fetch("/api/update-entry-info", {
       query: { id }
     })
     toast.add({
       title: "Entry info updated",
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
   } catch (e) {
     toast.add({
       title: "Error updating entry info",
       description: e.message,
-      icon: "lucide:circle-x",
+      icon: icons.close,
       color: "error"
     })
+  } finally {
+    set(updating, false)
   }
 }
 </script>
@@ -51,8 +59,7 @@ const updateEntryInfo = async () => {
           <template #right>
             <u-popover>
               <u-button
-                icon="lucide:table-of-contents"
-                size="sm"
+                :icon="icons.menu"
                 class="mx-2"
               />
               <template #content>
@@ -65,10 +72,7 @@ const updateEntryInfo = async () => {
               </template>
             </u-popover>
             <u-dropdown-menu :items="routes">
-              <u-button
-                icon="lucide:layers-3"
-                size="sm"
-              />
+              <u-button :icon="icons.tip" />
             </u-dropdown-menu>
           </template>
         </u-dashboard-navbar>
@@ -76,35 +80,28 @@ const updateEntryInfo = async () => {
           <u-button
             label="Update entry info"
             @click="updateEntryInfo"
-            size="sm"
+            :icon="icons.upload"
+            :loading="updating"
+            :loading-icon="ICONS.uploading"
             block
           />
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
-        <u-page-list
-          v-if="entries.length"
-          class="*:my-2"
-        >
+        <u-page-list class="*:my-1">
           <entries-edit
+            v-if="entries.length"
             v-for="(entry, index) in entries"
             :key="`entry-${index}`"
             :entry
           />
-        </u-page-list>
-        <div v-else-if="status === 'pending'">Loading...</div>
-        <div
-          v-else
-          class="flex flex-col gap-2 items-center"
-        >
-          <div>No entries found.</div>
-          <u-button
-            label="Refresh"
-            @click="() => reloadNuxtApp()"
-            icon="lucide:refresh-ccw"
+          <loading v-else-if="status === 'pending'" />
+          <reload
+            v-else
+            message="entries"
           />
-        </div>
+        </u-page-list>
       </template>
     </u-dashboard-panel>
   </div>

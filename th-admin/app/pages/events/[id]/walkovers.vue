@@ -6,8 +6,15 @@ const {
 } = useRoute("walkovers")
 useHead({ title: () => `${id} Walkovers - TH Admin` })
 const addWalkovers = ref([])
+const {
+  ui: { icons }
+} = useAppConfig()
 
-const { data: entries, status } = await useFetch("/api/retirements/get", {
+const {
+  data: entries,
+  status,
+  refresh
+} = await useFetch("/api/retirements/get", {
   query: { id, type: "WALKOVER" },
   default: () => []
 })
@@ -24,10 +31,7 @@ function handleAddWalkover() {
         <u-dashboard-navbar :title="`Walkovers - ${id}`">
           <template #right>
             <u-dropdown-menu :items="routes">
-              <u-button
-                icon="lucide:layers-3"
-                size="sm"
-              />
+              <u-button :icon="icons.tip" />
             </u-dropdown-menu>
           </template>
         </u-dashboard-navbar>
@@ -36,39 +40,32 @@ function handleAddWalkover() {
             label="Add Walkover"
             @click="handleAddWalkover"
             block
-            size="sm"
-            icon="lucide:square-plus"
+            :icon="icons.plus"
           />
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
-        <client-only>
+        <u-page-list class="*:my-1">
           <retirements-add
             v-for="n in addWalkovers"
             :key="`add-walkover-${n}`"
             type="Walkover"
+            :refresh
           />
-        </client-only>
-        <retirements-edit
-          v-if="entries.length"
-          v-for="(entry, index) in entries"
-          :key="`walkover-${index}`"
-          :entry
-          type="Walkover"
-        />
-        <div v-else-if="status === 'pending'">Loading...</div>
-        <div
-          v-else
-          class="flex flex-col gap-2 items-center"
-        >
-          <div>No entries found.</div>
-          <u-button
-            label="Refresh"
-            @click="() => reloadNuxtApp()"
-            icon="lucide:refresh-ccw"
+          <retirements-edit
+            v-if="entries.length"
+            v-for="(entry, index) in entries"
+            :key="`walkover-${index}`"
+            :entry
+            type="Walkover"
           />
-        </div>
+          <loading v-else-if="status === 'pending'" />
+          <reload
+            v-else
+            message="entries"
+          />
+        </u-page-list>
       </template>
     </u-dashboard-panel>
   </div>

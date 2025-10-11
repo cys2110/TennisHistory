@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const { query } = useRoute()
+const {
+  params: { id }
+} = useRoute("draws")
 const tour = defineModel<string>()
 const type = defineModel<string>("type")
 const draw = defineModel<string>("draw")
@@ -7,8 +9,8 @@ const colorMode = useColorMode()
 
 // API call
 const { data, status } = await useFetch<any>("/api/get-draws", {
-  key: () => `draw-${query.id}-${tour.value}-${type.value}-${draw.value}`,
-  query: { id: query.id, tour, type, draw },
+  key: () => `draw-${id}-${tour.value}-${type.value}-${draw.value}`,
+  query: { id, tour, type, draw },
   default: () => [],
   server: false
 })

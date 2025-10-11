@@ -1,5 +1,8 @@
 <script setup lang="ts">
 useHead({ title: "Players - TH Admin" })
+const {
+  ui: { icons }
+} = useAppConfig()
 const selectedLetter = ref<string>("Update")
 
 const {
@@ -36,7 +39,7 @@ const toc = computed(() => [
             <players-create />
             <u-popover>
               <u-button
-                icon="lucide:table-of-contents"
+                :icon="icons.menu"
                 size="sm"
                 class="mx-2"
               />
@@ -54,43 +57,15 @@ const toc = computed(() => [
         <u-dashboard-toolbar>
           <u-select-menu
             v-model="selectedLetter"
-            :items="[
-              'Update',
-              'A',
-              'B',
-              'C',
-              'D',
-              'E',
-              'F',
-              'G',
-              'H',
-              'I',
-              'J',
-              'K',
-              'L',
-              'M',
-              'N',
-              'O',
-              'P',
-              'Q',
-              'R',
-              'S',
-              'T',
-              'U',
-              'V',
-              'W',
-              'X',
-              'Y',
-              'Z'
-            ]"
+            :items="['Update', ...letters]"
           />
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
-        <u-page-list
+        <u-page-grid
           v-if="players?.length"
-          class="*:my-2"
+          class="gap-x-5 gap-y-2 2xl:grid-cols-6"
         >
           <u-link
             v-for="player in players"
@@ -101,21 +76,13 @@ const toc = computed(() => [
           >
             {{ player.first_name ? `${player.first_name} ${player.last_name}` : player.id }}
           </u-link>
-        </u-page-list>
+        </u-page-grid>
 
-        <div v-else-if="status === 'pending'">Loading...</div>
-
-        <div
+        <loading v-else-if="status === 'pending'" />
+        <reload
           v-else
-          class="flex flex-col gap-1 items-center"
-        >
-          Error loading players.
-          <u-button
-            @click="() => refresh()"
-            label="Refresh"
-            icon="lucide:refresh-ccw"
-          />
-        </div>
+          message="players"
+        />
       </template>
     </u-dashboard-panel>
   </div>

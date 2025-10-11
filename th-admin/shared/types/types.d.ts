@@ -52,6 +52,19 @@ declare global {
     title: string
     nationality: string
   }
+
+  interface FormFieldInterface<S> {
+    label: string
+    key: keyof S
+    type: "selectMenu" | "select" | "text" | "number" | "player" | "currency" | "tags" | "date" | "coaches" | "umpires" | "supervisors" | "venues"
+    items?: any[]
+    loading?: boolean
+    subType?: string
+    required?: boolean
+    max?: number
+    format?: (value: any) => any
+    disabled?: boolean
+  }
 }
 
 export {}
