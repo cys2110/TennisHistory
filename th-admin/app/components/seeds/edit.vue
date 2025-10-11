@@ -27,7 +27,7 @@ const state = reactive<Partial<Schema>>({
   rank: seed.rank
 })
 
-const formFields: { label: string; key: keyof Schema; type: "number" }[] = [
+const formFields: FormFieldInterface<Schema>[] = [
   { label: "Seed", key: "seed", type: "number" },
   { label: "Qualifying Seed", key: "q_seed", type: "number" },
   { label: "Rank", key: "rank", type: "number" }
@@ -77,15 +77,17 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           disabled
         />
 
-        <template #help>
+        <template #hint>
           <div class="flex justify-between items-center gap-1">
             <u-badge
               :label="seed.tour"
               :color="seed.tour"
+              size="sm"
             />
             <u-badge
               :label="seed.type"
               :color="seed.type"
+              size="sm"
             />
           </div>
         </template>

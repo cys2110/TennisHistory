@@ -16,7 +16,7 @@ const { data: entries, status } = await useFetch<any[]>("/api/entries/get", {
   default: () => [],
   transform: data =>
     get(useArrayUnique(data, (a, b) => a.id === b.id)).map(entry => ({
-      id: entry.id,
+      id: entry.fid,
       label: entry.first_name ? `${entry.first_name} ${entry.last_name}` : entry.id
     }))
 })

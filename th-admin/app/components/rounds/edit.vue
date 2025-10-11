@@ -22,7 +22,7 @@ const state = reactive<Partial<Schema>>({
   pm: round.pm
 })
 
-const formFields: { label: string; key: keyof Schema; type: "select" | "text" | "player" | "number" | "currency"; items?: string[] }[] = [
+const formFields: FormFieldInterface<Schema>[] = [
   { label: "Number", key: "number", type: "number" },
   { label: "Points", key: "points", type: "number" },
   { label: "Prize Money", key: "pm", type: "currency" }
@@ -58,26 +58,29 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-5 border-t border-muted pt-1.5 gap-2">
+    <div class="grid grid-cols-5 border-b border-muted pb-2 gap-1">
       <u-form-field label="Round">
         <u-input
           :model-value="round.round"
           disabled
         />
 
-        <template #help>
-          <div class="flex justify-between items-center">
+        <template #hint>
+          <div class="flex justify-between items-center gap-1">
             <u-badge
               :label="round.tour"
               :color="round.tour"
+              size="sm"
             />
             <u-badge
               :label="round.type"
               :color="round.type"
+              size="sm"
             />
             <u-badge
               :label="round.draw"
               :color="round.draw"
+              size="sm"
             />
           </div>
         </template>

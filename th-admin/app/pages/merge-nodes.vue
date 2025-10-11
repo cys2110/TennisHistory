@@ -1,5 +1,8 @@
 <script setup lang="ts">
 useHead({ title: "Merge Nodes - TH Admin" })
+const {
+  ui: { icons }
+} = useAppConfig()
 </script>
 
 <template>
@@ -10,7 +13,7 @@ useHead({ title: "Merge Nodes - TH Admin" })
           <template #right>
             <u-button
               label="Refresh"
-              icon="lucide:refresh-ccw"
+              :icon="icons.reload"
               @click="reloadNuxtApp()"
             />
           </template>

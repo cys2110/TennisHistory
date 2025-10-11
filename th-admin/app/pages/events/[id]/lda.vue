@@ -6,8 +6,15 @@ const {
 } = useRoute("rounds")
 useHead({ title: () => `${id} LDA - TH Admin` })
 const addLdas = ref([])
+const {
+  ui: { icons }
+} = useAppConfig()
 
-const { data: entries, status } = await useFetch("/api/lda/get", {
+const {
+  data: entries,
+  status,
+  refresh
+} = await useFetch("/api/lda/get", {
   query: { id },
   default: () => []
 })
@@ -24,10 +31,7 @@ function handleAddLda() {
         <u-dashboard-navbar :title="`LDA - ${id}`">
           <template #right>
             <u-dropdown-menu :items="routes">
-              <u-button
-                icon="lucide:layers-3"
-                size="sm"
-              />
+              <u-button :icon="icons.tip" />
             </u-dropdown-menu>
           </template>
         </u-dashboard-navbar>
@@ -36,37 +40,30 @@ function handleAddLda() {
             label="Add LDA"
             @click="handleAddLda"
             block
-            size="sm"
-            icon="lucide:square-plus"
+            :icon="icons.plus"
           />
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
-        <client-only>
+        <u-page-list class="*:my-1">
           <lda-add
             v-for="n in addLdas"
             :key="`add-lda-${n}`"
+            :refresh
           />
-        </client-only>
-        <lda-edit
-          v-if="entries.length"
-          v-for="(entry, index) in entries"
-          :key="`lda-${index}`"
-          :entry
-        />
-        <div v-else-if="status === 'pending'">Loading...</div>
-        <div
-          v-else
-          class="flex flex-col gap-2 items-center"
-        >
-          <div>No entries found.</div>
-          <u-button
-            label="Refresh"
-            @click="() => reloadNuxtApp()"
-            icon="lucide:refresh-ccw"
+          <lda-edit
+            v-if="entries.length"
+            v-for="(entry, index) in entries"
+            :key="`lda-${index}`"
+            :entry
           />
-        </div>
+          <loading v-else-if="status === 'pending'" />
+          <reload
+            v-else
+            message="entries"
+          />
+        </u-page-list>
       </template>
     </u-dashboard-panel>
   </div>

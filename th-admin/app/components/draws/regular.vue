@@ -224,8 +224,13 @@ watch(
           return ""
         }
       },
-      navButtonsPosition: "overTitles"
-      // matchTextColor: colorMode.value === "dark" ? COLOURS.lightText : COLOURS.darkText
+      navButtonsPosition: "overTitles",
+      matchTextColor: "#94a3b8",
+      roundTitleColor: "#94a3b8",
+      connectionLinesWidth: 2,
+      connectionLinesColor: "#64748b",
+      highlightedConnectionLinesColor: "#a78bfa",
+      highlightedPlayerTitleColor: "#a78bfa"
     })
   },
   { immediate: true }
@@ -235,6 +240,6 @@ watch(
 <template>
   <div
     ref="wrapper"
-    class="max-h-200 max-w-300 overflow-y-auto"
+    class="max-h-200 max-w-400 overflow-y-auto"
   />
 </template>

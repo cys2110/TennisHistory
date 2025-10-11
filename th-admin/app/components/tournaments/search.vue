@@ -6,7 +6,7 @@ const {
   ui: { icons }
 } = useAppConfig()
 
-const { data: supervisors, status } = await useFetch("/api/supervisors/search", {
+const { data: tournaments, status } = await useFetch("/api/tournaments/search", {
   query: { search: searchTerm },
   default: () => []
 })
@@ -16,8 +16,7 @@ const { data: supervisors, status } = await useFetch("/api/supervisors/search", 
   <u-select-menu
     v-model="modelValue"
     v-model:search-term="searchTerm"
-    multiple
-    :items="supervisors"
+    :items="tournaments"
     :loading="status === 'pending'"
     :placeholder="`Select ${placeholder}`"
     value-key="id"
@@ -25,7 +24,7 @@ const { data: supervisors, status } = await useFetch("/api/supervisors/search", 
   >
     <template #content-bottom>
       <u-field-group>
-        <create-person type="Supervisor" />
+        <tournaments-create block />
         <u-button
           label="Clear"
           size="xs"

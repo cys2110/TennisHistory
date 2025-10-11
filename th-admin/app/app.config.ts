@@ -21,8 +21,9 @@ export default defineAppConfig({
       menu: "line-md:list",
       plus: "line-md:plus-square-twotone",
       reload: "line-md:rotate-270",
+      search: "line-md:search-twotone",
       success: "line-md:circle-to-confirm-circle-twotone-transition",
-      tip: "lucide:layers-3",
+      tip: "solar:layers-line-duotone",
       upload: "line-md:uploading"
     },
     badge: { defaultVariants: { variant: "subtle", size: "xs" } },
@@ -66,6 +67,7 @@ export default defineAppConfig({
       }
     },
     inputTags: { slots: { root: "w-full" }, defaultVariants: { size: "sm" } },
-    textarea: { defaultVariants: { size: "sm" }, slots: { root: "w-full" } }
+    textarea: { defaultVariants: { size: "sm" }, slots: { root: "w-full" } },
+    commandPalette: { slots: { input: "[&>input]:h-8", item: "text-xs" } }
   }
 })

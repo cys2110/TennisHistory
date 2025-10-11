@@ -4,6 +4,10 @@ import * as z from "zod"
 
 const { entry } = defineProps<{ entry: any }>()
 const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
+const uploading = ref(false)
 
 type Schema = z.output<typeof ldaSchema>
 
@@ -15,22 +19,25 @@ const state = reactive<Partial<Schema>>({
 })
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(uploading, true)
   try {
     await $fetch("/api/lda/update", {
       query: event.data
     })
     toast.add({
       title: "LDA updated",
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
   } catch (e) {
     toast.add({
       title: "Error updating LDA",
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons.close,
       color: "error"
     })
+  } finally {
+    set(uploading, false)
   }
 }
 </script>
@@ -41,7 +48,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-4 border-t border-muted pt-1.5 gap-2">
+    <div class="grid grid-cols-3 border-b border-muted pb-2 gap-2">
       <u-form-field label="Player">
         <u-link
           v-if="!entry.first_name"
@@ -54,34 +61,34 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           class="w-full"
           disabled
         />
+
+        <template #hint>
+          <div class="flex justify-center items-center gap-1">
+            <u-badge
+              :label="entry.type"
+              :color="entry.type"
+              size="sm"
+            />
+            <u-badge
+              :label="entry.draw"
+              :color="entry.draw"
+              size="sm"
+            />
+          </div>
+        </template>
       </u-form-field>
 
-      <div class="flex justify-center items-center gap-1">
-        <u-badge
-          :label="entry.type"
-          :color="entry.type"
-        />
-        <u-badge
-          :label="entry.draw"
-          :color="entry.draw"
-        />
-      </div>
-
-      <u-form-field label="Rank">
-        <u-input-number
-          v-model="state.rank"
-          orientation="vertical"
-          class="w-full"
-        />
-      </u-form-field>
+      <form-field
+        :field="{ label: 'Rank', key: 'rank', type: 'number' }"
+        v-model="state.rank"
+      />
 
       <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
-          size="sm"
           block
-          icon="lucide:square-check-big"
+          :icon="uploading ? ICONS.uploading : icons.check"
         />
       </div>
     </div>

@@ -2,7 +2,7 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
-const { type, refresh } = defineProps<{ type: "Retirement" | "Walkover"; refresh: () => void }>()
+const { type, refresh } = defineProps<{ type: "Retirement" | "Walkover" | "Default"; refresh: () => void }>()
 const {
   params: { id }
 } = useRoute("retirements")
@@ -16,27 +16,18 @@ const { data: entries, status } = await useFetch("/api/entries/get", {
   query: { id },
   default: () => [],
   transform: data =>
-    useArrayUnique(data, (a, b) => a.id === b.id).value.map(entry => ({
-      id: entry.id,
+    get(useArrayUnique(data, (a, b) => a.id === b.id)).map(entry => ({
+      id: entry.fid,
       label: entry.first_name ? `${entry.first_name} ${entry.last_name}` : entry.id
     }))
 })
 
 type Schema = z.output<typeof retirementSchema>
 
-const state = reactive<Partial<Schema>>({
-  id: "",
-  type: "",
-  draw: "",
-  team_reason: undefined,
-  reason: undefined,
-  eid: id as string
-})
+const state = reactive<Partial<Schema>>({ eid: id as string })
 
-const formFields = computed<
-  { label: string; key: keyof Schema; type: "selectMenu" | "select" | "text" | "player"; items?: any[]; loading?: boolean }[]
->(() => [
-  { label: "Player", key: "id", type: "selectMenu", items: entries.value, loading: status.value === "pending" },
+const formFields = computed<FormFieldInterface<Schema>[]>(() => [
+  { label: "Player", key: "id", type: "selectMenu", items: get(entries.value), loading: get(status) === "pending", required: true },
   { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"] },
   { label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"] },
   { label: "Reason", key: "reason", type: "text" },
@@ -46,7 +37,7 @@ const formFields = computed<
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   set(uploading, true)
   try {
-    const apiRoute = type === "Retirement" ? "/api/retirements/add" : "/api/walkovers/add"
+    const apiRoute = type === "Retirement" ? "/api/retirements/add" : type === "Walkover" ? "/api/walkovers/add" : "/api/defaults/add"
     await $fetch(apiRoute, {
       query: event.data
     })
@@ -75,7 +66,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :schema="retirementSchema"
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-6 border-t border-muted pt-1.5 gap-2">
+    <div class="grid grid-cols-6 border-b border-muted pb-2 gap-2">
       <form-field
         v-for="field in formFields"
         :key="field.label"

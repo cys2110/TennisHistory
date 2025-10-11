@@ -65,14 +65,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   }
 }
 
-const formFields: {
-  label: string
-  key: keyof Schema
-  type: "text" | "player" | "select" | "number" | "selectMenu" | "date" | "umpires"
-  items?: any[]
-  loading?: boolean
-  required?: boolean
-}[] = [
+const formFields: FormFieldInterface<Schema>[] = [
   { label: "Round", key: "round", type: "text", required: true },
   { label: "Match No.", key: "match_no", type: "number", required: true },
   { label: "Best of", key: "best_of", type: "select", items: ["Best3", "Best5"] },
@@ -91,7 +84,7 @@ const formFields: {
     @submit="onSubmit"
   >
     <div class="grid grid-cols-10 border-b border-muted pb-2 gap-2">
-      <div class="row-span-2">
+      <div>
         <u-form-field
           label="ID"
           :hint="match.stats ? '' : 'No stats available'"
@@ -103,7 +96,7 @@ const formFields: {
             class="w-full"
             size="sm"
           />
-          <template #help>
+          <template #hint>
             <div class="flex justify-between items-center gap-1">
               <u-badge
                 :label="match.tour"
@@ -132,7 +125,7 @@ const formFields: {
         v-model="state[field.key]"
       />
 
-      <div class="flex items-center row-span-2">
+      <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
@@ -142,7 +135,7 @@ const formFields: {
         />
       </div>
 
-      <div class="col-span-8 text-sm">
+      <div class="col-span-10 text-sm">
         {{
           match.players.length < 3 ? match.players.join(" v ") : match.players.slice(0, 2).join(" / ") + " v " + match.players.slice(2).join(" / ")
         }}

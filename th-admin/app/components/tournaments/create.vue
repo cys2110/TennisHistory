@@ -2,28 +2,36 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
+defineProps<{ block?: boolean }>()
 const open = ref(false)
 const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
+const uploading = ref(false)
 
 type Schema = z.output<typeof tournamentSchema>
 
-const state = reactive<Partial<Schema>>({
-  id: 0,
-  name: "",
-  established: undefined,
-  abolished: undefined,
-  website: undefined,
-  tours: []
-})
+const state = reactive<Partial<Schema>>({})
+
+const formFields: FormFieldInterface<Schema>[] = [
+  { label: "Tournament Name", key: "name", type: "text", required: true, colSpan: 2 },
+  { label: "Tournament ID", key: "id", type: "number", required: true },
+  { label: "Tours", key: "tours", type: "tags", required: true },
+  { label: "Year Established", key: "established", type: "number" },
+  { label: "Year Abolished", key: "abolished", type: "number" },
+  { label: "Website URL", key: "website", type: "textarea", colSpan: 2 }
+]
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(uploading, true)
   try {
     await $fetch("/api/tournaments/create", {
       query: event.data
     })
     toast.add({
       title: "Tournament created",
-      icon: "lucide:circle-check",
+      icon: icons["success"],
       color: "success"
     })
     set(open, false)
@@ -31,9 +39,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     toast.add({
       title: "Error creating tournament",
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons["error"],
       color: "error"
     })
+  } finally {
+    set(uploading, false)
   }
 }
 </script>
@@ -46,7 +56,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   >
     <u-button
       label="Create Tournament"
-      size="sm"
+      :icon="icons.plus"
+      :block
     />
 
     <template #body>
@@ -57,78 +68,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         @submit="onSubmit"
       >
         <div class="grid grid-cols-2 gap-2">
-          <div class="col-span-2">
-            <u-form-field
-              name="name"
-              label="Name"
-            >
-              <u-input
-                v-model="state.name"
-                placeholder="Enter Tournament Name"
-                class="w-full"
-              />
-            </u-form-field>
-          </div>
-
-          <u-form-field
-            name="id"
-            label="ID"
-          >
-            <u-input
-              type="number"
-              v-model="state.id"
-              placeholder="Enter Tournament ID"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field
-            name="tours"
-            label="Tours"
-          >
-            <u-input-tags
-              v-model="state.tours"
-              placeholder="Enter Tournament Tours"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field
-            name="established"
-            label="Established"
-          >
-            <u-input
-              v-model="state.established"
-              type="number"
-              placeholder="Enter Year Established"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field
-            name="abolished"
-            label="Abolished"
-          >
-            <u-input
-              v-model="state.abolished"
-              type="number"
-              placeholder="Enter Year Abolished"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <div class="col-span-2">
-            <u-form-field
-              name="website"
-              label="Website"
-            >
-              <u-textarea
-                v-model="state.website"
-                placeholder="Enter Website URL"
-                class="w-full"
-              />
-            </u-form-field>
-          </div>
+          <form-field
+            v-for="field in formFields"
+            :key="field.label"
+            :field="field"
+            v-model="state[field.key]"
+          />
         </div>
       </u-form>
     </template>
@@ -138,13 +83,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         form="tournament-form"
         type="submit"
         label="Save"
-        icon="lucide:square-check-big"
+        :icon="uploading ? ICONS.uploading : icons.check"
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
-        icon="lucide:circle-x"
+        :icon="icons['error']"
       />
     </template>
   </u-modal>

@@ -21,7 +21,7 @@ const schema = z.object({
   type: z.enum(["Singles", "Doubles"]),
   draw: z.enum(["Main", "Qualifying"]).optional(),
   links: z.array(z.string()).optional(),
-  draw_range: z.array(z.string()),
+  draw_range: z.array(z.string()).optional(),
   skip: z.array(z.string()).optional()
 })
 
@@ -29,10 +29,7 @@ type Schema = z.output<typeof schema>
 
 const state = reactive<Partial<Schema>>({
   eid: id as string,
-  type: "Singles",
-  links: [],
-  draw_range: [],
-  skip: []
+  type: "Singles"
 })
 
 const formFields = computed(
@@ -44,8 +41,7 @@ const formFields = computed(
       { label: "Match Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true },
       ...(get(selectedTour) === "WTA" ? [{ label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true }] : []),
       ...(get(selectedTour) === "WTA" ? [{ label: "Draw Range", key: "draw_range", type: "tags", max: 2, required: true }] : []),
-      ...(get(selectedTour) === "WTA" ? [{ label: "Matches to Skip", key: "skip", type: "tags" }] : []),
-      ...(get(selectedTour) === "ATP" ? [{ label: "Match Links", key: "links", type: "tags", required: true, format: cleanLink }] : [])
+      ...(get(selectedTour) === "WTA" ? [{ label: "Matches to Skip", key: "skip", type: "tags" }] : [])
     ] as FormFieldInterface<Schema>[]
 )
 
@@ -66,6 +62,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         icon: icons.success,
         color: "success"
       })
+      set(open, false)
     } else {
       toast.add({
         title: "Error scraping matches",
@@ -118,6 +115,23 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
             :field="field"
             v-model="state[field.key]"
           />
+
+          <div
+            v-if="selectedTour === 'ATP'"
+            class="col-span-2"
+          >
+            <u-form-field
+              label="Match Links"
+              required
+            >
+              <u-input-tags
+                v-model="state.links"
+                placeholder="Enter match links"
+                add-on-paste
+                :convert-value="cleanLink"
+              />
+            </u-form-field>
+          </div>
         </div>
       </u-form>
     </template>

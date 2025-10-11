@@ -4,6 +4,10 @@ import * as z from "zod"
 
 const { person, type } = defineProps<{ person: any; type: "Coach" | "Umpire" | "Supervisor" }>()
 const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
+const updating = ref(false)
 
 type Schema = z.output<typeof personSchema>
 
@@ -13,23 +17,32 @@ const state = reactive<Partial<Schema>>({
   last_name: person.last_name
 })
 
+const formFields: FormFieldInterface<Schema>[] = [
+  { label: "ID", key: "id", type: "text", required: true },
+  { label: "First Name", key: "first_name", type: "text", required: true },
+  { label: "Last Name", key: "last_name", type: "text", required: true }
+]
+
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(updating, true)
   try {
     await $fetch("/api/update-person", {
       query: { ...event.data, type }
     })
     toast.add({
       title: `${type} updated`,
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
   } catch (e) {
     toast.add({
       title: `Error updating ${type}`,
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons["error"],
       color: "error"
     })
+  } finally {
+    set(updating, false)
   }
 }
 </script>
@@ -40,36 +53,20 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-4 border-t border-indigo-800 pt-2 gap-2">
-      <u-form-field label="ID">
-        <u-input
-          v-model="state.id"
-          placeholder="ID"
-          class="w-full"
-        />
-      </u-form-field>
-      <u-form-field label="First Name">
-        <u-input
-          v-model="state.first_name"
-          placeholder="First Name"
-          class="w-full"
-        />
-      </u-form-field>
+    <div class="grid grid-cols-4 border-b border-muted pb-2 gap-2">
+      <form-field
+        v-for="field in formFields"
+        :key="field.key"
+        :field="field"
+        v-model="state[field.key]"
+      />
 
-      <u-form-field label="Last Name">
-        <u-input
-          v-model="state.last_name"
-          placeholder="Last Name"
-          class="w-full"
-        />
-      </u-form-field>
       <div class="flex items-center">
         <u-button
           type="submit"
           label="Save"
-          size="sm"
           block
-          icon="lucide:square-check-big"
+          :icon="updating ? ICONS.uploading : icons.check"
         />
       </div>
     </div>

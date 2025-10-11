@@ -40,7 +40,6 @@ const toc = computed(() => [
             <u-popover>
               <u-button
                 :icon="icons.menu"
-                size="sm"
                 class="mx-2"
               />
               <template #content>

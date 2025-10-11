@@ -28,7 +28,7 @@ const toc = computed(() => [
 ])
 
 const updateEntryInfo = async () => {
-  set(uploading, true)
+  set(updating, true)
   try {
     await $fetch("/api/update-entry-info", {
       query: { id }

@@ -2,7 +2,7 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
-const { entry, type } = defineProps<{ entry: any; type: "Retirement" | "Walkover" }>()
+const { entry, type } = defineProps<{ entry: any; type: "Retirement" | "Walkover" | "Default" }>()
 const toast = useToast()
 const {
   ui: { icons }
@@ -18,9 +18,7 @@ const state = reactive<Partial<Schema>>({
   reason: entry.reason
 })
 
-const formFields = computed<
-  { label: string; key: keyof Schema; type: "selectMenu" | "select" | "text" | "player"; items?: any[]; loading?: boolean }[]
->(() => [
+const formFields = computed<FormFieldInterface<Schema>[]>(() => [
   { label: "Reason", key: "reason", type: "text" },
   { label: "Team Reason", key: "team_reason", type: "text" }
 ])
@@ -29,7 +27,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   set(uploading, true)
   try {
     await $fetch("/api/retirements/update", {
-      query: { ...event.data, relationship: type === "Retirement" ? "RETIRED" : "WALKOVER" }
+      query: { ...event.data, relationship: type === "Retirement" ? "RETIRED" : type.toUpperCase() }
     })
     toast.add({
       title: `${type} updated`,
@@ -55,7 +53,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-5 border-t border-muted pt-1.5 gap-2">
+    <div class="grid grid-cols-5 border-b border-muted pb-2 gap-2">
       <u-form-field label="Player">
         <u-link
           v-if="!entry.first_name"
@@ -70,7 +68,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           class="w-full"
         />
 
-        <template #help>
+        <template #hint>
           <u-badge
             :label="entry.type"
             :color="entry.type"

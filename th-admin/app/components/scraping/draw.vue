@@ -29,7 +29,7 @@ const formFields = computed(
       ...(get(selectedTour) === "ATP" ? [{ label: "Draw Size", key: "draw_size", type: "number", required: true }] : []),
       ...(get(selectedTour) === "ATP" ? [{ label: "Match Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true }] : []),
       ...(get(selectedTour) === "ATP" ? [{ label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true }] : []),
-      ...(get(selectedTour) === "ATP" ? [{ label: "Best of", key: "sets", type: "select", items: ["Best3", "Best5"], required: true }] : [])
+      ...(get(selectedTour) === "ATP" ? [{ label: "Best of", key: "sets", type: "select", items: ["Best3", "Best5"] }] : [])
     ] as FormFieldInterface<Schema>[]
 )
 

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 defineProps<{ placeholder: string }>()
 const searchTerm = ref("")
-const modelValue = defineModel<string[]>()
+const modelValue = defineModel<string>()
 const {
   ui: { icons }
 } = useAppConfig()
 
-const { data: supervisors, status } = await useFetch("/api/supervisors/search", {
+const { data: countries, status } = await useFetch("/api/countries/search", {
   query: { search: searchTerm },
   default: () => []
 })
@@ -16,24 +16,20 @@ const { data: supervisors, status } = await useFetch("/api/supervisors/search", 
   <u-select-menu
     v-model="modelValue"
     v-model:search-term="searchTerm"
-    multiple
-    :items="supervisors"
+    :items="countries"
     :loading="status === 'pending'"
     :placeholder="`Select ${placeholder}`"
     value-key="id"
     label-key="label"
   >
     <template #content-bottom>
-      <u-field-group>
-        <create-person type="Supervisor" />
-        <u-button
-          label="Clear"
-          size="xs"
-          @click="modelValue = undefined"
-          :icon="icons.close"
-          block
-        />
-      </u-field-group>
+      <u-button
+        label="Clear"
+        size="xs"
+        @click="modelValue = undefined"
+        :icon="icons.close"
+        block
+      />
     </template>
   </u-select-menu>
 </template>

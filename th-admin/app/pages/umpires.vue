@@ -1,5 +1,8 @@
 <script setup lang="ts">
 useHead({ title: "Umpires - TH Admin" })
+const {
+  ui: { icons }
+} = useAppConfig()
 const { data: umpires, status } = await useFetch<any>("/api/umpires/get", { default: () => [] })
 
 const toc = computed(() => [
@@ -23,8 +26,7 @@ const toc = computed(() => [
             <create-person type="Umpire" />
             <u-popover>
               <u-button
-                icon="lucide:table-of-contents"
-                size="sm"
+                :icon="icons.menu"
                 class="mx-2"
               />
               <template #content>
@@ -41,7 +43,7 @@ const toc = computed(() => [
       </template>
 
       <template #body>
-        <u-page-list class="*:my-2">
+        <u-page-list class="*:my-1">
           <edit-person
             v-if="umpires.length"
             v-for="umpire in umpires"
@@ -50,19 +52,12 @@ const toc = computed(() => [
             type="Umpire"
           />
 
-          <div v-else-if="status === 'pending'">Loading...</div>
+          <loading v-else-if="status === 'pending'" />
 
-          <div
+          <reload
             v-else
-            class="flex flex-col gap-1 items-center"
-          >
-            No umpires found.
-            <u-button
-              @click="() => reloadNuxtApp()"
-              label="Refresh"
-              icon="lucide:refresh-ccw"
-            />
-          </div>
+            message="umpires"
+          />
         </u-page-list>
       </template>
     </u-dashboard-panel>

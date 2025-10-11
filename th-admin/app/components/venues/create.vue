@@ -2,8 +2,13 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
-const open = ref(false)
+defineProps<{ block?: boolean }>()
 const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
+const open = ref(false)
+const uploading = ref(false)
 
 const schema = z.object({
   name: z.string().optional(),
@@ -13,20 +18,23 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>
 
-const state = reactive<Partial<Schema>>({
-  name: undefined,
-  city: "",
-  country: ""
-})
+const state = reactive<Partial<Schema>>({})
+
+const formFields: FormFieldInterface<Schema>[] = [
+  { label: "Name", key: "name", type: "text", colSpan: 2 },
+  { label: "City", key: "city", type: "text", required: true },
+  { label: "Country", key: "country", type: "countries", required: true }
+]
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(uploading, true)
   try {
     await $fetch("/api/venues/create", {
       query: event.data
     })
     toast.add({
       title: "Venue created",
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
     set(open, false)
@@ -34,9 +42,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     toast.add({
       title: "Error creating venue",
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons.error,
       color: "error"
     })
+  } finally {
+    set(uploading, false)
   }
 }
 </script>
@@ -49,7 +59,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   >
     <u-button
       label="Create Venue"
-      size="sm"
+      :block
+      :icon="icons.plus"
     />
 
     <template #body>
@@ -60,31 +71,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         @submit="onSubmit"
       >
         <div class="grid grid-cols-2 gap-2">
-          <div class="col-span-2">
-            <u-form-field label="Name">
-              <u-input
-                v-model="state.name"
-                placeholder="Enter name"
-                class="w-full"
-              />
-            </u-form-field>
-          </div>
-
-          <u-form-field label="City">
-            <u-input
-              v-model="state.city"
-              placeholder="Enter city"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field label="Country">
-            <u-input
-              v-model="state.country"
-              placeholder="Enter country code"
-              class="w-full"
-            />
-          </u-form-field>
+          <form-field
+            v-for="field in formFields"
+            :key="field.label"
+            :field="field"
+            v-model="state[field.key]"
+          />
         </div>
       </u-form>
     </template>
@@ -94,13 +86,14 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         form="venue-form"
         type="submit"
         label="Save"
-        icon="lucide:square-check-big"
+        :icon="uploading ? ICONS.uploading : icons.check"
       />
+
       <u-button
         label="Cancel"
         color="error"
         @click="close"
-        icon="lucide:circle-x"
+        :icon="icons.close"
       />
     </template>
   </u-modal>

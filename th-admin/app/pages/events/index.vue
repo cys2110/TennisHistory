@@ -70,7 +70,7 @@ const toc = computed(() => [
             :id="`event-${event.id}`"
             class="text-sm hover-link"
           >
-            {{ event.name ?? event.id }}
+            {{ event.name ? `${event.name} - ${event.id}` : event.id }}
           </u-link>
         </u-page-grid>
 

@@ -1,6 +1,6 @@
-declare global {
-  interface EventInterface {}
+import appConfig from "~/app.config"
 
+declare global {
   interface TournamentInterface {
     id: number
     name: string
@@ -56,7 +56,7 @@ declare global {
   interface FormFieldInterface<S> {
     label: string
     key: keyof S
-    type: "selectMenu" | "select" | "text" | "number" | "player" | "currency" | "tags" | "date" | "coaches" | "umpires" | "supervisors" | "venues"
+    type: string
     items?: any[]
     loading?: boolean
     subType?: string
@@ -64,6 +64,8 @@ declare global {
     max?: number
     format?: (value: any) => any
     disabled?: boolean
+    colSpan?: number
+    colour?: keyof typeof appConfig.ui.colors
   }
 }
 

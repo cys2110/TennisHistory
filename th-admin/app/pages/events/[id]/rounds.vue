@@ -46,13 +46,11 @@ function handleAddRound() {
       </template>
 
       <template #body>
-        <client-only>
-          <rounds-add
-            v-for="n in addRounds"
-            :key="`add-round-${n}`"
-            :refresh
-          />
-        </client-only>
+        <rounds-add
+          v-for="n in addRounds"
+          :key="`add-round-${n}`"
+          :refresh
+        />
         <rounds-edit
           v-if="rounds.length"
           v-for="(round, index) in rounds"

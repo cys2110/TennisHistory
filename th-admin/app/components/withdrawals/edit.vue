@@ -20,7 +20,7 @@ const state = reactive<Partial<Schema>>({
   team_mate: entry.team_mate?.id
 })
 
-const formFields: { label: string; key: keyof Schema; type: "text" | "player" }[] = [
+const formFields: FormFieldInterface<Schema>[] = [
   { label: "Reason", key: "reason", type: "text" },
   { label: "Team Reason", key: "team_reason", type: "text" },
   { label: "Team Mate", key: "team_mate", type: "player" }
@@ -72,7 +72,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           />
         </div>
 
-        <template #help>
+        <template #hint>
           <div class="flex justify-between items-center">
             <u-badge
               :label="entry.type"

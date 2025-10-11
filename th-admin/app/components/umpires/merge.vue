@@ -1,5 +1,8 @@
 <script setup lang="ts">
 const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
 
 const { data, status, refresh } = await useFetch<any>("/api/umpires/get-merge", {
   default: () => []
@@ -12,14 +15,14 @@ const handleMerge = async (id1: number, id2: number) => {
     })
     toast.add({
       title: `Nodes merged`,
-      icon: "lucide:circle-check",
+      icon: icons["check"],
       color: "success"
     })
   } catch (e) {
     toast.add({
       title: `Error merging nodes`,
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons["error"],
       color: "error"
     })
   }
@@ -42,11 +45,12 @@ const handleMerge = async (id1: number, id2: number) => {
           <u-button
             label="Merge"
             @click="handleMerge(result.umpire1, result.umpire2)"
+            :icon="ICONS.merge"
           />
         </div>
       </div>
 
-      <div v-else-if="status === 'pending'">Loading...</div>
+      <loading v-else-if="status === 'pending'" />
 
       <div
         v-else
@@ -56,7 +60,7 @@ const handleMerge = async (id1: number, id2: number) => {
         <u-button
           label="Refresh"
           @click="refresh()"
-          icon="lucide:refresh-ccw"
+          :icon="icons.reload"
         />
       </div>
     </u-page-list>

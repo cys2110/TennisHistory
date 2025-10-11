@@ -1,5 +1,8 @@
 <script setup lang="ts">
 useHead({ title: "Tournaments - TH Admin" })
+const {
+  ui: { icons }
+} = useAppConfig()
 const { data: tournaments, status, refresh } = await useFetch<TournamentInterface[]>("/api/tournaments/get", { default: () => [] })
 
 const toc = computed(() => [
@@ -20,10 +23,10 @@ const toc = computed(() => [
       <template #header>
         <u-dashboard-navbar title="Tournaments">
           <template #right>
+            <tournaments-create />
             <u-popover>
               <u-button
-                icon="lucide:table-of-contents"
-                size="sm"
+                :icon="icons.menu"
                 class="mx-2"
               />
               <template #content>
@@ -51,19 +54,11 @@ const toc = computed(() => [
           />
         </u-page-grid>
 
-        <div v-else-if="status === 'pending'">Loading...</div>
-
-        <div
+        <loading v-else-if="status === 'pending'" />
+        <reload
           v-else
-          class="flex flex-col items-center gap-1"
-        >
-          No tournaments found.
-          <u-button
-            @click="() => reloadNuxtApp()"
-            label="Refresh"
-            icon="lucide:refresh-ccw"
-          />
-        </div>
+          message="tournaments"
+        />
       </template>
     </u-dashboard-panel>
   </div>

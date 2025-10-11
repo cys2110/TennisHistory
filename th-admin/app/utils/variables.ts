@@ -51,6 +51,7 @@ export const routes = [
 export const ICONS = {
   download: "line-md:downloading",
   downloading: "line-md:downloading",
+  merge: "solar:minimize-square-minimalistic-bold-duotone",
   uploading: "line-md:uploading-loop"
 }
 

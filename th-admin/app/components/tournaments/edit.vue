@@ -3,28 +3,41 @@ import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
 const { tournament } = defineProps<{ tournament: TournamentInterface }>()
-const open = ref(false)
 const toast = useToast()
+const {
+  ui: { icons }
+} = useAppConfig()
+const open = ref(false)
+const uploading = ref(false)
 
 type Schema = z.output<typeof tournamentSchema>
 
 const state = reactive<Partial<Schema>>({
   id: tournament.id,
   name: tournament.name,
-  established: tournament.established,
-  abolished: tournament.abolished,
+  established: tournament.established ?? undefined,
+  abolished: tournament.abolished ?? undefined,
   website: tournament.website,
-  tours: tournament.tours
+  tours: tournament.tours as Schema["tours"]
 })
 
+const formFields: FormFieldInterface<Schema>[] = [
+  { label: "Name", key: "name", type: "text", required: true, colSpan: 2 },
+  { label: "Tours", key: "tours", type: "tags", required: true, colSpan: 2 },
+  { label: "Established", key: "established", type: "number" },
+  { label: "Abolished", key: "abolished", type: "number" },
+  { label: "Website", key: "website", type: "textarea", colSpan: 2 }
+]
+
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(uploading, true)
   try {
     await $fetch("/api/tournaments/update", {
       query: event.data
     })
     toast.add({
       title: "Tournament updated",
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
     set(open, false)
@@ -32,9 +45,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     toast.add({
       title: "Error updating tournament",
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons.close,
       color: "error"
     })
+  } finally {
+    set(uploading, false)
   }
 }
 </script>
@@ -59,64 +74,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         @submit="onSubmit"
       >
         <div class="grid grid-cols-2 gap-2">
-          <div class="col-span-2">
-            <u-form-field
-              name="name"
-              label="Name"
-            >
-              <u-input
-                v-model="state.name"
-                class="w-full"
-              />
-            </u-form-field>
-          </div>
-          <div class="col-span-2">
-            <u-form-field
-              name="tours"
-              label="Tours"
-            >
-              <u-input-tags
-                v-model="state.tours"
-                class="w-full"
-                placeholder="Enter tours"
-                add-on-tab
-              />
-            </u-form-field>
-          </div>
-          <u-form-field
-            name="established"
-            label="Established"
-          >
-            <u-input
-              v-model="state.established"
-              type="number"
-              placeholder="Enter Year Established"
-              class="w-full"
-            />
-          </u-form-field>
-          <u-form-field
-            name="abolished"
-            label="Abolished"
-          >
-            <u-input
-              type="number"
-              v-model="state.abolished"
-              placeholder="Enter Year Abolished"
-              class="w-full"
-            />
-          </u-form-field>
-          <div class="col-span-2">
-            <u-form-field
-              name="website"
-              label="Website"
-            >
-              <u-textarea
-                v-model="state.website"
-                placeholder="Enter Website URL"
-                class="w-full"
-              />
-            </u-form-field>
-          </div>
+          <form-field
+            v-for="field in formFields"
+            :key="field.key"
+            :field="field"
+            v-model="state[field.key]"
+          />
         </div>
       </u-form>
     </template>
@@ -126,13 +89,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         form="tournament-form"
         type="submit"
         label="Save"
-        icon="lucide:square-check-big"
+        :icon="uploading ? ICONS.uploading : icons.check"
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
-        icon="lucide:circle-x"
+        :icon="icons.close"
       />
     </template>
   </u-modal>

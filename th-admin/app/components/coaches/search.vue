@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{ placeholder: string }>()
 const searchTerm = ref("")
-const modelValue = defineModel<string[]>()
+const modelValue = defineModel<string>()
 const {
   ui: { icons }
 } = useAppConfig()
@@ -16,10 +16,11 @@ const { data: coaches, status } = await useFetch("/api/coaches/search", {
   <u-select-menu
     v-model="modelValue"
     v-model:search-term="searchTerm"
-    multiple
     :items="coaches"
     :loading="status === 'pending'"
     :placeholder="`Select ${placeholder}`"
+    value-key="id"
+    label-key="label"
   >
     <template #content-bottom>
       <u-field-group>

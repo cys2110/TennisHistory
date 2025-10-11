@@ -17,13 +17,6 @@ type Schema = z.output<typeof roundSchema>
 
 const state = reactive<Partial<Schema>>({
   id: id as string,
-  tour: "",
-  draw: "",
-  type: "",
-  round: "",
-  number: 0,
-  points: undefined,
-  pm: undefined,
   eid: id as string
 })
 
@@ -47,7 +40,7 @@ watch(
   }
 )
 
-const formFields: { label: string; key: keyof Schema; type: "select" | "text" | "player" | "number" | "currency"; items?: string[] }[] = [
+const formFields: FormFieldInterface<Schema>[] = [
   { label: "Round ID", key: "id", type: "text" },
   { label: "Round", key: "round", type: "select", items: rounds },
   { label: "Tour", key: "tour", type: "select", items: tours },
@@ -89,7 +82,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-9 border-t border-muted pt-1.5 gap-1">
+    <div class="grid grid-cols-9 border-b border-muted pb-2 gap-1">
       <form-field
         v-for="field in formFields"
         :key="field.label"

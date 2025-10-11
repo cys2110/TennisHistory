@@ -43,7 +43,7 @@ const state = reactive<Partial<Schema>>({
   q_status: entry.q_status
 })
 
-const formFields: { label: string; key: keyof Schema; type: "select" | "text" | "player" | "number" | "currency"; items?: string[] }[] = [
+const formFields: FormFieldInterface<Schema>[] = [
   { label: "Rank", key: "rank", type: "number" },
   { label: "Points", key: "points", type: "number" },
   { label: "Prize Money", key: "pm", type: "currency" },
@@ -81,14 +81,14 @@ const handleCopy = async () => {
     await navigator.clipboard.writeText(entry.id)
     toast.add({
       title: "Copied to clipboard",
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
   } catch (e) {
     console.error("Failed to copy text: ", e)
     toast.add({
       title: "Error copying to clipboard",
-      icon: "lucide:circle-x",
+      icon: icons.error,
       color: "error"
     })
   }

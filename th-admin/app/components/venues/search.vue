@@ -20,10 +20,12 @@ const { data: venues, status } = await useFetch("/api/venues/search", {
     :items="venues"
     :loading="status === 'pending'"
     :placeholder="`Select ${placeholder}`"
+    value-key="id"
+    label-key="label"
   >
     <template #content-bottom>
       <u-field-group>
-        <venues-create />
+        <venues-create block />
         <u-button
           label="Clear"
           size="xs"

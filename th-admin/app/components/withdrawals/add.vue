@@ -15,25 +15,16 @@ const uploading = ref(false)
 type Schema = z.output<typeof withdrawalSchema>
 
 const state = reactive<Partial<Schema>>({
-  id: "",
-  type: "",
-  draw: "",
-  team_reason: undefined,
-  reason: undefined,
-  eid: id as string,
-  team_mate: undefined,
-  seed: undefined,
-  status: undefined,
-  rank: undefined
+  eid: id as string
 })
 
-const formFields: { label: string; key: keyof Schema; type: "select" | "text" | "player" | "number"; items?: string[] }[] = [
-  { label: "Player", key: "id", type: "player" },
+const formFields: FormFieldInterface<Schema>[] = [
+  { label: "Player", key: "id", type: "players" },
   { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"] },
   { label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"] },
   { label: "Reason", key: "reason", type: "text" },
   { label: "Team Reason", key: "team_reason", type: "text" },
-  { label: "Team Mate", key: "team_mate", type: "player" },
+  { label: "Team Mate", key: "team_mate", type: "players" },
   { label: "Seed", key: "seed", type: "number" },
   { label: "Status", key: "status", type: "select", items: ["AL", "WC", "Q", "SE", "PR", "LL"] },
   { label: "Rank", key: "rank", type: "number" }

@@ -3,25 +3,31 @@ import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
 const { type } = defineProps<{ type: "Coach" | "Umpire" | "Supervisor" }>()
-
+const {
+  ui: { icons }
+} = useAppConfig()
 const open = ref(false)
 const toast = useToast()
+const updating = ref(false)
 
 type Schema = z.output<typeof personSchema>
 
-const state = reactive<Partial<Schema>>({
-  first_name: "",
-  last_name: ""
-})
+const state = reactive<Partial<Schema>>({})
+
+const formFields: FormFieldInterface<Schema>[] = [
+  { label: "First Name", key: "first_name", type: "text", required: true },
+  { label: "Last Name", key: "last_name", type: "text", required: true }
+]
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+  set(updating, true)
   try {
     await $fetch("/api/create-person", {
       query: { ...event.data, type }
     })
     toast.add({
       title: `${type} created`,
-      icon: "lucide:circle-check",
+      icon: icons.success,
       color: "success"
     })
     set(open, false)
@@ -29,9 +35,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     toast.add({
       title: `Error creating ${type}`,
       description: (e as Error).message,
-      icon: "lucide:circle-x",
+      icon: icons["error"],
       color: "error"
     })
+  } finally {
+    set(updating, false)
   }
 }
 </script>
@@ -45,7 +53,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     <u-button
       :label="`Create ${type}`"
       block
-      size="sm"
+      icon="line-md:account-add"
     />
 
     <template #body>
@@ -56,24 +64,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         @submit="onSubmit"
       >
         <div class="grid grid-cols-2 gap-2">
-          <u-form-field label="First Name">
-            <u-input
-              v-model="state.first_name"
-              placeholder="First Name"
-              class="w-full"
-            />
-          </u-form-field>
-
-          <u-form-field
-            name="last_name"
-            label="Last Name"
-          >
-            <u-input
-              v-model="state.last_name"
-              placeholder="Last Name"
-              class="w-full"
-            />
-          </u-form-field>
+          <form-field
+            v-for="field in formFields"
+            :key="field.key"
+            :field="field"
+            v-model="state[field.key]"
+          />
         </div>
       </u-form>
     </template>
@@ -83,11 +79,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         form="person-form"
         type="submit"
         label="Save"
+        :icon="updating ? ICONS.uploading : icons.check"
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
+        :icon="icons.close"
       />
     </template>
   </u-modal>
