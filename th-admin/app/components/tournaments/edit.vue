@@ -58,7 +58,6 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   <u-modal
     :title="tournament.id.toString()"
     v-model:open="open"
-    :ui="{ body: '*:my-2', footer: 'justify-end' }"
   >
     <u-button
       :label="tournament.name ?? tournament.id.toString()"
@@ -90,12 +89,14 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         type="submit"
         label="Save"
         :icon="uploading ? ICONS.uploading : icons.check"
+        block
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
         :icon="icons.close"
+        block
       />
     </template>
   </u-modal>

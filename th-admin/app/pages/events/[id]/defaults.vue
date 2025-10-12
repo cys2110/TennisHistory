@@ -1,11 +1,10 @@
-<script setup>
+<script setup lang="ts">
 definePageMeta({ name: "defaults" })
 
 const {
   params: { id }
 } = useRoute("defaults")
 useHead({ title: () => `${id} Defaults - TH Admin` })
-const addDefaults = ref([])
 const {
   ui: { icons }
 } = useAppConfig()
@@ -18,10 +17,6 @@ const {
   query: { id, type: "DEFAULTED" },
   default: () => []
 })
-
-function handleAddDefault() {
-  addDefaults.value.push(Date.now())
-}
 </script>
 
 <template>
@@ -29,6 +24,9 @@ function handleAddDefault() {
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar :title="`Defaults - ${id}`">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
           <template #right>
             <u-dropdown-menu :items="routes">
               <u-button :icon="icons.tip" />
@@ -36,23 +34,15 @@ function handleAddDefault() {
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar>
-          <u-button
-            label="Add Default"
-            @click="handleAddDefault"
-            block
-            :icon="icons.plus"
+          <retirements-add
+            type="Default"
+            :refresh
           />
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
         <u-page-list class="*:my-1">
-          <retirements-add
-            v-for="n in addDefaults"
-            :key="`add-default-${n}`"
-            type="Default"
-            :refresh
-          />
           <retirements-edit
             v-if="entries.length"
             v-for="(entry, index) in entries"

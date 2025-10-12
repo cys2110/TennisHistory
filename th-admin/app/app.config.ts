@@ -1,17 +1,18 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: "indigo",
+      primary: "sky",
       Singles: "emerald",
       Doubles: "orange",
-      ATP: "sky",
+      ATP: "violet",
       WTA: "fuchsia",
       Men: "cyan",
       Women: "pink",
-      Main: "violet",
+      Main: "indigo",
       Qualifying: "stone",
       error: "red",
-      success: "green"
+      success: "green",
+      warning: "amber"
     },
     icons: {
       check: "line-md:confirm-square-twotone",
@@ -52,8 +53,11 @@ export default defineAppConfig({
         body: "scroll-smooth"
       }
     },
-    formField: { slots: { label: "font-semibold", error: "text-xs" } },
-    modal: { slots: { content: "p-5" } },
+    formField: {
+      slots: { label: "font-semibold", error: "text-xs", description: "text-xs", help: "text-xs", hint: "text-xs" },
+      defaultVariants: { size: "sm" }
+    },
+    modal: { slots: { body: "*:my-2", content: "p-5", footer: "justify-between" } },
     input: { slots: { root: "w-full" }, defaultVariants: { size: "sm" } },
     inputNumber: {
       slots: { root: "w-full" },
@@ -68,6 +72,21 @@ export default defineAppConfig({
     },
     inputTags: { slots: { root: "w-full" }, defaultVariants: { size: "sm" } },
     textarea: { defaultVariants: { size: "sm" }, slots: { root: "w-full" } },
-    commandPalette: { slots: { input: "[&>input]:h-8", item: "text-xs" } }
+    commandPalette: {
+      slots: { input: "[&>input]:h-8", item: "text-xs" },
+      variants: {
+        active: {
+          false: { item: "data-highlighted:not-data-disabled:before:bg-default" }
+        }
+      }
+    },
+    dropdownMenu: {
+      variants: {
+        active: {
+          true: { item: "before:bg-default text-primary" },
+          false: { item: "data-highlighted:not-data-disabled:before:bg-default" }
+        }
+      }
+    }
   }
 })

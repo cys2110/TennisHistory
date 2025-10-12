@@ -1,11 +1,10 @@
-<script setup>
+<script setup lang="ts">
 definePageMeta({ name: "lda" })
 
 const {
   params: { id }
 } = useRoute("rounds")
 useHead({ title: () => `${id} LDA - TH Admin` })
-const addLdas = ref([])
 const {
   ui: { icons }
 } = useAppConfig()
@@ -18,10 +17,6 @@ const {
   query: { id },
   default: () => []
 })
-
-function handleAddLda() {
-  addLdas.value.push(Date.now()) // ensures unique key
-}
 </script>
 
 <template>
@@ -29,6 +24,9 @@ function handleAddLda() {
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar :title="`LDA - ${id}`">
+          <template #leading>
+            <u-dashboard-sidebar-collapse />
+          </template>
           <template #right>
             <u-dropdown-menu :items="routes">
               <u-button :icon="icons.tip" />
@@ -36,22 +34,12 @@ function handleAddLda() {
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar>
-          <u-button
-            label="Add LDA"
-            @click="handleAddLda"
-            block
-            :icon="icons.plus"
-          />
+          <lda-add :refresh />
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
         <u-page-list class="*:my-1">
-          <lda-add
-            v-for="n in addLdas"
-            :key="`add-lda-${n}`"
-            :refresh
-          />
           <lda-edit
             v-if="entries.length"
             v-for="(entry, index) in entries"

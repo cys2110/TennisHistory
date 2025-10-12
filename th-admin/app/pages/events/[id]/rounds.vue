@@ -1,11 +1,10 @@
-<script setup>
+<script setup lang="ts">
 definePageMeta({ name: "rounds" })
 
 const {
   params: { id }
 } = useRoute("rounds")
 useHead({ title: () => `${id} Rounds - TH Admin` })
-const addRounds = ref([])
 const {
   ui: { icons }
 } = useAppConfig()
@@ -18,10 +17,6 @@ const {
   query: { id },
   default: () => []
 })
-
-function handleAddRound() {
-  addRounds.value.push(Date.now()) // ensures unique key
-}
 </script>
 
 <template>
@@ -29,6 +24,9 @@ function handleAddRound() {
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar :title="`Rounds - ${id}`">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
           <template #right>
             <u-dropdown-menu :items="routes">
               <u-button :icon="icons.tip" />
@@ -36,21 +34,11 @@ function handleAddRound() {
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar>
-          <u-button
-            label="Add Round"
-            @click="handleAddRound"
-            block
-            :icon="icons.plus"
-          />
+          <rounds-add :refresh />
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
-        <rounds-add
-          v-for="n in addRounds"
-          :key="`add-round-${n}`"
-          :refresh
-        />
         <rounds-edit
           v-if="rounds.length"
           v-for="(round, index) in rounds"

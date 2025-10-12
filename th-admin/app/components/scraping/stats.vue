@@ -13,6 +13,7 @@ const open = ref(false)
 const selectedTour = ref<"ATP" | "WTA">("ATP")
 const toast = useToast()
 const scraping = ref(false)
+const form = useTemplateRef("form")
 
 const schema = z.object({
   eid: z.string(),
@@ -62,6 +63,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         icon: icons.success,
         color: "success"
       })
+      state.links = []
       set(open, false)
     } else {
       toast.add({
@@ -104,6 +106,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
 
       <u-form
         id="matches-form"
+        ref="form"
         :schema
         :state
         @submit="onSubmit"
@@ -142,12 +145,14 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         type="submit"
         label="Scrape"
         :icon="scraping ? ICONS.downloading : ICONS.download"
+        block
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
         :icon="icons.close"
+        block
       />
     </template>
   </u-modal>

@@ -37,7 +37,7 @@ const buttonFields: {
   {
     label: "Links",
     children: [
-      { label: "Wiki", colour: "primary", key: "wiki_link", type: "textarea" },
+      { label: "Wiki", colour: "warning", key: "wiki_link", type: "textarea" },
       { label: "ATP", colour: "ATP", key: "atp_link", type: "textarea" },
       { label: "WTA", colour: "WTA", key: "wta_link", type: "textarea" },
       { label: "ITF(M)", colour: "Men", key: "men_link", type: "textarea" },
@@ -49,7 +49,7 @@ const buttonFields: {
     children: [
       {
         label: "General",
-        colour: "primary",
+        colour: "warning",
         children: [
           { key: "draw_type", placeholder: "draw type", type: "select", items: drawOptions },
           { key: "draw_link", placeholder: "draw link", type: "text" }
@@ -133,7 +133,7 @@ const groupFields: {
     colSpan: 2,
     gridCols: 3,
     children: [
-      { label: "General", colour: "primary", key: "sponsor_name", type: "text" },
+      { label: "General", colour: "warning", key: "sponsor_name", type: "text" },
       { label: "ATP", colour: "ATP", key: "atp_sponsor_name", type: "text" },
       { label: "WTA", colour: "WTA", key: "wta_sponsor_name", type: "text" }
     ]
@@ -143,7 +143,7 @@ const groupFields: {
     colSpan: 3,
     gridCols: 5,
     children: [
-      { label: "General", colour: "primary", key: "category", type: "text" },
+      { label: "General", colour: "warning", key: "category", type: "text" },
       { label: "ATP", colour: "ATP", key: "atp_category", type: "text" },
       { label: "WTA", colour: "WTA", key: "wta_category", type: "text" },
       { label: "ITF(M)", colour: "Men", key: "men_category", type: "text" },
@@ -157,7 +157,7 @@ const groupFields: {
     children: [
       {
         label: "General",
-        colour: "primary",
+        colour: "warning",
         children: [
           { key: "start_date", placeholder: "start date", type: "date" },
           { key: "end_date", placeholder: "end date", type: "date" }
@@ -204,7 +204,7 @@ const groupFields: {
     children: [
       {
         label: "General",
-        colour: "primary",
+        colour: "warning",
         key: "currency",
         type: "select",
         items: currencies,
@@ -290,12 +290,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     title="Create Event"
     v-model:open="open"
     fullscreen
-    :ui="{ body: '*:my-2', footer: 'justify-end' }"
   >
-    <u-button
-      label="Create Event"
-      :icon="icons.plus"
-    />
+    <u-button :icon="icons.plus" />
 
     <template #body>
       <u-form
@@ -501,12 +497,14 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         type="submit"
         label="Save"
         :icon="uploading ? ICONS.uploading : icons.check"
+        block
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
         :icon="icons.close"
+        block
       />
     </template>
   </u-modal>

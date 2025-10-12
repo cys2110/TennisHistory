@@ -5,6 +5,9 @@ const {
   params: { id }
 } = useRoute("event")
 useHead({ title: () => `${id} Draws - TH Admin` })
+const {
+  ui: { icons }
+} = useAppConfig()
 
 const selectedTour = ref<string>("ATP")
 const selectedType = ref<string>("Singles")
@@ -15,7 +18,16 @@ const selectedDraw = ref<string>("Main")
   <div class="w-full">
     <u-dashboard-panel>
       <template #header>
-        <u-dashboard-navbar :title="`Matches - ${id}`" />
+        <u-dashboard-navbar :title="`Matches - ${id}`">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
+          <template #right>
+            <u-dropdown-menu :items="routes">
+              <u-button :icon="icons.tip" />
+            </u-dropdown-menu>
+          </template>
+        </u-dashboard-navbar>
         <u-dashboard-toolbar>
           <u-radio-group
             legend="Tour Type"

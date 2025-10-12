@@ -11,7 +11,7 @@ export const tournamentSchema = z.object({
 
 export const eventSchema = z.object({
   id: z.number("Please enter a valid numeric ID"),
-  tournament: z.number("Please enter a valid tournament ID").optional(),
+  tournament: z.any().optional(),
   year: z.number("Please enter a valid year").optional(),
   tours: z.array(z.enum(["ATP", "WTA", "Men", "Women"])).nonempty("Please select at least one tour"),
   surface: z.string("Please select a valid surface").optional(),

@@ -48,10 +48,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   <u-modal
     :title="`Create ${type}`"
     v-model:open="open"
-    :ui="{ body: '*:my-2', footer: 'justify-end' }"
   >
     <u-button
-      :label="`Create ${type}`"
       block
       icon="line-md:account-add"
     />
@@ -80,12 +78,14 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         type="submit"
         label="Save"
         :icon="updating ? ICONS.uploading : icons.check"
+        block
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
         :icon="icons.close"
+        block
       />
     </template>
   </u-modal>

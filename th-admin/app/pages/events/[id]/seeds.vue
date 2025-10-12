@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 definePageMeta({ name: "seeds" })
 
 const {
@@ -20,6 +20,9 @@ const { data: seeds, status } = await useFetch("/api/seeds/get", {
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar :title="`Seeds - ${id}`">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
           <template #right>
             <u-dropdown-menu :items="routes">
               <u-button :icon="icons.tip" />

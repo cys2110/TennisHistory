@@ -19,6 +19,8 @@ const { data: players, status } = await useFetch("/api/players/search", {
     :items="players"
     :loading="status === 'pending'"
     :placeholder="`Select ${placeholder}`"
+    value-key="id"
+    label-key="label"
   >
     <template #content-bottom>
       <u-field-group>

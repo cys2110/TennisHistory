@@ -99,7 +99,6 @@ const state = reactive<Partial<Schema>>({
 })
 
 const formFields: FormFieldInterface<Schema>[] = [
-  { label: "ID", key: "id", type: "text", subType: "number", required: true },
   { label: "Tournament", key: "tournament", type: "text", disabled: true, required: true },
   { label: "Tours", key: "tours", type: "tags", required: true },
   { label: "Surface", key: "surface", type: "select", items: surfaces },
@@ -107,19 +106,235 @@ const formFields: FormFieldInterface<Schema>[] = [
   { label: "Supervisors", key: "supervisors", type: "supervisors" }
 ]
 
-const tours: { label: string; color: keyof typeof colors }[] = [
-  { label: "General", color: "primary" },
-  { label: "ATP", color: "ATP" },
-  { label: "WTA", color: "WTA" },
-  { label: "Men", color: "Men" },
-  { label: "Women", color: "Women" }
+const buttonFields: {
+  label: string
+  children: {
+    label: string
+    colour: keyof typeof colors
+    key?: keyof Schema
+    type?: string
+    children?: { placeholder: string; key: keyof Schema; type: string; items?: string[] }[]
+  }[]
+}[] = [
+  {
+    label: "Links",
+    children: [
+      { label: "Wiki", colour: "warning", key: "wiki_link", type: "textarea" },
+      { label: "ATP", colour: "ATP", key: "atp_link", type: "textarea" },
+      { label: "WTA", colour: "WTA", key: "wta_link", type: "textarea" },
+      { label: "ITF(M)", colour: "Men", key: "men_link", type: "textarea" },
+      { label: "ITF(W)", colour: "Women", key: "women_link", type: "textarea" }
+    ]
+  },
+  {
+    label: "Draws",
+    children: [
+      {
+        label: "General",
+        colour: "warning",
+        children: [
+          { key: "draw_type", placeholder: "draw type", type: "select", items: drawOptions },
+          { key: "draw_link", placeholder: "draw link", type: "text" }
+        ]
+      },
+      {
+        label: "ATP",
+        colour: "ATP",
+        children: [
+          { key: "atp_draw_s", placeholder: "singles draw", type: "select", items: drawOptions },
+          { key: "atp_draw_s_link", placeholder: "singles draw link", type: "text" },
+          { key: "atp_draw_d", placeholder: "doubles draw", type: "select", items: drawOptions },
+          { key: "atp_draw_d_link", placeholder: "doubles draw link", type: "text" },
+          { key: "atp_draw_qs", placeholder: "qualifying singles draw", type: "select", items: drawOptions },
+          { key: "atp_draw_qs_link", placeholder: "qualifying singles draw link", type: "text" },
+          { key: "atp_draw_qd", placeholder: "qualifying doubles draw", type: "select", items: drawOptions },
+          { key: "atp_draw_qd_link", placeholder: "qualifying doubles draw link", type: "text" }
+        ]
+      },
+      {
+        label: "WTA",
+        colour: "WTA",
+        children: [
+          { key: "wta_draw_s", placeholder: "singles draw", type: "select", items: drawOptions },
+          { key: "wta_draw_s_link", placeholder: "singles draw link", type: "text" },
+          { key: "wta_draw_d", placeholder: "doubles draw", type: "select", items: drawOptions },
+          { key: "wta_draw_d_link", placeholder: "doubles draw link", type: "text" },
+          { key: "wta_draw_qs", placeholder: "qualifying singles draw", type: "select", items: drawOptions },
+          { key: "wta_draw_qs_link", placeholder: "qualifying singles draw link", type: "text" },
+          { key: "wta_draw_qd", placeholder: "qualifying doubles draw", type: "select", items: drawOptions },
+          { key: "wta_draw_qd_link", placeholder: "qualifying doubles draw link", type: "text" }
+        ]
+      },
+      {
+        label: "ITF(M)",
+        colour: "Men",
+        children: [
+          { key: "men_draw_s", placeholder: "singles draw", type: "select", items: drawOptions },
+          { key: "men_draw_s_link", placeholder: "singles draw link", type: "text" },
+          { key: "men_draw_d", placeholder: "doubles draw", type: "select", items: drawOptions },
+          { key: "men_draw_d_link", placeholder: "doubles draw link", type: "text" },
+          { key: "men_draw_qs", placeholder: "qualifying singles draw", type: "select", items: drawOptions },
+          { key: "men_draw_qs_link", placeholder: "qualifying singles draw link", type: "text" },
+          { key: "men_draw_qd", placeholder: "qualifying doubles draw", type: "select", items: drawOptions },
+          { key: "men_draw_qd_link", placeholder: "qualifying doubles draw link", type: "text" }
+        ]
+      },
+      {
+        label: "ITF(W)",
+        colour: "Women",
+        children: [
+          { key: "women_draw_s", placeholder: "singles draw", type: "select", items: drawOptions },
+          { key: "women_draw_s_link", placeholder: "singles draw link", type: "text" },
+          { key: "women_draw_d", placeholder: "doubles draw", type: "select", items: drawOptions },
+          { key: "women_draw_d_link", placeholder: "doubles draw link", type: "text" },
+          { key: "women_draw_qs", placeholder: "qualifying singles draw", type: "select", items: drawOptions },
+          { key: "women_draw_qs_link", placeholder: "qualifying singles draw link", type: "text" },
+          { key: "women_draw_qd", placeholder: "qualifying doubles draw", type: "select", items: drawOptions },
+          { key: "women_draw_qd_link", placeholder: "qualifying doubles draw link", type: "text" }
+        ]
+      }
+    ]
+  }
 ]
 
-const draws = [
-  { label: "singles", key: "s" },
-  { label: "doubles", key: "d" },
-  { label: "qualifying singles", key: "qs" },
-  { label: "qualifying doubles", key: "qd" }
+const groupFields: {
+  label: string
+  colSpan: number
+  gridCols: number
+  children: {
+    label: string
+    colour: keyof typeof colors
+    key?: keyof Schema
+    type?: string
+    items?: string[]
+    children?: { placeholder: string; key: keyof Schema; type: string }[]
+  }[]
+}[] = [
+  {
+    label: "Sponsor Names",
+    colSpan: 3,
+    gridCols: 3,
+    children: [
+      { label: "General", colour: "warning", key: "sponsor_name", type: "text" },
+      { label: "ATP", colour: "ATP", key: "atp_sponsor_name", type: "text" },
+      { label: "WTA", colour: "WTA", key: "wta_sponsor_name", type: "text" }
+    ]
+  },
+  {
+    label: "Categories",
+    colSpan: 4,
+    gridCols: 5,
+    children: [
+      { label: "General", colour: "warning", key: "category", type: "text" },
+      { label: "ATP", colour: "ATP", key: "atp_category", type: "text" },
+      { label: "WTA", colour: "WTA", key: "wta_category", type: "text" },
+      { label: "ITF(M)", colour: "Men", key: "men_category", type: "text" },
+      { label: "ITF(W)", colour: "Women", key: "women_category", type: "text" }
+    ]
+  },
+  {
+    label: "Dates",
+    colSpan: 4,
+    gridCols: 5,
+    children: [
+      {
+        label: "General",
+        colour: "warning",
+        children: [
+          { key: "start_date", placeholder: "start date", type: "date" },
+          { key: "end_date", placeholder: "end date", type: "date" }
+        ]
+      },
+      {
+        label: "ATP",
+        colour: "ATP",
+        children: [
+          { key: "atp_start_date", placeholder: "start date", type: "date" },
+          { key: "atp_end_date", placeholder: "end date", type: "date" }
+        ]
+      },
+      {
+        label: "WTA",
+        colour: "WTA",
+        children: [
+          { key: "wta_start_date", placeholder: "start date", type: "date" },
+          { key: "wta_end_date", placeholder: "end date", type: "date" }
+        ]
+      },
+      {
+        label: "ITF(M)",
+        colour: "Men",
+        children: [
+          { key: "men_start_date", placeholder: "start date", type: "date" },
+          { key: "men_end_date", placeholder: "end date", type: "date" }
+        ]
+      },
+      {
+        label: "ITF(W)",
+        colour: "Women",
+        children: [
+          { key: "women_start_date", placeholder: "start date", type: "date" },
+          { key: "women_end_date", placeholder: "end date", type: "date" }
+        ]
+      }
+    ]
+  },
+  {
+    label: "Money",
+    colSpan: 4,
+    gridCols: 5,
+    children: [
+      {
+        label: "General",
+        colour: "warning",
+        key: "currency",
+        type: "select",
+        items: currencies,
+        children: [
+          { key: "pm", placeholder: "PM", type: "currency" },
+          { key: "tfc", placeholder: "TFC", type: "currency" }
+        ]
+      },
+      {
+        label: "ATP",
+        colour: "ATP",
+        key: "atp_currency",
+        type: "select",
+        items: currencies,
+        children: [
+          { key: "atp_pm", placeholder: "PM", type: "currency" },
+          { key: "atp_tfc", placeholder: "TFC", type: "currency" }
+        ]
+      },
+      {
+        label: "WTA",
+        colour: "WTA",
+        key: "wta_currency",
+        type: "select",
+        items: currencies,
+        children: [
+          { key: "wta_pm", placeholder: "PM", type: "currency" },
+          { key: "wta_tfc", placeholder: "TFC", type: "currency" }
+        ]
+      },
+      {
+        label: "ITF(M)",
+        colour: "Men",
+        key: "men_currency",
+        type: "select",
+        items: currencies,
+        children: [{ key: "men_pm", placeholder: "PM", type: "currency" }]
+      },
+      {
+        label: "ITF(W)",
+        colour: "Women",
+        key: "women_currency",
+        type: "select",
+        items: currencies,
+        children: [{ key: "women_pm", placeholder: "PM", type: "currency" }]
+      }
+    ]
+  }
 ]
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
@@ -151,6 +366,9 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar :title="`Edit Event - ${id}`">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
           <template #right>
             <u-dropdown-menu :items="routes">
               <u-button :icon="icons.tip" />
@@ -161,6 +379,13 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           <scraping-draw v-if="event.tours.some((tour: string) => ['ATP', 'WTA'].includes(tour))" />
           <scraping-results v-if="event.tours.includes('ATP')" />
           <scraping-stats v-if="event.tours.some((tour: string) => ['ATP', 'WTA'].includes(tour))" />
+          <u-button
+            form="event-form"
+            type="submit"
+            label="Save"
+            block
+            :icon="submitting ? ICONS.uploading : icons.check"
+          />
         </u-dashboard-toolbar>
       </template>
 
@@ -171,14 +396,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           :state
           @submit="onSubmit"
         >
-          <u-button
-            type="submit"
-            label="Save"
-            block
-            class="mb-3"
-            :icon="submitting ? ICONS.uploading : icons.check"
-          />
-          <div class="grid grid-cols-3 gap-5 items-center">
+          <div class="grid grid-cols-4 gap-5 items-center">
             <form-field
               v-for="field in formFields"
               :key="field.label"
@@ -186,227 +404,54 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
               v-model="state[field.key]"
             />
 
-            <div class="col-span-3">
-              <u-form-field label="Sponsor Names">
-                <div class="grid grid-cols-3 gap-2 *:flex *:flex-col *:gap-1">
-                  <div
-                    v-for="tour in tours.slice(0, 3)"
-                    :key="`sponsor-${tour.label}`"
+            <div
+              v-for="field in groupFields"
+              :key="field.label"
+              :class="`col-span-${field.colSpan}`"
+            >
+              <u-form-field :label="field.label">
+                <div :class="`grid grid-cols-${field.gridCols} gap-2`">
+                  <u-field-group
+                    v-for="item in field.children"
+                    :key="item.key"
                   >
-                    <label :for="`${tour.label.toLowerCase()}_sponsor_name`">
-                      <u-badge
-                        :label="tour.label"
-                        :color="tour.color"
-                        size="md"
-                        class="w-full justify-center"
-                      />
-                    </label>
-                    <!--@vue-expect-error-->
+                    <u-button
+                      disabled
+                      :color="item.colour"
+                      :label="item.label"
+                      class="disabled:cursor-default"
+                    />
                     <u-input
-                      :id="`${tour.label.toLowerCase()}_sponsor_name`"
-                      v-model="state[tour.label === 'General' ? 'sponsor_name' : `${tour.label.toLowerCase()}_sponsor_name` as keyof typeof state]"
-                      :placeholder="`Enter ${tour.label} sponsor name`"
-                    />
-                  </div>
-                </div>
-              </u-form-field>
-            </div>
-
-            <div class="col-span-3">
-              <u-form-field label="Categories">
-                <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
-                  <div
-                    v-for="tour in tours"
-                    :key="`category-${tour.label}`"
-                  >
-                    <label :for="`${tour.label.toLowerCase()}_category`">
-                      <u-badge
-                        :label="tour.label"
-                        :color="tour.color"
-                        size="md"
-                        class="w-full justify-center"
-                      />
-                    </label>
-                    <!--@vue-expect-error-->
-                    <u-input
-                      :id="`${tour.label.toLowerCase()}_category`"
-                      v-model="state[tour.label === 'General' ? 'category' : `${tour.label.toLowerCase()}_category` as keyof typeof state]"
-                      :placeholder="`Enter ${tour.label} category`"
-                    />
-                  </div>
-                </div>
-              </u-form-field>
-            </div>
-
-            <div class="col-span-3">
-              <u-form-field
-                label="Dates"
-                required
-              >
-                <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
-                  <div
-                    v-for="tour in tours"
-                    :key="`date-${tour.label}`"
-                  >
-                    <label :for="`${tour.label.toLowerCase()}_start_date`">
-                      <u-badge
-                        :label="tour.label"
-                        :color="tour.color"
-                        size="md"
-                        class="w-full justify-center"
-                      />
-                    </label>
-                    <date-picker
-                      :id="`${tour.label.toLowerCase()}_start_date`"
-                      v-model=" state[tour.label === 'General' ? 'start_date' : `${tour.label.toLowerCase()}_start_date` as keyof typeof state]"
-                      :placeholder="`${tour.label === 'General' ? '' : tour.label + ' '}start date`"
-                    />
-                    <date-picker
-                      :id="`${tour.label.toLowerCase()}_end_date`"
-                      v-model=" state[tour.label === 'General' ? 'end_date' : `${tour.label.toLowerCase()}_end_date` as keyof typeof state]"
-                      :placeholder="`${tour.label === 'General' ? '' : tour.label + ' '}end date`"
-                    />
-                  </div>
-                </div>
-              </u-form-field>
-            </div>
-
-            <div class="col-span-3">
-              <u-form-field label="Money">
-                <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
-                  <div
-                    v-for="tour in tours"
-                    :key="`money-${tour.label}`"
-                  >
-                    <label :for="`${tour.label.toLowerCase()}_currency`">
-                      <u-badge
-                        :label="tour.label"
-                        :color="tour.color"
-                        size="md"
-                        class="w-full justify-center"
-                      />
-                    </label>
-                    <div class="flex items-center gap-2">
-                      <!--@vue-expect-error-->
-                      <u-select
-                        v-model="state[tour.label === 'General' ? 'currency' : `${tour.label.toLowerCase()}_currency` as keyof typeof state]"
-                        :items="currencies"
-                        placeholder="e.g. $"
-                        class="w-fit"
-                      >
-                        <template #content-bottom>
-                          <u-button
-                            @click="state.currency = undefined"
-                            size="sm"
-                            label="Clear"
-                          />
-                        </template>
-                      </u-select>
-                      <!--@vue-expect-error-->
-                      <u-input-number
-                        v-model="state[tour.label === 'General' ? 'pm' : `${tour.label.toLowerCase()}_pm` as keyof typeof state]"
-                        :placeholder="`Enter ${tour.label === 'General' ? '' : tour.label + ' '}prize money`"
-                        :step="0.01"
-                        :format-options="{
-                          style: 'currency',
-                          currency: state[tour.label === 'General' ? 'currency' : `${tour.label.toLowerCase()}_currency` as keyof typeof state] || 'USD'
-                        }"
-                      >
-                        <template #increment>
-                          <u-button
-                            v-if="state[tour.label === 'General' ? 'pm' : `${tour.label.toLowerCase()}_pm` as keyof typeof state] !== undefined"
-                            color="neutral"
-                            variant="ghost"
-                            size="xs"
-                            :icon="icons.close"
-                            aria-label="Clear input"
-                            @click="state[tour.label === 'General' ? 'pm' : (`${tour.label.toLowerCase()}_pm` as keyof typeof state)] = undefined"
-                          />
-                          <template v-else>{{ "" }}</template>
-                        </template>
-                      </u-input-number>
-                    </div>
-                    <!--@vue-expect-error-->
-                    <u-input-number
-                      v-if="!['Men', 'Women'].includes(tour.label)"
-                      v-model="state[tour.label === 'General' ? 'tfc' : `${tour.label.toLowerCase()}_tfc` as keyof typeof state]"
-                      :placeholder="`Enter ${tour.label === 'General' ? '' : tour.label + ' '}total financial commitment`"
-                      :step="0.01"
-                      :format-options="{
-                          style: 'currency',
-                          currency: state[tour.label === 'General' ? 'currency' : `${tour.label.toLowerCase()}_currency` as keyof typeof state] || 'USD'
-                        }"
+                      v-if="item.type === 'text'"
+                      :id="item.key"
+                      v-model="(state[item.key as keyof Schema] as string)"
+                      :placeholder="`Enter ${field.label.toLowerCase()}`"
                     >
-                      <template #increment>
+                      <template
+                        v-if="(state[item.key as keyof Schema] as string)?.length"
+                        #trailing
+                      >
                         <u-button
-                          v-if="state[tour.label === 'General' ? 'tfc' : `${tour.label.toLowerCase()}_tfc` as keyof typeof state] !== undefined"
                           color="neutral"
-                          variant="ghost"
+                          variant="link"
                           size="xs"
                           :icon="icons.close"
                           aria-label="Clear input"
-                          @click="state[tour.label === 'General' ? 'tfc' : (`${tour.label.toLowerCase()}_tfc` as keyof typeof state)] = undefined"
+                          @click="state[item.key as keyof Schema] = undefined"
                         />
-                        <template v-else>{{ "" }}</template>
                       </template>
-                    </u-input-number>
-                  </div>
-                </div>
-              </u-form-field>
-            </div>
+                    </u-input>
 
-            <div class="col-span-3">
-              <u-form-field
-                label="Links"
-                required
-              >
-                <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
-                  <div
-                    v-for="tour in tours"
-                    :key="`link-${tour.label}`"
-                  >
-                    <label :for="`${tour.label.toLowerCase()}_link`">
-                      <u-badge
-                        :label="tour.label === 'General' ? 'Wikipedia' : tour.label"
-                        :color="tour.color"
-                        class="w-full justify-center"
-                        size="md"
-                      />
-                    </label>
-                    <!--@vue-expect-error-->
-                    <u-textarea
-                      :id="`${tour.label.toLowerCase()}_link`"
-                      v-model="state[tour.label === 'General' ? 'wiki_link' : `${tour.label.toLowerCase()}_link`]"
-                      :placeholder="`Enter ${tour.label === 'General' ? 'Wikipedia' : tour.label} link`"
-                    />
-                  </div>
-                </div>
-              </u-form-field>
-            </div>
-
-            <div class="col-span-3">
-              <u-form-field
-                label="Draws"
-                required
-              >
-                <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
-                  <div>
-                    <label for="draw_link">
-                      <u-badge
-                        label="General"
-                        class="w-full justify-center"
-                        size="md"
-                      />
-                    </label>
                     <u-select
-                      id="draw_type"
-                      v-model="state.draw_type"
-                      placeholder="Enter draw type"
-                      :items="drawOptions"
+                      v-else-if="item.type === 'select'"
+                      v-model="(state[item.key as keyof Schema] as string)"
+                      :items="item.items || []"
+                      placeholder="e.g. $"
+                      class="w-fit"
                     >
                       <template #content-bottom>
                         <u-button
-                          @click="state.draw_type = undefined"
+                          @click="state[item.key as keyof Schema] = undefined"
                           size="xs"
                           label="Clear"
                           :icon="icons.close"
@@ -414,39 +459,118 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                         />
                       </template>
                     </u-select>
-                    <u-textarea
-                      v-model="state.draw_link"
-                      placeholder="Enter draw link"
-                    />
-                  </div>
-
-                  <div
-                    v-for="tour in tours.slice(1)"
-                    :key="`draw-${tour.label}`"
-                  >
-                    <label :for="`${tour.label.toLowerCase()}_draw_s`">
-                      <u-badge
-                        :label="tour.label"
-                        :color="tour.color"
-                        size="md"
-                        class="w-full justify-center"
-                      />
-                    </label>
 
                     <template
-                      v-for="draw in draws"
-                      :key="draw.key"
+                      v-for="child in item.children"
+                      :key="child.key"
                     >
-                      <!--@vue-expect-error-->
+                      <date-picker
+                        v-if="child.type === 'date'"
+                        v-model="state[child.key]"
+                        :placeholder="child.placeholder"
+                      />
+
+                      <u-input-number
+                        v-else-if="child.type === 'currency'"
+                        :id="child.key"
+                        v-model="(state[child.key] as number)"
+                        :placeholder="child.placeholder"
+                        :format-options="{
+                      style: 'currency',
+                      currency: (state[item.key as keyof Schema] as string) || 'USD'
+                    }"
+                      >
+                        <template #increment>
+                          <u-button
+                            v-if="state[child.key] !== undefined"
+                            color="neutral"
+                            variant="ghost"
+                            size="xs"
+                            :icon="icons.close"
+                            aria-label="Clear input"
+                            @click="state[child.key] = undefined"
+                          />
+                          <template v-else>{{ "" }}</template>
+                        </template>
+                      </u-input-number>
+                    </template>
+                  </u-field-group>
+                </div>
+              </u-form-field>
+            </div>
+
+            <div
+              v-for="field in buttonFields"
+              :key="field.label"
+              class="col-span-4"
+            >
+              <u-form-field :label="field.label">
+                <div class="grid grid-cols-5 gap-2 *:flex *:flex-col *:gap-1">
+                  <div
+                    v-for="item in field.children"
+                    :key="item.key"
+                  >
+                    <u-badge
+                      :color="item.colour"
+                      :label="item.label"
+                      size="md"
+                      class="w-full justify-center"
+                    />
+                    <u-textarea
+                      v-if="item.type === 'textarea'"
+                      :id="item.key"
+                      v-model="(state[item.key as keyof Schema] as string)"
+                      placeholder="Enter link"
+                    >
+                      <template
+                        v-if="(state[item.key as keyof Schema] as string)?.length"
+                        #trailing
+                      >
+                        <u-button
+                          color="neutral"
+                          variant="link"
+                          size="xs"
+                          :icon="icons.close"
+                          aria-label="Clear input"
+                          @click="state[item.key as keyof Schema] = undefined"
+                        />
+                      </template>
+                    </u-textarea>
+
+                    <template
+                      v-for="child in item.children"
+                      :key="child.key"
+                    >
+                      <u-textarea
+                        v-if="child.type === 'text'"
+                        :id="child.key"
+                        v-model="(state[child.key] as string)"
+                        :placeholder="`Enter ${child.placeholder}`"
+                      >
+                        <template
+                          v-if="(state[child.key] as string)?.length"
+                          #trailing
+                        >
+                          <u-button
+                            color="neutral"
+                            variant="link"
+                            size="xs"
+                            :icon="icons.close"
+                            aria-label="Clear input"
+                            @click="state[child.key] = undefined"
+                          />
+                        </template>
+                      </u-textarea>
+
                       <u-select
-                        :id="`${tour.label.toLowerCase()}_draw_${draw.key}`"
-                        v-model="state[`${tour.label.toLowerCase()}_draw_${draw.key}` as keyof typeof state]"
-                        :placeholder="`Enter ${tour.label} ${draw.label} draw`"
-                        :items="drawOptions"
+                        v-else
+                        v-model="(state[child.key] as string)"
+                        :items="child.items || []"
+                        :placeholder="`Select ${child.placeholder}`"
                       >
                         <template #content-bottom>
                           <u-button
-                            @click="state[`${tour.label.toLowerCase()}_draw_${draw.key}` as keyof typeof state] = undefined"
+                            @click="state[child.key] = undefined"
                             size="xs"
                             label="Clear"
                             :icon="icons.close"
@@ -454,11 +578,6 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                           />
                         </template>
                       </u-select>
-                      <!--@vue-expect-error-->
-                      <u-textarea
-                        v-model="state[`${tour.label.toLowerCase()}_draw_${draw.key}_link` as keyof typeof state]"
-                        :placeholder="`Enter ${tour.label} ${draw.label} draw link`"
-                      />
                     </template>
                   </div>
                 </div>

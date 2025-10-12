@@ -26,7 +26,7 @@ export default defineEventHandler(async event => {
       tour,
       draw,
       points: points ? int(points) : null,
-      pm: pm ? (Number.isInteger(Number(pm)) ? int(pm) : Number(pm)) : null,
+      pm: pm ? (Number.isInteger(Number(pm)) ? int(pm) : pm) : null,
       number: int(number),
       round
     }

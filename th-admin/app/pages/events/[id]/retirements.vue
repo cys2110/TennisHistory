@@ -1,11 +1,10 @@
-<script setup>
+<script setup lang="ts">
 definePageMeta({ name: "retirements" })
 
 const {
   params: { id }
 } = useRoute("retirements")
 useHead({ title: () => `${id} Retirements - TH Admin` })
-const addRetirements = ref([])
 const {
   ui: { icons }
 } = useAppConfig()
@@ -18,10 +17,6 @@ const {
   query: { id, type: "RETIRED" },
   default: () => []
 })
-
-function handleAddRetirement() {
-  addRetirements.value.push(Date.now())
-}
 </script>
 
 <template>
@@ -29,6 +24,9 @@ function handleAddRetirement() {
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar :title="`Retirements - ${id}`">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
           <template #right>
             <u-dropdown-menu :items="routes">
               <u-button :icon="icons.tip" />
@@ -36,23 +34,15 @@ function handleAddRetirement() {
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar>
-          <u-button
-            label="Add Retirement"
-            @click="handleAddRetirement"
-            block
-            :icon="icons.plus"
+          <retirements-add
+            type="Retirement"
+            :refresh
           />
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
         <u-page-list class="*:my-1">
-          <retirements-add
-            v-for="n in addRetirements"
-            :key="`add-retirement-${n}`"
-            type="Retirement"
-            :refresh
-          />
           <retirements-edit
             v-if="entries.length"
             v-for="(entry, index) in entries"

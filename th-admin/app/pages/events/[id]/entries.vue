@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 definePageMeta({ name: "entries" })
 
 const {
@@ -11,7 +11,11 @@ const {
 } = useAppConfig()
 const updating = ref(false)
 
-const { data: entries, status } = await useFetch("/api/entries/get", {
+const {
+  data: entries,
+  status,
+  refresh
+} = await useFetch("/api/entries/get", {
   query: { id },
   default: () => []
 })
@@ -41,7 +45,7 @@ const updateEntryInfo = async () => {
   } catch (e) {
     toast.add({
       title: "Error updating entry info",
-      description: e.message,
+      description: (e as Error).message,
       icon: icons.close,
       color: "error"
     })
@@ -56,6 +60,9 @@ const updateEntryInfo = async () => {
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar :title="`Entries - ${id}`">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
           <template #right>
             <u-popover>
               <u-button
@@ -77,6 +84,7 @@ const updateEntryInfo = async () => {
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar>
+          <entries-add :refresh />
           <u-button
             label="Update entry info"
             @click="updateEntryInfo"

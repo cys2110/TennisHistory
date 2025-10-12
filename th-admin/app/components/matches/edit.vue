@@ -37,7 +37,7 @@ const state = reactive<Partial<Schema>>({
   date: match.date ? parseDate(match.date) : undefined,
   incomplete: match.incomplete,
   duration: match.duration,
-  umpire: match.umpire,
+  umpire: match.umpire ?? undefined,
   round: match.round,
   best_of: match.best_of
 })
@@ -87,8 +87,8 @@ const formFields: FormFieldInterface<Schema>[] = [
       <div>
         <u-form-field
           label="ID"
-          :hint="match.stats ? '' : 'No stats available'"
-          :ui="{ hint: 'text-red-600 text-xs' }"
+          :help="match.stats ? '' : 'No stats available'"
+          :ui="{ help: 'text-red-600 text-xs' }"
           required
         >
           <u-input
@@ -135,7 +135,7 @@ const formFields: FormFieldInterface<Schema>[] = [
         />
       </div>
 
-      <div class="col-span-10 text-sm">
+      <div class="col-span-10 text-xs">
         {{
           match.players.length < 3 ? match.players.join(" v ") : match.players.slice(0, 2).join(" / ") + " v " + match.players.slice(2).join(" / ")
         }}

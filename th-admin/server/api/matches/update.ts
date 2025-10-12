@@ -1,12 +1,15 @@
-import { int } from "neo4j-driver"
+import { int, Date as NeoDate } from "neo4j-driver"
 
 export default defineEventHandler(async event => {
   const { id, tour, draw, type, match_no, court, date, incomplete, duration, umpire, round, best_of } = getQuery(event)
+
+  const matchDate = date ? JSON.parse(date as string) : null
 
   const [hours, minutes, seconds] = duration ? (duration as string).split(":").map((x: string) => parseInt(x, 10)) : [0, 0, 0]
 
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
+      CYPHER 25
       MATCH (m:Match:$($tour):$($draw):$($type) {id: $id})-[t:PLAYED]->(r:Round)
       SET m.match_no = $match_no,
           m.court = $court,
@@ -20,7 +23,7 @@ export default defineEventHandler(async event => {
         }
       }
       CALL (m, r, t) {
-        WHEN r.round <> $round {
+        WHEN r.round <> $round THEN {
           MATCH (r1:Round:$($tour):$($draw):$($type) {round: $round}) WHERE r1.id STARTS WITH $eid
           MERGE (m)-[:PLAYED]->(r1)
           DELETE t
@@ -44,13 +47,13 @@ export default defineEventHandler(async event => {
       draw,
       type,
       match_no: int(match_no as string),
-      court,
-      date,
-      incomplete,
+      court: court ?? null,
+      date: matchDate ? NeoDate.fromStandardDate(new Date(matchDate.year, matchDate.month - 1, matchDate.day)) : null,
+      incomplete: incomplete ?? null,
       hours,
       minutes,
       seconds,
-      umpire,
+      umpire: umpire ?? null,
       round,
       best_of,
       eid: (id as string).split(" ")[0]

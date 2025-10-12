@@ -1,11 +1,10 @@
-<script setup>
+<script setup lang="ts">
 definePageMeta({ name: "withdrawals" })
 
 const {
   params: { id }
 } = useRoute("withdrawals")
 useHead({ title: () => `${id} Withdrawals - TH Admin` })
-const addWithdrawals = ref([])
 const {
   ui: { icons }
 } = useAppConfig()
@@ -18,10 +17,6 @@ const {
   query: { id },
   default: () => []
 })
-
-function handleAddWithdrawal() {
-  addWithdrawals.value.push(Date.now())
-}
 </script>
 
 <template>
@@ -29,6 +24,9 @@ function handleAddWithdrawal() {
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar :title="`Withdrawals - ${id}`">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
           <template #right>
             <u-dropdown-menu :items="routes">
               <u-button :icon="icons.tip" />
@@ -36,22 +34,12 @@ function handleAddWithdrawal() {
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar>
-          <u-button
-            label="Add Withdrawal"
-            @click="handleAddWithdrawal"
-            block
-            :icon="icons.plus"
-          />
+          <withdrawals-add :refresh />
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
         <u-page-list class="*:my-1">
-          <withdrawals-add
-            v-for="n in addWithdrawals"
-            :key="`add-withdrawal-${n}`"
-            :refresh
-          />
           <withdrawals-edit
             v-if="entries.length"
             v-for="(entry, index) in entries"

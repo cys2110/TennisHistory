@@ -15,7 +15,7 @@ export default defineNuxtConfig({
   },
   ui: {
     theme: {
-      colors: ["primary", "Singles", "Doubles", "ATP", "WTA", "Men", "Women", "Main", "Qualifying", "error", "success"]
+      colors: ["primary", "Singles", "Doubles", "ATP", "WTA", "Men", "Women", "Main", "Qualifying", "error", "success", "warning"]
     }
   },
   imports: {
@@ -41,18 +41,6 @@ export default defineNuxtConfig({
           "useArrayEvery"
         ]
       }
-      // {
-      //   from: "@vueuse/router",
-      //   imports: ["useRouteQuery"]
-      // },
-      // {
-      //   from: "@vueuse/math",
-      //   imports: ["useAverage"]
-      // },
-      // {
-      //   from: "change-case",
-      //   imports: ["kebabCase", "capitalCase", "sentenceCase"]
-      // },
     ]
   }
 })

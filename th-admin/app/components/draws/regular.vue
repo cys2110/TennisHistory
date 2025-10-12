@@ -230,7 +230,8 @@ watch(
       connectionLinesWidth: 2,
       connectionLinesColor: "#64748b",
       highlightedConnectionLinesColor: "#a78bfa",
-      highlightedPlayerTitleColor: "#a78bfa"
+      highlightedPlayerTitleColor: "#a78bfa",
+      matchStatusBgColor: "#1e3a8a"
     })
   },
   { immediate: true }
@@ -240,6 +241,6 @@ watch(
 <template>
   <div
     ref="wrapper"
-    class="max-h-200 max-w-400 overflow-y-auto"
+    class="max-h-200 max-w-380 overflow-y-auto"
   />
 </template>

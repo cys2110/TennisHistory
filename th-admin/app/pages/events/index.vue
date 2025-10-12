@@ -32,6 +32,9 @@ const toc = computed(() => [
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar title="Events">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
           <template #right>
             <events-create />
             <u-popover>

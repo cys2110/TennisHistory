@@ -2,7 +2,11 @@
 import type { FormSubmitEvent } from "@nuxt/ui"
 import * as z from "zod"
 
-defineProps<{ block?: boolean }>()
+const { refresh } = defineProps<{ refresh: () => void }>()
+
+const {
+  params: { id }
+} = useRoute("rounds")
 const toast = useToast()
 const {
   ui: { icons }
@@ -11,36 +15,44 @@ const open = ref(false)
 const uploading = ref(false)
 
 const schema = z.object({
-  name: z.string().optional(),
-  city: z.string(),
-  country: z.string()
+  id: z.string(),
+  eid: z.string(),
+  type: z.string(),
+  seed: z.number().optional(),
+  status: z.string().optional(),
+  q_seed: z.number().optional(),
+  q_status: z.string().optional()
 })
 
 type Schema = z.output<typeof schema>
 
-const state = reactive<Partial<Schema>>({})
+const state = reactive<Partial<Schema>>({ eid: id as string })
 
 const formFields: FormFieldInterface<Schema>[] = [
-  { label: "Name", key: "name", type: "text", colSpan: 2 },
-  { label: "City", key: "city", type: "text", required: true },
-  { label: "Country", key: "country", type: "countries", required: true }
+  { label: "Player", key: "id", type: "players", required: true },
+  { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true },
+  { label: "Seed", key: "seed", type: "number" },
+  { label: "Status", key: "status", type: "select", items: ["AL", "WC", "Q", "SE", "PR", "LL"] },
+  { label: "Qualifying Seed", key: "q_seed", type: "number" },
+  { label: "Qualifying Status", key: "q_status", type: "select", items: ["AL", "WC", "Q", "SE", "PR", "LL"] }
 ]
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   set(uploading, true)
   try {
-    await $fetch("/api/venues/create", {
+    await $fetch("/api/entries/add", {
       query: event.data
     })
     toast.add({
-      title: "Venue created",
+      title: "Entry created",
       icon: icons.success,
       color: "success"
     })
     set(open, false)
+    refresh()
   } catch (e) {
     toast.add({
-      title: "Error creating venue",
+      title: "Error creating entry",
       description: (e as Error).message,
       icon: icons.error,
       color: "error"
@@ -53,17 +65,18 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
 
 <template>
   <u-modal
-    title="Create Venue"
+    title="Add Entry"
     v-model:open="open"
   >
     <u-button
-      :block
+      label="Add Entry"
       :icon="icons.plus"
+      block
     />
 
     <template #body>
       <u-form
-        id="venue-form"
+        id="entry-form"
         :schema="schema"
         :state
         @submit="onSubmit"
@@ -72,7 +85,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           <form-field
             v-for="field in formFields"
             :key="field.label"
-            :field="field"
+            :field
             v-model="state[field.key]"
           />
         </div>
@@ -81,18 +94,17 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
 
     <template #footer="{ close }">
       <u-button
-        form="venue-form"
+        form="entry-form"
         type="submit"
         label="Save"
         :icon="uploading ? ICONS.uploading : icons.check"
         block
       />
-
       <u-button
         label="Cancel"
         color="error"
         @click="close"
-        :icon="icons.close"
+        :icon="icons['error']"
         block
       />
     </template>

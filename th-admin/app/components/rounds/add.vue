@@ -11,6 +11,7 @@ const toast = useToast()
 const {
   ui: { icons }
 } = useAppConfig()
+const open = ref(false)
 const uploading = ref(false)
 
 type Schema = z.output<typeof roundSchema>
@@ -41,12 +42,12 @@ watch(
 )
 
 const formFields: FormFieldInterface<Schema>[] = [
-  { label: "Round ID", key: "id", type: "text" },
-  { label: "Round", key: "round", type: "select", items: rounds },
-  { label: "Tour", key: "tour", type: "select", items: tours },
-  { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"] },
-  { label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"] },
-  { label: "Number", key: "number", type: "number" },
+  { label: "Round ID", key: "id", type: "text", required: true },
+  { label: "Round", key: "round", type: "select", items: rounds, required: true },
+  { label: "Tour", key: "tour", type: "select", items: tours, required: true },
+  { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true },
+  { label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true },
+  { label: "Number", key: "number", type: "number", required: true },
   { label: "Points", key: "points", type: "number" },
   { label: "Prize Money", key: "pm", type: "currency" }
 ]
@@ -62,6 +63,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       icon: icons.success,
       color: "success"
     })
+    set(open, false)
     refresh()
   } catch (e) {
     toast.add({
@@ -77,28 +79,50 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
 </script>
 
 <template>
-  <u-form
-    :schema="roundSchema"
-    :state
-    @submit="onSubmit"
+  <u-modal
+    title="Add Round"
+    v-model:open="open"
   >
-    <div class="grid grid-cols-9 border-b border-muted pb-2 gap-1">
-      <form-field
-        v-for="field in formFields"
-        :key="field.label"
-        :field
-        v-model="state[field.key]"
-        :currency
-      />
+    <u-button
+      label="Add Round"
+      :icon="icons.plus"
+      block
+    />
 
-      <div class="flex items-end">
-        <u-button
-          type="submit"
-          label="Save"
-          block
-          :icon="uploading ? ICONS.uploading : icons.check"
-        />
-      </div>
-    </div>
-  </u-form>
+    <template #body>
+      <u-form
+        id="round-form"
+        :schema="roundSchema"
+        :state
+        @submit="onSubmit"
+      >
+        <div class="grid grid-cols-2 gap-2">
+          <form-field
+            v-for="field in formFields"
+            :key="field.label"
+            :field
+            v-model="state[field.key]"
+            :currency
+          />
+        </div>
+      </u-form>
+    </template>
+
+    <template #footer="{ close }">
+      <u-button
+        form="round-form"
+        type="submit"
+        label="Save"
+        :icon="uploading ? ICONS.uploading : icons.check"
+        block
+      />
+      <u-button
+        label="Cancel"
+        color="error"
+        @click="close"
+        :icon="icons['error']"
+        block
+      />
+    </template>
+  </u-modal>
 </template>

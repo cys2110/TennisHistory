@@ -10,9 +10,11 @@ const {
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar title="Merge Nodes">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
           <template #right>
             <u-button
-              label="Refresh"
               :icon="icons.reload"
               @click="reloadNuxtApp()"
             />

@@ -1,4 +1,4 @@
-import { int } from "neo4j-driver"
+import { int, isInt } from "neo4j-driver"
 
 export default defineEventHandler(async query => {
   const { id } = getQuery<{ id: string }>(query)
@@ -26,13 +26,11 @@ export default defineEventHandler(async query => {
 
   const rounds = records.map(record => {
     const round = record.get("round")
-    const numberKeys = ["points", "number"]
+    const numberKeys = ["points", "number", "pm"]
 
     for (const key of numberKeys) {
-      if (round[key]) round[key] = round[key]?.toInt()
+      if (round[key]) round[key] = isInt(round[key]) ? round[key]?.toInt() : round[key]
     }
-
-    if (round.pm) round.pm = round.pm?.toNumber()
 
     return round
   })

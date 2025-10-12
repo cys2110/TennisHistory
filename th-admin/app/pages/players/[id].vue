@@ -77,7 +77,7 @@ const state = reactive<Partial<Schema>>({
 })
 
 const formFields: FormFieldInterface<Schema>[] = [
-  { label: "First Name", key: "first_name", type: "text" },
+  { label: "First Name", key: "first_name", type: "text", required: true },
   { label: "Last Name", key: "last_name", type: "text", required: true },
   { label: "Tours", key: "tours", type: "tags", required: true },
   { label: "Turned Pro", key: "turned_pro", type: "text", subType: "number" },
@@ -121,7 +121,7 @@ const rankFields: { label: keyof typeof colors; children: FormFieldInterface<Sch
 const linkFields: { label: string; key: keyof Schema; color: keyof typeof colors }[] = [
   { label: "ATP", key: "atp_link", color: "ATP" },
   { label: "WTA", key: "wta_link", color: "WTA" },
-  { label: "Wiki", key: "wiki_link", color: "primary" },
+  { label: "Wiki", key: "wiki_link", color: "warning" },
   { label: "Official", key: "official_link", color: "success" }
 ]
 
@@ -175,7 +175,6 @@ const handleScrape = async () => {
 }
 
 const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
-  console.log(e.data)
   set(submitting, true)
   try {
     await $fetch("/api/players/update", {
@@ -204,7 +203,11 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
     <div class="w-full">
       <u-dashboard-panel>
         <template #header>
-          <u-dashboard-navbar :title="`Edit Player - ${player?.first_name ? `${player.first_name} ${player.last_name}` : id}`" />
+          <u-dashboard-navbar :title="`Edit Player - ${player?.first_name ? `${player.first_name} ${player.last_name}` : id}`">
+            <template #leading>
+              <u-dashboard-sidebar-collapse variant="link" />
+            </template>
+          </u-dashboard-navbar>
           <u-dashboard-toolbar>
             <u-button
               v-if="scrapeDisabled"
@@ -215,7 +218,7 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
             />
             <u-badge
               v-if="player?.updated_at"
-              class="w-full py-1.5"
+              class="w-full py-1.5 justify-center"
               :label="`Updated at: ${get(useDateFormat(player.updated_at, 'DD MMMM YYYY'))}`"
               color="success"
               size="md"
@@ -230,7 +233,6 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
           </u-dashboard-toolbar>
         </template>
         <template #body>
-          {{ state.rh }}
           <u-form
             id="player-form"
             :schema="playerSchema"

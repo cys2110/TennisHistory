@@ -1,11 +1,10 @@
-<script setup>
+<script setup lang="ts">
 definePageMeta({ name: "walkovers" })
 
 const {
   params: { id }
 } = useRoute("walkovers")
 useHead({ title: () => `${id} Walkovers - TH Admin` })
-const addWalkovers = ref([])
 const {
   ui: { icons }
 } = useAppConfig()
@@ -18,10 +17,6 @@ const {
   query: { id, type: "WALKOVER" },
   default: () => []
 })
-
-function handleAddWalkover() {
-  addWalkovers.value.push(Date.now()) // ensures unique key
-}
 </script>
 
 <template>
@@ -29,6 +24,9 @@ function handleAddWalkover() {
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar :title="`Walkovers - ${id}`">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
           <template #right>
             <u-dropdown-menu :items="routes">
               <u-button :icon="icons.tip" />
@@ -36,23 +34,15 @@ function handleAddWalkover() {
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar>
-          <u-button
-            label="Add Walkover"
-            @click="handleAddWalkover"
-            block
-            :icon="icons.plus"
+          <retirements-add
+            type="Walkover"
+            :refresh
           />
         </u-dashboard-toolbar>
       </template>
 
       <template #body>
         <u-page-list class="*:my-1">
-          <retirements-add
-            v-for="n in addWalkovers"
-            :key="`add-walkover-${n}`"
-            type="Walkover"
-            :refresh
-          />
           <retirements-edit
             v-if="entries.length"
             v-for="(entry, index) in entries"

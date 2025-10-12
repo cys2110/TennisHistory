@@ -31,10 +31,17 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       color: "success"
     })
     set(open, false)
-    await navigateTo({
-      name: "player",
-      query: { id: state.id }
-    })
+    await navigateTo(
+      {
+        name: "player",
+        params: { id: state.id }
+      },
+      {
+        open: {
+          target: "_blank"
+        }
+      }
+    )
   } catch (e) {
     toast.add({
       title: "Error creating player",
@@ -52,10 +59,8 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   <u-modal
     title="Create Player"
     v-model:open="open"
-    :ui="{ body: '*:my-2', footer: 'justify-end' }"
   >
     <u-button
-      label="Create Player"
       :block
       icon="line-md:account-add"
     />
@@ -93,12 +98,14 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         type="submit"
         label="Save"
         :icon="uploading ? ICONS.uploading : icons.upload"
+        block
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
         :icon="icons.error"
+        block
       />
     </template>
   </u-modal>

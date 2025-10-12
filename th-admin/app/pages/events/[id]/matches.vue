@@ -6,7 +6,6 @@ const {
 } = useRoute("matches")
 useHead({ title: () => `${id} Matches - TH Admin` })
 const toast = useToast()
-const addMatches = ref<number[]>([])
 const {
   ui: { icons }
 } = useAppConfig()
@@ -36,10 +35,6 @@ const updateTiebreaks = async () => {
     set(updating, false)
   }
 }
-
-const handleAddMatch = () => {
-  addMatches.value.push(Date.now())
-}
 </script>
 
 <template>
@@ -47,6 +42,9 @@ const handleAddMatch = () => {
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar :title="`Matches - ${id}`">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
           <template #right>
             <u-dropdown-menu :items="routes">
               <u-button :icon="icons.tip" />
@@ -54,12 +52,7 @@ const handleAddMatch = () => {
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar>
-          <u-button
-            label="Add Match"
-            @click="handleAddMatch"
-            block
-            :icon="icons.plus"
-          />
+          <matches-add :refresh />
           <u-button
             @click="updateTiebreaks"
             label="Update tiebreaks"
@@ -71,11 +64,6 @@ const handleAddMatch = () => {
 
       <template #body>
         <u-page-list class="*:my-1">
-          <matches-add
-            v-for="n in addMatches"
-            :key="`add-match-${n}`"
-            :refresh
-          />
           <matches-edit
             v-if="matches.length"
             v-for="match in matches"

@@ -23,7 +23,7 @@ const state = reactive<Partial<Schema>>({
 })
 
 const formFields: FormFieldInterface<Schema>[] = [
-  { label: "Number", key: "number", type: "number" },
+  { label: "Number", key: "number", type: "number", required: true },
   { label: "Points", key: "points", type: "number" },
   { label: "Prize Money", key: "pm", type: "currency" }
 ]

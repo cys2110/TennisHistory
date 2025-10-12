@@ -23,7 +23,7 @@ const state = reactive<Partial<Schema>>({
 const formFields: FormFieldInterface<Schema>[] = [
   { label: "Reason", key: "reason", type: "text" },
   { label: "Team Reason", key: "team_reason", type: "text" },
-  { label: "Team Mate", key: "team_mate", type: "player" }
+  { label: "Team Mate", key: "team_mate", type: "players" }
 ]
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {

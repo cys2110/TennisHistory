@@ -77,7 +77,6 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   <u-modal
     title="Scrape Results"
     v-model:open="open"
-    :ui="{ body: '*:my-2', footer: 'justify-end' }"
   >
     <u-button
       label="Scrape results"
@@ -109,12 +108,14 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         type="submit"
         label="Scrape"
         :icon="scraping ? ICONS.downloading : ICONS.download"
+        block
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
         :icon="icons.close"
+        block
       />
     </template>
   </u-modal>

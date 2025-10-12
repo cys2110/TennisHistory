@@ -22,6 +22,9 @@ const toc = computed(() => [
     <u-dashboard-panel>
       <template #header>
         <u-dashboard-navbar title="Tournaments">
+          <template #leading>
+            <u-dashboard-sidebar-collapse variant="link" />
+          </template>
           <template #right>
             <tournaments-create />
             <u-popover>

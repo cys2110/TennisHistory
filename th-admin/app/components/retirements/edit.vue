@@ -53,7 +53,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     :state
     @submit="onSubmit"
   >
-    <div class="grid grid-cols-5 border-b border-muted pb-2 gap-2">
+    <div class="grid grid-cols-4 border-b border-muted pb-2 gap-2">
       <u-form-field label="Player">
         <u-link
           v-if="!entry.first_name"

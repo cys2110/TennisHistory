@@ -106,8 +106,8 @@ export default defineEventHandler(async event => {
   const formerCoachesArray = former_coaches ? (Array.isArray(former_coaches) ? former_coaches : [former_coaches]) : []
 
   const formerCountriesArray = previous_countries ? (Array.isArray(previous_countries) ? previous_countries : [previous_countries]) : []
-  const normalisedPreviousCountries = formerCountriesArray.filter(c => c.id).map(normaliseCountry)
-  const normalisedCountry = country && country.id ? normaliseCountry(country) : null
+  const normalisedPreviousCountries = formerCountriesArray.map(normaliseCountry)
+  const normalisedCountry = country ? normaliseCountry(country) : null
 
   const normalisedCoaches = coachesArray.filter(c => c.id).map(normaliseCoach)
   const normalisedFormerCoaches = formerCoachesArray.filter(c => c.id).map(normaliseCoach)

@@ -46,12 +46,13 @@ const groups = computed(() => [
       </template>
     </u-dashboard-search>
 
-    <u-dashboard-sidebar>
+    <u-dashboard-sidebar collapsible>
       <template #default>
         <u-dashboard-search-button />
         <u-navigation-menu
           :items="items[0]"
           orientation="vertical"
+          variant="link"
         />
       </template>
     </u-dashboard-sidebar>
