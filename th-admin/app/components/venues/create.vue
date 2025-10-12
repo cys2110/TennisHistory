@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-defineProps<{ block?: boolean }>()
+<script setup>
+defineProps(["block"])
 const toast = useToast()
 const {
   ui: { icons }
@@ -10,23 +7,25 @@ const {
 const open = ref(false)
 const uploading = ref(false)
 
+defineShortcuts({
+  meta_enter: () => set(open, !get(open))
+})
+
 const schema = z.object({
   name: z.string().optional(),
   city: z.string(),
   country: z.string()
 })
 
-type Schema = z.output<typeof schema>
+const state = reactive({})
 
-const state = reactive<Partial<Schema>>({})
-
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "Name", key: "name", type: "text", colSpan: 2 },
   { label: "City", key: "city", type: "text", required: true },
   { label: "Country", key: "country", type: "countries", required: true }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/venues/create", {
@@ -41,7 +40,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error creating venue",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.error,
       color: "error"
     })
@@ -80,21 +79,25 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     </template>
 
     <template #footer="{ close }">
-      <u-button
-        form="venue-form"
-        type="submit"
-        label="Save"
-        :icon="uploading ? ICONS.uploading : icons.check"
-        block
-      />
+      <div class="w-full">
+        <u-button
+          form="venue-form"
+          type="submit"
+          label="Save"
+          :icon="uploading ? ICONS.uploading : icons.check"
+          block
+        />
+      </div>
 
-      <u-button
-        label="Cancel"
-        color="error"
-        @click="close"
-        :icon="icons.close"
-        block
-      />
+      <div class="w-full">
+        <u-button
+          label="Cancel"
+          color="error"
+          @click="close"
+          :icon="icons.close"
+          block
+        />
+      </div>
     </template>
   </u-modal>
 </template>

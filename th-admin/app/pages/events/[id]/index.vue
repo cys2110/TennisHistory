@@ -1,7 +1,5 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
+<script setup>
 import { parseDate } from "@internationalized/date"
-import * as z from "zod"
 
 definePageMeta({ name: "event" })
 useHead({ title: "Edit Event - TH Admin" })
@@ -15,19 +13,23 @@ const {
 } = useAppConfig()
 const submitting = ref(false)
 
-const { data: event, status } = await useFetch<any>("/api/events/get-event", {
+const form = useTemplateRef("form")
+
+const { data: event, status } = await useFetch("/api/events/get-event", {
   query: { id }
 })
 
-type Schema = z.output<typeof eventSchema>
+defineShortcuts({
+  meta_enter: () => form.value?.submit()
+})
 
-const state = reactive<Partial<Schema>>({
+const state = reactive({
   id: get(event)?.id,
   tournament: get(event)?.tournament,
-  tours: get(event)?.tours || [],
+  tours: get(event)?.tours.filter(tour => tour !== "Update") || [],
   surface: get(event)?.surface,
   supervisors: get(event)?.supervisors || [],
-  venues: get(event)?.venues.map((v: any) => v.id) || [],
+  venues: get(event)?.venues.map(v => v.id) || [],
   atp_link: get(event)?.atp_link,
   wta_link: get(event)?.wta_link,
   men_link: get(event)?.men_link,
@@ -98,24 +100,15 @@ const state = reactive<Partial<Schema>>({
   women_end_date: get(event)?.women_end_date ? parseDate(get(event)?.women_end_date) : undefined
 })
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "Tournament", key: "tournament", type: "text", disabled: true, required: true },
-  { label: "Tours", key: "tours", type: "tags", required: true },
+  { label: "Tours", key: "tours", type: "checkbox", items: tours, required: true },
   { label: "Surface", key: "surface", type: "select", items: surfaces },
   { label: "Venues", key: "venues", type: "venues" },
   { label: "Supervisors", key: "supervisors", type: "supervisors" }
 ]
 
-const buttonFields: {
-  label: string
-  children: {
-    label: string
-    colour: keyof typeof colors
-    key?: keyof Schema
-    type?: string
-    children?: { placeholder: string; key: keyof Schema; type: string; items?: string[] }[]
-  }[]
-}[] = [
+const buttonFields = [
   {
     label: "Links",
     children: [
@@ -197,19 +190,7 @@ const buttonFields: {
   }
 ]
 
-const groupFields: {
-  label: string
-  colSpan: number
-  gridCols: number
-  children: {
-    label: string
-    colour: keyof typeof colors
-    key?: keyof Schema
-    type?: string
-    items?: string[]
-    children?: { placeholder: string; key: keyof Schema; type: string }[]
-  }[]
-}[] = [
+const groupFields = [
   {
     label: "Sponsor Names",
     colSpan: 3,
@@ -337,7 +318,7 @@ const groupFields: {
   }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(submitting, true)
   try {
     await $fetch("/api/events/update", {
@@ -351,7 +332,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error updating event",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.error,
       color: "error"
     })
@@ -376,9 +357,9 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
           </template>
         </u-dashboard-navbar>
         <u-dashboard-toolbar>
-          <scraping-draw v-if="event.tours.some((tour: string) => ['ATP', 'WTA'].includes(tour))" />
+          <scraping-draw v-if="event.tours.some(tour => ['ATP', 'WTA'].includes(tour))" />
           <scraping-results v-if="event.tours.includes('ATP')" />
-          <scraping-stats v-if="event.tours.some((tour: string) => ['ATP', 'WTA'].includes(tour))" />
+          <scraping-stats v-if="event.tours.some(tour => ['ATP', 'WTA'].includes(tour))" />
           <u-button
             form="event-form"
             type="submit"
@@ -392,6 +373,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       <template #body>
         <u-form
           id="event-form"
+          ref="form"
           :schema="eventSchema"
           :state
           @submit="onSubmit"
@@ -424,11 +406,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                     <u-input
                       v-if="item.type === 'text'"
                       :id="item.key"
-                      v-model="(state[item.key as keyof Schema] as string)"
+                      v-model="state[item.key]"
                       :placeholder="`Enter ${field.label.toLowerCase()}`"
                     >
                       <template
-                        v-if="(state[item.key as keyof Schema] as string)?.length"
+                        v-if="state[item.key]?.length"
                         #trailing
                       >
                         <u-button
@@ -437,21 +419,21 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                           size="xs"
                           :icon="icons.close"
                           aria-label="Clear input"
-                          @click="state[item.key as keyof Schema] = undefined"
+                          @click="state[item.key] = undefined"
                         />
                       </template>
                     </u-input>
 
                     <u-select
                       v-else-if="item.type === 'select'"
-                      v-model="(state[item.key as keyof Schema] as string)"
+                      v-model="state[item.key]"
                       :items="item.items || []"
                       placeholder="e.g. $"
                       class="w-fit"
                     >
                       <template #content-bottom>
                         <u-button
-                          @click="state[item.key as keyof Schema] = undefined"
+                          @click="state[item.key] = undefined"
                           size="xs"
                           label="Clear"
                           :icon="icons.close"
@@ -473,12 +455,12 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       <u-input-number
                         v-else-if="child.type === 'currency'"
                         :id="child.key"
-                        v-model="(state[child.key] as number)"
+                        v-model="state[child.key]"
                         :placeholder="child.placeholder"
                         :format-options="{
-                      style: 'currency',
-                      currency: (state[item.key as keyof Schema] as string) || 'USD'
-                    }"
+                          style: 'currency',
+                          currency: state[item.key] || 'USD'
+                        }"
                       >
                         <template #increment>
                           <u-button
@@ -519,11 +501,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                     <u-textarea
                       v-if="item.type === 'textarea'"
                       :id="item.key"
-                      v-model="(state[item.key as keyof Schema] as string)"
+                      v-model="state[item.key]"
                       placeholder="Enter link"
                     >
                       <template
-                        v-if="(state[item.key as keyof Schema] as string)?.length"
+                        v-if="state[item.key]?.length"
                         #trailing
                       >
                         <u-button
@@ -532,7 +514,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                           size="xs"
                           :icon="icons.close"
                           aria-label="Clear input"
-                          @click="state[item.key as keyof Schema] = undefined"
+                          @click="state[item.key] = undefined"
                         />
                       </template>
                     </u-textarea>
@@ -544,11 +526,11 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
                       <u-textarea
                         v-if="child.type === 'text'"
                         :id="child.key"
-                        v-model="(state[child.key] as string)"
+                        v-model="state[child.key]"
                         :placeholder="`Enter ${child.placeholder}`"
                       >
                         <template
-                          v-if="(state[child.key] as string)?.length"
+                          v-if="state[child.key]?.length"
                           #trailing
                         >
                           <u-button
@@ -564,7 +546,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
 
                       <u-select
                         v-else
-                        v-model="(state[child.key] as string)"
+                        v-model="state[child.key]"
                         :items="child.items || []"
                         :placeholder="`Select ${child.placeholder}`"
                       >

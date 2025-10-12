@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { entry } = defineProps<{ entry: any }>()
+<script setup>
+const { entry } = defineProps(["entry"])
 const {
   params: { id }
 } = useRoute("entries")
@@ -17,22 +14,8 @@ const { data: currency, status } = await useFetch("/api/get-currency", {
   default: () => "USD"
 })
 
-const schema = z.object({
-  fid: z.string(),
-  type: z.string(),
-  rank: z.number().optional(),
-  points: z.number().optional(),
-  pm: z.number().optional(),
-  seed: z.number().optional(),
-  status: z.string().optional(),
-  q_seed: z.number().optional(),
-  q_status: z.string().optional()
-})
-
-type Schema = z.output<typeof schema>
-
-const state = reactive<Partial<Schema>>({
-  fid: entry.fid,
+const state = reactive({
+  id: entry.fid,
   type: entry.type,
   rank: entry.rank,
   points: entry.points,
@@ -43,7 +26,7 @@ const state = reactive<Partial<Schema>>({
   q_status: entry.q_status
 })
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "Rank", key: "rank", type: "number" },
   { label: "Points", key: "points", type: "number" },
   { label: "Prize Money", key: "pm", type: "currency" },
@@ -53,7 +36,7 @@ const formFields: FormFieldInterface<Schema>[] = [
   { label: "Qualifying Status", key: "q_status", type: "select", items: ["AL", "WC", "Q", "SE", "PR", "LL"] }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/entries/update", {
@@ -67,7 +50,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error updating entry",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.error,
       color: "error"
     })
@@ -80,7 +63,7 @@ const handleCopy = async () => {
   try {
     await navigator.clipboard.writeText(entry.id)
     toast.add({
-      title: "Copied to clipboard",
+      title: `${entry.id} copied to clipboard`,
       icon: icons.success,
       color: "success"
     })
@@ -98,7 +81,7 @@ const handleCopy = async () => {
 <template>
   <u-form
     @submit="onSubmit"
-    :schema
+    :schema="entrySchema"
     :state
     :id="`${entry.id}-${entry.type}`"
   >

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 useHead({ title: "Merge Nodes - TH Admin" })
 const {
   ui: { icons }

@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { tournament } = defineProps<{ tournament: TournamentInterface }>()
+<script setup>
+const { tournament } = defineProps(["tournament"])
 const toast = useToast()
 const {
   ui: { icons }
@@ -10,26 +7,24 @@ const {
 const open = ref(false)
 const uploading = ref(false)
 
-type Schema = z.output<typeof tournamentSchema>
-
-const state = reactive<Partial<Schema>>({
+const state = reactive({
   id: tournament.id,
   name: tournament.name,
   established: tournament.established ?? undefined,
   abolished: tournament.abolished ?? undefined,
   website: tournament.website,
-  tours: tournament.tours as Schema["tours"]
+  tours: tournament.tours.filter(tour => tour !== "Update")
 })
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "Name", key: "name", type: "text", required: true, colSpan: 2 },
-  { label: "Tours", key: "tours", type: "tags", required: true, colSpan: 2 },
-  { label: "Established", key: "established", type: "number" },
-  { label: "Abolished", key: "abolished", type: "number" },
+  { label: "Tours", key: "tours", type: "checkbox", items: tours, required: true, colSpan: 2 },
+  { label: "Established", key: "established", type: "text", subType: "number" },
+  { label: "Abolished", key: "abolished", type: "text", subType: "number" },
   { label: "Website", key: "website", type: "textarea", colSpan: 2 }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/tournaments/update", {
@@ -44,7 +39,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error updating tournament",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.close,
       color: "error"
     })
@@ -63,6 +58,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       :label="tournament.name ?? tournament.id.toString()"
       :id="`tournament-${tournament.id}`"
       block
+      :color="tournament.tours.includes('Update') ? 'warning' : 'primary'"
     />
 
     <template #body>

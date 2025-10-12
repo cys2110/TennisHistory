@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { refresh } = defineProps<{ refresh: () => void }>()
+<script setup>
+const { refresh } = defineProps(["refresh"])
 
 const {
   params: { id }
@@ -14,11 +11,13 @@ const {
 const open = ref(false)
 const uploading = ref(false)
 
-type Schema = z.output<typeof roundSchema>
+defineShortcuts({
+  meta_enter: () => set(open, !get(open))
+})
 
-const state = reactive<Partial<Schema>>({
-  id: id as string,
-  eid: id as string
+const state = reactive({
+  id,
+  eid: id
 })
 
 const params = computed(() => ({
@@ -41,10 +40,10 @@ watch(
   }
 )
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "Round ID", key: "id", type: "text", required: true },
   { label: "Round", key: "round", type: "select", items: rounds, required: true },
-  { label: "Tour", key: "tour", type: "select", items: tours, required: true },
+  { label: "Tour", key: "tour", type: "radio", items: tours, required: true },
   { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true },
   { label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true },
   { label: "Number", key: "number", type: "number", required: true },
@@ -52,7 +51,7 @@ const formFields: FormFieldInterface<Schema>[] = [
   { label: "Prize Money", key: "pm", type: "currency" }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/rounds/add", {
@@ -68,7 +67,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error creating round",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.error,
       color: "error"
     })

@@ -6,11 +6,11 @@ export default defineEventHandler(async query => {
       CYPHER 25
       WHEN $letter = 'Update' THEN {
         MATCH (p:Player WHERE p.first_name IS NULL)
-        RETURN {id: p.id} AS player
+        RETURN {id: p.id, labels: labels(p)} AS player
         ORDER BY player.id
       } ELSE {
         MATCH (p:Player WHERE toLower(p.last_name) STARTS WITH toLower($letter))
-        RETURN apoc.map.submap(p, ['id', 'first_name', 'last_name'], null, false) AS player
+        RETURN apoc.map.merge(apoc.map.submap(p, ['id', 'first_name', 'last_name'], null, false), {labels: labels(p)}) AS player
         ORDER BY toLower(p.last_name), toLower(p.first_name)
       }
     `,

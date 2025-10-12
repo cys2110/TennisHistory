@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { refresh } = defineProps<{ refresh: () => void }>()
+<script setup>
+const { refresh } = defineProps(["refresh"])
 
 const {
   params: { id }
@@ -14,21 +11,13 @@ const {
 const open = ref(false)
 const uploading = ref(false)
 
-const schema = z.object({
-  id: z.string(),
-  eid: z.string(),
-  type: z.string(),
-  seed: z.number().optional(),
-  status: z.string().optional(),
-  q_seed: z.number().optional(),
-  q_status: z.string().optional()
+defineShortcuts({
+  meta_enter: () => set(open, !get(open))
 })
 
-type Schema = z.output<typeof schema>
+const state = reactive({ eid: id })
 
-const state = reactive<Partial<Schema>>({ eid: id as string })
-
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "Player", key: "id", type: "players", required: true },
   { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true },
   { label: "Seed", key: "seed", type: "number" },
@@ -37,7 +26,7 @@ const formFields: FormFieldInterface<Schema>[] = [
   { label: "Qualifying Status", key: "q_status", type: "select", items: ["AL", "WC", "Q", "SE", "PR", "LL"] }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/entries/add", {
@@ -53,7 +42,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error creating entry",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.error,
       color: "error"
     })
@@ -77,7 +66,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
     <template #body>
       <u-form
         id="entry-form"
-        :schema="schema"
+        :schema="entrySchema"
         :state
         @submit="onSubmit"
       >

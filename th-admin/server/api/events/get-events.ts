@@ -6,7 +6,7 @@ export default defineEventHandler(async query => {
   const { records } = await useDriver().executeQuery(
     `/* cypher */
       MATCH (t:Tournament)<-[:EDITION_OF]-(e:Event)-[:IN_YEAR]->(:Year {id: $year})
-      RETURN {name: t.name, id: e.id} AS event
+      RETURN {name: t.name, id: e.id, labels: labels(e)} AS event
       ORDER BY t.name
     `,
     { year: int(year) }
@@ -16,7 +16,7 @@ export default defineEventHandler(async query => {
     const event = r.get("event")
 
     return {
-      name: event.name,
+      ...event,
       id: event.id.toInt()
     }
   })

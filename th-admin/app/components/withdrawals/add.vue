@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { refresh } = defineProps<{ refresh: () => void }>()
+<script setup>
+const { refresh } = defineProps(["refresh"])
 const {
   params: { id }
 } = useRoute("withdrawals")
@@ -13,14 +10,16 @@ const {
 const open = ref(false)
 const uploading = ref(false)
 
-type Schema = z.output<typeof withdrawalSchema>
-
-const state = reactive<Partial<Schema>>({
-  id: "",
-  eid: id as string
+defineShortcuts({
+  meta_enter: () => set(open, !get(open))
 })
 
-const formFields: FormFieldInterface<Schema>[] = [
+const state = reactive({
+  id: "",
+  eid: id
+})
+
+const formFields = [
   { label: "Player", key: "id", type: "players", colSpan: 2, required: true },
   { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true },
   { label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true },
@@ -32,7 +31,7 @@ const formFields: FormFieldInterface<Schema>[] = [
   { label: "Rank", key: "rank", type: "number" }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/withdrawals/add", {
@@ -48,7 +47,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error creating withdrawal",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.close,
       color: "error"
     })
@@ -71,6 +70,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
 
     <template #body>
       <u-form
+        id="withdrawal-form"
         :state
         :schema="withdrawalSchema"
         @submit="onSubmit"
@@ -88,7 +88,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
 
     <template #footer="{ close }">
       <u-button
-        form="entry-form"
+        form="withdrawal-form"
         type="submit"
         label="Save"
         :icon="uploading ? ICONS.uploading : icons.check"

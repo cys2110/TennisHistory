@@ -1,6 +1,6 @@
-<script setup lang="ts">
-defineProps<{ label: string }>()
-const modelValue = defineModel<any>()
+<script setup>
+defineProps(["label"])
+const modelValue = defineModel()
 const {
   ui: { icons }
 } = useAppConfig()

@@ -1,15 +1,15 @@
-<script setup lang="ts">
-defineProps<{ placeholder: string }>()
+<script setup>
+defineProps(["placeholder"])
 
 const {
   params: { id }
 } = useRoute("event")
-const modelValue = defineModel<string>()
+const modelValue = defineModel()
 const {
   ui: { icons }
 } = useAppConfig()
 
-const { data: entries, status } = await useFetch<any[]>("/api/entries/get", {
+const { data: entries, status } = await useFetch("/api/entries/get", {
   query: { id },
   default: () => [],
   transform: data =>

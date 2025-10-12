@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-defineProps<{ block?: boolean }>()
+<script setup>
+defineProps(["block"])
 const {
   ui: { icons }
 } = useAppConfig()
@@ -10,16 +7,13 @@ const open = ref(false)
 const toast = useToast()
 const uploading = ref(false)
 
-const schema = z.object({
-  id: z.string(),
-  tour: z.string()
+defineShortcuts({
+  meta_enter: () => set(open, !get(open))
 })
 
-type Schema = z.output<typeof schema>
+const state = reactive({})
 
-const state = reactive<Partial<Schema>>({})
-
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/players/create", {
@@ -45,7 +39,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error creating player",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons["error"],
       color: "error"
     })

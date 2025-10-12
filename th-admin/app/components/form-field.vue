@@ -1,10 +1,7 @@
-<script setup lang="ts">
-const { field } = defineProps<{
-  field: FormFieldInterface<any>
-  currency?: string
-}>()
+<script setup>
+const { field } = defineProps(["field", "currency"])
 
-const modelValue = defineModel<any>()
+const modelValue = defineModel()
 
 const searchComponent = defineAsyncComponent(() => import(`@/components/${field.type}/search.vue`))
 
@@ -65,7 +62,7 @@ const {
         :disabled="field.disabled"
       >
         <template
-          v-if="(modelValue as string)?.length && !field.disabled"
+          v-if="(modelValue || modelValue?.length) && !field.disabled"
           #trailing
         >
           <u-button
@@ -146,12 +143,22 @@ const {
         v-model="modelValue"
         :items="field.items"
         orientation="horizontal"
+        :size="field.size || 'sm'"
+      />
+
+      <u-radio-group
+        v-else-if="field.type === 'radio'"
+        v-model="modelValue"
+        :items="field.items"
+        orientation="horizontal"
+        :size="field.size || 'sm'"
       />
 
       <search-component
         v-else
         v-model="modelValue"
         :placeholder="field.label.toLowerCase()"
+        :key="field.key"
       />
     </u-form-field>
   </div>

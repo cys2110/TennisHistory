@@ -1,42 +1,38 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
+<script setup>
 const {
   ui: { icons }
 } = useAppConfig()
 
 const open = ref(false)
-const selectedTour = ref<"ATP" | "WTA">("ATP")
+const selectedTour = ref("ATP")
 const toast = useToast()
 const scraping = ref(false)
 
-type Schema = z.output<typeof scrapeEventSchema>
+defineShortcuts({
+  meta_shift_d: () => set(open, !get(open))
+})
 
-const state = reactive<Partial<Schema>>({
+const state = reactive({
   year: new Date().getFullYear(),
   type: "Singles",
   draw: "Main"
 })
 
-const formFields = computed(
-  () =>
-    [
-      { label: "DB ID", key: "tid", type: "text", subType: "number", required: true },
-      { label: "Source ID", key: "tid2", type: "text", subType: "number" },
-      { label: "Year Slug", key: "year", type: "text", subType: "number", required: true },
-      { label: "Year", key: "year2", type: "text", subType: "number" },
-      ...(get(selectedTour) === "ATP" ? [{ label: "Draw Size", key: "draw_size", type: "number", required: true }] : []),
-      ...(get(selectedTour) === "ATP" ? [{ label: "Match Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true }] : []),
-      ...(get(selectedTour) === "ATP" ? [{ label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true }] : []),
-      ...(get(selectedTour) === "ATP" ? [{ label: "Best of", key: "sets", type: "select", items: ["Best3", "Best5"] }] : [])
-    ] as FormFieldInterface<Schema>[]
-)
+const formFields = computed(() => [
+  { label: "DB ID", key: "tid", type: "text", subType: "number", required: true },
+  { label: "Source ID", key: "tid2", type: "text", subType: "number" },
+  { label: "Year Slug", key: "year", type: "text", subType: "number", required: true },
+  { label: "Year", key: "year2", type: "text", subType: "number" },
+  ...(get(selectedTour) === "ATP" ? [{ label: "Draw Size", key: "draw_size", type: "number", required: true }] : []),
+  ...(get(selectedTour) === "ATP" ? [{ label: "Match Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true }] : []),
+  ...(get(selectedTour) === "ATP" ? [{ label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true }] : []),
+  ...(get(selectedTour) === "ATP" ? [{ label: "Best of", key: "sets", type: "select", items: ["Best3", "Best5"] }] : [])
+])
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(scraping, true)
   try {
-    const response: any = await $fetch(`http://127.0.0.1:5001/${get(selectedTour).toLowerCase()}_draw`, {
+    const response = await $fetch(`http://127.0.0.1:5001/${get(selectedTour).toLowerCase()}_draw`, {
       method: "POST",
       timeout: 120_000,
       "Content-Type": "application/json",

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 definePageMeta({ name: "draws" })
 
 const {
@@ -9,9 +9,9 @@ const {
   ui: { icons }
 } = useAppConfig()
 
-const selectedTour = ref<string>("ATP")
-const selectedType = ref<string>("Singles")
-const selectedDraw = ref<string>("Main")
+const selectedTour = ref("ATP")
+const selectedType = ref("Singles")
+const selectedDraw = ref("Main")
 </script>
 
 <template>

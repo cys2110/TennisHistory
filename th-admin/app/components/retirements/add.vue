@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { type, refresh } = defineProps<{ type: "Retirement" | "Walkover" | "Default"; refresh: () => void }>()
+<script setup>
+const { type, refresh } = defineProps(["type", "refresh"])
 const {
   params: { id }
 } = useRoute("retirements")
@@ -13,11 +10,13 @@ const {
 const open = ref(false)
 const uploading = ref(false)
 
-type Schema = z.output<typeof retirementSchema>
+defineShortcuts({
+  meta_enter: () => set(open, !get(open))
+})
 
-const state = reactive<Partial<Schema>>({ eid: id as string })
+const state = reactive({ eid: id })
 
-const formFields = computed<FormFieldInterface<Schema>[]>(() => [
+const formFields = computed(() => [
   { label: "Player", key: "id", type: "entries", colSpan: 2, required: true },
   { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true },
   { label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true },
@@ -25,7 +24,7 @@ const formFields = computed<FormFieldInterface<Schema>[]>(() => [
   { label: "Team Reason", key: "team_reason", type: "text" }
 ])
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     const apiRoute = type === "Retirement" ? "/api/retirements/add" : type === "Walkover" ? "/api/walkovers/add" : "/api/defaults/add"
@@ -42,7 +41,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: `Error creating ${type}`,
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.close,
       color: "error"
     })

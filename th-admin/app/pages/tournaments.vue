@@ -1,9 +1,9 @@
-<script setup lang="ts">
+<script setup>
 useHead({ title: "Tournaments - TH Admin" })
 const {
   ui: { icons }
 } = useAppConfig()
-const { data: tournaments, status, refresh } = await useFetch<TournamentInterface[]>("/api/tournaments/get", { default: () => [] })
+const { data: tournaments, status, refresh } = await useFetch("/api/tournaments/get", { default: () => [] })
 
 const toc = computed(() => [
   {
@@ -26,7 +26,7 @@ const toc = computed(() => [
             <u-dashboard-sidebar-collapse variant="link" />
           </template>
           <template #right>
-            <tournaments-create />
+            <tournaments-create :refresh />
             <u-popover>
               <u-button
                 :icon="icons.menu"

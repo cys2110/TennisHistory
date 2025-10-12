@@ -1,9 +1,7 @@
-<script setup lang="ts"></script>
+<script setup></script>
 
 <template>
-  <div>
-    Component: event/draws/rr
-  </div>
+  <div> Component: event/draws/rr </div>
 </template>
 
 <style scoped></style>

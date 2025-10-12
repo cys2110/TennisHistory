@@ -1,25 +1,12 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { seed } = defineProps<{ seed: any }>()
+<script setup>
+const { seed } = defineProps(["seed"])
 const toast = useToast()
 const {
   ui: { icons }
 } = useAppConfig()
 const uploading = ref(false)
 
-const schema = z.object({
-  id: z.string(),
-  type: z.string(),
-  seed: z.number().optional(),
-  q_seed: z.number().optional(),
-  rank: z.number().optional()
-})
-
-type Schema = z.output<typeof schema>
-
-const state = reactive<Partial<Schema>>({
+const state = reactive({
   id: seed.id,
   type: seed.type,
   seed: seed.seed,
@@ -27,13 +14,13 @@ const state = reactive<Partial<Schema>>({
   rank: seed.rank
 })
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "Seed", key: "seed", type: "number" },
   { label: "Qualifying Seed", key: "q_seed", type: "number" },
   { label: "Rank", key: "rank", type: "number" }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/seeds/update", {
@@ -47,7 +34,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error updating seed",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.close,
       color: "error"
     })
@@ -59,7 +46,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
 
 <template>
   <u-form
-    :schema
+    :schema="seedSchema"
     :state
     @submit="onSubmit"
   >

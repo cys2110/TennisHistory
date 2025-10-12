@@ -1,15 +1,15 @@
-<script setup lang="ts">
+<script setup>
 useHead({ title: "Players - TH Admin" })
 const {
   ui: { icons }
 } = useAppConfig()
-const selectedLetter = ref<string>("Update")
+const selectedLetter = ref("Update")
 
 const {
   data: players,
   status,
   refresh
-} = await useFetch<{ first_name: string; last_name: string; id: string }[]>("/api/players/get-players", {
+} = await useFetch("/api/players/get-players", {
   query: { letter: selectedLetter },
   default: () => []
 })
@@ -28,6 +28,13 @@ const toc = computed(() => [
     }))
   }
 ])
+
+const handleClick = async id => {
+  await navigateTo({
+    name: "player",
+    params: { id }
+  })
+}
 </script>
 
 <template>
@@ -67,17 +74,17 @@ const toc = computed(() => [
       <template #body>
         <u-page-grid
           v-if="players?.length"
-          class="gap-x-5 gap-y-2 2xl:grid-cols-6"
+          class="gap-y-2 gap-x-5 2xl:grid-cols-4"
         >
-          <u-link
+          <u-button
             v-for="player in players"
             :key="player.id"
-            :to="{ name: 'player', params: { id: player.id } }"
             :id="player.id"
-            class="text-sm hover-link"
-          >
-            {{ player.first_name ? `${player.first_name} ${player.last_name}` : player.id }}
-          </u-link>
+            :label="player.first_name ? `${player.first_name} ${player.last_name}` : player.id"
+            @click="handleClick(player.id)"
+            :color="player.labels.includes('Update') ? 'warning' : 'primary'"
+            block
+          />
         </u-page-grid>
 
         <loading v-else-if="status === 'pending'" />

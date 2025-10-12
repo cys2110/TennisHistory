@@ -1,15 +1,15 @@
-<script setup lang="ts">
+<script setup>
 useHead({ title: "Coaches - TH Admin" })
 const {
   ui: { icons }
 } = useAppConfig()
-const selectedLetter = ref<string>("Update")
+const selectedLetter = ref("Update")
 
 const {
   data: coaches,
   status,
   refresh
-} = await useFetch<{ first_name: string; last_name: string; id: string }[]>("/api/coaches/get", {
+} = await useFetch("/api/coaches/get", {
   query: { letter: selectedLetter },
   default: () => []
 })

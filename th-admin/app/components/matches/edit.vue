@@ -1,33 +1,14 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
+<script setup>
 import { parseDate } from "@internationalized/date"
 
-const { match } = defineProps<{ match: any }>()
+const { match } = defineProps(["match"])
 const toast = useToast()
 const {
   ui: { icons }
 } = useAppConfig()
 const uploading = ref(false)
 
-const schema = z.object({
-  id: z.string(),
-  tour: z.string(),
-  draw: z.string(),
-  type: z.string(),
-  match_no: z.number(),
-  court: z.string().optional(),
-  date: z.unknown().optional(),
-  incomplete: z.string().optional(),
-  duration: z.string().optional(),
-  umpire: z.string().optional(),
-  round: z.string(),
-  best_of: z.enum(["Best3", "Best5"]).optional()
-})
-
-type Schema = z.output<typeof schema>
-
-const state = reactive<Partial<Schema>>({
+const state = reactive({
   id: match.id,
   tour: match.tour,
   draw: match.draw,
@@ -42,7 +23,7 @@ const state = reactive<Partial<Schema>>({
   best_of: match.best_of
 })
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/matches/update", {
@@ -56,7 +37,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error updating match",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.error,
       color: "error"
     })
@@ -65,7 +46,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   }
 }
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "Round", key: "round", type: "text", required: true },
   { label: "Match No.", key: "match_no", type: "number", required: true },
   { label: "Best of", key: "best_of", type: "select", items: ["Best3", "Best5"] },
@@ -79,44 +60,40 @@ const formFields: FormFieldInterface<Schema>[] = [
 
 <template>
   <u-form
-    :schema="schema"
+    :schema="matchSchema"
     :state
     @submit="onSubmit"
   >
     <div class="grid grid-cols-10 border-b border-muted pb-2 gap-2">
-      <div>
-        <u-form-field
-          label="ID"
-          :help="match.stats ? '' : 'No stats available'"
-          :ui="{ help: 'text-red-600 text-xs' }"
-          required
-        >
-          <u-input
-            :model-value="state.id"
-            class="w-full"
-            size="sm"
-          />
-          <template #hint>
-            <div class="flex justify-between items-center gap-1">
-              <u-badge
-                :label="match.tour"
-                :color="match.tour"
-                size="sm"
-              />
-              <u-badge
-                :label="match.type"
-                :color="match.type"
-                size="sm"
-              />
-              <u-badge
-                :label="match.draw"
-                :color="match.draw"
-                size="sm"
-              />
-            </div>
-          </template>
-        </u-form-field>
-      </div>
+      <u-form-field
+        label="ID"
+        required
+      >
+        <u-input
+          :model-value="state.id"
+          class="w-full"
+          size="sm"
+        />
+        <template #hint>
+          <div class="flex justify-between items-center gap-1">
+            <u-badge
+              :label="match.tour"
+              :color="match.tour"
+              size="sm"
+            />
+            <u-badge
+              :label="match.type"
+              :color="match.type"
+              size="sm"
+            />
+            <u-badge
+              :label="match.draw"
+              :color="match.draw"
+              size="sm"
+            />
+          </div>
+        </template>
+      </u-form-field>
 
       <form-field
         v-for="field in formFields"
@@ -135,10 +112,14 @@ const formFields: FormFieldInterface<Schema>[] = [
         />
       </div>
 
-      <div class="col-span-10 text-xs">
+      <div class="col-span-9 text-xs">
         {{
           match.players.length < 3 ? match.players.join(" v ") : match.players.slice(0, 2).join(" / ") + " v " + match.players.slice(2).join(" / ")
         }}
+      </div>
+
+      <div class="flex items-center">
+        <matches-stats v-if="!match.stats" />
       </div>
     </div>
   </u-form>

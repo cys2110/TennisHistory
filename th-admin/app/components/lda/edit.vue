@@ -1,24 +1,19 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { entry } = defineProps<{ entry: any }>()
+<script setup>
+const { entry } = defineProps(["entry"])
 const toast = useToast()
 const {
   ui: { icons }
 } = useAppConfig()
 const uploading = ref(false)
 
-type Schema = z.output<typeof ldaSchema>
-
-const state = reactive<Partial<Schema>>({
+const state = reactive({
   id: entry.fid,
   draw: entry.draw,
   type: entry.type,
   rank: entry.rank
 })
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/lda/update", {
@@ -32,7 +27,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error updating LDA",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.close,
       color: "error"
     })

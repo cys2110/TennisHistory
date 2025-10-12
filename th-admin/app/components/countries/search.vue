@@ -1,7 +1,7 @@
 <script setup lang="ts">
-defineProps<{ placeholder: string }>()
+defineProps(["placeholder"])
 const searchTerm = ref("")
-const modelValue = defineModel<string>()
+const modelValue = defineModel()
 const {
   ui: { icons }
 } = useAppConfig()

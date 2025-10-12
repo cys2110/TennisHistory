@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 definePageMeta({ name: "entries" })
 
 const {
@@ -10,6 +10,10 @@ const {
   ui: { icons }
 } = useAppConfig()
 const updating = ref(false)
+
+defineShortcuts({
+  meta_shift_u: () => updateEntryInfo()
+})
 
 const {
   data: entries,
@@ -45,7 +49,7 @@ const updateEntryInfo = async () => {
   } catch (e) {
     toast.add({
       title: "Error updating entry info",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.close,
       color: "error"
     })

@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { refresh } = defineProps<{ refresh: () => void }>()
+<script setup>
+const { refresh } = defineProps(["refresh"])
 
 const {
   params: { id }
@@ -14,18 +11,20 @@ const {
 const open = ref(false)
 const uploading = ref(false)
 
-type Schema = z.output<typeof ldaSchema>
+defineShortcuts({
+  meta_enter: () => set(open, !get(open))
+})
 
-const state = reactive<Partial<Schema>>({ eid: id as string })
+const state = reactive({ eid: id })
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "Player", key: "id", type: "entries", required: true },
   { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true },
   { label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true },
   { label: "Rank", key: "rank", type: "number" }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/lda/add", {
@@ -41,7 +40,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error creating LDA",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.close,
       color: "error"
     })

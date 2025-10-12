@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { type } = defineProps<{ type: "Coach" | "Umpire" | "Supervisor" }>()
+<script setup>
+const { type } = defineProps(["type"])
 const {
   ui: { icons }
 } = useAppConfig()
@@ -10,16 +7,18 @@ const open = ref(false)
 const toast = useToast()
 const updating = ref(false)
 
-type Schema = z.output<typeof personSchema>
+defineShortcuts({
+  meta_enter: () => set(open, !get(open))
+})
 
-const state = reactive<Partial<Schema>>({})
+const state = reactive({})
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "First Name", key: "first_name", type: "text", required: true },
   { label: "Last Name", key: "last_name", type: "text", required: true }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(updating, true)
   try {
     await $fetch("/api/create-person", {
@@ -34,7 +33,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: `Error creating ${type}`,
-      description: (e as Error).message,
+      description: e.message,
       icon: icons["error"],
       color: "error"
     })

@@ -1,18 +1,16 @@
-<script setup lang="ts">
-import type { NavigationMenuItem } from "@nuxt/ui"
+<script setup>
+const id = ref("Enter ID")
 
-const id = ref<string>("Enter ID")
-
-const items: NavigationMenuItem[][] = [
+const items = [
   [
-    { label: "Home", to: "/" },
-    { label: "Tournaments", to: { name: "tournaments" } },
-    { label: "Events", to: { name: "events" } },
-    { label: "Players", to: { name: "players" } },
-    { label: "Coaches", to: { name: "coaches" } },
-    { label: "Supervisors", to: { name: "supervisors" } },
-    { label: "Umpires", to: { name: "umpires" } },
-    { label: "Merge Nodes", to: { name: "merge-nodes" } }
+    { label: "Home", to: "/", icon: "line-md:home-md-twotone" },
+    { label: "Tournaments", to: { name: "tournaments" }, icon: "game-icons:trophy" },
+    { label: "Events", to: { name: "events" }, icon: "solar:calendar-mark-bold-duotone" },
+    { label: "Players", to: { name: "players" }, icon: "map:stadium" },
+    { label: "Coaches", to: { name: "coaches" }, icon: "game-icons:tennis-racket" },
+    { label: "Supervisors", to: { name: "supervisors" }, icon: "line-md:clipboard-list-twotone" },
+    { label: "Umpires", to: { name: "umpires" }, icon: "game-icons:whistle" },
+    { label: "Merge Nodes", to: { name: "merge-nodes" }, icon: "game-icons:join" }
   ]
 ]
 
@@ -47,10 +45,12 @@ const groups = computed(() => [
     </u-dashboard-search>
 
     <u-dashboard-sidebar collapsible>
-      <template #default>
-        <u-dashboard-search-button />
+      <template #default="{ collapsed }">
+        <u-dashboard-search-button :collapsed />
         <u-navigation-menu
+          :collapsed
           :items="items[0]"
+          tooltip
           orientation="vertical"
           variant="link"
         />

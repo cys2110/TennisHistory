@@ -1,15 +1,11 @@
-<script setup lang="ts">
+<script setup>
 useHead({ title: "Events - TH Admin" })
 const {
   ui: { icons }
 } = useAppConfig()
 const year = ref(new Date().getFullYear())
 
-const {
-  data: events,
-  status,
-  refresh
-} = await useFetch<{ name: string; id: number }[]>("/api/events/get-events", { query: { year }, default: () => [] })
+const { data: events, status, refresh } = await useFetch("/api/events/get-events", { query: { year }, default: () => [] })
 
 watch(year, () => {
   refresh()
@@ -25,6 +21,10 @@ const toc = computed(() => [
     }))
   }
 ])
+
+const handleClick = async id => {
+  await navigateTo({ name: "event", params: { id } })
+}
 </script>
 
 <template>
@@ -66,15 +66,15 @@ const toc = computed(() => [
           v-if="events.length"
           class="gap-y-2 gap-x-5 2xl:grid-cols-4"
         >
-          <u-link
+          <u-button
             v-for="event in events"
             :key="event.id"
-            :to="{ name: 'event', params: { id: event.id } }"
             :id="`event-${event.id}`"
-            class="text-sm hover-link"
-          >
-            {{ event.name ? `${event.name} - ${event.id}` : event.id }}
-          </u-link>
+            block
+            :color="event.labels?.includes('Update') ? 'warning' : 'primary'"
+            :label="event.name ?? event.id.toString()"
+            @click="handleClick(event.id)"
+          />
         </u-page-grid>
 
         <loading v-else-if="status === 'pending'" />

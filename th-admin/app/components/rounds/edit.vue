@@ -1,17 +1,12 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { round } = defineProps<{ round: any }>()
+<script setup>
+const { round } = defineProps(["round"])
 const toast = useToast()
 const {
   ui: { icons }
 } = useAppConfig()
 const uploading = ref(false)
 
-type Schema = z.output<typeof roundSchema>
-
-const state = reactive<Partial<Schema>>({
+const state = reactive({
   id: round.id,
   tour: round.tour,
   draw: round.draw,
@@ -22,13 +17,13 @@ const state = reactive<Partial<Schema>>({
   pm: round.pm
 })
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "Number", key: "number", type: "number", required: true },
   { label: "Points", key: "points", type: "number" },
   { label: "Prize Money", key: "pm", type: "currency" }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/rounds/update", {
@@ -42,7 +37,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error updating round",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.error,
       color: "error"
     })

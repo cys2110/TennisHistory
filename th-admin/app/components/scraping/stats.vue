@@ -1,7 +1,4 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
+<script setup>
 const {
   params: { id }
 } = useRoute("event")
@@ -10,48 +7,35 @@ const {
 } = useAppConfig()
 
 const open = ref(false)
-const selectedTour = ref<"ATP" | "WTA">("ATP")
+const selectedTour = ref("ATP")
 const toast = useToast()
 const scraping = ref(false)
-const form = useTemplateRef("form")
 
-const schema = z.object({
-  eid: z.string(),
-  year: z.number().optional(),
-  wid: z.number().optional(),
-  type: z.enum(["Singles", "Doubles"]),
-  draw: z.enum(["Main", "Qualifying"]).optional(),
-  links: z.array(z.string()).optional(),
-  draw_range: z.array(z.string()).optional(),
-  skip: z.array(z.string()).optional()
+defineShortcuts({
+  meta_shift_m: () => set(open, !get(open))
 })
 
-type Schema = z.output<typeof schema>
-
-const state = reactive<Partial<Schema>>({
-  eid: id as string,
+const state = reactive({
+  eid: id,
   type: "Singles"
 })
 
-const formFields = computed(
-  () =>
-    [
-      { label: "Event ID", key: "eid", type: "text", subType: "number", required: true },
-      ...(get(selectedTour) === "WTA" ? [{ label: "WTA ID", key: "wid", type: "text", subType: "number", required: true }] : []),
-      ...(get(selectedTour) === "WTA" ? [{ label: "Year", key: "year", type: "text", subType: "number", required: true }] : []),
-      { label: "Match Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true },
-      ...(get(selectedTour) === "WTA" ? [{ label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true }] : []),
-      ...(get(selectedTour) === "WTA" ? [{ label: "Draw Range", key: "draw_range", type: "tags", max: 2, required: true }] : []),
-      ...(get(selectedTour) === "WTA" ? [{ label: "Matches to Skip", key: "skip", type: "tags" }] : [])
-    ] as FormFieldInterface<Schema>[]
-)
+const formFields = computed(() => [
+  { label: "Event ID", key: "eid", type: "text", subType: "number", required: true },
+  ...(get(selectedTour) === "WTA" ? [{ label: "WTA ID", key: "wid", type: "text", subType: "number", required: true }] : []),
+  ...(get(selectedTour) === "WTA" ? [{ label: "Year", key: "year", type: "text", subType: "number", required: true }] : []),
+  { label: "Match Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true },
+  ...(get(selectedTour) === "WTA" ? [{ label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true }] : []),
+  ...(get(selectedTour) === "WTA" ? [{ label: "Draw Range", key: "draw_range", type: "tags", max: 2, required: true }] : []),
+  ...(get(selectedTour) === "WTA" ? [{ label: "Matches to Skip", key: "skip", type: "tags" }] : [])
+])
 
-const cleanLink = (link: string) => link.replace(/^[\s"'“”‘’\[\]]+|[\s"'“”‘’\[\]]+$/g, "")
+const cleanLink = link => link.replace(/^[\s"'“”‘’\[\]]+|[\s"'“”‘’\[\]]+$/g, "")
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(scraping, true)
   try {
-    const response: any = await $fetch(`http://127.0.0.1:5001/${get(selectedTour).toLowerCase()}_stats`, {
+    const response = await $fetch(`http://127.0.0.1:5001/${get(selectedTour).toLowerCase()}_stats`, {
       method: "POST",
       timeout: 120_000,
       "Content-Type": "application/json",
@@ -107,7 +91,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       <u-form
         id="matches-form"
         ref="form"
-        :schema
+        :schema="scrapeStatsSchema"
         :state
         @submit="onSubmit"
       >

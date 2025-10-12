@@ -52,7 +52,6 @@ export default defineEventHandler(async event => {
           MERGE (s1:Score:$($type):$($tour):$($draw) {id: m.id || ' ' || p1.id})
           MERGE (f1)-[:SCORED]->(s1)
           MERGE (s1)-[:SCORED]->(m)
-          SET s1 += $team1
           CALL (*) {
             WHEN $type = 'Singles' THEN {
               SET s1:P1
@@ -65,6 +64,9 @@ export default defineEventHandler(async event => {
             WHEN $winner IS NOT NULL AND $winner IN ['Player 1', 'Team 1'] THEN SET s1:Winner
             WHEN $winner IS NOT NULL THEN SET s1:Loser
           }
+          CALL (s1) {
+            WHEN $team1 IS NOT NULL THEN SET s1 += $team1
+          }
         }
       }
       CALL (*) {
@@ -72,7 +74,6 @@ export default defineEventHandler(async event => {
           MERGE (s2:Score:$($type):$($tour):$($draw) {id: m.id || ' ' || p3.id})
           MERGE (f3)-[:SCORED]->(s2)
           MERGE (s2)-[:SCORED]->(m)
-          SET s2 += $team2
           CALL (*) {
             WHEN $type = 'Singles' THEN {
               SET s2:P2
@@ -84,6 +85,9 @@ export default defineEventHandler(async event => {
           CALL (s2) {
             WHEN $winner IS NOT NULL AND $winner IN ['Player 2', 'Team 2'] THEN SET s2:Winner
             WHEN $winner IS NOT NULL THEN SET s2:Loser
+          }
+          CALL (s2) {
+            WHEN $team2 IS NOT NULL THEN SET s2 += $team2
           }
         }
       }

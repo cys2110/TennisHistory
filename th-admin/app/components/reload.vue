@@ -1,8 +1,8 @@
-<script setup lang="ts">
+<script setup>
 const {
   ui: { icons }
 } = useAppConfig()
-defineProps<{ message: string }>()
+defineProps(["message"])
 </script>
 
 <template>

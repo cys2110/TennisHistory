@@ -1,17 +1,12 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { entry } = defineProps<{ entry: any }>()
+<script setup>
+const { entry } = defineProps(["entry"])
 const toast = useToast()
 const {
   ui: { icons }
 } = useAppConfig()
 const uploading = ref(false)
 
-type Schema = z.output<typeof withdrawalSchema>
-
-const state = reactive<Partial<Schema>>({
+const state = reactive({
   id: entry.id,
   type: entry.type,
   team_reason: entry.team_reason,
@@ -20,13 +15,13 @@ const state = reactive<Partial<Schema>>({
   team_mate: entry.team_mate?.id
 })
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "Reason", key: "reason", type: "text" },
   { label: "Team Reason", key: "team_reason", type: "text" },
   { label: "Team Mate", key: "team_mate", type: "players" }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/withdrawals/update", {
@@ -40,7 +35,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error updating withdrawal",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.error,
       color: "error"
     })

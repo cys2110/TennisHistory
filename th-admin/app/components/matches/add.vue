@@ -1,11 +1,8 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
+<script setup>
 const {
   params: { id }
 } = useRoute("matches")
-const { refresh } = defineProps<{ refresh: () => void }>()
+const { refresh } = defineProps(["refresh"])
 const toast = useToast()
 const {
   ui: { icons }
@@ -13,36 +10,12 @@ const {
 const open = ref(false)
 const uploading = ref(false)
 
-const schema = z.object({
-  id: z.string(),
-  tour: z.string(),
-  draw: z.string(),
-  type: z.string(),
-  round: z.string(),
-  match_no: z.number(),
-  sets: z.string().optional(),
-  player_1: z.string().optional(),
-  player_2: z.string().optional(),
-  player_3: z.string().optional(),
-  player_4: z.string().optional(),
-  incomplete: z.string().optional(),
-  s1: z.array(z.number().optional()),
-  s2: z.array(z.number().optional()),
-  s3: z.array(z.number().optional()),
-  s4: z.array(z.number().optional()),
-  s5: z.array(z.number().optional()),
-  t1: z.number().optional(),
-  t2: z.number().optional(),
-  t3: z.number().optional(),
-  t4: z.number().optional(),
-  t5: z.number().optional(),
-  winner: z.string().optional()
+defineShortcuts({
+  meta_enter: () => set(open, !get(open))
 })
 
-type Schema = z.output<typeof schema>
-
-const state = reactive<Partial<Schema>>({
-  id: id as string,
+const state = reactive({
+  id: id,
   s1: [],
   s2: [],
   s3: [],
@@ -55,7 +28,7 @@ const numberOfSets = computed(() => {
   return 3
 })
 
-const formFields = computed<FormFieldInterface<Schema>[]>(() => [
+const formFields = computed(() => [
   { label: "Tour", key: "tour", type: "select", items: tours, required: true },
   { label: "Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true },
   { label: "Draw", key: "draw", type: "select", items: ["Main", "Qualifying"], required: true },
@@ -65,7 +38,7 @@ const formFields = computed<FormFieldInterface<Schema>[]>(() => [
   { label: "Incomplete", key: "incomplete", type: "select", items: ["B", "WO"], colSpan: state.s1?.length ? 1 : 2 }
 ])
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/matches/add", {
@@ -81,7 +54,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: `Error creating match`,
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.error,
       color: "error"
     })
@@ -106,7 +79,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
       <u-form
         id="match-form"
         :state
-        :schema
+        :schema="matchSchema"
         @submit="onSubmit"
       >
         <div class="grid grid-cols-2 items-center gap-5">
@@ -186,15 +159,15 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
 
                   <input-number
                     :label="`${state.type === 'Doubles' ? 'team' : 'player'} 1 score`"
-                    v-model="(state[`s${n}` as keyof Schema] as number[])[0]"
+                    v-model="state[`s${n}`][0]"
                   />
                   <input-number
                     :label="`${state.type === 'Doubles' ? 'team' : 'player'} 2 score`"
-                    v-model="(state[`s${n}` as keyof Schema] as number[])[1]"
+                    v-model="state[`s${n}`][1]"
                   />
                   <input-number
                     label="tb low"
-                    v-model="(state[`t${n}` as keyof Schema] as number)"
+                    v-model="state[`t${n}`]"
                   />
                 </u-field-group>
               </div>

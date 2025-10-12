@@ -1,29 +1,24 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-const { person, type } = defineProps<{ person: any; type: "Coach" | "Umpire" | "Supervisor" }>()
+<script setup>
+const { person, type } = defineProps(["person", "type"])
 const toast = useToast()
 const {
   ui: { icons }
 } = useAppConfig()
 const updating = ref(false)
 
-type Schema = z.output<typeof personSchema>
-
-const state = reactive<Partial<Schema>>({
+const state = reactive({
   id: person.id,
   first_name: person.first_name,
   last_name: person.last_name
 })
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "ID", key: "id", type: "text", required: true },
   { label: "First Name", key: "first_name", type: "text", required: true },
   { label: "Last Name", key: "last_name", type: "text", required: true }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(updating, true)
   try {
     await $fetch("/api/update-person", {
@@ -37,7 +32,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: `Error updating ${type}`,
-      description: (e as Error).message,
+      description: e.message,
       icon: icons["error"],
       color: "error"
     })

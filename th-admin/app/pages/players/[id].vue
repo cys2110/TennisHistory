@@ -1,31 +1,35 @@
-<script setup lang="ts">
-definePageMeta({ name: "player" })
-import type { FormSubmitEvent } from "@nuxt/ui"
+<script setup>
 import { parseDate } from "@internationalized/date"
-import * as z from "zod"
+
+definePageMeta({ name: "player" })
 
 useHead({ title: "Edit Player - TH Admin" })
 
 const {
   params: { id }
-} = useRoute("player")
+} = useRoute()
 const toast = useToast()
 const {
-  ui: { icons, colors }
+  ui: { icons }
 } = useAppConfig()
+
+const form = useTemplateRef("form")
 
 const scraping = ref(false)
 const submitting = ref(false)
 
-const { data: player, status } = await useFetch<any>("/api/players/get-player", { query: { id } })
+defineShortcuts({
+  meta_enter: () => form.value?.submit(),
+  meta_shift_s: () => handleScrape()
+})
 
-type Schema = z.output<typeof playerSchema>
+const { data: player, status } = await useFetch("/api/players/get-player", { query: { id } })
 
-const state = reactive<Partial<Schema>>({
-  id: id as string,
-  first_name: get(player)?.first_name ?? "",
+const state = reactive({
+  id,
+  first_name: get(player)?.first_name,
   last_name: get(player)?.last_name,
-  tours: get(player)?.tours,
+  tours: get(player)?.tours.filter(t => t !== "Update")[0],
   country: get(player)?.country
     ? {
         id: get(player)?.country?.id,
@@ -35,7 +39,7 @@ const state = reactive<Partial<Schema>>({
         id: "",
         start_date: undefined
       },
-  previous_countries: get(player)?.previous_countries?.map((c: any) => ({
+  previous_countries: get(player)?.previous_countries?.map(c => ({
     id: c.id,
     start_date: c.start_date ? parseDate(c.start_date) : undefined,
     end_date: c.end_date ? parseDate(c.end_date) : undefined
@@ -43,14 +47,14 @@ const state = reactive<Partial<Schema>>({
   turned_pro: get(player)?.turned_pro,
   retired: get(player)?.retired,
   coaches: get(player)?.coaches?.length
-    ? get(player)?.coaches?.map((c: any) => ({
+    ? get(player)?.coaches?.map(c => ({
         id: c.id,
         name: c.first_name ? `${c.first_name} ${c.last_name}` : undefined,
         start_date: c.start_date ? parseDate(c.start_date) : undefined
       }))
     : [],
   former_coaches: get(player)?.former_coaches?.length
-    ? get(player)?.former_coaches?.map((c: any) => ({
+    ? get(player)?.former_coaches?.map(c => ({
         id: c.id,
         name: c.first_name ? `${c.first_name} ${c.last_name}` : undefined,
         start_date: c.start_date ? parseDate(c.start_date) : undefined,
@@ -76,10 +80,10 @@ const state = reactive<Partial<Schema>>({
   hof: get(player)?.hof
 })
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "First Name", key: "first_name", type: "text", required: true },
   { label: "Last Name", key: "last_name", type: "text", required: true },
-  { label: "Tours", key: "tours", type: "tags", required: true },
+  { label: "Tours", key: "tours", type: "radio", items: ["ATP", "WTA"], required: true },
   { label: "Turned Pro", key: "turned_pro", type: "text", subType: "number" },
   { label: "Retired", key: "retired", type: "text", subType: "number" },
   {
@@ -99,7 +103,7 @@ const formFields: FormFieldInterface<Schema>[] = [
   { label: "Hall of Fame Induction", key: "hof", type: "text", subType: "number" }
 ]
 
-const rankFields: { label: keyof typeof colors; children: FormFieldInterface<Schema>[] }[] = [
+const rankFields = [
   {
     label: "Singles",
     children: [
@@ -118,7 +122,7 @@ const rankFields: { label: keyof typeof colors; children: FormFieldInterface<Sch
   }
 ]
 
-const linkFields: { label: string; key: keyof Schema; color: keyof typeof colors }[] = [
+const linkFields = [
   { label: "ATP", key: "atp_link", color: "ATP" },
   { label: "WTA", key: "wta_link", color: "WTA" },
   { label: "Wiki", key: "wiki_link", color: "warning" },
@@ -133,7 +137,7 @@ const scrapeDisabled = computed(() => {
   if (
     updatedAt &&
     updatedAt > new Date(2025, 9, 11) &&
-    ((singlesChDate && singlesChDate < cutoffDate) || (doublesChDate && doublesChDate < cutoffDate))
+    ((singlesChDate && singlesChDate < cutoffDate) || (doublesChDate && doublesChDate < cutoffDate) || get(player).dod)
   ) {
     return false
   }
@@ -144,7 +148,7 @@ const handleScrape = async () => {
   set(scraping, true)
   try {
     const apiSlug = isNaN(Number(id)) ? "atp_player" : "wta_player"
-    const response: any = await $fetch(`http://127.0.0.1:5001/${apiSlug}/` + id, {
+    const response = await $fetch(`http://127.0.0.1:5001/${apiSlug}/` + id, {
       method: "GET",
       timeout: 120_000
     })
@@ -174,7 +178,8 @@ const handleScrape = async () => {
   }
 }
 
-const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
+const onSubmit = async e => {
+  console.log("Submitting", e.data)
   set(submitting, true)
   try {
     await $fetch("/api/players/update", {
@@ -188,7 +193,7 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error updating player",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.error,
       color: "error"
     })
@@ -235,6 +240,7 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
         <template #body>
           <u-form
             id="player-form"
+            ref="form"
             :schema="playerSchema"
             :state
             @submit="onSubmit"
@@ -253,11 +259,11 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
               <u-form-field label="Country">
                 <u-field-group class="w-full">
                   <countries-search
-                    v-model="state.country!.id"
+                    v-model="state.country.id"
                     placeholder="country"
                   />
                   <date-picker
-                    v-model="state.country!.start_date"
+                    v-model="state.country.start_date"
                     placeholder="start date"
                   />
                   <u-button
@@ -290,14 +296,14 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                       <u-button
                         color="error"
                         :icon="icons.close"
-                        @click="state.previous_countries = state.previous_countries!.filter(c => c !== country)"
+                        @click="state.previous_countries = state.previous_countries.filter(c => c !== country)"
                       />
                     </u-field-group>
                     <u-button
                       label="Add Former Country"
                       icon="solar:globus-line-duotone"
                       block
-                      @click="state.previous_countries!.push({ id: '', start_date: undefined, end_date: undefined })"
+                      @click="state.previous_countries.push({ id: '', start_date: undefined, end_date: undefined })"
                     />
                   </div>
                 </u-form-field>
@@ -382,14 +388,14 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                     <u-button
                       color="error"
                       :icon="icons.close"
-                      @click="state.coaches = state.coaches!.filter(c => c !== coach)"
+                      @click="state.coaches = state.coaches.filter(c => c !== coach)"
                     />
                   </u-field-group>
                   <u-button
                     label="Add Coach"
                     icon="line-md:account-add"
                     block
-                    @click="state.coaches!.push({ id: '', start_date: undefined })"
+                    @click="state.coaches.push({ id: '', start_date: undefined })"
                   />
                 </div>
               </u-form-field>
@@ -422,14 +428,14 @@ const onSubmit = async (e: FormSubmitEvent<typeof state>) => {
                       <u-button
                         color="error"
                         :icon="icons.close"
-                        @click="state.former_coaches = state.former_coaches!.filter(c => c !== coach)"
+                        @click="state.former_coaches = state.former_coaches.filter(c => c !== coach)"
                       />
                     </u-field-group>
                     <u-button
                       label="Add Former Coach"
                       icon="line-md:account-add"
                       block
-                      @click="state.former_coaches!.push({ id: '', start_date: undefined, end_date: undefined })"
+                      @click="state.former_coaches.push({ id: '', start_date: undefined, end_date: undefined })"
                     />
                   </div>
                 </u-form-field>

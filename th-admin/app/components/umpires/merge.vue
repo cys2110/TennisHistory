@@ -1,14 +1,14 @@
-<script setup lang="ts">
+<script setup>
 const toast = useToast()
 const {
   ui: { icons }
 } = useAppConfig()
 
-const { data, status, refresh } = await useFetch<any>("/api/umpires/get-merge", {
+const { data, status, refresh } = await useFetch("/api/umpires/get-merge", {
   default: () => []
 })
 
-const handleMerge = async (id1: number, id2: number) => {
+const handleMerge = async (id1, id2) => {
   try {
     await $fetch("/api/merge-nodes", {
       query: { type: "Umpire", id1: id1, id2: id2 }
@@ -21,7 +21,7 @@ const handleMerge = async (id1: number, id2: number) => {
   } catch (e) {
     toast.add({
       title: `Error merging nodes`,
-      description: (e as Error).message,
+      description: e.message,
       icon: icons["error"],
       color: "error"
     })

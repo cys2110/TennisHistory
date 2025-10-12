@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 definePageMeta({ name: "matches" })
 
 const {
@@ -10,6 +10,10 @@ const {
   ui: { icons }
 } = useAppConfig()
 const updating = ref(false)
+
+defineShortcuts({
+  meta_shift_u: () => updateTiebreaks()
+})
 
 const { data: matches, status, refresh } = await useFetch("/api/matches/get", { query: { id }, default: () => [] })
 
@@ -27,7 +31,7 @@ const updateTiebreaks = async () => {
   } catch (e) {
     toast.add({
       title: "Error updating tiebreaks",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons.error,
       color: "error"
     })

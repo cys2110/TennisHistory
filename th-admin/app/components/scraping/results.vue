@@ -1,24 +1,23 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
+<script setup>
 const {
   ui: { icons }
 } = useAppConfig()
 
 const open = ref(false)
 const toast = useToast()
-const links = ref<string[]>([])
+const links = ref([])
 const scraping = ref(false)
 
-type Schema = z.output<typeof scrapeEventSchema>
+defineShortcuts({
+  meta_shift_r: () => set(open, !get(open))
+})
 
-const state = reactive<Partial<Schema>>({
+const state = reactive({
   year: new Date().getFullYear(),
   type: "Singles"
 })
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "DB ID", key: "tid", type: "text", subType: "number", required: true },
   { label: "Source ID", key: "tid2", type: "text", subType: "number" },
   { label: "Year Slug", key: "year", type: "text", subType: "number", required: true },
@@ -26,10 +25,10 @@ const formFields: FormFieldInterface<Schema>[] = [
   { label: "Match Type", key: "type", type: "select", items: ["Singles", "Doubles"], required: true }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(scraping, true)
   try {
-    const response: any = await $fetch("http://127.0.0.1:5001/atp_results", {
+    const response = await $fetch("http://127.0.0.1:5001/atp_results", {
       method: "POST",
       timeout: 120_000,
       "Content-Type": "application/json",

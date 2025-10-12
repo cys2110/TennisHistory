@@ -1,8 +1,5 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-import * as z from "zod"
-
-defineProps<{ block?: boolean }>()
+<script setup>
+defineProps(["block", "refresh"])
 const open = ref(false)
 const toast = useToast()
 const {
@@ -10,20 +7,22 @@ const {
 } = useAppConfig()
 const uploading = ref(false)
 
-type Schema = z.output<typeof tournamentSchema>
+defineShortcuts({
+  meta_enter: () => set(open, !get(open))
+})
 
-const state = reactive<Partial<Schema>>({})
+const state = reactive({})
 
-const formFields: FormFieldInterface<Schema>[] = [
+const formFields = [
   { label: "Tournament Name", key: "name", type: "text", required: true, colSpan: 2 },
   { label: "Tournament ID", key: "id", type: "number", required: true },
-  { label: "Tours", key: "tours", type: "tags", required: true },
+  { label: "Tours", key: "tours", type: "checkbox", items: tours, size: "xs", required: true },
   { label: "Year Established", key: "established", type: "number" },
   { label: "Year Abolished", key: "abolished", type: "number" },
   { label: "Website URL", key: "website", type: "textarea", colSpan: 2 }
 ]
 
-const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
+const onSubmit = async event => {
   set(uploading, true)
   try {
     await $fetch("/api/tournaments/create", {
@@ -38,7 +37,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   } catch (e) {
     toast.add({
       title: "Error creating tournament",
-      description: (e as Error).message,
+      description: e.message,
       icon: icons["error"],
       color: "error"
     })
