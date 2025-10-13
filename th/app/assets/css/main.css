@@ -5,7 +5,6 @@
 @theme {
   --font-sans: "Fira Sans Condensed", sans-serif;
   --font-cursive: "Petit Formal Script", cursive;
-  --text-tiny: 0.625rem;
 }
 
 ::-webkit-scrollbar {
@@ -20,30 +19,16 @@
   --ui-bg: var(--ui-color-neutral-950);
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .hover-link {
   @apply bg-gradient-to-r bg-bottom bg-[length:0_1px] bg-no-repeat bg-[0_100%] transition-[background-size] hover:bg-[length:100%_1px] w-fit duration-500;
 }
 
 .default-link {
   @apply from-[var(--ui-text-muted)] to-[var(--ui-text-muted)];
-}
-
-.atp-link {
-  @apply from-[var(--ui-atp)] to-[var(--ui-atp)] text-atp hover:text-atp;
-}
-
-.wta-link {
-  @apply from-[var(--ui-wta)] to-[var(--ui-wta)] text-wta hover:text-wta;
-}
-
-.men-link {
-  @apply from-[var(--ui-men)] to-[var(--ui-men)] text-men hover:text-men;
-}
-
-.women-link {
-  @apply from-[var(--ui-women)] to-[var(--ui-women)] text-women hover:text-women;
-}
-
-.primary-link {
-  @apply from-[var(--ui-primary)] to-[var(--ui-primary)] text-primary hover:text-primary;
 }

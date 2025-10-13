@@ -1,24 +1,23 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: "violet",
-      atp: "sky",
-      wta: "fuchsia",
-      men: "cyan",
-      women: "pink",
-      active: "emerald",
-      inactive: "zinc",
-      singles: "orange",
-      doubles: "indigo",
+      primary: "sky",
       success: "green",
-      warning: "yellow",
+      warning: "amber",
       error: "red",
-      info: "blue",
-      tour: "teal",
-      challenger: "stone",
-      itf: "rose",
-      main: "lime",
-      qualifying: "gray"
+      ATP: "indigo",
+      WTA: "fuchsia",
+      Men: "blue",
+      Women: "pink",
+      Active: "emerald",
+      Inactive: "zinc",
+      Singles: "violet",
+      Doubles: "orange",
+      Tour: "teal",
+      Challenger: "stone",
+      ITF: "rose",
+      Main: "lime",
+      Qualifying: "gray"
     },
     icons: {
       arrowLeft: "line-md:arrow-left-circle-twotone",
@@ -58,56 +57,13 @@ export default defineAppConfig({
       tip: "line-md:lightbulb-twotone",
       warning: "line-md:alert-twotone-loop"
     },
-    dashboardSidebar: { slots: { header: "justify-center font-cursive lg:text-lg xl:text-xl 2xl:text-2xl" } },
-    dashboardPanel: {
-      slots: {
-        root: "h-screen max-w-screen lg:max-w-[calc(100vw-3rem)] xl:max-w-[calc(100vw-4rem)] 2xl:max-w-[calc(100vw-5rem)]",
-        body: "scroll-smooth"
-      }
-    },
-    dashboardToolbar: { slots: { root: "py-2 flex-wrap gap-x-4 xl:gap-x-2" } },
-    table: {
-      slots: {
-        root: "scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent",
-        th: "text-xs md:text-sm text-center py-1",
-        td: "text-xs md:text-sm text-center py-1"
-      },
-      defaultVariants: { loadingAnimation: "swing" }
-    },
-    badge: { defaultVariants: { variant: "outline" } },
-    select: {
-      slots: {
-        base: "cursor-pointer w-full",
-        content: "ring-primary cursor-pointer w-full",
-        trailingIcon: "group-data-[state=open]:rotate-180 transition-transform duration-250"
-      },
-      defaultVariants: { variant: "none" }
-    },
-    selectMenu: {
-      slots: {
-        base: "cursor-pointer w-full",
-        content: "ring-primary cursor-pointer lg:w-full",
-        trailingIcon: "group-data-[state=open]:rotate-180 transition-transform duration-250"
-      },
-      defaultVariants: { variant: "none" }
-    },
-    dropdownMenu: {
-      slots: { content: "max-h-80 !min-w-fit border border-primary", item: "cursor-pointer" }
-    },
     button: {
       slots: { base: "cursor-pointer" },
-      defaultVariants: { variant: "subtle" }
+      defaultVariants: { variant: "subtle", size: "sm" }
     },
-    radioGroup: {
-      slots: {
-        indicator: "cursor-pointer",
-        item: "cursor-pointer",
-        label: "cursor-pointer"
-      }
-    },
-    tabs: { slots: { trigger: "cursor-pointer" } },
-    progress: { slots: { status: "!w-full" } },
-    calendar: { slots: { cell: "cursor-pointer" } },
-    contextMenu: { slots: { item: "cursor-pointer" } }
+    commandPalette: { slots: { input: "[&>input]:h-8 text-xs", item: "cursor-pointer text-sm" } },
+    dashboardSidebar: { slots: { header: "justify-center font-cursive lg:text-lg xl:text-xl 2xl:text-2xl" } },
+    footerColumns: { slots: { center: "xl:col-span-3" } },
+    header: { slots: { container: "max-w-full", title: "font-cursive" } }
   }
 })

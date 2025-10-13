@@ -3,6 +3,17 @@ useHead({
   titleTemplate: title => `${title} | TennisHistory`,
   htmlAttrs: { class: "scroll-smooth" }
 })
+
+const route = useRoute()
+const { viewMode } = useViewMode()
+provideSSRWidth(1024)
+
+const layout = computed(() => {
+  if (route.path.startsWith("/admin")) {
+    return "layout-admin"
+  }
+  return get(viewMode)
+})
 </script>
 
 <template>
@@ -12,7 +23,7 @@ useHead({
   >
     <nuxt-loading-indicator color="repeating-linear-gradient(to right,#ddd6fe 0%,#8b5cf6 50%,#5b21b6 100%)" />
 
-    <nuxt-layout>
+    <nuxt-layout :name="layout">
       <nuxt-page />
     </nuxt-layout>
   </u-app>

@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "@nuxt/image", "nuxt-echarts", "nuxt-neo4j", "@vueuse/nuxt", "@nuxt/ui"],
+  modules: ["@nuxt/eslint", "@vueuse/nuxt", "nuxt-neo4j", "nuxt-echarts", "nuxt-aos", "@nuxt/ui"],
   // Set page transitions
   app: { pageTransition: { name: "page", mode: "out-in" } },
   // Set scroll behaviour
@@ -19,14 +19,15 @@ export default defineNuxtConfig({
         imports: [
           "breakpointsTailwind",
           "useBreakpoints",
+          "provideSSRWidth",
+          "useSSRWidth",
           "useInfiniteScroll",
-          "useResizeObserver",
-          "useArrayUnique",
           "useDateFormat",
           "isDefined",
-          "useSorted",
           "get",
           "set",
+          "useSorted",
+          "useArrayUnique",
           "useArrayFilter",
           "useArrayMap",
           "useArrayJoin",
@@ -57,6 +58,8 @@ export default defineNuxtConfig({
       }
     ]
   },
+  // Ignore admin pages/components in build
+  ignorePrefix: "admin",
   // neo4j configuration
   neo4j: {
     uri: process.env.NEO4J_URI,
@@ -82,20 +85,20 @@ export default defineNuxtConfig({
         "warning",
         "error",
         "success",
-        "atp",
-        "wta",
-        "men",
-        "women",
+        "ATP",
+        "WTA",
+        "Men",
+        "Women",
         "info",
-        "singles",
-        "doubles",
-        "active",
-        "inactive",
-        "tour",
-        "challenger",
-        "itf",
-        "main",
-        "qualifying"
+        "Singles",
+        "Doubles",
+        "Active",
+        "Inactive",
+        "Tour",
+        "Challenger",
+        "ITF",
+        "Main",
+        "Qualifying"
       ]
     }
   },
