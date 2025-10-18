@@ -149,14 +149,16 @@ const {
         :items="field.items"
         orientation="horizontal"
         :size="field.size || 'sm'"
-      />
+      />-->
 
-      <search-component
-        v-else
+      <form-select-search
+        v-else-if="field.type === 'search'"
+        :type="field.subType!"
         v-model="modelValue"
-        :placeholder="field.label.toLowerCase()"
+        :placeholder="`Select ${field.label.toLowerCase()}`"
         :key="field.key"
-      /> -->
+        block
+      />
     </u-form-field>
   </div>
 </template>

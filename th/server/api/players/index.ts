@@ -13,9 +13,9 @@ export default defineEventHandler(async event => {
   const formattedParams = {
     skip: int(skip),
     tour: tour ?? null,
-    countries: countries ? (Array.isArray(countries) ? countries.map(c => c.id) : [countries.id]) : null,
-    players: players ? (Array.isArray(players) ? players.map(p => p.id) : [players.id]) : null,
-    coaches: coaches ? (Array.isArray(coaches) ? coaches.map(c => c.id) : [coaches.id]) : null,
+    countries: countries.map((c: any) => c.id),
+    players: players.map((p: any) => p.id),
+    coaches: coaches.map((c: any) => c.id),
     minYear: minYear ? int(minYear) : null,
     maxYear: maxYear ? int(maxYear) : null,
     status: status ? (status === "Active" ? true : false) : null

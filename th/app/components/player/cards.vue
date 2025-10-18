@@ -213,7 +213,6 @@ onMounted(() => {
         <u-page-grid
           v-if="players.length || status === 'pending'"
           ref="grid"
-          class="max-h-200 overflow-y-auto p-5"
         >
           <div
             v-if="players.length"

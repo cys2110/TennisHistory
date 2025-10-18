@@ -64,8 +64,14 @@ export default defineAppConfig({
       slots: { base: "cursor-pointer" },
       defaultVariants: { variant: "subtle", size: "sm" }
     },
+    calendar: { slots: { cell: "cursor-pointer" } },
     commandPalette: { slots: { input: "[&>input]:h-8 text-xs", item: "cursor-pointer text-sm" } },
-    dashboardPanel: { slots: { root: "h-screen", body: "scroll-smooth" } },
+    dashboardPanel: {
+      slots: {
+        root: "h-screen max-w-screen lg:max-w-[calc(100vw-3rem)] xl:max-w-[calc(100vw-4rem)] 2xl:max-w-[calc(100vw-15%)]",
+        body: "scroll-smooth"
+      }
+    },
     dashboardSidebar: { slots: { header: "justify-center font-cursive lg:text-lg xl:text-xl 2xl:text-2xl" } },
     dropdownMenu: { slots: { content: "max-h-80 !min-w-fit border border-primary", item: "cursor-pointer" } },
     footerColumns: { slots: { center: "xl:col-span-3" } },
@@ -78,7 +84,9 @@ export default defineAppConfig({
       defaultVariants: { size: "sm" }
     },
     navigationMenu: { defaultVariants: { variant: "link" } },
+    pageGrid: { base: "scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent overflow-y-auto scroll-smooth max-h-200 p-5" },
     pageHeader: { slots: { wrapper: "flex-row justify-between" } },
+    pageList: { base: "scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent overflow-y-auto scroll-smooth max-h-200 p-5" },
     radioGroup: {
       slots: { base: "cursor-pointer", label: "cursor-pointer" },
       defaultVariants: { size: "sm" }

@@ -68,7 +68,6 @@ const onSubmit = async (event: FormSubmitEvent<TournamentSchema>) => {
   >
     <u-button
       :icon="ICONS.edit"
-      label="Edit tournament"
       :size="size || 'xs'"
       block
       class="mt-2"

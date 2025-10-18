@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineProps<{
-  items: string[] | { value: string; label: string }[]
+  items: string[] | { value: string; label: string }[] | number[]
   loading?: boolean
   placeholder: string
   block?: boolean
@@ -8,7 +8,7 @@ defineProps<{
   multiple?: boolean
   icon?: string
 }>()
-const modelValue = defineModel<string | { value: string; label: string } | string[] | { value: string; label: string }[]>()
+const modelValue = defineModel<string | { value: string; label: string } | string[] | { value: string; label: string }[] | number>()
 
 const {
   ui: { icons }

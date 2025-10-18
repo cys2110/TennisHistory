@@ -10,7 +10,6 @@ const { status, count, tournaments } = defineProps<{
 const skip = defineModel<number>("skip")
 const filters = defineModel<TournamentFiltersType>("filters")
 const table = useTemplateRef<any>("table")
-const currentYear = new Date().getFullYear()
 
 onMounted(() => {
   useInfiniteScroll(

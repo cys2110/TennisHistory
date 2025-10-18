@@ -18,6 +18,9 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => {
     case "countries":
       crumbs.push({ label: "Countries", icon: ICONS.countries, to: { name: "countries" } })
       break
+    case "results-archive":
+      crumbs.push({ label: "Results Archive", icon: ICONS.event, to: { name: "results-archive" } })
+      break
     case "players":
       crumbs.push({ label: "Players", icon: ICONS.player, to: { name: "players" } })
       break

@@ -1,3 +1,24 @@
+export const ALL_YEARS = Array.from({ length: new Date().getFullYear() - 1968 + 1 }, (_, i) => 1968 + i)
+
+export const EVENT_PAGES = [
+  {
+    label: "Details",
+    name: "event",
+    icon: ICONS.overview
+  },
+  {
+    label: "Results",
+    name: "results",
+    icon: ICONS.cards
+  },
+  {
+    label: "Draws",
+    name: "draws",
+    icon: ICONS.draw,
+    ui: { itemLeadingIcon: "rotate-270" }
+  }
+]
+
 export const LETTERS = [
   "A",
   "B",
@@ -26,3 +47,11 @@ export const LETTERS = [
   "Y",
   "Z"
 ]
+
+export const tourColourMapping: Record<number, string> = {
+  0: "muted",
+  1: "ATP",
+  2: "WTA",
+  3: "Men",
+  4: "Women"
+}
