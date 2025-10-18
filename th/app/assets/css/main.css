@@ -5,6 +5,7 @@
 @theme {
   --font-sans: "Fira Sans Condensed", sans-serif;
   --font-cursive: "Petit Formal Script", cursive;
+  --container-8xl: 120rem;
 }
 
 ::-webkit-scrollbar {
@@ -13,6 +14,7 @@
 
 :root {
   --ui-bg: var(--ui-color-neutral-100);
+  --ui-container: var(--container-8xl);
 }
 
 .dark {
@@ -26,9 +28,9 @@ input::-webkit-inner-spin-button {
 }
 
 .hover-link {
-  @apply bg-gradient-to-r bg-bottom bg-[length:0_1px] bg-no-repeat bg-[0_100%] transition-[background-size] hover:bg-[length:100%_1px] w-fit duration-500;
+  @apply text-primary bg-gradient-to-r bg-bottom bg-[length:0_1px] bg-no-repeat bg-[0_100%] transition-[background-size] hover:bg-[length:100%_1px] w-fit duration-500 cursor-pointer;
 }
 
 .default-link {
-  @apply from-[var(--ui-text-muted)] to-[var(--ui-text-muted)];
+  @apply from-[var(--ui-primary)] to-[var(--ui-primary)];
 }

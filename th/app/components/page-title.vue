@@ -13,10 +13,19 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => {
 
   switch (routeName) {
     case "about":
-      return [...crumbs, { label: "About", icon: icons.info, to: { name: "about" } }]
+      crumbs.push({ label: "About", icon: icons.info, to: { name: "about" } })
+      break
+    case "countries":
+      crumbs.push({ label: "Countries", icon: ICONS.countries, to: { name: "countries" } })
+      break
+    case "players":
+      crumbs.push({ label: "Players", icon: ICONS.player, to: { name: "players" } })
+      break
     default:
-      return crumbs
+      break
   }
+
+  return crumbs
 })
 
 const pageTitle = computed(() => {

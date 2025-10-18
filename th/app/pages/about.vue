@@ -26,7 +26,7 @@ const { viewMode } = useViewMode()
       </template>
     </u-dashboard-panel>
 
-    <u-container>
+    <u-container class="w-(--container-6xl)">
       <u-page>
         <u-page-header title="About" />
 

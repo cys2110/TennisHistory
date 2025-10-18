@@ -5,14 +5,14 @@ export default defineAppConfig({
       success: "green",
       warning: "amber",
       error: "red",
-      ATP: "indigo",
+      ATP: "violet",
       WTA: "fuchsia",
       Men: "blue",
-      Women: "pink",
+      Women: "orange",
       Active: "emerald",
       Inactive: "zinc",
-      Singles: "violet",
-      Doubles: "orange",
+      Singles: "indigo",
+      Doubles: "pink",
       Tour: "teal",
       Challenger: "stone",
       ITF: "rose",
@@ -57,13 +57,55 @@ export default defineAppConfig({
       tip: "line-md:lightbulb-twotone",
       warning: "line-md:alert-twotone-loop"
     },
+    alert: { defaultVariants: { variant: "subtle" } },
+    badge: { defaultVariants: { variant: "subtle", size: "sm" } },
     button: {
       slots: { base: "cursor-pointer" },
       defaultVariants: { variant: "subtle", size: "sm" }
     },
     commandPalette: { slots: { input: "[&>input]:h-8 text-xs", item: "cursor-pointer text-sm" } },
+    dashboardPanel: { slots: { root: "h-screen", body: "scroll-smooth" } },
     dashboardSidebar: { slots: { header: "justify-center font-cursive lg:text-lg xl:text-xl 2xl:text-2xl" } },
+    dropdownMenu: { slots: { content: "max-h-80 !min-w-fit border border-primary", item: "cursor-pointer" } },
     footerColumns: { slots: { center: "xl:col-span-3" } },
-    header: { slots: { container: "max-w-full", title: "font-cursive" } }
+    formField: { slots: { label: "font-semibold" }, defaultVariants: { size: "sm" } },
+    header: { slots: { container: "max-w-full", title: "font-cursive" } },
+    input: { slots: { root: "w-full" }, defaultVariants: { size: "sm" } },
+    inputNumber: {
+      slots: { root: "w-full" },
+      variants: { orientation: { horizontal: { decrement: "hidden" } } },
+      defaultVariants: { size: "sm" }
+    },
+    navigationMenu: { defaultVariants: { variant: "link" } },
+    pageHeader: { slots: { wrapper: "flex-row justify-between" } },
+    radioGroup: {
+      slots: { base: "cursor-pointer", label: "cursor-pointer" },
+      defaultVariants: { size: "sm" }
+    },
+    select: {
+      slots: {
+        base: "cursor-pointer w-full",
+        content: "ring-primary cursor-pointer w-full",
+        trailingIcon: "group-data-[state=open]:rotate-180 duration-250"
+      },
+      defaultVariants: { size: "sm" }
+    },
+    selectMenu: {
+      slots: {
+        base: "cursor-pointer w-full",
+        content: "ring-primary cursor-pointer w-full",
+        trailingIcon: "group-data-[state=open]:rotate-180 duration-250"
+      },
+      defaultVariants: { size: "sm" }
+    },
+    slideover: { slots: { body: "flex flex-col gap-5" } },
+    table: {
+      slots: {
+        root: "scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent",
+        th: "text-xs md:text-sm text-center py-1",
+        td: "text-xs md:text-sm text-center py-1"
+      },
+      defaultVariants: { loadingAnimation: "swing" }
+    }
   }
 })
