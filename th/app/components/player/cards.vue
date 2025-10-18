@@ -52,7 +52,7 @@ onMounted(() => {
             class="flex flex-col gap-5"
           >
             <u-radio-group
-              legend="Status"
+              legend="Tour"
               v-model="filters.tour"
               :items="['ATP', 'WTA']"
               :ui="{ item: 'ml-3' }"
@@ -144,7 +144,7 @@ onMounted(() => {
                 class="flex flex-col gap-5"
               >
                 <u-radio-group
-                  legend="Status"
+                  legend="Tour"
                   v-model="filters.tour"
                   :items="['ATP', 'WTA']"
                   :ui="{ item: 'ml-3' }"

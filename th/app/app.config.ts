@@ -51,6 +51,7 @@ export default defineAppConfig({
       panelClose: "tabler:layout-sidebar-left-collapse",
       panelOpen: "tabler:layout-sidebar-left-expand",
       plus: "line-md:plus",
+      reload: "line-md:rotate-270",
       search: "line-md:search-twotone",
       success: "line-md:circle-to-confirm-circle-twotone-transition",
       system: "line-md:monitor-twotone",
@@ -106,6 +107,7 @@ export default defineAppConfig({
         td: "text-xs md:text-sm text-center py-1"
       },
       defaultVariants: { loadingAnimation: "swing" }
-    }
+    },
+    textarea: { slots: { root: "w-full" }, defaultVariants: { size: "sm" } }
   }
 })

@@ -41,7 +41,7 @@ export const shortDateFormat = new Intl.DateTimeFormat("en-GB", {
   year: "2-digit"
 })
 
-export const getTourColour = (tours: TourEnum | TourEnum[]) => {
+export const getTourColour = (tours: TourEnum | TourEnum[] | keyof typeof TourEnum | (keyof typeof TourEnum)[]) => {
   if (!Array.isArray(tours) || tours.length === 1) {
     const tour = Array.isArray(tours) ? tours[0] : tours
     return tour?.replace("ITF (M)", "Men").replace("ITF (W)", "Women") as keyof typeof appConfig.ui.colors

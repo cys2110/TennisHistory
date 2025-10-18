@@ -11,6 +11,13 @@ declare global {
     coaches: SelectOptionsType[]
   }
 
+  type TournamentFiltersType = {
+    tours: TourEnum[]
+    tournaments: SelectOptionsType[]
+    established: number | undefined
+    abolished: number | undefined
+  }
+
   type SelectOptionsType = { id: string; label: string }
 
   type SortType = "ASC" | "DESC" | undefined
@@ -19,6 +26,17 @@ declare global {
     id: string
     name: string
     alpha2?: string
+  }
+
+  interface FormFieldInterface<S> {
+    label: string
+    key: keyof S
+    type: string
+    subType?: string
+    items?: any[]
+    required?: boolean
+    colSpan?: number
+    size?: "sm" | "md" | "xs"
   }
 
   interface PersonInterface {
@@ -36,6 +54,16 @@ declare global {
     min_year: number
     max_year: number
     tour: TourEnum
+  }
+
+  interface TournamentInterface {
+    abolished: number
+    established: number
+    id: number
+    name: string
+    tours: (keyof typeof TourEnum)[]
+    update: boolean
+    website: string
   }
 }
 

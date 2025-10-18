@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { ColouredBadge, CountryLink, FormSelectMenu, FormSelectSearch } from "#components"
 import { type TableColumn, type TableRow } from "@nuxt/ui"
-import { routerViewLocationKey } from "vue-router"
 
 const { status, count, players } = defineProps<{
   players: PlayerInterface[]

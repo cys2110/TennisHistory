@@ -21,6 +21,9 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => {
     case "players":
       crumbs.push({ label: "Players", icon: ICONS.player, to: { name: "players" } })
       break
+    case "tournaments":
+      crumbs.push({ label: "Tournaments", icon: ICONS.tournament, to: { name: "tournaments" } })
+      break
     default:
       break
   }

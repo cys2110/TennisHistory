@@ -14,6 +14,7 @@ export default {
   noCountries: "tabler:globe-off",
   noFilter: "line-md:filter-off-twotone",
   noPeople: "tabler:friends-off",
+  noTournament: "tabler:trophy-off",
   player: "map:stadium",
   sortAlpha: "tabler:sort-a-z",
   sortAlphaDown: "tabler:sort-descending-letters",

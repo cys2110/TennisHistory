@@ -19,7 +19,7 @@ const layout = computed(() => {
 <template>
   <u-app
     :tooltip="{ delayDuration: 100 }"
-    :toaster="{ position: 'bottom-center' }"
+    :toaster="{ position: 'top-center' }"
   >
     <nuxt-loading-indicator color="repeating-linear-gradient(to right,#ddd6fe 0%,#8b5cf6 50%,#5b21b6 100%)" />
 
