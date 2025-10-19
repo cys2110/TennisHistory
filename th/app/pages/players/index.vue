@@ -5,7 +5,7 @@ const { viewMode } = useViewMode()
 const skip = ref(0)
 const players = ref<PlayerInterface[]>([])
 
-const baseFilters: PlayerFiltersType = {
+const filters = reactive<PlayerFiltersType>({
   players: [],
   tour: undefined,
   countries: [],
@@ -13,9 +13,16 @@ const baseFilters: PlayerFiltersType = {
   maxYear: undefined,
   status: undefined,
   coaches: []
+})
+const resetFilters = () => {
+  filters.players = []
+  filters.tour = undefined
+  filters.countries = []
+  filters.minYear = undefined
+  filters.maxYear = undefined
+  filters.status = undefined
+  filters.coaches = []
 }
-const filters = ref<PlayerFiltersType>(baseFilters)
-const resetFilters = () => set(filters, baseFilters)
 
 const reset = () => {
   set(skip, 0)
@@ -23,11 +30,6 @@ const reset = () => {
 }
 
 watchDeep(filters, reset)
-watchOnce(players, () => {
-  if (get(players).length === 0) {
-    reset()
-  }
-})
 
 const { data, status, execute } = await useFetch<{ count: number; players: PlayerInterface[] }>("/api/players", {
   key: () => `players-${JSON.stringify(get(filters))}-${get(skip)}`,

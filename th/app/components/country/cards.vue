@@ -3,21 +3,51 @@ const { countries } = defineProps<{ countries: CountryInterface[]; status: APISt
 
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: useSSRWidth() })
 const mdAndDown = breakpoints.smallerOrEqual("md")
+const filtered = ref(false)
 
 const selectedLetter = ref<string | undefined>()
-const filteredCountries = computed(() => {
+const filteredCountries = ref(countries)
+
+watch(selectedLetter, () => {
+  set(filteredCountries, [])
+  set(filtered, false)
   if (get(selectedLetter)) {
-    return countries.filter(country => country.name.startsWith(get(selectedLetter)!))
+    set(
+      filteredCountries,
+      countries.filter(country => country.name.startsWith(get(selectedLetter)!))
+    )
+  } else {
+    set(filteredCountries, countries)
   }
-  return get(countries)
 })
 
-const toc = computed(() => [
+const toc = ref([
   {
     id: "countries",
-    items: get(filteredCountries).map(country => ({
+    label: "Countries",
+    items: countries.map(country => ({
       label: country.name,
-      to: `#${country.id}`
+      onSelect: () => {
+        set(selectedLetter, undefined)
+        if (get(filtered)) {
+          if (get(filteredCountries).some(c => c.id === country.id)) {
+            if (get(filteredCountries).length === 1) {
+              set(filtered, false)
+              set(filteredCountries, countries) // Reset to all countries
+            } else {
+              set(
+                filteredCountries,
+                get(filteredCountries).filter(c => c.id !== country.id)
+              )
+            }
+          } else {
+            set(filteredCountries, [...get(filteredCountries), country])
+          }
+        } else {
+          set(filteredCountries, [country])
+          set(filtered, true)
+        }
+      }
     }))
   }
 ])

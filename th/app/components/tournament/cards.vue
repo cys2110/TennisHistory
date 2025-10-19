@@ -37,18 +37,25 @@ onMounted(() => {
         <u-page-aside>
           <div class="font-semibold">{{ count }} tournament{{ count === 1 ? "" : "s" }}</div>
 
+          <dev-only>
+            <tournament-create
+              size="xs"
+              class="my-2"
+            />
+          </dev-only>
+
           <u-button
             label="Reset Filters"
             :icon="ICONS.noFilter"
             @click="resetFilters"
             block
             size="xs"
-            class="my-5"
+            class="my-2"
           />
 
           <div
             v-if="filters"
-            class="flex flex-col gap-5"
+            class="flex flex-col gap-3"
           >
             <u-checkbox-group
               legend="Tours"
@@ -104,19 +111,31 @@ onMounted(() => {
             <template #body>
               <div class="font-semibold">{{ count }} tournament{{ count === 1 ? "" : "s" }}</div>
 
+              <dev-only>
+                <tournament-create size="xs" />
+              </dev-only>
+
               <u-button
                 label="Reset Filters"
                 :icon="ICONS.noFilter"
                 @click="resetFilters"
                 block
                 size="xs"
-                class="my-5"
               />
 
               <div
                 v-if="filters"
                 class="flex flex-col gap-5"
               >
+                <form-select-search
+                  v-if="filters"
+                  v-model="filters.tournaments"
+                  placeholder="Select tournaments"
+                  type="tournaments"
+                  :icon="ICONS.tournament"
+                  block
+                />
+
                 <u-checkbox-group
                   legend="Tours"
                   v-model="filters.tours"
@@ -124,32 +143,19 @@ onMounted(() => {
                   :ui="{ item: 'ml-3' }"
                 />
 
-                <u-form-field label="Established">
-                  <form-input
-                    v-if="filters"
-                    v-model="filters.established"
-                    type="number"
-                    placeholder="Year established"
-                    block
-                  />
-                </u-form-field>
-
-                <u-form-field label="Abolished">
-                  <form-input
-                    v-if="filters"
-                    v-model="filters.abolished"
-                    type="number"
-                    placeholder="Year abolished"
-                    block
-                  />
-                </u-form-field>
-
-                <form-select-search
+                <form-input
                   v-if="filters"
-                  v-model="filters.tournaments"
-                  placeholder="Select tournaments"
-                  type="tournaments"
-                  :icon="ICONS.tournament"
+                  v-model="filters.established"
+                  type="number"
+                  placeholder="Year established"
+                  block
+                />
+
+                <form-input
+                  v-if="filters"
+                  v-model="filters.abolished"
+                  type="number"
+                  placeholder="Year abolished"
                   block
                 />
               </div>
@@ -184,7 +190,10 @@ onMounted(() => {
               </template>
 
               <template #title>
-                <u-link :to="{ name: 'tournament', params: { id: tournament.id, name: kebabCase(tournament.name) } }">
+                <u-link
+                  :to="{ name: 'tournament', params: { id: tournament.id, name: kebabCase(tournament.name ?? '-') } }"
+                  class="hover-link default-link"
+                >
                   {{ tournament.name }}
                 </u-link>
               </template>
@@ -193,12 +202,6 @@ onMounted(() => {
                 <span v-if="tournament.established">{{ tournament.established }}</span>
                 <span v-if="tournament.established && !tournament.abolished"> - present</span>
                 <span v-else-if="tournament.abolished && tournament.established !== tournament.abolished"> - {{ tournament.abolished }}</span>
-              </template>
-
-              <template #footer>
-                <dev-only>
-                  <tournament-edit :tournament />
-                </dev-only>
               </template>
             </u-page-card>
           </div>

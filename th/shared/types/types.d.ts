@@ -81,7 +81,7 @@ declare global {
   }
 
   type TournamentFiltersType = {
-    tours: TourEnum[]
+    tours: (keyof typeof TourEnum)[]
     tournaments: SelectOptionsType[]
     established: number | undefined
     abolished: number | undefined
@@ -119,14 +119,16 @@ declare global {
   }
 
   interface FormFieldInterface<S> {
-    label: string
-    key: keyof S
-    type: string
-    subType?: string
+    colSpan?: string
     items?: any[]
+    key: keyof S
+    label: string
+    loading?: boolean
+    multiple?: boolean
     required?: boolean
-    colSpan?: number
     size?: "sm" | "md" | "xs"
+    subType?: string
+    type: string
   }
 
   interface PersonInterface {
@@ -143,7 +145,7 @@ declare global {
     country: CountryInterface
     min_year: number
     max_year: number
-    tour: TourEnum
+    tour: keyof typeof TourEnum
   }
 
   interface SurfaceInterface {

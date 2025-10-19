@@ -13,7 +13,7 @@ export default defineEventHandler(async query => {
 
   const results = records.map(r => {
     const tournament = r.get("tournament")
-    return { id: tournament.id, label: tournament.name }
+    return { id: tournament.id.toInt(), label: tournament.name }
   })
 
   return results

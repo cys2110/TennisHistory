@@ -12,12 +12,8 @@ export default defineEventHandler(async event => {
 
   const formattedParams = {
     skip: int(skip),
-    tours: tours
-      ? Array.isArray(tours)
-        ? tours.map((t: any) => (typeof t === "string" ? t : t.value))
-        : [typeof tours === "string" ? tours : tours.value]
-      : null,
-    tournaments: tournaments ? (Array.isArray(tournaments) ? tournaments.map((t: any) => int(t.id)) : [int(tournaments.id)]) : null,
+    tours: tours.map((t: any) => (typeof t === "string" ? t : t.value)),
+    tournaments: tournaments.map((t: any) => int(t.id)),
     established: established ? int(established) : null,
     abolished: abolished ? int(abolished) : null
   }
@@ -26,9 +22,8 @@ export default defineEventHandler(async event => {
     `/* cypher */
     CALL () {
       MATCH (t:Tournament)
-        WHERE t.name IS NOT NULL
-        AND ($tours IS NULL OR SIZE($tours) = 0 OR ANY(x IN $tours WHERE x IN labels(t)))
-        AND ($tournaments IS NULL OR SIZE($tournaments) = 0 OR t.id IN $tournaments)
+        WHERE (SIZE($tours) = 0 OR ANY(x IN $tours WHERE x IN labels(t)))
+        AND (SIZE($tournaments) = 0 OR t.id IN $tournaments)
         AND ($established IS NULL OR
           EXISTS {
             MATCH (t)-[:ESTABLISHED]->(:Year {id: $established})
@@ -41,9 +36,8 @@ export default defineEventHandler(async event => {
     }
     CALL () {
       MATCH (t:Tournament)
-        WHERE t.name IS NOT NULL
-        AND ($tours IS NULL OR SIZE($tours) = 0 OR ANY(x IN $tours WHERE x IN labels(t)))
-        AND ($tournaments IS NULL OR SIZE($tournaments) = 0 OR t.id IN $tournaments)
+        WHERE (SIZE($tours) = 0 OR ANY(x IN $tours WHERE x IN labels(t)))
+        AND (SIZE($tournaments) = 0 OR t.id IN $tournaments)
       CALL (t) {
         OPTIONAL MATCH (t)-[:ESTABLISHED]->(e:Year)
         OPTIONAL MATCH (t)-[:ABOLISHED]->(a:Year)

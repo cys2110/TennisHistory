@@ -28,9 +28,13 @@ input::-webkit-inner-spin-button {
 }
 
 .hover-link {
-  @apply text-primary bg-gradient-to-r bg-bottom bg-[length:0_1px] bg-no-repeat bg-[0_100%] transition-[background-size] hover:bg-[length:100%_1px] w-fit duration-500 cursor-pointer;
+  @apply bg-gradient-to-r bg-bottom bg-[length:0_1px] bg-no-repeat bg-[0_100%] transition-[background-size] hover:bg-[length:100%_1px] w-fit duration-500 cursor-pointer;
 }
 
 .default-link {
-  @apply from-[var(--ui-primary)] to-[var(--ui-primary)];
+  @apply text-muted from-[var(--ui-text-muted)] to-[var(--ui-text-muted)];
+}
+
+.primary-link {
+  @apply text-primary from-[var(--ui-primary)] to-[var(--ui-primary)];
 }

@@ -5,14 +5,18 @@ const { viewMode } = useViewMode()
 const skip = ref(0)
 const tournaments = ref<TournamentInterface[]>([])
 
-const baseFilters: TournamentFiltersType = {
+const filters = reactive<TournamentFiltersType>({
   tours: [],
   tournaments: [],
   established: undefined,
   abolished: undefined
+})
+const resetFilters = () => {
+  filters.tours = []
+  filters.tournaments = []
+  filters.established = undefined
+  filters.abolished = undefined
 }
-const filters = ref<TournamentFiltersType>(baseFilters)
-const resetFilters = () => set(filters, baseFilters)
 
 const reset = () => {
   set(skip, 0)

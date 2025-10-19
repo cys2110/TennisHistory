@@ -9,7 +9,7 @@ const {
 </script>
 
 <template>
-  <div :class="`col-span-${field.colSpan ?? 1}`">
+  <div :class="field.colSpan">
     <u-form-field
       :label="field.label"
       :required="field.required"
@@ -32,14 +32,12 @@ const {
         </template>
       </u-select>
 
-      <!-- <u-select-menu
+      <u-select-menu
         v-else-if="field.type === 'selectMenu'"
         v-model="modelValue"
         :items="field.items"
         :placeholder="`Select ${field.label.toLowerCase()}`"
         :loading="field.loading"
-        value-key="id"
-        label-key="label"
       >
         <template #content-bottom>
           <u-button
@@ -50,7 +48,7 @@ const {
             block
           />
         </template>
-      </u-select-menu> -->
+      </u-select-menu>
 
       <u-input
         v-else-if="field.type === 'text'"
@@ -87,7 +85,7 @@ const {
         :label="field.label"
       /> -->
 
-      <!-- <u-input-number
+      <u-input-number
         v-else-if="field.type === 'currency'"
         v-model="modelValue"
         :placeholder="`Enter ${field.label.toLowerCase()}`"
@@ -109,7 +107,7 @@ const {
           />
           <template v-else>{{ "" }}</template>
         </template>
-      </u-input-number> -->
+      </u-input-number>
 
       <u-textarea
         v-else-if="field.type === 'textarea'"
@@ -143,13 +141,13 @@ const {
         :size="field.size || 'sm'"
       />
 
-      <!-- <u-radio-group
+      <u-radio-group
         v-else-if="field.type === 'radio'"
         v-model="modelValue"
         :items="field.items"
         orientation="horizontal"
         :size="field.size || 'sm'"
-      />-->
+      />
 
       <form-select-search
         v-else-if="field.type === 'search'"
@@ -157,6 +155,7 @@ const {
         v-model="modelValue"
         :placeholder="`Select ${field.label.toLowerCase()}`"
         :key="field.key"
+        :multiple="field.multiple"
         block
       />
     </u-form-field>

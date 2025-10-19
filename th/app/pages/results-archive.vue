@@ -5,7 +5,7 @@ const { viewMode } = useViewMode()
 const skip = ref(0)
 const events = ref<EventInterface[]>([])
 
-const baseFilters: EventFiltersType = {
+const filters = reactive<EventFiltersType>({
   tours: [],
   tournaments: [],
   levels: [],
@@ -18,9 +18,21 @@ const baseFilters: EventFiltersType = {
   umpires: [],
   environment: undefined,
   year: undefined
+})
+const resetFilters = () => {
+  filters.tours = []
+  filters.tournaments = []
+  filters.levels = []
+  filters.categories = []
+  filters.dateRange = { start: undefined, end: undefined }
+  filters.surfaces = []
+  filters.venues = []
+  filters.countries = []
+  filters.supervisors = []
+  filters.umpires = []
+  filters.environment = undefined
+  filters.year = undefined
 }
-const filters = ref<EventFiltersType>(baseFilters)
-const resetFilters = () => set(filters, baseFilters)
 
 const reset = () => {
   set(skip, 0)

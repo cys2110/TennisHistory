@@ -34,7 +34,7 @@ const columns: TableColumn<TournamentInterface>[] = [
 ]
 
 const handleSelect = async (row: TableRow<TournamentInterface>) => {
-  await navigateTo({ name: "tournament", params: { id: row.original.id, name: kebabCase(row.original.name) } })
+  await navigateTo({ name: "tournament", params: { id: row.original.id, name: kebabCase(row.original.name ?? "-") } })
 }
 </script>
 
@@ -46,6 +46,10 @@ const handleSelect = async (row: TableRow<TournamentInterface>) => {
       </u-dashboard-navbar>
 
       <u-dashboard-toolbar>
+        <dev-only>
+          <tournament-create />
+        </dev-only>
+
         <u-button
           label="Reset Filters"
           :icon="ICONS.noFilter"
@@ -67,6 +71,7 @@ const handleSelect = async (row: TableRow<TournamentInterface>) => {
         :columns
         :loading="status === 'pending'"
         sticky
+        render-fallback-value="—"
         @select="handleSelect"
         :ui="{ tbody: '[&>tr]:cursor-pointer' }"
       >
@@ -86,24 +91,17 @@ const handleSelect = async (row: TableRow<TournamentInterface>) => {
             :items="Object.entries(TourEnum).map(tour => ({ value: tour[0], label: tour[1] }))"
             placeholder="Tour"
             :icon="ICONS.tour"
-            size="md"
             multiple
           />
         </template>
         <template #tours-cell="{ row }">
           <div class="flex justify-center items-center gap-1">
-            <coloured-badge
+            <u-badge
               v-for="tour in row.original.tours"
               :key="tour"
               :label="TourEnum[tour]"
               :color="tour"
             />
-            <dev-only>
-              <tournament-edit
-                :tournament="row.original"
-                class="w-fit"
-              />
-            </dev-only>
           </div>
         </template>
 
@@ -114,30 +112,25 @@ const handleSelect = async (row: TableRow<TournamentInterface>) => {
             placeholder="Tournament"
             type="tournaments"
             :icon="ICONS.tournament"
-            size="md"
           />
         </template>
         <template #established-header>
-          <u-form-field label="Established">
-            <form-input
-              v-if="filters"
-              v-model="filters.established"
-              type="number"
-              placeholder="Filter by Year Established"
-              block
-            />
-          </u-form-field>
+          <form-input
+            v-if="filters"
+            v-model="filters.established"
+            type="number"
+            placeholder="Year Established"
+            block
+          />
         </template>
         <template #abolished-header>
-          <u-form-field label="Abolished">
-            <form-input
-              v-if="filters"
-              v-model="filters.abolished"
-              type="number"
-              placeholder="Filter by year abolished"
-              block
-            />
-          </u-form-field>
+          <form-input
+            v-if="filters"
+            v-model="filters.abolished"
+            type="number"
+            placeholder="Year Abolished"
+            block
+          />
         </template>
       </u-table>
     </template>

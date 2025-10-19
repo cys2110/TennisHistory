@@ -38,18 +38,25 @@ onMounted(() => {
         <u-page-aside>
           <div class="font-semibold">{{ count }} player{{ count === 1 ? "" : "s" }}</div>
 
+          <dev-only>
+            <player-create
+              size="xs"
+              class="my-2"
+            />
+          </dev-only>
+
           <u-button
             label="Reset Filters"
             :icon="ICONS.noFilter"
             @click="resetFilters"
             block
             size="xs"
-            class="my-5"
+            class="my-2"
           />
 
           <div
             v-if="filters"
-            class="flex flex-col gap-5"
+            class="flex flex-col gap-3"
           >
             <u-radio-group
               legend="Tour"
@@ -65,32 +72,28 @@ onMounted(() => {
               :ui="{ item: 'ml-3' }"
             />
 
-            <u-form-field label="Year of First Tournament">
-              <form-input
-                v-if="filters"
-                v-model="filters.minYear"
-                type="number"
-                :placeholder="`1968-${currentYear}`"
-                block
-              />
-            </u-form-field>
-
-            <u-form-field label="Year of Last Tournament">
-              <form-input
-                v-if="filters"
-                v-model="filters.maxYear"
-                type="number"
-                :placeholder="`1968-${currentYear}`"
-                block
-              />
-            </u-form-field>
-
             <form-select-search
               v-if="filters"
               v-model="filters.countries"
               placeholder="Select country"
               type="countries"
               :icon="ICONS.countries"
+              block
+            />
+
+            <form-input
+              v-if="filters"
+              v-model="filters.minYear"
+              type="number"
+              placeholder="Year of First Tournament"
+              block
+            />
+
+            <form-input
+              v-if="filters"
+              v-model="filters.maxYear"
+              type="number"
+              placeholder="Year of Last Tournament"
               block
             />
 
@@ -130,13 +133,16 @@ onMounted(() => {
             <template #body>
               <div class="font-semibold">{{ count }} player{{ count === 1 ? "" : "s" }}</div>
 
+              <dev-only>
+                <player-create size="xs" />
+              </dev-only>
+
               <u-button
                 label="Reset Filters"
                 :icon="ICONS.noFilter"
                 @click="resetFilters"
                 block
                 size="xs"
-                class="my-5"
               />
 
               <div
@@ -155,6 +161,24 @@ onMounted(() => {
                   v-model="filters.status"
                   :items="['Active', 'Inactive']"
                   :ui="{ item: 'ml-3' }"
+                />
+
+                <form-select-search
+                  v-if="filters"
+                  v-model="filters.players"
+                  placeholder="Select players"
+                  type="players"
+                  :icon="ICONS.player"
+                  block
+                />
+
+                <form-select-search
+                  v-if="filters"
+                  v-model="filters.countries"
+                  placeholder="Select country"
+                  type="countries"
+                  :icon="ICONS.countries"
+                  block
                 />
 
                 <u-form-field label="Year of First Tournament">
@@ -176,24 +200,6 @@ onMounted(() => {
                     block
                   />
                 </u-form-field>
-
-                <form-select-search
-                  v-if="filters"
-                  v-model="filters.players"
-                  placeholder="Select players"
-                  type="players"
-                  :icon="ICONS.player"
-                  block
-                />
-
-                <form-select-search
-                  v-if="filters"
-                  v-model="filters.countries"
-                  placeholder="Select country"
-                  type="countries"
-                  :icon="ICONS.countries"
-                  block
-                />
 
                 <form-select-search
                   v-if="filters"
@@ -287,16 +293,6 @@ onMounted(() => {
                     ? `${player.min_year} - ${player.max_year}`
                     : "—"
                 }}
-                <dev-only>
-                  <u-button
-                    :icon="ICONS.edit"
-                    label="Edit player"
-                    size="xs"
-                    block
-                    :to="{ name: 'admin-players', params: { id: player.id } }"
-                    class="mt-2"
-                  />
-                </dev-only>
               </template>
             </u-page-card>
           </div>

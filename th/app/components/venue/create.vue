@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui"
-defineProps<{ block?: boolean }>()
-const toast = useToast()
+import type { FormErrorEvent, FormSubmitEvent } from "@nuxt/ui"
 const {
   ui: { icons }
 } = useAppConfig()
+const toast = useToast()
 const open = ref(false)
 const uploading = ref(false)
 
@@ -23,7 +22,7 @@ const state = reactive<VenueSchema>({
 })
 
 const formFields: FormFieldInterface<VenueSchema>[] = [
-  { label: "Name", key: "name", type: "text", colSpan: 2 },
+  { label: "Name", key: "name", type: "text", colSpan: "col-span-2" },
   { label: "City", key: "city", type: "text", required: true },
   { label: "Country", key: "country", type: "search", subType: "countries", required: true }
 ]
@@ -58,6 +57,15 @@ const onSubmit = async (event: FormSubmitEvent<VenueSchema>) => {
     set(uploading, false)
   }
 }
+
+const onError = (event: FormErrorEvent) => {
+  toast.add({
+    title: "Error creating venue",
+    description: event.errors.map(err => err.message).join(", "),
+    icon: icons.error,
+    color: "error"
+  })
+}
 </script>
 
 <template>
@@ -67,8 +75,8 @@ const onSubmit = async (event: FormSubmitEvent<VenueSchema>) => {
   >
     <u-button
       icon="tabler:building-plus"
-      :label="block ? 'Create Venue' : undefined"
-      :block
+      label="Create Venue"
+      block
     />
 
     <template #body>
@@ -77,6 +85,7 @@ const onSubmit = async (event: FormSubmitEvent<VenueSchema>) => {
         :schema="venueSchema"
         :state
         @submit="onSubmit"
+        @error="onError"
       >
         <div class="grid grid-cols-2 gap-2">
           <form-field

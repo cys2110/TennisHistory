@@ -1,58 +1,69 @@
 <script setup lang="ts">
 import type { FormErrorEvent, FormSubmitEvent } from "@nuxt/ui"
-
-const { tournament } = defineProps<{ tournament: TournamentInterface; size?: "sm" | "md" }>()
+defineProps<{ size?: "xs" }>()
 const toast = useToast()
 const {
   ui: { icons }
 } = useAppConfig()
-const open = ref(false)
 const uploading = ref(false)
+const open = ref(false)
 
-const baseState = {
-  id: tournament.id,
-  name: tournament.name,
-  established: tournament.established ?? undefined,
-  abolished: tournament.abolished ?? undefined,
-  website: tournament.website,
-  tours: tournament.tours
-}
-const state = ref<TournamentSchema>(baseState)
+defineShortcuts({
+  meta_enter: () => set(open, !get(open))
+})
+
+const state = reactive<TournamentSchema>({
+  id: 0,
+  name: "",
+  established: undefined,
+  abolished: undefined,
+  website: undefined,
+  tours: []
+})
 
 const formFields: FormFieldInterface<TournamentSchema>[] = [
   { label: "Name", key: "name", type: "text", required: true, colSpan: "col-span-2" },
+  { label: "ID", key: "id", type: "text", subType: "number", required: true },
   {
     label: "Tours",
     key: "tours",
     type: "checkbox",
     items: Object.entries(TourEnum).map(tour => ({ label: tour[1], value: tour[0] })),
-    required: true,
-    colSpan: "col-span-2"
+    required: true
   },
-  { label: "Established", key: "established", type: "text", subType: "number" },
-  { label: "Abolished", key: "abolished", type: "text", subType: "number" },
-  { label: "Website", key: "website", type: "textarea", colSpan: "col-span-2" }
+  { label: "Year Established", key: "established", type: "text", subType: "number" },
+  { label: "Year Abolished", key: "abolished", type: "text", subType: "number" },
+  { label: "Website URL", key: "website", type: "textarea", colSpan: "col-span-2" }
 ]
 
-const handleReset = () => set(state, baseState)
+const handleReset = () => {
+  state.id = 0
+  state.name = ""
+  state.established = undefined
+  state.abolished = undefined
+  state.website = undefined
+  state.tours = []
+}
 
 const onSubmit = async (event: FormSubmitEvent<TournamentSchema>) => {
   set(uploading, true)
   try {
-    await $fetch("/api/tournaments/edit", {
+    await $fetch("/api/tournaments/create", {
       query: event.data
     })
     toast.add({
-      title: "Tournament updated",
-      icon: icons.success,
+      title: "Tournament created",
+      icon: icons["success"],
       color: "success"
     })
+    handleReset()
     set(open, false)
+    await navigateTo({ name: "tournament", params: { id: state.id, name: kebabCase(state.name) } })
   } catch (e) {
     toast.add({
-      title: "Error updating tournament",
+      title: "Error creating tournament",
       description: (e as Error).message,
-      icon: icons.close,
+      icon: icons["error"],
       color: "error"
     })
   } finally {
@@ -60,11 +71,11 @@ const onSubmit = async (event: FormSubmitEvent<TournamentSchema>) => {
   }
 }
 
-const onError = async (event: FormErrorEvent) => {
+const handleError = (event: FormErrorEvent) => {
   toast.add({
     title: "Please ensure all fields are filled out correctly",
     description: event.errors.map(error => error.message).join(", "),
-    icon: icons.close,
+    icon: icons["error"],
     color: "error"
   })
 }
@@ -72,30 +83,28 @@ const onError = async (event: FormErrorEvent) => {
 
 <template>
   <u-modal
-    :title="tournament.name ?? tournament.id.toString()"
+    title="Create Tournament"
     v-model:open="open"
   >
     <u-button
-      :icon="ICONS.edit"
-      label="Edit Tournament"
-      :size="size || 'xs'"
+      :icon="icons.plus"
+      label="Create Tournament"
+      :size
       block
-      :color="tournament.update ? 'warning' : 'primary'"
     />
 
     <template #body>
       <u-form
         id="tournament-form"
-        ref="form"
         :schema="tournamentSchema"
         :state
         @submit="onSubmit"
-        @error="onError"
+        @error="handleError"
       >
         <div class="grid grid-cols-2 gap-2">
           <form-field
             v-for="field in formFields"
-            :key="field.key"
+            :key="field.label"
             :field="field"
             v-model="state[field.key]"
           />
@@ -112,17 +121,17 @@ const onError = async (event: FormErrorEvent) => {
         block
       />
       <u-button
-        label="Reset"
-        color="warning"
         @click="handleReset"
+        label="Reset"
         :icon="icons.reload"
         block
+        color="warning"
       />
       <u-button
         label="Cancel"
         color="error"
         @click="close"
-        :icon="icons.close"
+        :icon="icons['error']"
         block
       />
     </template>

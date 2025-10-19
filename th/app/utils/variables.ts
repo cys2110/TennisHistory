@@ -1,4 +1,8 @@
+import { CurrencyEnum } from "~~/shared/types/enums"
+
 export const ALL_YEARS = Array.from({ length: new Date().getFullYear() - 1968 + 1 }, (_, i) => 1968 + i)
+
+export const CURRENCIES = Object.entries(CurrencyEnum).map(([key, value]) => ({ label: value, value: key }))
 
 export const EVENT_PAGES = [
   {
@@ -48,6 +52,8 @@ export const LETTERS = [
   "Z"
 ]
 
+export const SURFACES = ["Indoor Clay", "Outdoor Clay", "Outdoor Grass", "Indoor Hard", "Outdoor Hard", "Indoor Carpet", "Outdoor Carpet"]
+
 export const tourColourMapping: Record<number, string> = {
   0: "muted",
   1: "ATP",
@@ -55,3 +61,5 @@ export const tourColourMapping: Record<number, string> = {
   3: "Men",
   4: "Women"
 }
+
+export const TOUR_OPTIONS = Object.entries(TourEnum).map(([key, value]) => ({ label: value, value: key }))

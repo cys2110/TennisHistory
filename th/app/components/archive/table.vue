@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { type TableColumn, type TableRow } from "@nuxt/ui"
 import type { RouteLocationRaw } from "vue-router"
-import { ALL_CATEGORIES } from "~~/shared/utils/variables"
 
 const { status, count, events } = defineProps<{
   events: EventInterface[]
@@ -101,16 +100,14 @@ onBeforeRouteLeave(() => toast.clear())
     <template #header>
       <u-dashboard-navbar>
         <template #title> <page-title /> </template>
-        <template #right>
-          <dev-only>
-            <person-create />
-            <venue-create />
-            <event-create />
-          </dev-only>
-        </template>
       </u-dashboard-navbar>
 
       <u-dashboard-toolbar>
+        <dev-only>
+          <person-create />
+          <venue-create />
+          <event-create />
+        </dev-only>
         <u-button
           label="Reset Filters"
           :icon="ICONS.noFilter"
@@ -154,17 +151,16 @@ onBeforeRouteLeave(() => toast.clear())
             placeholder="Tournament"
             type="tournaments"
             :icon="ICONS.tournament"
-            size="md"
           />
         </template>
 
         <template #year-header>
-          <form-input
+          <form-select-menu
             v-if="filters"
             v-model="filters.year"
-            type="number"
+            :items="ALL_YEARS"
             placeholder="Year"
-            class="min-w-15"
+            :icon="ICONS.event"
           />
         </template>
 
@@ -174,7 +170,6 @@ onBeforeRouteLeave(() => toast.clear())
             v-model="filters.levels"
             :items="['Tour', 'Challenger', 'ITF']"
             placeholder="Level"
-            size="md"
             multiple
             :icon="ICONS.level"
           />
@@ -197,7 +192,6 @@ onBeforeRouteLeave(() => toast.clear())
             :items="Object.entries(TourEnum).map(tour => ({ value: tour[0], label: tour[1] }))"
             placeholder="Tour"
             :icon="ICONS.tour"
-            size="md"
             multiple
           />
         </template>
@@ -209,7 +203,6 @@ onBeforeRouteLeave(() => toast.clear())
               :key="tour"
               :label="TourEnum[tour]"
               :color="tour"
-              size="md"
             />
           </div>
         </template>
@@ -220,7 +213,6 @@ onBeforeRouteLeave(() => toast.clear())
             v-model="filters.categories"
             :items="useArrayUnique(ALL_CATEGORIES).value"
             placeholder="Category"
-            size="md"
             :icon="ICONS.categories"
           />
         </template>
@@ -244,7 +236,6 @@ onBeforeRouteLeave(() => toast.clear())
             v-if="filters"
             v-model="filters.dateRange"
             placeholder="Dates"
-            size="md"
           />
         </template>
 
@@ -272,7 +263,6 @@ onBeforeRouteLeave(() => toast.clear())
             v-model="filters.environment"
             :items="['Indoor', 'Outdoor']"
             placeholder="Environment"
-            size="md"
           />
         </template>
 
@@ -283,7 +273,6 @@ onBeforeRouteLeave(() => toast.clear())
             :items="['Clay', 'Grass', 'Hard', 'Carpet']"
             :icon="ICONS.court"
             placeholder="Surface"
-            size="md"
             multiple
           />
         </template>
@@ -295,7 +284,6 @@ onBeforeRouteLeave(() => toast.clear())
             type="venues"
             placeholder="Venue"
             :icon="ICONS.venue"
-            size="md"
           />
         </template>
 
@@ -315,7 +303,6 @@ onBeforeRouteLeave(() => toast.clear())
             type="countries"
             placeholder="Country"
             :icon="ICONS.countries"
-            size="md"
           />
         </template>
 
@@ -335,27 +322,16 @@ onBeforeRouteLeave(() => toast.clear())
             type="supervisors"
             placeholder="Supervisor"
             :icon="ICONS.supervisor"
-            size="md"
           />
         </template>
 
         <template #supervisors-cell="{ row }">
-          <dev-only>
-            <person-edit
-              v-for="supervisor in row.original.supervisors"
-              :key="supervisor.id"
-              :person="supervisor"
-              type="Supervisor"
-            />
-            <template #fallback>
-              <div
-                v-for="supervisor in row.original.supervisors"
-                :key="supervisor.id"
-              >
-                {{ supervisor.id }}
-              </div>
-            </template>
-          </dev-only>
+          <div
+            v-for="supervisor in row.original.supervisors"
+            :key="supervisor.id"
+          >
+            {{ supervisor.id }}
+          </div>
         </template>
 
         <template #umpires-header>
@@ -365,27 +341,16 @@ onBeforeRouteLeave(() => toast.clear())
             type="umpires"
             placeholder="Umpire"
             :icon="ICONS.umpire"
-            size="md"
           />
         </template>
 
         <template #umpires-cell="{ row }">
-          <dev-only>
-            <person-edit
-              v-for="umpire in row.original.umpires"
-              :key="umpire.id"
-              :person="umpire"
-              type="Umpire"
-            />
-            <template #fallback>
-              <div
-                v-for="umpire in row.original.umpires"
-                :key="umpire.id"
-              >
-                {{ umpire.id }}
-              </div>
-            </template>
-          </dev-only>
+          <div
+            v-for="umpire in row.original.umpires"
+            :key="umpire.id"
+          >
+            {{ umpire.id }}
+          </div>
         </template>
       </u-table>
     </template>

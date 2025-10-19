@@ -11,6 +11,11 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
   // Turn on typed router
   experimental: { typedPages: true },
+  runtimeConfig: {
+    public: {
+      devMode: process.env.NODE_ENV === "development" || false
+    }
+  },
   // Imports not required
   imports: {
     presets: [

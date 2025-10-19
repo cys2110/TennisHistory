@@ -50,7 +50,7 @@ export default defineAppConfig({
       minus: "line-md:minus",
       panelClose: "tabler:layout-sidebar-left-collapse",
       panelOpen: "tabler:layout-sidebar-left-expand",
-      plus: "line-md:plus",
+      plus: "line-md:plus-square-twotone",
       reload: "line-md:rotate-270",
       search: "line-md:search-twotone",
       success: "line-md:circle-to-confirm-circle-twotone-transition",
@@ -65,6 +65,8 @@ export default defineAppConfig({
       defaultVariants: { variant: "subtle", size: "sm" }
     },
     calendar: { slots: { cell: "cursor-pointer" } },
+    checkbox: { slots: { base: "cursor-pointer", label: "cursor-pointer" }, defaultVariants: { size: "sm" } },
+    checkboxGroup: { slots: { item: "cursor-pointer" }, defaultVariants: { size: "sm" } },
     commandPalette: { slots: { input: "[&>input]:h-8 text-xs", item: "cursor-pointer text-sm" } },
     dashboardPanel: {
       slots: {

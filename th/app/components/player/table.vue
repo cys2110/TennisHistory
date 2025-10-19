@@ -9,7 +9,12 @@ const { status, count, players } = defineProps<{
 }>()
 const skip = defineModel<number>("skip")
 const filters = defineModel<PlayerFiltersType>("filters")
+
+const {
+  ui: { colors }
+} = useAppConfig()
 const table = useTemplateRef<any>("table")
+
 const currentYear = new Date().getFullYear()
 
 onMounted(() => {
@@ -38,7 +43,10 @@ const columns: TableColumn<PlayerInterface>[] = [
 ]
 
 const handleSelect = async (row: TableRow<PlayerInterface>) => {
-  await navigateTo({ name: "player", params: { id: row.original.id, name: kebabCase(`${row.original.first_name} ${row.original.last_name}`) } })
+  await navigateTo({
+    name: "player",
+    params: { id: row.original.id, name: row.original.first_name ? kebabCase(`${row.original.first_name} ${row.original.last_name}`) : "-" }
+  })
 }
 </script>
 
@@ -50,6 +58,10 @@ const handleSelect = async (row: TableRow<PlayerInterface>) => {
       </u-dashboard-navbar>
 
       <u-dashboard-toolbar>
+        <dev-only>
+          <player-create />
+        </dev-only>
+
         <u-button
           label="Reset Filters"
           :icon="ICONS.noFilter"
@@ -71,6 +83,7 @@ const handleSelect = async (row: TableRow<PlayerInterface>) => {
         :columns
         :loading="status === 'pending'"
         sticky
+        render-fallback-value="—"
         @select="handleSelect"
         :ui="{ tbody: '[&>tr]:cursor-pointer' }"
       >
@@ -90,21 +103,13 @@ const handleSelect = async (row: TableRow<PlayerInterface>) => {
             :items="[TourEnum['ATP'], TourEnum['WTA']]"
             placeholder="Tour"
             :icon="ICONS.tour"
-            size="md"
           />
         </template>
-        <template #tour-cell="{ cell, row }">
-          <div class="flex justify-center items-center gap-2">
-            <dev-only>
-              <u-button
-                :to="{ name: 'admin-player', params: { id: row.original.id } }"
-                label="Edit player"
-                :icon="ICONS.edit"
-                size="xs"
-              />
-            </dev-only>
-            <coloured-badge :label="(cell.getValue() as string)" />
-          </div>
+        <template #tour-cell="{ row }">
+          <u-badge
+            :label="TourEnum[row.original.tour]"
+            :color="row.original.tour"
+          />
         </template>
         <template #status-header>
           <form-select-menu
@@ -113,11 +118,13 @@ const handleSelect = async (row: TableRow<PlayerInterface>) => {
             :items="['Active', 'Inactive']"
             placeholder="Status"
             :icon="ICONS.tennis"
-            size="md"
           />
         </template>
         <template #status-cell="{ cell }">
-          <coloured-badge :label="(cell.getValue() as string)" />
+          <u-badge
+            :label="(cell.getValue() as string)"
+            :color="(cell.getValue() as keyof typeof colors )"
+          />
         </template>
         <template #country-header>
           <form-select-search
@@ -126,7 +133,6 @@ const handleSelect = async (row: TableRow<PlayerInterface>) => {
             placeholder="Country"
             type="countries"
             :icon="ICONS.countries"
-            size="md"
           />
         </template>
         <template #country-cell="{ row }">
@@ -142,28 +148,23 @@ const handleSelect = async (row: TableRow<PlayerInterface>) => {
             placeholder="Player"
             type="players"
             :icon="ICONS.player"
-            size="md"
           />
         </template>
         <template #min_year-header>
-          <u-form-field label="Year of First Tournament">
-            <form-input
-              v-if="filters"
-              v-model="filters.minYear"
-              type="number"
-              :placeholder="`1968-${currentYear}`"
-            />
-          </u-form-field>
+          <form-input
+            v-if="filters"
+            v-model="filters.minYear"
+            type="number"
+            placeholder="Year of First Tournament"
+          />
         </template>
         <template #max_year-header>
-          <u-form-field label="Year of Last Tournament">
-            <form-input
-              v-if="filters"
-              v-model="filters.maxYear"
-              type="number"
-              :placeholder="`1968-${currentYear}`"
-            />
-          </u-form-field>
+          <form-input
+            v-if="filters"
+            v-model="filters.maxYear"
+            type="number"
+            placeholder="Year of Last Tournament"
+          />
         </template>
         <template #coaches-header>
           <form-select-search
@@ -172,7 +173,6 @@ const handleSelect = async (row: TableRow<PlayerInterface>) => {
             placeholder="Coach"
             type="coaches"
             :icon="ICONS.coach"
-            size="md"
           />
         </template>
         <template #coaches-cell="{ row }">
