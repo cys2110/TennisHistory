@@ -52,7 +52,7 @@ def get_atp_player(player_id):
         "atp_link": atp_link,
         'current_singles': None,
         'ch_singles': None,
-        'singles_ate': None,
+        'singles_date': None,
         'current_doubles': None,
         'ch_doubles': None,
         'doubles_date': None
@@ -543,7 +543,7 @@ def get_atp_results():
         date_obj = None
         if date_container:
             stripped_date = re.match(r"([A-Za-z]{3}, \d{2} [A-Za-z]+, \d{4})", date_container.get_text(strip=True))
-            date_obj = datetime.strptime(stripped_date.group(1), "%a, %d %B, %Y")
+            date_obj = datetime.strptime(stripped_date.group(1), "%a, %d %B, %Y") if stripped_date else None
 
         matches_details = container.find_all('div', class_='match')
 
@@ -614,10 +614,7 @@ def get_atp_results():
                     "seconds": match['seconds'],
                     'type': match_type
                 }
-                if not match.get('date') is None:
-                    params['date'] = match['date']
-                if not match.get('umpire') is None:
-                    params['umpire'] = match['umpire']
+
 
                 # query = f"""
                 #     MATCH (:Player:ATP {{id: $p1id}})-[]-(:Entry:Doubles)-[]-(s1:Score)-[]-(m:Doubles:ATP:Main)-[]-(s2:Score)-[]-(:Entry:Doubles)-[]-(:Player:ATP {{id: $p3id}})
@@ -627,14 +624,21 @@ def get_atp_results():
                 query = f"""
                     MATCH (:Player:ATP {{id: $p1id}})-[]-(:Entry:$($type))-[]-(s1:Score)-[]-(m:$($type):ATP)-[]-(s2:Score)-[]-(:Entry:$($type))-[]-(:Player:ATP {{id: $p2id}})
                     WHERE m.id CONTAINS $eid
-                    SET m.date = date($date), m.court = $court, m.duration = duration({{hours: $hours, minutes: $minutes, seconds: $seconds}}), s1:Winner, s2:Loser
+                    SET m.court = $court, m.duration = duration({{hours: $hours, minutes: $minutes, seconds: $seconds}}), s1:Winner, s2:Loser
                 """
 
-                if not params.get('umpire') is None:
+                if match.get('date') is not None:
+                    query += """
+                        SET m.date = date($date)
+                    """
+                    params['date'] = match['date']
+
+                if match.get('umpire') is not None:
                     query += """
                         MERGE (u:Umpire {id: $umpire})
                         MERGE (u)-[:UMPIRED]->(m)
                     """
+                    params['umpire'] = match['umpire']
 
                 # query = f"""
                 #     MATCH (:Player:ATP {{id: $p1id}})-[]-(f1:Entry:Doubles)-[]-(s1:Score)-[]-(m:Doubles:ATP)-[]-(s2:Score)-[]-(:Entry:Doubles)-[]-(:Player:ATP {{id: $p3id}})
@@ -732,9 +736,8 @@ def get_atp_stats():
                         key = stats_dictionary[stat_label]
                         p1_stat = stat.find('div', class_='speedkmh1').get_text(strip=True)
                         p2_stat = stat.find('div', class_='speedkmh2').get_text(strip=True)
-                        temp = re.search(r'\d{2,3}', p1_stat)
-                        match_info['p1'][key] = int(re.search(r'\d{2,3}', p1_stat).group())
-                        match_info['p2'][key] = int(re.search(r'\d{2,3}', p2_stat).group())
+                        match_info['p1'][key] = int(re.search(r'\d{2,3}', p1_stat).group()) if re.search(r'\d{2,3}', p1_stat) is not None else None
+                        match_info['p2'][key] = int(re.search(r'\d{2,3}', p2_stat).group()) if re.search(r'\d{2,3}', p2_stat) is not None else None
                     else:
                         p1_stat = stat.find('div', class_='player1').get_text(strip=True)
                         p2_stat = stat.find('div', class_='player2').get_text(strip=True)

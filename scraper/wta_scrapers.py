@@ -23,7 +23,7 @@ AUTH = (os.getenv("NEO4J_USERNAME"), os.getenv("NEO4J_PASSWORD"))
 @app.route('/wta_player/<player_id>', methods=['GET'])
 def get_wta_player(player_id):
     player = {
-        'id': player_id
+        'id': player_id,
     }
 
     driver = webdriver.Chrome()
@@ -124,12 +124,12 @@ def get_wta_player(player_id):
             SET p.first_name = $player.first_name, p.last_name = $player.last_name, p.ch_singles = $player.ch_singles, p.ch_doubles = $player.ch_doubles, p.current_singles = $player.current_singles, p.current_doubles = $player.current_doubles, p.pm = $player.pm, p.dob = date($player.dob), p.wta_link = 'https://www.wtatennis.com/players/' || p.id || '/' || toLower($player.first_name) || '-' || toLower($player.last_name), p.singles_ch_date = date($player.singles_ch_date), p.doubles_ch_date = date($player.doubles_ch_date), p.updated_at = date()
         """
 
-        if player['height'] is not None:
+        if player.get('height') is not None:
             query += """
                 SET p.height = $player.height
             """
 
-        if player['rh'] is not None:
+        if player.get('rh') is not None:
             query += """
                 SET p.rh = toBoolean($player.rh)
             """
@@ -391,7 +391,7 @@ def get_wta_stats():
     draw_type = data.get('draw')
     match_type = data.get('type')
     range_start, range_end = [int(x) for x in data.get('draw_range')]
-    skip = [int(x) for x in data.get('skip')]
+    skip = [int(x) for x in data.get('skip')] if data.get('skip') else []
     matches = []
 
     driver = webdriver.Chrome()
