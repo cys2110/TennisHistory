@@ -4,7 +4,7 @@ export default defineEventHandler(async event => {
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
       CYPHER 25
-      MERGE (p:Player:$($tour) {id: $id})
+      MERGE (p:Player:$($tour) {id: $id, updated_at: date()})
     `,
     {
       id,

@@ -26,10 +26,8 @@ defineShortcuts({
 const { data: player, status } = await useFetch("/api/players/get-player", { query: { id } })
 
 const state = reactive({
+  ...get(player),
   id,
-  first_name: get(player)?.first_name,
-  last_name: get(player)?.last_name,
-  tours: get(player)?.tours.filter(t => t !== "Update")[0],
   country: get(player)?.country
     ? {
         id: get(player)?.country?.id,
@@ -44,58 +42,34 @@ const state = reactive({
     start_date: c.start_date ? parseDate(c.start_date) : undefined,
     end_date: c.end_date ? parseDate(c.end_date) : undefined
   })),
-  turned_pro: get(player)?.turned_pro,
-  retired: get(player)?.retired,
   coaches: get(player)?.coaches?.length
     ? get(player)?.coaches?.map(c => ({
         id: c.id,
         name: c.first_name ? `${c.first_name} ${c.last_name}` : undefined,
-        start_date: c.start_date ? parseDate(c.start_date) : undefined
+        years: c.years || undefined
       }))
     : [],
   former_coaches: get(player)?.former_coaches?.length
     ? get(player)?.former_coaches?.map(c => ({
         id: c.id,
         name: c.first_name ? `${c.first_name} ${c.last_name}` : undefined,
-        start_date: c.start_date ? parseDate(c.start_date) : undefined,
-        end_date: c.end_date ? parseDate(c.end_date) : undefined
+        years: c.years || undefined
       }))
     : [],
-  atp_link: get(player)?.atp_link,
-  wta_link: get(player)?.wta_link,
-  wiki_link: get(player)?.wiki_link,
-  official_link: get(player)?.official_link,
-  bh: get(player)?.bh,
-  rh: get(player)?.rh,
-  current_singles: get(player)?.current_singles,
-  current_doubles: get(player)?.current_doubles,
-  ch_singles: get(player)?.ch_singles,
-  ch_doubles: get(player)?.ch_doubles,
   singles_ch_date: get(player)?.singles_ch_date ? parseDate(get(player)?.singles_ch_date) : undefined,
   doubles_ch_date: get(player)?.doubles_ch_date ? parseDate(get(player)?.doubles_ch_date) : undefined,
   dob: get(player)?.dob ? parseDate(get(player)?.dob) : undefined,
-  dod: get(player)?.dod ? parseDate(get(player)?.dod) : undefined,
-  height: get(player)?.height,
-  pm: get(player)?.pm,
-  hof: get(player)?.hof
+  dod: get(player)?.dod ? parseDate(get(player)?.dod) : undefined
 })
 
 const formFields = [
   { label: "First Name", key: "first_name", type: "text", required: true },
   { label: "Last Name", key: "last_name", type: "text", required: true },
-  { label: "Tours", key: "tours", type: "radio", items: ["ATP", "WTA"], required: true },
+  { label: "Tour", key: "tour", type: "radio", items: ["ATP", "WTA"], required: true },
   { label: "Turned Pro", key: "turned_pro", type: "text", subType: "number" },
   { label: "Retired", key: "retired", type: "text", subType: "number" },
-  {
-    label: "Handedness",
-    key: "rh",
-    type: "select",
-    items: [
-      { value: true, label: "Right" },
-      { value: false, label: "Left" }
-    ]
-  },
-  { label: "Backhand", key: "bh", type: "select", items: ["One", "Two"] },
+  { label: "Plays", key: "rh", type: "radio", items: ["Right", "Left"] },
+  { label: "Backhand", key: "bh", type: "radio", items: ["One", "Two"] },
   { label: "Date of Birth", key: "dob", type: "date" },
   { label: "Date of Death", key: "dod", type: "date" },
   { label: "Height (cm)", key: "height", type: "number" },
@@ -123,22 +97,16 @@ const rankFields = [
 ]
 
 const linkFields = [
-  { label: "ATP", key: "atp_link", color: "ATP" },
-  { label: "WTA", key: "wta_link", color: "WTA" },
+  { label: "Site", key: "site_link", color: "primary" },
   { label: "Wiki", key: "wiki_link", color: "warning" },
   { label: "Official", key: "official_link", color: "success" }
 ]
 
-const scrapeDisabled = computed(() => {
-  const updatedAt = get(player).updated_at ? new Date(get(player).updated_at) : null
+const scrapeEnabled = computed(() => {
   const singlesChDate = get(player).singles_ch_date ? new Date(get(player).singles_ch_date) : null
   const doublesChDate = get(player).doubles_ch_date ? new Date(get(player).doubles_ch_date) : null
-  const cutoffDate = new Date("2000-01-01")
-  if (
-    updatedAt &&
-    updatedAt > new Date(2025, 9, 11) &&
-    ((singlesChDate && singlesChDate < cutoffDate) || (doublesChDate && doublesChDate < cutoffDate) || get(player).dod)
-  ) {
+  const cutoffDate = new Date("2001-01-01")
+  if ((singlesChDate && singlesChDate < cutoffDate) || (doublesChDate && doublesChDate < cutoffDate) || get(player).dod) {
     return false
   }
   return true
@@ -178,8 +146,9 @@ const handleScrape = async () => {
   }
 }
 
+const onError = event => console.error(event.errors)
+
 const onSubmit = async e => {
-  console.log("Submitting", e.data)
   set(submitting, true)
   try {
     await $fetch("/api/players/update", {
@@ -215,7 +184,7 @@ const onSubmit = async e => {
           </u-dashboard-navbar>
           <u-dashboard-toolbar>
             <u-button
-              v-if="scrapeDisabled"
+              v-if="scrapeEnabled"
               label="Scrape player"
               @click="handleScrape"
               block
@@ -244,6 +213,7 @@ const onSubmit = async e => {
             :schema="playerSchema"
             :state
             @submit="onSubmit"
+            @error="onError"
           >
             <div
               v-if="status === 'success'"
@@ -381,10 +351,24 @@ const onSubmit = async e => {
                       placeholder="name"
                       disabled
                     />
-                    <date-picker
-                      v-model="coach.start_date"
-                      placeholder="start date"
-                    />
+                    <u-input
+                      v-model="coach.years"
+                      placeholder="Years coached"
+                    >
+                      <template
+                        v-if="coach.years"
+                        #trailing
+                      >
+                        <u-button
+                          color="neutral"
+                          variant="link"
+                          size="xs"
+                          :icon="icons.close"
+                          aria-label="Clear input"
+                          @click="coach.years = undefined"
+                        />
+                      </template>
+                    </u-input>
                     <u-button
                       color="error"
                       :icon="icons.close"
@@ -395,7 +379,7 @@ const onSubmit = async e => {
                     label="Add Coach"
                     icon="line-md:account-add"
                     block
-                    @click="state.coaches.push({ id: '', start_date: undefined })"
+                    @click="state.coaches.push({ id: '', years: undefined })"
                   />
                 </div>
               </u-form-field>
@@ -417,14 +401,24 @@ const onSubmit = async e => {
                         placeholder="name"
                         disabled
                       />
-                      <date-picker
-                        v-model="coach.start_date"
-                        placeholder="start date"
-                      />
-                      <date-picker
-                        v-model="coach.end_date"
-                        placeholder="end date"
-                      />
+                      <u-input
+                        v-model="coach.years"
+                        placeholder="Years coached"
+                      >
+                        <template
+                          v-if="coach.years"
+                          #trailing
+                        >
+                          <u-button
+                            color="neutral"
+                            variant="link"
+                            size="xs"
+                            :icon="icons.close"
+                            aria-label="Clear input"
+                            @click="coach.years = undefined"
+                          />
+                        </template>
+                      </u-input>
                       <u-button
                         color="error"
                         :icon="icons.close"
@@ -435,7 +429,7 @@ const onSubmit = async e => {
                       label="Add Former Coach"
                       icon="line-md:account-add"
                       block
-                      @click="state.former_coaches.push({ id: '', start_date: undefined, end_date: undefined })"
+                      @click="state.former_coaches.push({ id: '', years: undefined })"
                     />
                   </div>
                 </u-form-field>

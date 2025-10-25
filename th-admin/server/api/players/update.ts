@@ -5,7 +5,7 @@ export default defineEventHandler(async event => {
     id: string
     first_name?: string
     last_name?: string
-    tours?: string | string[]
+    tour?: string
     country?: {
       id: string
       start_date?: any
@@ -17,17 +17,9 @@ export default defineEventHandler(async event => {
     }[]
     turned_pro?: string
     retired?: string
-    coaches?: {
-      id: string
-      start_date?: any
-    }[]
-    former_coaches?: {
-      id: string
-      start_date?: any
-      end_date?: any
-    }[]
-    atp_link?: string
-    wta_link?: string
+    coaches?: string[]
+    former_coaches?: string[]
+    site_link?: string
     wiki_link?: string
     official_link?: string
     bh?: string
@@ -42,15 +34,14 @@ export default defineEventHandler(async event => {
     id,
     first_name,
     last_name,
-    tours,
+    tour,
     country,
     previous_countries,
     turned_pro,
     retired,
     coaches,
     former_coaches,
-    atp_link,
-    wta_link,
+    site_link,
     wiki_link,
     official_link,
     bh,
@@ -80,17 +71,6 @@ export default defineEventHandler(async event => {
     return null
   }
 
-  const normaliseCoach = (item: any) => {
-    const coach = typeof item === "string" ? JSON.parse(item) : item
-    const start_date = convertDate(coach.start_date)
-    const end_date = convertDate(coach.end_date)
-    return {
-      ...coach,
-      start_date: start_date ? NeoDate.fromStandardDate(start_date) : null,
-      end_date: end_date ? NeoDate.fromStandardDate(end_date) : null
-    }
-  }
-
   const normaliseCountry = (item: any) => {
     const country = typeof item === "string" ? JSON.parse(item) : item
     const start_date = convertDate(country.start_date)
@@ -109,17 +89,14 @@ export default defineEventHandler(async event => {
   const normalisedPreviousCountries = formerCountriesArray.map(normaliseCountry)
   const normalisedCountry = country ? normaliseCountry(country) : null
 
-  const normalisedCoaches = coachesArray.filter(c => c.id).map(normaliseCoach)
-  const normalisedFormerCoaches = formerCoachesArray.filter(c => c.id).map(normaliseCoach)
-
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
       CYPHER 25
       MATCH (p:Player {id: $id})
-      SET p.first_name = $first_name, p.last_name = $last_name, p.atp_link = $atp_link, p.wta_link = $wta_link, p.wiki_link = $wiki_link, p.official_link = $official_link, p.bh = $bh, p.rh = toBoolean($rh), p.height = $height, p.hof = $hof, p.dob = $dob, p.dod = $dod, p.updated_at = date()
+      SET p.first_name = $first_name, p.last_name = $last_name, p.site_link = $site_link, p.wiki_link = $wiki_link, p.official_link = $official_link, p.bh = $bh, p.rh = $rh, p.height = $height, p.dob = $dob, p.dod = $dod, p.updated_at = date()
       CALL (p) {
-        WITH [x IN $tours WHERE NOT x IN labels(p)] AS add, [x IN labels(p) WHERE NOT x IN $tours AND NOT x IN ['Player', 'Coach']] AS remove
-        SET p:$(add) REMOVE p:$(remove)
+        WITH [x IN labels(p) WHERE NOT x <> $tour AND NOT x IN ['Player', 'Coach']] AS remove
+        REMOVE p:$(remove) SET p:$($tour)
       }
       CALL (p) {
         MATCH (p)-[v:REPRESENTS]->(c:Country)
@@ -161,6 +138,12 @@ export default defineEventHandler(async event => {
         }
       }
       CALL (p) {
+        WHEN $hof IS NOT NULL THEN {
+          MATCH (y:Year {id: $hof})
+          MERGE (p)-[:HOF]->(y)
+        }
+      }
+      CALL (p) {
         WHEN $coaches IS NOT NULL THEN {
           OPTIONAL MATCH (x:Coach)-[r:COACHES]->(p)
           CALL (x, r) {
@@ -170,7 +153,7 @@ export default defineEventHandler(async event => {
           UNWIND $coaches AS k
           MATCH (x1:Coach {id: k.id})
           MERGE (x1)-[q:COACHES]->(p)
-          SET q.start_date = k.start_date
+          SET q.years = k.years
         }
       }
       CALL (p) {
@@ -180,22 +163,21 @@ export default defineEventHandler(async event => {
             WITH x, r WHERE NOT x.id IN [k IN $former_coaches | k.id]
             DELETE r
           }
-          UNWIND $coaches AS k
+          UNWIND $former_coaches AS k
           MATCH (x1:Coach {id: k.id})
           MERGE (x1)-[q:COACHED]->(p)
-          SET q.start_date = k.start_date, q.end_date = k.end_date
+          SET q.years = k.years
         }
       }
     `,
     {
       id,
-      tours: tours ? (Array.isArray(tours) ? tours : [tours]) : null,
+      tour: tour || null,
       first_name: first_name || null,
       previous_countries: normalisedPreviousCountries,
-      coaches: normalisedCoaches,
-      former_coaches: normalisedFormerCoaches,
-      atp_link: atp_link || null,
-      wta_link: wta_link || null,
+      coaches: coachesArray.map(c => JSON.parse(c)),
+      former_coaches: formerCoachesArray.map(c => JSON.parse(c)),
+      site_link: site_link || null,
       official_link: official_link || null,
       last_name: last_name || null,
       wiki_link: wiki_link || null,

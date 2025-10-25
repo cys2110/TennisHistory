@@ -68,6 +68,8 @@ const formFields = [
       <u-form-field
         label="ID"
         required
+        :help="match.stats ? undefined : 'No stats available'"
+        :ui="{ help: 'text-error-500 text-xs' }"
       >
         <u-input
           :model-value="state.id"
@@ -112,14 +114,10 @@ const formFields = [
         />
       </div>
 
-      <div class="col-span-9 text-xs">
+      <div class="col-span-10 text-xs">
         {{
           match.players.length < 3 ? match.players.join(" v ") : match.players.slice(0, 2).join(" / ") + " v " + match.players.slice(2).join(" / ")
         }}
-      </div>
-
-      <div class="flex items-center">
-        <matches-stats v-if="!match.stats" />
       </div>
     </div>
   </u-form>

@@ -10,7 +10,8 @@ export default defineEventHandler(async query => {
       OPTIONAL MATCH (p)-[v2:REPRESENTED]->(c1:Country)
       OPTIONAL MATCH (x:Coach)-[t:COACHES]->(p)
       OPTIONAL MATCH (x1:Coach)-[t1:COACHED]->(p)
-      WITH p, c, tp, ret,
+      OPTIONAL MATCH (p)-[:HOF]->(hof:Year)
+      WITH p, c, tp, ret, hof,
       COLLECT
         (DISTINCT apoc.map.clean(
           apoc.map.merge(
@@ -28,7 +29,7 @@ export default defineEventHandler(async query => {
           apoc.map.merge(
             apoc.map.submap(
               x, ['id', 'first_name', 'last_name'], null, false
-            ), {start_date: t.start_date, end_date: t.end_date}
+            ), {years: t.years}
           ), [], [null]
         )
        ) AS coaches,
@@ -37,34 +38,16 @@ export default defineEventHandler(async query => {
           apoc.map.merge(
             apoc.map.submap(
               x1, ['id', 'first_name', 'last_name'], null, false
-            ), {start_date: t1.start_date, end_date: t1.end_date}
+            ), {years: t1.years}
           ), [], [null]
         )
       ) AS former_coaches
-      RETURN [x IN labels(p) WHERE NOT x IN ['Player', 'Coach']] AS tours, country, properties(p) AS player, tp.id AS turned_pro, ret.id AS retired, previous_countries, coaches, former_coaches
+      RETURN [x IN labels(p) WHERE NOT x IN ['Player', 'Coach']][0] AS tour, country, properties(p) AS player, tp.id AS turned_pro, ret.id AS retired, previous_countries, coaches, former_coaches, hof.id AS hof
     `,
     { id }
   )
 
   const result = records[0].toObject()
-
-  if (result.coaches.length === 1 && !result.coaches[0].id) {
-    result.coaches = []
-  } else {
-    for (const coach of result.coaches) {
-      if (coach.start_date) coach.start_date = coach.start_date.toStandardDate().toISOString().slice(0, 10)
-      if (coach.end_date) coach.end_date = coach.end_date.toStandardDate().toISOString().slice(0, 10)
-    }
-  }
-
-  if (result.former_coaches.length === 1 && !result.former_coaches[0].id) {
-    result.former_coaches = []
-  } else {
-    for (const coach of result.former_coaches) {
-      if (coach.start_date) coach.start_date = coach.start_date.toStandardDate().toISOString().slice(0, 10)
-      if (coach.end_date) coach.end_date = coach.end_date.toStandardDate().toISOString().slice(0, 10)
-    }
-  }
 
   if (result.previous_countries.length === 1 && !result.previous_countries[0].id) {
     result.previous_countries = []
@@ -78,21 +61,20 @@ export default defineEventHandler(async query => {
   if (result.country?.start_date) result.country.start_date = result.country.start_date.toStandardDate().toISOString().slice(0, 10)
 
   return {
-    tours: result.tours,
+    tour: result.tour,
     country: result.country,
     previous_countries: result.previous_countries,
     turned_pro: result.turned_pro?.toInt() || undefined,
     retired: result.retired?.toInt() || undefined,
-    coaches: result.coaches,
-    former_coaches: result.former_coaches,
+    coaches: Object.keys(result.coaches[0]).length ? result.coaches : [],
+    former_coaches: Object.keys(result.former_coaches[0]).length ? result.former_coaches : [],
     id: result.player.id,
     first_name: result.player.first_name,
     last_name: result.player.last_name,
-    atp_link: result.player.atp_link || undefined,
-    wta_link: result.player.wta_link || undefined,
+    site_link: result.player.site_link || undefined,
     wiki_link: result.player.wiki_link || undefined,
     bh: result.player.bh || undefined,
-    rh: result.player.rh,
+    rh: result.player.rh || undefined,
     current_singles: result.player.current_singles?.toInt() || undefined,
     current_doubles: result.player.current_doubles?.toInt() || undefined,
     ch_singles: result.player.ch_singles?.toInt() || undefined,
