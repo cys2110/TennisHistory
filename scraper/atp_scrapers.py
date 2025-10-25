@@ -14,7 +14,7 @@ from server import app
 from flask import Flask, jsonify, request
 
 # Loading neo4j authentication details
-load_status = load_dotenv("Neo4j-a4c75a44-Created-2025-03-21.txt")
+load_status = load_dotenv("Neo4j-4504c504-Created-2025-10-19.txt")
 if load_status is False:
     raise RuntimeError('Environment variables not loaded.')
 URI = os.getenv("NEO4J_URI")
@@ -118,7 +118,7 @@ def get_atp_player(player_id):
             else:
                 params['coach'] = [coach_text]
         elif text.startswith("Plays"):
-            params['rh'] = True if "Right" in text else False if "Left" in text else None
+            params['rh'] = 'Right' if "Right" in text else 'Left' if "Left" in text else None
             params['bh'] = 'Two' if "Two" in text else 'One' if "One" in text else None
 
     driver.quit()
@@ -131,7 +131,7 @@ def get_atp_player(player_id):
             MERGE (p)-[:REPRESENTS]->(c1)
             SET
                 p.pm = $pm,
-                p.atp_link = $atp_link,
+                p.site_link = $atp_link,
                 p.updated_at = date(),
                 p.current_singles = $current_singles,
                 p.ch_singles = $ch_singles,
@@ -171,7 +171,7 @@ def get_atp_player(player_id):
             query += """
                 WITH p
                 UNWIND $coach AS coach_name
-                OPTIONAL MATCH (c:Coach) WHERE c.id = coach_name OR c.first_name || ' ' || c.last_name = coach_name
+                OPTIONAL MATCH (c:Coach) WHERE apoc.text.compareCleaned(c.id, coach_name) OR apoc.text.compareCleaned(c.first_name || ' ' || c.last_name, coach_name)
                 CALL (p, c, coach_name) {
                     WHEN c IS NULL THEN {
                         MERGE (c1:Coach {id: coach_name})
@@ -201,7 +201,7 @@ def get_atp_draw():
     draw_size = data.get('draw_size')
     match_type = data.get('type')
     draw = data.get('draw')
-    sets = data.get('sets') if data.get('sets') else 'Best3'
+    sets = data.get('sets') if data.get('sets') else 'BestOf3'
     matches = []
 
     url_slug = ""
@@ -275,7 +275,7 @@ def get_atp_draw():
         round_matches = round.find_all('div', class_='draw-stats')
         for match in round_matches:
             match_info = {
-                'id': f"{tid}{year} {match_no}",
+                'id': f"{tid}{year}-ATP {match_type[0]} {draw[0]} {match_no}",
                 'match_no': match_no,
                 'round': round_name,
                 'p1': {},
@@ -289,16 +289,20 @@ def get_atp_draw():
 
             players = match.find_all('div', class_ = 'name')
 
+            skip1 = False
+
             for index, player in enumerate(players):
                 if player.get_text(strip=True) in ('Bye', 'Bye1'):
                     match_info['bye'] = True
+                    if match_type == 'Doubles' and index == 0 and len(players) < 4:
+                        skip1 = True
                 elif player.get_text(strip=True) in ('Qualifier', 'TBA', '. Alternate'):
                     pass
                 else:
                     try:
                         p_link = player.find('a')
                         id = re.search(r'/([a-zA-Z0-9]{4})/', p_link['href'])
-                        match_info[f"p{index + 1}"]['id'] = id.group(1)
+                        match_info[f"p{index + 1 if not skip1 else index + 2}"]['id'] = id.group(1)
                         status_tag = player.find('span')
                         if status_tag:
                             status_text = status_tag.get_text(strip=True).strip("()")
@@ -318,7 +322,7 @@ def get_atp_draw():
         for match in matches:
             # Base params
             params = {
-                'eid': int(f"{tid}{year}"),
+                'eid': f"{tid}{year}-ATP",
                 'mid': match['id'],
                 'round': match['round'],
                 'match_no': match['match_no'],
@@ -327,6 +331,8 @@ def get_atp_draw():
                 'sets': sets,
                 'bye': match['bye']
             }
+            print(match)
+
             # Base query
             query = """
                 CYPHER 25
@@ -343,12 +349,15 @@ def get_atp_draw():
             if match['p1'].get('id') is not None:
                 query += """
                     MERGE (p1:Player:ATP {id: $p1id})
-                        ON CREATE SET p1:Update
                     MERGE (f1:Entry:$($type) {id: $entry1})
+                    MERGE (s1:Score:T1:$($type):$($draw):ATP {id: $score1})
                     MERGE (p1)-[:ENTERED]->(f1)
+                    MERGE (f1)-[:SCORED]->(s1)
+                    MERGE (s1)-[:SCORED]->(m)
                 """
                 params['p1id'] = match['p1']['id']
-                params['entry1'] = f"{tid}{year} {match['p1']['id']}"
+                params['entry1'] = f"{tid}{year}-ATP {match['p1']['id']}" if match_type == 'Singles' else f"{tid}{year} {match['p1']['id']} {match['p2']['id']}"
+                params['score1'] = f"{match['id']} {match['p1']['id']}" if match_type == 'Singles' else f"{match['id']} {match['p1']['id']} {match['p2']['id']}"
 
                 if match['p1'].get('seed') is not None:
                     params['p1seed'] = match['p1']['seed']
@@ -374,80 +383,59 @@ def get_atp_draw():
                             SET f1.q_status = $p1status
                         """
 
-                if match_type == 'Singles':
+                if match['bye'] == True:
                     query += """
-                        MERGE (s1:Score:P1:Singles:$($draw):ATP {id: $score1})
-                        MERGE (f1)-[:SCORED]->(s1)
-                        MERGE (s1)-[:SCORED]->(m)
+                        SET s1:Winner
                     """
-                    params['score1'] = f"{match['id']} {match['p1']['id']}"
-
-                    if match['bye'] == True:
-                        query += """
-                            SET s1:Winner
-                        """
-                elif match_type == 'Doubles':
-                    query += """
-                        MERGE (s1:Score:T1:Doubles:$($draw):ATP {id: $score1})
-                        MERGE (f1)-[:SCORED]->(s1)
-                        MERGE (s1)-[:SCORED]->(m)
-                    """
-                    params['score1'] = f"{match['id']} {match['p1']['id']} {match['p2']['id']}"
-
-                    if match['bye'] == True:
-                        query += """
-                            SET s1:Winner
-                        """
 
             # Handle P2
             if match['p2'].get('id') is not None:
                 query += """
                     MERGE (p2:Player:ATP {id: $p2id})
-                        ON CREATE SET p2:Update
-                    MERGE (f2:Entry:$($type) {id: $entry2})
-                    MERGE (p2)-[:ENTERED]->(f2)
                 """
                 params['p2id'] = match['p2']['id']
-                params['entry2'] = f"{tid}{year} {match['p2']['id']}"
-
-                if match['p2'].get('seed') is not None:
-                    params['p2seed'] = match['p2']['seed']
-                    if draw == 'Main':
-                        query += """
-                            SET f2.seed = $p2seed
-                            MERGE (f2)-[:SEEDED]->(e)
-                        """
-                    else:
-                        query += """
-                            SET f2.q_seed = $p2seed
-                            MERGE (f2)-[:Q_SEEDED]->(e)
-                        """
-
-                if match['p2'].get('status') is not None:
-                    params['p2status'] = match['p2']['status']
-                    if draw == 'Main':
-                        query += """
-                        SET f2.status = $p2status
-                    """
-                    else:
-                        query += """
-                            SET f2.q_status = $p2status
-                        """
 
                 if match_type == 'Singles':
                     query += """
-                        MERGE (s2:Score:P2:Singles:$($draw):ATP {id: $score2})
+                        MERGE (f2:Entry:$($type) {id: $entry2})
+                        MERGE (p2)-[:ENTERED]->(f2)
+                        MERGE (s2:Score:T2:Singles:$($draw):ATP {id: $score2})
                         MERGE (f2)-[:SCORED]->(s2)
                         MERGE (s2)-[:SCORED]->(m)
                     """
+                    params['entry2'] = f"{tid}{year}-ATP {match['p2']['id']}"
                     params['score2'] = f"{match['id']} {match['p2']['id']}"
+
+                    if match['p2'].get('seed') is not None:
+                        params['p2seed'] = match['p2']['seed']
+                        if draw == 'Main':
+                            query += """
+                                SET f2.seed = $p2seed
+                                MERGE (f2)-[:SEEDED]->(e)
+                            """
+                        else:
+                            query += """
+                                SET f2.q_seed = $p2seed
+                                MERGE (f2)-[:Q_SEEDED]->(e)
+                            """
+
+                    if match['p2'].get('status') is not None:
+                        params['p2status'] = match['p2']['status']
+                        if draw == 'Main':
+                            query += """
+                            SET f2.status = $p2status
+                        """
+                        else:
+                            query += """
+                                SET f2.q_status = $p2status
+                            """
 
                     if match['bye'] == True:
                         query += "SET s2:Winner"
 
                 elif match_type == 'Doubles':
                     query += """
-                        MERGE (f2)-[:SCORED]->(s1)
+                        MERGE (p2)-[:ENTERED]->(f1)
                     """
 
             # Handle Team 2
@@ -455,55 +443,52 @@ def get_atp_draw():
                 if match['p3'].get('id') is not None:
                     query += """
                         MERGE (p3:Player:ATP {id: $p3id})
-                            ON CREATE SET p3:Update
                         MERGE (p4:Player:ATP {id: $p4id})
-                            ON CREATE SET p4:Update
-                        MERGE (f3:Entry:Doubles {id: $entry3})
-                        MERGE (f4:Entry:Doubles {id: $entry4})
-                        MERGE (p3)-[:ENTERED]->(f3)
-                        MERGE (p4)-[:ENTERED]->(f4)
+                        MERGE (f2:Entry:Doubles {id: $entry3})
                         MERGE (s2:Score:T2:Doubles:$($draw):ATP {id: $score2})
-                        MERGE (f3)-[:SCORED]->(s2)
-                        MERGE (f4)-[:SCORED]->(s2)
+                        MERGE (p3)-[:ENTERED]->(f2)
+                        MERGE (p4)-[:ENTERED]->(f2)
+                        MERGE (f2)-[:SCORED]->(s2)
                         MERGE (s2)-[:SCORED]->(m)
                     """
                     params['p3id'] = match['p3']['id']
                     params['p4id'] = match['p4']['id']
-                    params['entry3'] = f"{tid}{year} {match['p3']['id']}"
-                    params['entry4'] = f"{tid}{year} {match['p4']['id']}"
+                    params['entry3'] = f"{tid}{year}-ATP {match['p3']['id']} {match['p4']['id']}"
                     params['score2'] = f"{match['id']} {match['p3']['id']} {match['p4']['id']}"
 
-                    for i in range(3, 5):
-                        if match[f"p{i}"].get('seed') is not None:
-                            if draw == 'Main':
-                                query += f"""
-                                    SET f{i}.seed = $p{i}seed
-                                    MERGE (f{i})-[:SEEDED]->(e)
-                                """
-                            else:
-                                query += f"""
-                                    SET f{i}.q_seed = $p{i}seed
-                                    MERGE (f{i})-[:Q_SEEDED]->(e)
-                                """
-                            params[f'p{i}seed'] = match[f"p{i}"]['seed']
+                    if match["p3"].get('seed') is not None:
+                        if draw == 'Main':
+                            query += """
+                                SET f2.seed = $p3seed
+                                MERGE (f2)-[:SEEDED]->(e)
+                            """
+                        else:
+                            query += """
+                                SET f2.q_seed = $p3seed
+                                MERGE (f2)-[:Q_SEEDED]->(e)
+                            """
+                        params['p3seed'] = match["p3"]['seed']
 
-                        if match[f"p{i}"].get('status') is not None:
-                            if draw == 'Main':
-                                query += f"""
-                                    SET f{i}.status = $p{i}status
-                                """
-                            else:
-                                query += f"""
-                                    SET f{i}.q_status = $p{i}status
-                                """
-                            params[f'p{i}status'] = match[f"p{i}"]['status']
+                    if match["p3"].get('status') is not None:
+                        if draw == 'Main':
+                            query += """
+                                SET f2.status = $p3status
+                            """
+                        else:
+                            query += """
+                                SET f2.q_status = $p3status
+                            """
+                        params['p3status'] = match['p3']['status']
 
                     if match['bye'] == True:
-                        query += f"""SET s2:Winner"""
+                        query += """
+                            SET s2:Winner
+                        """
 
             db.run(query, **params)
 
     with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        driver.verify_connectivity()
         with driver.session(database="neo4j") as session:
             records = session.execute_write(add_events)
 
@@ -607,7 +592,7 @@ def get_atp_results():
                 params = {
                     "p1id": match['p1'],
                     "p2id": match['p2'] if match_type == 'Singles' else match['p3'],
-                    "eid": f"{tid}{year}",
+                    "eid": f"{tid}{year}-ATP",
                     "court": match['court'],
                     "hours": match['hours'],
                     "minutes": match['minutes'],
@@ -618,12 +603,13 @@ def get_atp_results():
 
                 # query = f"""
                 #     MATCH (:Player:ATP {{id: $p1id}})-[]-(:Entry:Doubles)-[]-(s1:Score)-[]-(m:Doubles:ATP:Main)-[]-(s2:Score)-[]-(:Entry:Doubles)-[]-(:Player:ATP {{id: $p3id}})
-                #     WHERE m.id CONTAINS $eid
+                #     WHERE m.id STARTS WITH $eid
                 #     SET m.duration = duration({{hours: $hours, minutes: $minutes}}), s1:Winner, s2:Loser
                 # """
                 query = f"""
+                    CYPHER 25
                     MATCH (:Player:ATP {{id: $p1id}})-[]-(:Entry:$($type))-[]-(s1:Score)-[]-(m:$($type):ATP)-[]-(s2:Score)-[]-(:Entry:$($type))-[]-(:Player:ATP {{id: $p2id}})
-                    WHERE m.id CONTAINS $eid
+                    WHERE m.id STARTS WITH $eid
                     SET m.court = $court, m.duration = duration({{hours: $hours, minutes: $minutes, seconds: $seconds}}), s1:Winner, s2:Loser
                 """
 
@@ -635,8 +621,15 @@ def get_atp_results():
 
                 if match.get('umpire') is not None:
                     query += """
-                        MERGE (u:Umpire {id: $umpire})
-                        MERGE (u)-[:UMPIRED]->(m)
+                        OPTIONAL MATCH (u:Umpire) WHERE apoc.text.compareCleaned(u.id, $umpire)
+                        CALL (u, m) {
+                            WHEN u IS NULL THEN {
+                                MERGE (u1:Umpire {id: $umpire})
+                                MERGE (u1)-[:UMPIRED]->(m)
+                            } ELSE {
+                                MERGE (u)-[:UMPIRED]->(m)
+                            }
+                        }
                     """
                     params['umpire'] = match['umpire']
 
@@ -777,9 +770,9 @@ def get_atp_stats():
         for match in matches:
             result = db.run("""
                 MATCH (:Player:ATP {id: $p1})-[]-(:Entry:$($type))-[]-(s1:Score)-[]-(m:$($type):ATP)-[]-(s2:Score)-[]-(:Entry:$($type))-[]-(:Player:ATP {id: $p2})
-                MATCH (m)-[]-(r:Round:$($type))-[]-(:Event {id: toInteger($eid)})
+                WHERE m.id STARTS WITH $eid
                 SET s1 += $p1_stats, s2 += $p2_stats
-                """, p1=match['p1_id'], p2=match['p2_id'], type=match_type, eid=eid, p1_stats=match['p1'], p2_stats=match['p2'])
+                """, p1=match['p1_id'], p2=match['p2_id'], type=match_type, eid=f"{eid}-ATP", p1_stats=match['p1'], p2_stats=match['p2'])
 
     with GraphDatabase.driver(URI, auth=AUTH) as driver:
         with driver.session(database="neo4j") as session:

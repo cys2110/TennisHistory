@@ -73,10 +73,8 @@ def get_wta_player(player_id):
         country_mapping = {
             'Czech Republic': 'Czechia',
             'The Netherlands': 'Netherlands',
-            'Chinese Taipei': 'Taiwan',
             'Republic of Egypt': 'Egypt',
             'Korea (South)': 'South Korea',
-            'Slovak Republic': 'Slovakia',
             'Bosnia-Herzegovina': "Bosnia and Herzegovina",
             'Macedonia': 'North Macedonia',
             'Hong-Kong, China': 'Hong Kong'
