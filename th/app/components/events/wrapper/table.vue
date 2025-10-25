@@ -14,6 +14,11 @@ const { data: event } = await useFetch<EventInterface>("/api/events/event", {
   query: { id: `${edId}-${tour}` }
 })
 
+useHead({
+  title: () =>
+    `${EVENT_PAGES.find(page => page.name === routeName)?.label} | ${event.value?.edition.tournament.name ?? capitalCase(name)} ${year} ${tour}`
+})
+
 const toc = [
   { label: "Details", to: "#details", icon: ICONS.overview },
   { label: "Awards", to: "#awards", icon: ICONS.awards },

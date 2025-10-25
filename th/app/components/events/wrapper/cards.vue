@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { page } from "#build/ui"
 import type { DropdownMenuItem, PageLink } from "@nuxt/ui"
-
-defineProps<{ event: EventInterface }>()
 
 const {
   name: routeName,
@@ -13,6 +10,16 @@ const {
 } = useAppConfig()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: useSSRWidth() })
 const mdAndDown = breakpoints.smallerOrEqual("md")
+
+const { data: event } = await useFetch<EventInterface>("/api/events/event", {
+  key: `${edId}-${tour}`,
+  query: { id: `${edId}-${tour}` }
+})
+
+useHead({
+  title: () =>
+    `${EVENT_PAGES.find(page => page.name === routeName)?.label} | ${event.value?.edition.tournament.name ?? capitalCase(name)} ${year} ${tour}`
+})
 
 const toc = [
   { label: "Details", to: "#details", icon: ICONS.overview },
@@ -28,28 +35,35 @@ const toc = [
     <u-page>
       <template #left>
         <u-page-aside>
-          <dev-only>
-            <events-update
-              v-if="event"
-              :event
+          <template v-if="event && routeName === 'event'">
+            <dev-only>
+              <events-update
+                v-if="event"
+                :event
+              />
+              <events-scrape-draw v-if="['ATP', 'WTA'].includes(tour)" />
+              <events-scrape-results v-if="tour === 'ATP'" />
+              <events-scrape-stats v-if="['ATP', 'WTA'].includes(tour)" />
+            </dev-only>
+            <u-badge
+              color="success"
+              :label="`Updated: ${useDateFormat(event.updated_at, 'DD MMMM YYYY').value}`"
+              class="w-full justify-center"
             />
-            <events-scrape-draw v-if="['ATP', 'WTA'].includes(tour)" />
-            <events-scrape-results v-if="tour === 'ATP'" />
-            <events-scrape-stats v-if="['ATP', 'WTA'].includes(tour)" />
-          </dev-only>
-          <u-badge
-            color="success"
-            :label="`Updated: ${useDateFormat(event.updated_at, 'DD MMMM YYYY').value}`"
-            class="w-full justify-center"
-          />
+          </template>
 
           <u-page-links
             :links="(EVENT_PAGES.map(page => ({ label: page.label, to: { name: page.name, params: { name, id, year, edId } }, icon: page.icon, ui: { linkLeadingIcon: page.name === 'draws' ? 'rotate-270' : undefined} })) as PageLink[])"
           />
+
+          <slot name="page-left" />
         </u-page-aside>
       </template>
 
-      <template #right>
+      <template
+        #right
+        v-if="routeName === 'event' || $slots['page-right']"
+      >
         <u-page-aside>
           <u-page-links
             v-if="routeName === 'event' && !COUNTRY_DRAWS.includes(id)"
@@ -64,9 +78,12 @@ const toc = [
         :description="EVENT_PAGES.find(page => page.name === routeName)!.label"
       >
         <template #headline>
-          <div class="flex items-center gap-2">
+          <div
+            v-if="event"
+            class="flex items-center gap-2"
+          >
             <u-badge
-              :label="TourEnum[event?.tour]"
+              :label="TourEnum[event.tour]"
               :color="event?.tour"
             />
             <u-badge
@@ -77,7 +94,10 @@ const toc = [
         </template>
 
         <template #links>
-          <div class="flex items-center gap-2">
+          <div
+            v-if="event"
+            class="flex items-center gap-2"
+          >
             <slot name="header-links" />
             <u-dropdown-menu
               v-if="routeName === 'event' && !COUNTRY_DRAWS.includes(id) && mdAndDown"
@@ -91,7 +111,7 @@ const toc = [
               target="_blank"
             />
             <u-button
-              v-if="event.wiki_link"
+              v-if="event?.wiki_link"
               :href="event.wiki_link"
               :icon="ICONS.wikipedia"
               target="_blank"

@@ -10,7 +10,7 @@ export default defineEventHandler(async event => {
     { first_name, last_name, type }
   )
 
-  if (summary.counters.updates().nodesCreated === 0) {
+  if (Object.values(summary.counters.updates()).every(v => v === 0)) {
     throw createError({ statusCode: 400, statusMessage: `${type} could not be created` })
   } else {
     return { ok: true }

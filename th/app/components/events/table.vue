@@ -1,8 +1,12 @@
 <script setup lang="ts">
-defineProps<{ event: EventInterface }>()
 const {
-  params: { id, tour }
+  params: { id, tour, edId }
 } = useRoute("event")
+
+const { data: event } = await useFetch<EventInterface>("/api/events/event", {
+  key: `${edId}-${tour}`,
+  query: { id: `${edId}-${tour}` }
+})
 </script>
 
 <template>

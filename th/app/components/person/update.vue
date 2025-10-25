@@ -86,6 +86,7 @@ const onSubmit = async (event: FormSubmitEvent<PersonSchema>) => {
       block
       size="xs"
       :label="person ? `${person.first_name} ${person.last_name}` : `Create ${type}`"
+      :color="person && !person.last_name ? 'warning' : undefined"
     />
 
     <template #body>

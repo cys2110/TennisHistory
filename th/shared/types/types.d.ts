@@ -91,9 +91,10 @@ declare global {
     id: string
     incomplete?: keyof typeof IncompleteEnum
     match_no: number
+    round: keyof typeof RoundEnum
     tour: keyof typeof TourEnum
     type: MatchType
-    umpire?: PersonInterface
+    umpire: PersonInterface
   }
 
   interface ScoreInterface {
@@ -238,6 +239,53 @@ declare global {
     size?: "sm" | "md" | "xs"
     subType?: string
     type: string
+  }
+
+  interface DrawInterface {
+    rounds: DrawRoundInterface[]
+    matches?: DrawMatchInterface[]
+    contestants?: {
+      [contestantId: string]: DrawContestantInterface
+    }
+  }
+
+  interface DrawRoundInterface {
+    name?: string
+  }
+
+  interface DrawMatchInterface {
+    roundIndex: number
+    order: number
+    sides?: DrawSideInterface[]
+    matchStatus?: string
+    isBronzeMatch?: boolean
+    date?: string
+    duration?: string
+    court?: string
+    umpire?: string
+  }
+
+  interface DrawContestantInterface {
+    entryStatus?: string
+    players?: DrawPlayerInterface[]
+  }
+
+  interface DrawSideInterface {
+    title?: string
+    contestantId?: string
+    scores?: DrawScoreInterface[]
+    isWinner?: boolean
+  }
+
+  interface DrawScoreInterface {
+    mainScore: number
+    subscore?: number
+    isWinner?: boolean
+  }
+
+  interface DrawPlayerInterface {
+    title: string
+    nationality: string
   }
 }
 

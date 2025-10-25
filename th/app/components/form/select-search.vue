@@ -40,8 +40,8 @@ const { data, status } = await useFetch(`/api/${type.toLowerCase()}/search`, {
       <u-field-group>
         <venues-update v-if="type === 'venues'" />
         <person-update
-          v-else-if="type === 'supervisors'"
-          type="Supervisor"
+          v-else-if="['supervisors', 'umpires'].includes(type)"
+          :type="type === 'supervisors' ? 'Supervisor' : 'Umpire'"
         />
         <u-button
           label="Clear"

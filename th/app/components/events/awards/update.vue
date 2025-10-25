@@ -43,7 +43,7 @@ const state = reactive<Partial<RoundSchema>>({
 })
 
 const formFields: FormFieldInterface<RoundSchema>[] = [
-  { label: "Round", key: "round", type: "select", items: ROUND_OPTIONS, required: true },
+  { label: "Round", key: "round", type: "select", items: Object.keys(RoundEnum), required: true },
   { label: "Type", key: "type", type: "radio", items: ["Singles", "Doubles"], required: true },
   { label: "Draw", key: "draw", type: "radio", items: ["Main", "Qualifying"], required: true },
   { label: "Number", key: "number", type: "number", required: true },

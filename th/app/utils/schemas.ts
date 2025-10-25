@@ -134,6 +134,56 @@ export const eventSchema = z.object({
 
 export type EventSchema = z.infer<typeof eventSchema>
 
+export const matchSchema = z.object({
+  id: z.string("Please enter a match ID").optional(),
+  event: z.string("Please enter a valid event ID"),
+  tour: z.literal(Object.keys(TourEnum), "Please select a valid tour"),
+  type: z.literal(["Singles", "Doubles"], "Please select a valid match type"),
+  draw: z.literal(["Main", "Qualifying"], "Please select a valid draw type"),
+  round: z.string("Please enter a round name"),
+  match_no: z
+    .number("Please enter a valid match number")
+    .int("Match number must be a number")
+    .positive("Match number must be a positive number")
+    .optional(),
+  court: z.string("Please enter a court name").optional(),
+  date: z.unknown().optional(),
+  duration: z.string().optional(),
+  umpire: z
+    .object({
+      value: z.string("Please enter a valid umpire ID"),
+      label: z.string("Please enter a valid umpire name")
+    })
+    .optional(),
+  sets: z.literal(["BestOf3", "BestOf5"], "Please select a valid sets type").optional(),
+  incomplete: z.string().optional(),
+  team1: z
+    .object({
+      value: z.string("Please enter a valid team1 ID"),
+      label: z.string("Please enter a valid team1 name")
+    })
+    .optional(),
+  team2: z
+    .object({
+      value: z.string("Please enter a valid team2 ID"),
+      label: z.string("Please enter a valid team2 name")
+    })
+    .optional(),
+  s1: z.array(z.number().nullable()).optional(),
+  s2: z.array(z.number().nullable()).optional(),
+  s3: z.array(z.number().nullable()).optional(),
+  s4: z.array(z.number().nullable()).optional(),
+  s5: z.array(z.number().nullable()).optional(),
+  t1: z.number().optional(),
+  t2: z.number().optional(),
+  t3: z.number().optional(),
+  t4: z.number().optional(),
+  t5: z.number().optional(),
+  winner: z.literal(["Team1", "Team2"], "Please select a valid winner").optional()
+})
+
+export type MatchSchema = z.infer<typeof matchSchema>
+
 export const personSchema = z.object({
   type: z.literal(["Umpire", "Supervisor", "Coach"], "Please select a valid person type"),
   id: z.string().optional(),
