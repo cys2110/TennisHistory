@@ -56,10 +56,11 @@ export default defineAppConfig({
       success: "line-md:circle-to-confirm-circle-twotone-transition",
       system: "line-md:monitor-twotone",
       tip: "line-md:lightbulb-twotone",
+      upload: "line-md:uploading",
       warning: "line-md:alert-twotone-loop"
     },
     alert: { defaultVariants: { variant: "subtle" } },
-    badge: { defaultVariants: { variant: "subtle", size: "sm" } },
+    badge: { defaultVariants: { variant: "subtle" } },
     button: {
       slots: { base: "cursor-pointer" },
       defaultVariants: { variant: "subtle", size: "sm" }
@@ -70,7 +71,7 @@ export default defineAppConfig({
     commandPalette: { slots: { input: "[&>input]:h-8 text-xs", item: "cursor-pointer text-sm" } },
     dashboardPanel: {
       slots: {
-        root: "h-screen max-w-screen lg:max-w-[calc(100vw-3rem)] xl:max-w-[calc(100vw-4rem)] 2xl:max-w-[calc(100vw-15%)]",
+        root: "h-screen max-w-screen lg:max-w-[calc(100vw-3%)]",
         body: "scroll-smooth"
       }
     },
@@ -82,12 +83,14 @@ export default defineAppConfig({
     input: { slots: { root: "w-full" }, defaultVariants: { size: "sm" } },
     inputNumber: {
       slots: { root: "w-full" },
-      variants: { orientation: { horizontal: { decrement: "hidden" } } },
       defaultVariants: { size: "sm" }
     },
+    inputTags: { slots: { root: "w-full" }, defaultVariants: { size: "sm" } },
     navigationMenu: { defaultVariants: { variant: "link" } },
+    pageAside: { slots: { container: "*:my-2" } },
     pageGrid: { base: "scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent overflow-y-auto scroll-smooth max-h-200 p-5" },
     pageHeader: { slots: { wrapper: "flex-row justify-between" } },
+    pageLinks: { slots: { link: "cursor-pointer" } },
     pageList: { base: "scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent overflow-y-auto scroll-smooth max-h-200 p-5" },
     radioGroup: {
       slots: { base: "cursor-pointer", label: "cursor-pointer" },
@@ -113,7 +116,7 @@ export default defineAppConfig({
     table: {
       slots: {
         root: "scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent",
-        th: "text-xs md:text-sm text-center py-1",
+        th: "text-xs text-center py-1",
         td: "text-xs md:text-sm text-center py-1"
       },
       defaultVariants: { loadingAnimation: "swing" }

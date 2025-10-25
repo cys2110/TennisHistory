@@ -1,5 +1,15 @@
 <script setup lang="ts">
-const { type } = defineProps<{ placeholder: string; type: string; block?: boolean; icon?: string; size?: "md"; multiple?: boolean }>()
+const { type, id, tour, matchType } = defineProps<{
+  placeholder?: string
+  type: string
+  block?: boolean
+  icon?: string
+  size?: "md"
+  multiple?: boolean
+  id?: string
+  tour?: keyof typeof TourEnum
+  matchType?: MatchType
+}>()
 const {
   ui: { icons }
 } = useAppConfig()
@@ -8,7 +18,7 @@ const searchTerm = ref("")
 const modelValue = defineModel<SelectOptionsType[] | SelectOptionsType>()
 
 const { data, status } = await useFetch(`/api/${type.toLowerCase()}/search`, {
-  query: { search: searchTerm },
+  query: { search: searchTerm, id, tour, matchType },
   default: () => []
 })
 </script>
@@ -21,7 +31,6 @@ const { data, status } = await useFetch(`/api/${type.toLowerCase()}/search`, {
     :items="data"
     :loading="status === 'pending'"
     :placeholder
-    label-key="label"
     :variant="block ? undefined : 'none'"
     :class="{ 'w-fit max-w-50': !block }"
     :icon
@@ -29,6 +38,11 @@ const { data, status } = await useFetch(`/api/${type.toLowerCase()}/search`, {
   >
     <template #content-bottom>
       <u-field-group>
+        <venues-update v-if="type === 'venues'" />
+        <person-update
+          v-else-if="type === 'supervisors'"
+          type="Supervisor"
+        />
         <u-button
           label="Clear"
           size="xs"

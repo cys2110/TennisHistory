@@ -1,17 +1,15 @@
-import type appConfig from "~/app.config"
+export const convertToFt = (height: number) => {
+  const ftDecimal = convert(height, "cm").to("ft")
+  const ft = Math.floor(ftDecimal)
+  const inches = Math.round((ftDecimal - ft) * 12)
+  return `${ft}' ${inches}"`
+}
 
 export const dateTimeFormat = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "long",
   year: "numeric"
 })
-
-export const filterIncludesString = (row: any, columnId: string, filterValue: string[]) => {
-  const rowValue = row.getValue(columnId)
-  if (filterValue.length === 0 || filterValue.includes(rowValue)) return true
-
-  return false
-}
 
 export const getFlagCode = (country: CountryInterface) => {
   const countryMapping: Record<string, string> = {
@@ -21,7 +19,9 @@ export const getFlagCode = (country: CountryInterface) => {
     FRG: "germany",
     CIV: "cote-divoire",
     CGO: "congo-brazzaville",
-    COD: "congo-kinshasa"
+    COD: "congo-kinshasa",
+    TPE: "taiwan",
+    SVK: "slovakia"
   }
 
   if (countryMapping[country.id]) {
@@ -40,11 +40,3 @@ export const shortDateFormat = new Intl.DateTimeFormat("en-GB", {
   month: "numeric",
   year: "2-digit"
 })
-
-export const getTourColour = (tours: TourEnum | TourEnum[] | keyof typeof TourEnum | (keyof typeof TourEnum)[]) => {
-  if (!Array.isArray(tours) || tours.length === 1) {
-    const tour = Array.isArray(tours) ? tours[0] : tours
-    return tour?.replace("ITF (M)", "Men").replace("ITF (W)", "Women") as keyof typeof appConfig.ui.colors
-  }
-  return "primary"
-}

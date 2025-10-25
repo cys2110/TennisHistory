@@ -5,12 +5,13 @@ const { viewMode } = useViewMode()
 const skip = ref(0)
 const tournaments = ref<TournamentInterface[]>([])
 
-const filters = reactive<TournamentFiltersType>({
-  tours: [],
-  tournaments: [],
+const filters = reactive<Partial<FiltersInterface>>({
+  abolished: undefined,
   established: undefined,
-  abolished: undefined
+  tournaments: [],
+  tours: []
 })
+
 const resetFilters = () => {
   filters.tours = []
   filters.tournaments = []
@@ -26,11 +27,7 @@ const reset = () => {
 watchDeep(filters, reset)
 
 const { data, status, execute } = await useFetch<{ count: number; tournaments: TournamentInterface[] }>("/api/tournaments", {
-  key: () => `tournaments-${JSON.stringify(get(filters))}-${get(skip)}`,
-  query: {
-    skip,
-    filters
-  },
+  query: { skip, filters },
   default: () => ({ count: 0, tournaments: [] }),
   onResponse: ({ response }) => {
     set(tournaments, [...get(tournaments), ...(response._data?.tournaments || [])])
@@ -44,24 +41,23 @@ execute()
 
 <template>
   <div class="w-full">
-    <tournament-cards
+    <tournaments-cards
       v-if="viewMode === 'cards'"
       :tournaments
-      v-model:skip="skip"
-      :resetFilters
       :status
-      :count="data.count"
+      v-model:skip="skip"
       v-model:filters="filters"
+      :resetFilters
+      :count="data.count"
     />
-
-    <tournament-table
+    <tournaments-table
       v-else
       :tournaments
-      v-model:skip="skip"
-      :resetFilters
       :status
-      :count="data.count"
+      v-model:skip="skip"
       v-model:filters="filters"
+      :resetFilters
+      :count="data.count"
     />
   </div>
 </template>

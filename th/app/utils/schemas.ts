@@ -1,99 +1,115 @@
 import * as z from "zod"
 
-export const eventSchema = z.object({
-  id: z.number("Please enter an event ID").int("Event ID must be a number").positive("Event ID must be a positive number"),
+export const editionSchema = z.object({
+  id: z.number("Please enter an edition ID").int("Edition ID must be a number").positive("Edition ID must be a positive number"),
   tournament: z.object({
-    id: z.number("Please enter a tournament ID").int("Tournament ID must be a number").positive("Tournament ID must be a positive number"),
+    value: z.number("Please enter a tournament ID").int("Tournament ID must be a number").positive("Tournament ID must be a positive number"),
     label: z.string("Please enter a tournament name")
   }),
-  year: z.number("Please enter a valid year").int("Please enter a valid year").positive("Please enter a valid year"),
   tours: z.array(z.literal(Object.keys(TourEnum), "Please select a valid tour")),
+  year: z.number("Please enter a valid year").int("Please enter a valid year").positive("Please enter a valid year"),
+  start_date: z.unknown().optional(),
+  end_date: z.unknown().optional(),
   surface: z.string().optional(),
-  supervisors: z.array(
-    z.object({
-      id: z.string("Please enter a valid supervisor ID"),
-      label: z.string("Please enter a valid supervisor label")
+  venues: z
+    .array(
+      z.object({
+        value: z.string("Please enter a valid venue ID"),
+        label: z.string("Please enter a valid venue label")
+      })
+    )
+    .optional(),
+  currency: z.literal(Object.keys(CurrencyEnum), "Please select a valid currency").optional(),
+  tfc: z.number("Please enter a valid total financial commitment").positive("Total financial commitment must be a positive number").optional(),
+  wiki_link: z.url("Please enter a valid URL").optional(),
+  draw_type: z.string().optional(),
+  draw_link: z.url("Please enter a valid URL").optional(),
+  sponsor_name: z.string("Please enter a valid sponsor name").optional(),
+  category: z.string("Please enter a valid category").optional()
+})
+
+export type EditionSchema = z.infer<typeof editionSchema>
+
+export const entrySchema = z.object({
+  id: z.string().optional(),
+  event: z.string().optional(),
+  type: z.literal(["Singles", "Doubles"], "Please select a valid match type"),
+  seed: z.number("Please enter a valid seed number").int("Seed number must be a number").positive("Seed number must be a positive number").optional(),
+  status: z.string("Please enter a valid status").optional(),
+  rank: z.number("Please enter a valid rank").int("Rank must be a number").positive("Rank must be a positive number").optional(),
+  q_seed: z
+    .number("Please enter a valid qualifying seed number")
+    .int("Qualifying seed number must be a number")
+    .positive("Qualifying seed number must be a positive number")
+    .optional(),
+  q_status: z.string("Please enter a valid qualifying status").optional(),
+  player1: z
+    .object({
+      value: z.string("Please enter a valid player ID"),
+      label: z.string("Please enter a valid player name")
     })
-  ),
+    .optional(),
+  player2: z
+    .object({
+      value: z.string("Please enter a valid player ID"),
+      label: z.string("Please enter a valid player name")
+    })
+    .optional(),
+  rank2: z.number("Please enter a valid rank").int("Rank must be a number").positive("Rank must be a positive number").optional()
+})
+
+export type EntrySchema = z.infer<typeof entrySchema>
+
+export const entryInfoSchema = z.object({
+  event: z.string("Please enter a valid event ID").optional(),
+  relationship: z.string(),
+  draw: z.literal(["Main", "Qualifying"], "Please select a valid draw type"),
+  type: z.literal(["Singles", "Doubles"], "Please select a valid match type"),
+  rank: z.number("Please enter a valid rank").int("Rank must be a number").positive("Rank must be a positive number").optional(),
+  reason: z.string().optional(),
+  teammate: z.string().optional(),
+  entry: z
+    .object({
+      value: z.string(),
+      label: z.string()
+    })
+    .optional(),
+  players: z
+    .array(
+      z.object({
+        value: z.string(),
+        label: z.string()
+      })
+    )
+    .optional()
+})
+
+export type EntryInfoSchema = z.infer<typeof entryInfoSchema>
+
+export const eventSchema = z.object({
+  id: z.string("Please enter an event ID"),
+  edition: z.number("Please enter a valid edition ID").int("Edition ID must be a number").positive("Edition ID must be a positive number"),
+  tour: z.literal(Object.keys(TourEnum), "Please select a valid tour"),
+  level: z.literal(["Tour", "Challenger", "ITF"], "Please select a valid level"),
+  surface: z.string().optional(),
+  category: z.string().optional(),
+  sponsor_name: z.string().optional(),
   venues: z.array(
     z.object({
-      id: z.string("Please enter a valid venue ID"),
+      value: z.string("Please enter a valid venue ID"),
       label: z.string("Please enter a valid venue label")
     })
   ),
-  atp_link: z.url("Please enter a valid URL").optional(),
-  wta_link: z.url("Please enter a valid URL").optional(),
-  men_link: z.url("Please enter a valid URL").optional(),
-  women_link: z.url("Please enter a valid URL").optional(),
-  wiki_link: z.url("Please enter a valid URL").optional(),
-  category: z.string("Please enter a valid category").optional(),
-  atp_category: z.string("Please enter a valid category").optional(),
-  wta_category: z.string("Please enter a valid category").optional(),
-  men_category: z.string("Please enter a valid category").optional(),
-  women_category: z.string("Please enter a valid category").optional(),
-  sponsor_name: z.string("Please enter a valid sponsor name").optional(),
-  atp_sponsor_name: z.string("Please enter a valid sponsor name").optional(),
-  wta_sponsor_name: z.string("Please enter a valid sponsor name").optional(),
-  draw_type: z.string().optional(),
-  atp_draw_s: z.string().optional(),
-  atp_draw_d: z.string().optional(),
-  atp_draw_qs: z.string().optional(),
-  atp_draw_qd: z.string().optional(),
-  wta_draw_s: z.string().optional(),
-  wta_draw_d: z.string().optional(),
-  wta_draw_qs: z.string().optional(),
-  wta_draw_qd: z.string().optional(),
-  men_draw_s: z.string().optional(),
-  men_draw_d: z.string().optional(),
-  men_draw_qs: z.string().optional(),
-  men_draw_qd: z.string().optional(),
-  women_draw_s: z.string().optional(),
-  women_draw_d: z.string().optional(),
-  women_draw_qs: z.string().optional(),
-  women_draw_qd: z.string().optional(),
-  draw_link: z.url("Please enter a valid URL").optional(),
-  atp_draw_s_link: z.url("Please enter a valid URL").optional(),
-  atp_draw_d_link: z.url("Please enter a valid URL").optional(),
-  atp_draw_qs_link: z.url("Please enter a valid URL").optional(),
-  atp_draw_qd_link: z.url("Please enter a valid URL").optional(),
-  wta_draw_s_link: z.url("Please enter a valid URL").optional(),
-  wta_draw_d_link: z.url("Please enter a valid URL").optional(),
-  wta_draw_qs_link: z.url("Please enter a valid URL").optional(),
-  wta_draw_qd_link: z.url("Please enter a valid URL").optional(),
-  men_draw_s_link: z.url("Please enter a valid URL").optional(),
-  men_draw_d_link: z.url("Please enter a valid URL").optional(),
-  men_draw_qs_link: z.url("Please enter a valid URL").optional(),
-  men_draw_qd_link: z.url("Please enter a valid URL").optional(),
-  women_draw_s_link: z.url("Please enter a valid URL").optional(),
-  women_draw_d_link: z.url("Please enter a valid URL").optional(),
-  women_draw_qs_link: z.url("Please enter a valid URL").optional(),
-  women_draw_qd_link: z.url("Please enter a valid URL").optional(),
-  currency: z.string("Please enter a valid currency").optional(),
-  atp_currency: z.string("Please enter a valid currency").optional(),
-  wta_currency: z.string("Please enter a valid currency").optional(),
-  men_currency: z.string("Please enter a valid currency").optional(),
-  women_currency: z.string("Please enter a valid currency").optional(),
+  supervisors: z
+    .array(
+      z.object({
+        value: z.string(),
+        label: z.string()
+      })
+    )
+    .optional(),
+  currency: z.literal(Object.keys(CurrencyEnum), "Please select a valid currency").optional(),
   pm: z
-    .number("Please enter a valid prize money amount")
-    .int("Prize money must be a number")
-    .positive("Prize money must be a positive number")
-    .optional(),
-  atp_pm: z
-    .number("Please enter a valid prize money amount")
-    .int("Prize money must be a number")
-    .positive("Prize money must be a positive number")
-    .optional(),
-  wta_pm: z
-    .number("Please enter a valid prize money amount")
-    .int("Prize money must be a number")
-    .positive("Prize money must be a positive number")
-    .optional(),
-  men_pm: z
-    .number("Please enter a valid prize money amount")
-    .int("Prize money must be a number")
-    .positive("Prize money must be a positive number")
-    .optional(),
-  women_pm: z
     .number("Please enter a valid prize money amount")
     .int("Prize money must be a number")
     .positive("Prize money must be a positive number")
@@ -103,45 +119,91 @@ export const eventSchema = z.object({
     .int("Total financial commitment must be a number")
     .positive("Total financial commitment must be a positive number")
     .optional(),
-  atp_tfc: z
-    .number("Please enter a valid total financial commitment amount")
-    .int("Total financial commitment must be a number")
-    .positive("Total financial commitment must be a positive number")
-    .optional(),
-  wta_tfc: z
-    .number("Please enter a valid total financial commitment amount")
-    .int("Total financial commitment must be a number")
-    .positive("Total financial commitment must be a positive number")
-    .optional(),
   start_date: z.unknown().optional(),
   end_date: z.unknown().optional(),
-  atp_start_date: z.unknown().optional(),
-  wta_start_date: z.unknown().optional(),
-  men_start_date: z.unknown().optional(),
-  women_start_date: z.unknown().optional(),
-  atp_end_date: z.unknown().optional(),
-  wta_end_date: z.unknown().optional(),
-  men_end_date: z.unknown().optional(),
-  women_end_date: z.unknown().optional()
+  s_draw: z.string().optional(),
+  s_link: z.url("Please enter a valid URL").optional(),
+  d_draw: z.string().optional(),
+  d_link: z.url("Please enter a valid URL").optional(),
+  qs_draw: z.string().optional(),
+  qs_link: z.url("Please enter a valid URL").optional(),
+  qd_draw: z.string().optional(),
+  qd_link: z.url("Please enter a valid URL").optional(),
+  site_link: z.url("Please enter a valid URL").optional()
 })
 
 export type EventSchema = z.infer<typeof eventSchema>
 
 export const personSchema = z.object({
   type: z.literal(["Umpire", "Supervisor", "Coach"], "Please select a valid person type"),
+  id: z.string().optional(),
   first_name: z.string("Please enter a first name"),
   last_name: z.string("Please enter a last name")
 })
 
 export type PersonSchema = z.infer<typeof personSchema>
 
+export const roundSchema = z.object({
+  id: z.string().optional(),
+  edition: z.number("Please enter a valid edition ID").int("Edition ID must be a number").positive("Edition ID must be a positive number").optional(),
+  tour: z.literal(Object.keys(TourEnum), "Please select a valid tour").optional(),
+  draw: z.literal(["Main", "Qualifying"], "Please select a valid draw type"),
+  type: z.literal(["Singles", "Doubles"], "Please select a valid match type"),
+  round: z.string("Please enter a round name"),
+  number: z.number("Please enter a valid round number").int("Round number must be a number").positive("Round number must be a positive number"),
+  pm: z
+    .number("Please enter a valid prize money amount")
+    .int("Prize money must be a number")
+    .positive("Prize money must be a positive number")
+    .optional(),
+  points: z.number("Please enter a valid points amount").int("Points must be a number").positive("Points must be a positive number").optional()
+})
+
+export type RoundSchema = z.infer<typeof roundSchema>
+
+export const scrapeSchema = z.object({
+  year: z.number("Please enter a valid year").int("Please enter a valid year").positive("Please enter a valid year").optional(),
+  type: z.literal(["Singles", "Doubles"], "Please select a valid match type"),
+  draw: z.literal(["Main", "Qualifying"], "Please select a valid draw type").optional(),
+  tid: z
+    .number("Please enter a valid tournament ID")
+    .int("Tournament ID must be a number")
+    .positive("Tournament ID must be a positive number")
+    .optional(),
+  tid2: z.number("Please enter a valid site ID").int("Site ID must be a number").positive("Site ID must be a positive number").optional(),
+  year2: z.number("Please enter a valid site year").int("Site year must be a number").positive("Site year must be a positive number").optional(),
+  draw_size: z.number("Please enter a valid draw size").int("Draw size must be a number").positive("Draw size must be a positive number").optional(),
+  sets: z.string().optional(),
+  eid: z.string().optional(),
+  wid: z.number().optional(),
+  draw_range: z.array(z.string()).optional(),
+  skip: z.array(z.string()).optional()
+})
+
+export type ScrapeSchema = z.infer<typeof scrapeSchema>
+
+export const seedSchema = z.object({
+  id: z.string().optional(),
+  event: z.string("Please enter a valid event ID"),
+  draw: z.literal(["Main", "Qualifying"], "Please select a valid draw type"),
+  type: z.literal(["Singles", "Doubles"], "Please select a valid match type"),
+  seed: z.number("Please enter a valid seed number").int("Seed number must be a number").positive("Seed number must be a positive number").optional(),
+  rank: z.number("Please enter a valid rank").int("Rank must be a number").positive("Rank must be a positive number").optional(),
+  team: z.object({
+    value: z.string(),
+    label: z.string()
+  })
+})
+
+export type SeedSchema = z.infer<typeof seedSchema>
+
 export const tournamentSchema = z.object({
   id: z.number("Please enter a tournament ID").int("Tournament ID must be a number").positive("Tournament ID must be a positive number"),
-  name: z.string("Please enter a name"),
-  established: z.number("Please enter a valid year").int("Please enter a valid year").optional(),
-  abolished: z.number("Please enter a valid year").int("Please enter a valid year").optional(),
-  website: z.url("Please enter a valid URL").optional(),
-  tours: z.array(z.literal(Object.keys(TourEnum), "Please select a valid tour"))
+  name: z.string("Please enter a tournament name"),
+  tours: z.array(z.literal(Object.keys(TourEnum), "Please select a valid tour")),
+  established: z.number("Please enter a valid year").int("Please enter a valid year").positive("Please enter a valid year").optional(),
+  abolished: z.number("Please enter a valid year").int("Please enter a valid year").positive("Please enter a valid year").optional(),
+  website: z.url("Please enter a valid URL").optional()
 })
 
 export type TournamentSchema = z.infer<typeof tournamentSchema>
@@ -151,9 +213,8 @@ export const venueSchema = z.object({
   name: z.string().optional(),
   city: z.string("Please enter a city"),
   country: z.object({
-    id: z.string(),
-    name: z.string(),
-    alpha2: z.string().length(2).optional()
+    value: z.string(),
+    label: z.string()
   })
 })
 

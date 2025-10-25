@@ -30,7 +30,6 @@ const {
     <u-button
       label="Hide Columns"
       :icon="ICONS.noColumn"
-      :trailing-icon="icons.chevronDown"
       block
     />
   </u-dropdown-menu>

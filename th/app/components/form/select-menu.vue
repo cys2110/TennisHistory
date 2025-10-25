@@ -8,7 +8,7 @@ defineProps<{
   multiple?: boolean
   icon?: string
 }>()
-const modelValue = defineModel<string | { value: string; label: string } | string[] | { value: string; label: string }[] | number>()
+const modelValue = defineModel<string | { value: string; label: string } | string[] | { value: string; label: string }[] | number | number[]>()
 
 const {
   ui: { icons }

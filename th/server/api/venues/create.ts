@@ -2,7 +2,7 @@ export default defineEventHandler(async event => {
   interface QueryProps {
     name: string
     city: string
-    country: CountryInterface
+    country: SelectOptionsType
   }
 
   const { name, city, country } = getQuery<QueryProps>(event)
@@ -11,7 +11,11 @@ export default defineEventHandler(async event => {
     `/* cypher */
       MATCH (c:Country {id: $country})
       MERGE (v:Venue {city: $city})
-      ON CREATE SET v.id = CASE WHEN $name CONTAINS v.city THEN $name ELSE $name || ' ' || $city END
+      ON CREATE SET v.id = CASE
+        WHEN $name IS NULL THEN $city
+        WHEN $name CONTAINS v.city THEN $name
+        ELSE $name || ', ' || $city
+      END
       MERGE (v)-[:LOCATED_IN]->(c)
       SET v.name = $name
       RETURN v
@@ -19,9 +23,16 @@ export default defineEventHandler(async event => {
     {
       name,
       city,
-      country: country.id
+      country: country.value
     }
   )
 
-  return summary
+  if (Object.values(summary.counters.updates()).every(v => v === 0)) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Error creating venue"
+    })
+  } else {
+    return { ok: true }
+  }
 })

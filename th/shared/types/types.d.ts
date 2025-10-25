@@ -1,167 +1,202 @@
 declare global {
   type APIStatusType = "idle" | "pending" | "success" | "error"
 
-  type CategoryType =
-    | "ATP 250"
-    | "ATP 500"
-    | "ATP Masters 1000"
-    | "Grand Slam"
-    | "ATP Finals"
-    | "Next Gen ATP Finals"
-    | "World Team Cup"
-    | "Grand Slam Cup"
-    | "Laver Cup"
-    | "United Cup"
-    | "Davis Cup"
-    | "Billie Jean King Cup"
-    | "Olympics"
-    | "ATP Cup"
-    | "ATP International Series"
-    | "ATP International Series Gold"
-    | "ATP Masters Series"
-    | "ATP World Series"
-    | "ATP Championship Series"
-    | "ATP Championship Series, Single Week"
-    | "ATP Super 9"
-    | "ITF"
-    | "ILTF"
-    | "NTL"
-    | "Grand Prix"
-    | "WTA 1000"
-    | "WTA 500"
-    | "WTA 250"
-    | "WTA Finals"
-    | "WTA Elite Trophy"
-    | "WTA Premier Mandatory"
-    | "WTA Premier Five"
-    | "WTA Premier"
-    | "WTA International Tournaments"
-    | "ITF M25"
-    | "ITF W75"
-    | "ATP Challenger 175"
-    | "ATP Challenger 125"
-    | "WTA 125"
-    | "ATP Challenger 75"
-    | "ATP Challenger 100"
-    | "ATP Challenger 50"
-    | "ITF W100"
-    | "ITF W15"
+  type DrawType = "Main" | "Qualifying"
 
-  type CurrencyType = "USD" | "EUR" | "GBP" | "AUD" | "FRF"
+  type LevelType = "Tour" | "Challenger" | "ITF"
 
-  type EnvironmentType = "Indoor" | "Outdoor"
+  type MatchType = "Singles" | "Doubles"
 
-  type LevelType = "Challenger" | "Tour" | "ITF"
-
-  type SurfaceType = "Clay" | "Grass" | "Hard" | "Carpet"
-
-  type EventFiltersType = {
-    tournaments: SelectOptionsType[]
-    levels: LevelType[]
-    categories: CategoryType[]
-    surfaces: SurfaceType[]
-    environment: EnvironmentType | undefined
-    venues: SelectOptionsType[]
-    supervisors: SelectOptionsType[]
-    umpires: SelectOptionsType[]
-    countries: SelectOptionsType[]
-    dateRange: { start: CalendarDate | undefined; end: CalendarDate | undefined }
-    tours: TourEnum[]
-    year: number | undefined
-  }
-
-  type PlayerFiltersType = {
-    players: SelectOptionsType[]
-    tour: TourEnum | undefined
-    countries: SelectOptionsType[]
-    minYear: number | undefined
-    maxYear: number | undefined
-    status: string | undefined
-    coaches: SelectOptionsType[]
-  }
-
-  type TournamentFiltersType = {
-    tours: (keyof typeof TourEnum)[]
-    tournaments: SelectOptionsType[]
-    established: number | undefined
-    abolished: number | undefined
-  }
-
-  type SelectOptionsType = { id: string; label: string }
-
-  type SortType = "ASC" | "DESC" | undefined
-
-  interface CountryInterface {
-    id: string
-    name: string
-    alpha2?: string
-  }
-
-  interface EventInterface {
-    categories: CategoryType[]
-    countries: CountryInterface[]
-    currencies: CurrencyType[]
-    dates: string[][]
-    draws: string[][]
+  interface TournamentInterface {
+    abolished?: number
+    established?: number
     id: number
-    levels: LevelType[]
-    links: string[]
-    pm: number[]
-    sponsor_names: string[]
-    supervisors: PersonInterface[]
-    surface: SurfaceInterface
-    tfc: number[]
+    name: string
+    tours: (keyof typeof TourEnum)[]
+    updated_at: string
+    website?: string
+  }
+
+  interface EditionInterface {
+    category?: string
+    currency?: keyof typeof CurrencyEnum
+    draw_type?: string
+    draw_link?: string
+    end_date?: string
+    id: number
+    start_date?: string
+    sponsor_name?: string
+    surface?: SurfaceInterface
+    tfc?: number
     tournament: TournamentInterface
     tours: (keyof typeof TourEnum)[]
-    umpires: PersonInterface[]
-    venues: VenueInterface[]
+    updated_at: string
+    venues?: VenueInterface[]
+    wiki_link?: string
+    winners: {
+      tour: keyof typeof TourEnum
+      type: MatchType
+      team: PersonInterface[]
+    }[]
     year: number
   }
 
-  interface FormFieldInterface<S> {
-    colSpan?: string
-    items?: any[]
-    key: keyof S
-    label: string
-    loading?: boolean
-    multiple?: boolean
-    required?: boolean
-    size?: "sm" | "md" | "xs"
-    subType?: string
-    type: string
+  interface EventInterface {
+    category?: string
+    currency?: keyof typeof CurrencyEnum
+    d_draw?: string
+    d_link?: string
+    edition: EditionInterface
+    end_date?: string
+    id: string
+    level: LevelType
+    pm?: number
+    qd_draw?: string
+    qd_link?: string
+    qs_draw?: string
+    qs_link?: string
+    s_draw?: string
+    s_link?: string
+    site_link: string
+    sponsor_name?: string
+    start_date?: string
+    supervisors?: PersonInterface[]
+    surface?: SurfaceInterface
+    tfc?: number
+    tour: keyof typeof TourEnum
+    updated_at: string
+    venues: VenueInterface[]
+    wiki_link?: string
+    winners: {
+      type: MatchType
+      team: PersonInterface[]
+    }[]
   }
 
-  interface PersonInterface {
-    end_date: string
-    first_name: string
+  interface RoundInterface {
+    currency: keyof typeof CurrencyEnum
     id: string
-    labels: string[]
-    last_name: string
-    start_date: string
+    number: number
+    pm?: number
+    points?: number
+    round: string
+    type: MatchType
+  }
+
+  interface MatchInterface {
+    court?: string
+    date?: string
+    draw: DrawType
+    duration?: string
+    id: string
+    incomplete?: keyof typeof IncompleteEnum
+    match_no: number
+    tour: keyof typeof TourEnum
+    type: MatchType
+    umpire?: PersonInterface
+  }
+
+  interface ScoreInterface {
+    avg1_speed?: number
+    avg2_speed?: number
+    bp_opps?: number
+    bps_converted?: number
+    bps_faced?: number
+    bps_saved?: number
+    draw: DrawType
+    id: string
+    incomplete?: keyof typeof IncompleteEnum
+    max_speed?: number
+    net?: number
+    net_w?: number
+    outcome: "Winner" | "Loser"
+    ret1?: number
+    ret1_w?: number
+    ret2?: number
+    ret2_w?: number
+    return_games?: number
+    s1?: number
+    s2?: number
+    s3?: number
+    s4?: number
+    s5?: number
+    serve1?: number
+    serve1_w?: number
+    serve2?: number
+    serve2_w?: number
+    serve_games?: number
+    t1?: number
+    t2?: number
+    t3?: number
+    t4?: number
+    t5?: number
+    team_no: 1 | 2
+    tour: keyof typeof TourEnum
+    type: MatchType
+  }
+
+  interface EntryInterface {
+    draw: DrawType
+    draws: DrawType[]
+    id: string
+    pm?: number
+    points?: number
+    q_seed?: number
+    q_status?: keyof typeof StatusEnum
+    rank: number
+    reason?: string
+    relationship: string
+    seed?: number
+    status?: keyof typeof StatusEnum
+    team: PersonInterface[]
+    teammate?: string
+    type: MatchType
+    withdrew: boolean
+  }
+
+  interface EntryByPlayerInterface extends PersonInterface {
+    singles: EntryInterface | null
+    doubles: EntryInterface | null
   }
 
   interface PlayerInterface extends PersonInterface {
+    bh?: "One" | "Two"
+    ch_doubles?: number
+    ch_singles?: number
     coaches: PersonInterface[]
-    country: CountryInterface
-    min_year: number
-    max_year: number
+    current_doubles?: number
+    current_singles?: number
+    dob?: string
+    dod?: string
+    doubles_ch_date?: string
+    former_coaches?: PersonInterface[]
+    former_countries?: CountryInterface[]
+    height?: number
+    hof?: number
+    official_link?: string
+    pm: number
+    retired?: number
+    rh?: "Right" | "Left"
+    singles_ch_date?: string
+    site_link: string
     tour: keyof typeof TourEnum
+    turned_pro?: number
+    updated_at: string
+    wiki_link?: string
+  }
+
+  interface PersonInterface {
+    country: CountryInterface
+    first_name: string
+    id: string
+    last_name: string
+    rank: number
   }
 
   interface SurfaceInterface {
-    environment: EnvironmentType
+    environment: "Indoor" | "Outdoor"
     id: string
-    surface: SurfaceType
-  }
-
-  interface TournamentInterface {
-    abolished: number
-    established: number
-    id: number
-    name: string
-    tours: (keyof typeof TourEnum)[]
-    update: boolean
-    website: string
+    surface: "Clay" | "Grass" | "Hard" | "Carpet"
   }
 
   interface VenueInterface {
@@ -169,6 +204,40 @@ declare global {
     country: CountryInterface
     id: string
     name?: string
+  }
+
+  interface CountryInterface {
+    alpha2?: string
+    id: string
+    name: string
+  }
+
+  type SelectOptionsType = {
+    label: string
+    value: string | number
+  }
+
+  interface FiltersInterface {
+    abolished: number | undefined
+    established: number | undefined
+    tournaments: SelectOptionsType[]
+    tours: (keyof typeof TourEnum)[]
+    winners: SelectOptionsType[]
+    years: number[]
+  }
+
+  interface FormFieldInterface<S> {
+    class?: string
+    items?: any[]
+    key: keyof S
+    label: string
+    loading?: boolean
+    max?: number
+    multiple?: boolean
+    required?: boolean
+    size?: "sm" | "md" | "xs"
+    subType?: string
+    type: string
   }
 }
 

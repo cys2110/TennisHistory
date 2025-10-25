@@ -1,11 +1,11 @@
 <template>
   <div>
-    <Header />
+    <cards-header />
 
     <u-main>
       <slot />
     </u-main>
 
-    <Footer />
+    <cards-footer />
   </div>
 </template>

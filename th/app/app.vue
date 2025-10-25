@@ -4,16 +4,8 @@ useHead({
   htmlAttrs: { class: "scroll-smooth" }
 })
 
-const route = useRoute()
 const { viewMode } = useViewMode()
 provideSSRWidth(1024)
-
-const layout = computed(() => {
-  if (route.path.startsWith("/admin")) {
-    return "layout-admin"
-  }
-  return get(viewMode)
-})
 </script>
 
 <template>
@@ -21,9 +13,9 @@ const layout = computed(() => {
     :tooltip="{ delayDuration: 100 }"
     :toaster="{ position: 'top-center' }"
   >
-    <nuxt-loading-indicator color="repeating-linear-gradient(to right,#ddd6fe 0%,#8b5cf6 50%,#5b21b6 100%)" />
+    <nuxt-loading-indicator color="repeating-linear-gradient(to right,#e0f2fe 0%,#0ea5e9 50%,#0c4a6e 100%)" />
 
-    <nuxt-layout :name="layout">
+    <nuxt-layout :name="viewMode">
       <nuxt-page />
     </nuxt-layout>
   </u-app>

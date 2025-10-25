@@ -1,5 +1,5 @@
-export default defineEventHandler(async query => {
-  const { search } = getQuery(query)
+export default defineEventHandler(async event => {
+  const { search } = getQuery(event)
 
   const { records } = await useDriver().executeQuery(
     `/* cypher */
@@ -13,7 +13,7 @@ export default defineEventHandler(async query => {
 
   const results = records.map(r => {
     const venue = r.get("venue")
-    return { id: venue.id, label: `${venue.name ? `${venue.name}, ${venue.city}` : venue.city}, ${venue.country.name}` }
+    return { value: venue.id, label: `${venue.name ? `${venue.name}, ${venue.city}` : venue.city}, ${venue.country.name}` }
   })
 
   return results

@@ -7,18 +7,17 @@ export default defineEventHandler(async event => {
   }
 
   const { skip, filters } = getQuery<QueryProps>(event)
-
   const { tours, tournaments, established, abolished } = JSON.parse(filters)
 
   const formattedParams = {
     skip: int(skip),
-    tours: tours.map((t: any) => (typeof t === "string" ? t : t.value)),
-    tournaments: tournaments.map((t: any) => int(t.id)),
+    tours,
+    tournaments: Array.isArray(tournaments) ? tournaments.map((t: any) => int(t.value)) : [int(tournaments.value)],
     established: established ? int(established) : null,
     abolished: abolished ? int(abolished) : null
   }
 
-  const { records } = await useDriver().executeQuery(
+  const { records, summary } = await useDriver().executeQuery(
     `/* cypher */
     CALL () {
       MATCH (t:Tournament)
@@ -26,11 +25,11 @@ export default defineEventHandler(async event => {
         AND (SIZE($tournaments) = 0 OR t.id IN $tournaments)
         AND ($established IS NULL OR
           EXISTS {
-            MATCH (t)-[:ESTABLISHED]->(:Year {id: $established})
+            MATCH (t)-[:ESTABLISHED]->(y:Year WHERE y.id >= $established)
           })
         AND ($abolished IS NULL OR
           EXISTS {
-            MATCH (t)-[:ABOLISHED]->(:Year {id: $abolished})
+            MATCH (t)-[:ABOLISHED]->(y:Year WHERE y.id <= $abolished)
           })
       RETURN COUNT(t) AS count
     }
@@ -43,27 +42,37 @@ export default defineEventHandler(async event => {
         OPTIONAL MATCH (t)-[:ABOLISHED]->(a:Year)
         RETURN e.id AS established, a.id AS abolished
       }
-      WITH t, established, abolished, CASE WHEN t:Update THEN true ELSE false END AS update
-        WHERE ($established IS NULL OR established = $established)
-        AND ($abolished IS NULL OR abolished = $abolished)
+      WITH t, established, abolished
+        WHERE ($established IS NULL OR established >= $established)
+        AND ($abolished IS NULL OR abolished <= $abolished)
       ORDER BY t.name
       SKIP $skip
       LIMIT 40
-      RETURN apoc.map.clean(apoc.map.merge(properties(t), {established: established, abolished: abolished, tours: [x IN labels(t) WHERE NOT x IN ['Tournament', 'Update']], update: update}) , [], [null]) AS tournament
+      RETURN apoc.map.clean(apoc.map.merge(properties(t), {established: established, abolished: abolished, tours: [x IN labels(t) WHERE x <> 'Tournament']}) , [], [null]) AS tournament
     }
     RETURN count, tournament
     `,
     formattedParams
   )
 
+  console.log(
+    `Notifications for tournaments: `,
+    summary.gqlStatusObjects.filter(s => !["00000", "01N51"].includes(s.gqlStatus))
+  )
+
+  if (!records?.[0]?.get("tournament") || Object.keys(records[0]?.get("tournament")).length === 0) {
+    return {
+      count: 0,
+      tournaments: []
+    }
+  }
+
   const results = records.map(record => {
     const tournament = record.get("tournament")
     const numberKeys = ["id", "established", "abolished"]
 
     for (const key of numberKeys) {
-      if (tournament[key]) {
-        tournament[key] = tournament[key].toInt()
-      }
+      if (tournament[key]) tournament[key] = tournament[key].toInt()
     }
 
     return tournament

@@ -5,6 +5,7 @@ const {
   ui: { icons }
 } = useAppConfig()
 const { setViewMode } = useViewMode()
+const collapsed = ref(true)
 
 const searchTerm = ref("")
 
@@ -73,7 +74,16 @@ const groups = computed(() => [
   {
     id: "viewMode",
     label: "View mode",
-    items: [{ label: "Switch to card view", icon: ICONS.cards, onSelect: () => setViewMode("cards") }]
+    items: [
+      {
+        label: "Switch to card view",
+        icon: ICONS.cards,
+        onSelect: () => {
+          setViewMode("cards")
+          reloadNuxtApp()
+        }
+      }
+    ]
   },
   {
     id: "results",
@@ -91,8 +101,8 @@ const groups = computed(() => [
       :loading="status === 'pending'"
     />
 
-    <u-dashboard-sidebar collapsible>
-      <template #header="{ collapsed }">{{ collapsed ? "TH" : "Tennis History" }}</template>
+    <u-dashboard-sidebar v-model:collapsed="collapsed">
+      <template #header>TH</template>
 
       <template #default="{ collapsed }">
         <u-dashboard-search-button

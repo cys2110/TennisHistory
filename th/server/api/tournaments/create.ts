@@ -3,7 +3,7 @@ import { int } from "neo4j-driver"
 export default defineEventHandler(async event => {
   interface QueryProps {
     id: string
-    name?: string
+    name: string
     established?: string
     abolished?: string
     website?: string
@@ -39,5 +39,9 @@ export default defineEventHandler(async event => {
     }
   )
 
-  return summary
+  if (summary.counters.updates().nodesCreated === 0) {
+    throw createError({ statusCode: 400, statusMessage: "Tournament could not be created" })
+  } else {
+    return { ok: true }
+  }
 })

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-const { type } = defineProps<{ type: string }>()
+const { type, id } = defineProps<{ type: string; id?: string }>()
 const modelValue = defineModel<SelectOptionsType[]>()
 
 const searchTerm = ref("")
 
-const { data, status } = await useFetch(`/api/${type.toLowerCase()}/search`, {
-  query: { search: searchTerm },
+const { data, status } = await useFetch<SelectOptionsType[]>(`/api/${type.toLowerCase()}/search`, {
+  query: { search: searchTerm, id },
   default: () => []
 })
 
@@ -17,9 +17,9 @@ const groups = computed(() => [
       get(data).map(item => ({
         ...item,
         onSelect: () => {
-          const exists = get(modelValue)?.find(i => i.id === item.id)
+          const exists = get(modelValue)?.find(i => i.value === item.value)
           if (exists) {
-            set(modelValue, get(modelValue)?.filter(i => i.id !== item.id) || [])
+            set(modelValue, get(modelValue)?.filter(i => i.value !== item.value) || [])
           } else {
             set(modelValue, [...(get(modelValue) || []), item])
           }
