@@ -91,6 +91,7 @@ declare global {
     end_date: string
     id: string
     incomplete?: keyof typeof IncompleteEnum
+    loser: EntryInterface
     match_no: number
     match_stats: {
       label: string
@@ -114,6 +115,7 @@ declare global {
     tour: keyof typeof TourEnum
     type: MatchType
     umpire: PersonInterface
+    winner: EntryInterface
   }
 
   interface ScoreInterface {

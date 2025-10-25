@@ -6,7 +6,7 @@ const { match } = defineProps<{ match?: MatchInterface }>()
 const {
   params: { edId, tour, mid }
 } = useRoute("match")
-const { type, draw } = destructureMid(mid)
+const { type, draw } = destructureMid(mid ?? "")
 
 defineShortcuts({
   meta_shift_m: () => (match ? undefined : set(open, !get(open)))

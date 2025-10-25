@@ -1,17 +1,18 @@
 # TennisHistory
 
-This is a project in progress. The main branch is the current version built:
+TennisHistory is a web application which provides comprehensive historical data on tennis tournaments, players, and matches.
 
-- neo4j GraphQL
-- Vue
-- TypeScript
-- PrimeVue
-- Tailwind
+## Setup
 
-There are three branches. The first, named 'django', is an earlier version of the project built with Django and Vue. The second, named 'sequelize', is the following version built with Sequelize, Node, Express and Vue.
+This project is built using Nuxt 4 and TypeScript and uses neo4j as its database. There are scrapers provided using Flask endpoints to populate the database with historical tennis data.
 
-Upcoming improvements:
+### Dependencies
 
-- Round robin tournaments
-- Team tournaments
-- Davis Cup tournaments
+- Nuxt UI 4
+- Vueuse
+- Neo4j
+- Bracketry
+
+### Icon Sets
+
+## Database Schema

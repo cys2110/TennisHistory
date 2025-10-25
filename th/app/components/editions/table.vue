@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TableColumn } from "@nuxt/ui"
+import type { TableColumn, TableRow } from "@nuxt/ui"
 
 defineProps<{
   edition: EditionInterface
@@ -7,6 +7,9 @@ defineProps<{
   status: APIStatusType
   refresh?: () => void
 }>()
+const {
+  params: { id, name, edId, year }
+} = useRoute("edition")
 
 const columns: TableColumn<EventInterface>[] = [
   { accessorKey: "tour", header: "Tour" },
@@ -32,6 +35,13 @@ const columns: TableColumn<EventInterface>[] = [
   { accessorKey: "venues", header: "Venues" },
   { accessorKey: "winners", header: "Winners" }
 ]
+
+const handleSelect = async (e: Event, row: TableRow<EventInterface>) => {
+  await navigateTo({
+    name: "event",
+    params: { id, name, edId, year, tour: row.original.tour }
+  })
+}
 </script>
 
 <template>
@@ -75,6 +85,7 @@ const columns: TableColumn<EventInterface>[] = [
       :loading="status === 'pending'"
       sticky
       render-fallback-value="—"
+      @select="handleSelect"
       :ui="{ tbody: '[&>tr]:cursor-pointer' }"
     >
       <template #loading>
