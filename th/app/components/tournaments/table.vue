@@ -38,7 +38,7 @@ const columns: TableColumn<TournamentInterface>[] = [
   { accessorKey: "abolished" }
 ]
 
-const handleSelect = async (row: TableRow<TournamentInterface>) => {
+const handleSelect = async (e: Event, row: TableRow<TournamentInterface>) => {
   await navigateTo({ name: "tournament", params: { id: row.original.id, name: kebabCase(row.original.name ?? "-") } })
 }
 </script>

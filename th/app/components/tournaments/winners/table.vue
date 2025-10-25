@@ -60,7 +60,7 @@ const columns: TableColumn<EditionInterface>[] = [
   { accessorKey: "winners" }
 ]
 
-const handleSelect = async (row: TableRow<EditionInterface>) => {
+const handleSelect = async (e: Event, row: TableRow<EditionInterface>) => {
   await navigateTo({ name: "edition", params: { id, name, year: row.original.year, edId: row.original.id } })
 }
 </script>
@@ -71,7 +71,7 @@ const handleSelect = async (row: TableRow<EditionInterface>) => {
       #trailing
       v-if="!mdAndDown"
     >
-      <div class="text-(--ui-text-muted) font-semibold w-full text-center">
+      <div class="text-muted font-semibold w-full text-center">
         <span v-if="tournament?.established">{{ tournament.established }}</span>
         <span v-if="tournament?.established && !tournament.abolished"> - present</span>
         <span v-else-if="tournament?.abolished && tournament.established !== tournament.abolished"> - {{ tournament.abolished }}</span>

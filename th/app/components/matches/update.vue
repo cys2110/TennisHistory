@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { FormErrorEvent, FormSubmitEvent } from "@nuxt/ui"
+import { parseDuration, parseDate } from "@internationalized/date"
 
 const { match } = defineProps<{ match?: MatchInterface }>()
 const {
-  params: { edId, tour }
-} = useRoute("event")
+  params: { edId, tour, mid }
+} = useRoute("match")
+const { type, draw } = destructureMid(mid)
 
 defineShortcuts({
   meta_shift_m: () => (match ? undefined : set(open, !get(open)))
@@ -17,18 +19,29 @@ const {
 const open = ref(false)
 const uploading = ref(false)
 
+const duration = computed(() => {
+  if (match?.duration) {
+    const { seconds } = parseDuration(match.duration)
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
+  }
+  return undefined
+})
+
 const state = reactive<Partial<MatchSchema>>({
   id: match?.id,
   event: `${edId}-${tour}`,
-  tour: tour,
-  type: match?.type,
-  draw: match?.draw,
+  tour,
+  type: type!,
+  draw: draw!,
   round: match?.round,
   match_no: match?.match_no,
   incomplete: match?.incomplete,
   court: match?.court,
-  date: match?.date,
-  duration: match?.duration,
+  date: match?.date ? parseDate(match.date) : undefined,
+  duration: duration.value,
   umpire: match?.umpire ? { value: match.umpire.id, label: match.umpire.id } : undefined,
   s1: [],
   s2: [],
@@ -164,7 +177,7 @@ const onSubmit = async (event: FormSubmitEvent<MatchSchema>) => {
           />
 
           <form-select-search
-            v-if="state.type"
+            v-if="state.type && !match"
             v-model="state.team1"
             type="events/entries"
             :placeholder="state.type === 'Doubles' ? 'Select Team 1' : 'Select Player 1'"
@@ -175,7 +188,7 @@ const onSubmit = async (event: FormSubmitEvent<MatchSchema>) => {
           />
 
           <form-select-search
-            v-if="state.type"
+            v-if="state.type && !match"
             v-model="state.team2"
             type="events/entries"
             :placeholder="state.type === 'Doubles' ? 'Select Team 2' : 'Select Player 2'"

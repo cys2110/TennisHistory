@@ -92,6 +92,7 @@ export default defineAppConfig({
     pageHeader: { slots: { wrapper: "flex-row justify-between" } },
     pageLinks: { slots: { link: "cursor-pointer" } },
     pageList: { base: "scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-transparent overflow-y-auto scroll-smooth max-h-200 p-5" },
+    progress: { slots: { status: "!w-full" } },
     radioGroup: {
       slots: { base: "cursor-pointer", label: "cursor-pointer" },
       defaultVariants: { size: "sm" }
@@ -121,6 +122,7 @@ export default defineAppConfig({
       },
       defaultVariants: { loadingAnimation: "swing" }
     },
+    tabs: { slots: { trigger: "cursor-pointer" } },
     textarea: { slots: { root: "w-full" }, defaultVariants: { size: "sm" } }
   }
 })

@@ -75,7 +75,7 @@ export default defineEventHandler(async event => {
           WHEN 'Winner' IN labels(s1) THEN 't1'
           ELSE 't2'
         END AS winner,
-        u.id AS umpire
+        properties(u) AS umpire
       RETURN
         round,
         match,

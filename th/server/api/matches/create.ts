@@ -1,4 +1,4 @@
-import { int, Integer } from "neo4j-driver"
+import { int, Integer, Date as NeoDate, Duration as NeoDuration } from "neo4j-driver"
 
 export default defineEventHandler(async event => {
   interface QueryProps {
@@ -19,7 +19,28 @@ export default defineEventHandler(async event => {
     winner: string
   }
 
-  const { event: id, tour, draw, type, round, match_no, sets, incomplete, winner, team1: entry1, team2: entry2 } = getQuery<QueryProps>(event)
+  const {
+    event: id,
+    tour,
+    draw,
+    type,
+    round,
+    match_no,
+    sets,
+    incomplete,
+    winner,
+    team1: entry1,
+    team2: entry2,
+    court,
+    date,
+    duration,
+    umpire
+  } = getQuery<QueryProps>(event)
+
+  const matchDate = date ? JSON.parse(date as string) : null
+  const [hours, minutes, secs] = duration ? (duration as string).split(":").map((x: string) => parseInt(x, 10)) : [0, 0, 0]
+
+  const seconds = hours * 3600 + minutes * 60 + secs
 
   const team1: Record<string, Integer> = {}
   const team2: Record<string, Integer> = {}
@@ -55,7 +76,14 @@ export default defineEventHandler(async event => {
 
       MERGE (m:Match:$($tour):$($draw):$($type) {id: $matchId, match_no: $match_no})
       MERGE (m)-[:PLAYED]->(r)
-      SET m.incomplete = $incomplete
+      SET m.incomplete = $incomplete, m.court = $court, m.date = $date, m.duration = $duration
+
+      CALL (m) {
+        WHEN $umpire IS NOT NULL THEN {
+          MATCH (u:Umpire {id: $umpire})
+          MERGE (u)-[:UMPIRED]->(m)
+        }
+      }
 
       CALL (m) {
         WHEN $incomplete IS NULL THEN {
@@ -106,7 +134,11 @@ export default defineEventHandler(async event => {
       team2: Object.keys(team2).length ? team2 : null,
       winner: winner ?? null,
       entry1: entry1?.value ?? null,
-      entry2: entry2?.value ?? null
+      entry2: entry2?.value ?? null,
+      court: court ?? null,
+      date: matchDate ? NeoDate.fromStandardDate(new Date(matchDate.year, matchDate.month - 1, matchDate.day)) : null,
+      duration: new NeoDuration(0, 0, seconds, 0),
+      umpire: umpire ? umpire.value : null
     }
   )
 

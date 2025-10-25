@@ -19,6 +19,11 @@ const apiRoute = computed(() => {
         route: `/api/tournaments/overview?id=${params.id}`,
         key: `tournament-overview-${params.id}`
       }
+    case "match":
+      return {
+        route: `/api/matches/overview?edId=${params.edId}&tour=${params.tour}&mid=${params.mid}`,
+        key: `match-overview-${params.edId}-${params.tour}-${params.mid}`
+      }
     default:
       return {
         route: "",
@@ -41,6 +46,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => {
     case "event":
     case "results":
     case "draws":
+    case "match":
       crumbs.push({ label: "Tournaments", icon: ICONS.tournament, to: { name: "tournaments" } })
 
       if (name !== "tournaments") {
@@ -69,6 +75,19 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => {
             label: eventPage?.label || "",
             icon: eventPage?.icon,
             ui: { linkLeadingIcon: name === "draws" ? "rotate-270" : undefined }
+          }
+        )
+      } else if (name === "match") {
+        const { type } = destructureMid(params.mid)
+        crumbs.push(
+          {
+            label: type
+          },
+          {
+            label: data.value?.round ?? "Loading..."
+          },
+          {
+            label: data.value ? `${data.value.player1} v ${data.value.player2}` : "Loading..."
           }
         )
       }
@@ -109,6 +128,16 @@ const pageTitle = computed(() => {
     <div v-else-if="['event', 'results', 'draws'].includes(name as string)">
       <div>{{ EVENT_PAGES.find(page => page.name === name)?.label }}</div>
       <div class="truncate">{{ data.value?.name || capitalCase(params.name) }} {{ params.year }}</div>
+    </div>
+    <div v-else-if="name === 'match'">
+      <div>{{ data ? `${data.player1} vs ${data.player2}` : `${capitalCase(params.name as string)} ${params.year}` }}</div>
+      <div>{{
+        data
+          ? `${data.name} ${params.year}`
+          : `${TourEnum[params.tour as keyof typeof TourEnum]} ${destructureMid(params.mid).type} ${destructureMid(params.mid).draw} ${
+              destructureMid(params.mid).match_no
+            }`
+      }}</div>
     </div>
     <!-- <div v-if="['player', 'activity', 'titles-and-finals', 'wl-index', 'stats', 'record'].includes(name)">
       <div>{{ PLAYER_PAGES.find(page => page.name === name)?.label }}</div>

@@ -88,10 +88,29 @@ declare global {
     date?: string
     draw: DrawType
     duration?: string
+    end_date: string
     id: string
     incomplete?: keyof typeof IncompleteEnum
     match_no: number
+    match_stats: {
+      label: string
+      category: string
+      low: boolean
+      percent: boolean
+      t1: string
+      t2: string
+      t1_pc: number
+      t2_pc: number
+    }[]
     round: keyof typeof RoundEnum
+    sets: number[][][]
+    start_date: string
+    surface: SurfaceInterface
+    t1: EntryInterface
+    t1_incomplete: keyof typeof IncompleteEnum
+    t1_winner: boolean
+    t2: EntryInterface
+    t2_incomplete: keyof typeof IncompleteEnum
     tour: keyof typeof TourEnum
     type: MatchType
     umpire: PersonInterface
@@ -140,6 +159,7 @@ declare global {
     draw: DrawType
     draws: DrawType[]
     id: string
+    players: (PersonInterface & { rank: number })[]
     pm?: number
     points?: number
     q_seed?: number
