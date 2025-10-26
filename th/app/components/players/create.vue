@@ -1,34 +1,34 @@
 <script setup lang="ts">
 import type { FormErrorEvent, FormSubmitEvent } from "@nuxt/ui"
-const { person, type } = defineProps<{ person?: PersonInterface; type: "Umpire" | "Supervisor" | "Coach" }>()
+import * as z from "zod"
 
-const toast = useToast()
 const {
   ui: { icons }
 } = useAppConfig()
+const toast = useToast()
 const open = ref(false)
 const uploading = ref(false)
 
-const state = reactive<Partial<PersonSchema>>({
-  type,
-  id: person?.id,
-  first_name: person?.first_name,
-  last_name: person?.last_name
+defineShortcuts({
+  meta_enter: () => set(open, !get(open))
 })
 
-const formFields = computed<FormFieldInterface<PersonSchema>[]>(
-  () =>
-    [
-      ...(person ? [{ label: "ID", key: "id", type: "text", required: true }] : []),
-      { label: "First Name", key: "first_name", type: "text", required: true },
-      { label: "Last Name", key: "last_name", type: "text", required: true }
-    ] as FormFieldInterface<PersonSchema>[]
-)
+const schema = z.object({
+  id: z.string("Please enter an ID"),
+  tour: z.literal(["ATP", "WTA"], "Please select a tour")
+})
+type Schema = z.infer<typeof schema>
+
+const state = reactive<Partial<Schema>>({})
+
+const formFields: FormFieldInterface<Schema>[] = [
+  { label: "ID", key: "id", type: "text", required: true },
+  { label: "Tour", key: "tour", type: "radio", items: ["ATP", "WTA"], required: true }
+]
 
 const handleReset = () => {
-  state.id = person?.id
-  state.first_name = person?.first_name
-  state.last_name = person?.last_name
+  state.id = ""
+  state.tour = "ATP"
 }
 
 const onError = (event: FormErrorEvent) => {
@@ -40,24 +40,29 @@ const onError = (event: FormErrorEvent) => {
   })
 }
 
-const onSubmit = async (event: FormSubmitEvent<PersonSchema>) => {
+const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   set(uploading, true)
   try {
-    const response = await $fetch(`/api/person/${person ? "update" : "create"}`, {
+    const response = await $fetch("/api/players/create", {
       query: event.data
     })
 
     if ((response as any).ok) {
       toast.add({
-        title: `${type} ${person ? "updated" : "created"}`,
+        title: "Player created",
         icon: icons.success,
         color: "success"
       })
       handleReset()
       set(open, false)
+      // if (refresh) {
+      //   refresh()
+      // } else {
+      await navigateTo({ name: "player", params: { id: event.data.id, name: "—" } })
+      // }
     } else {
       toast.add({
-        title: `Error ${person ? "updating" : "creating"} ${type}`,
+        title: "Error creating player",
         description: (response as any).message,
         icon: icons.error,
         color: "error"
@@ -65,7 +70,7 @@ const onSubmit = async (event: FormSubmitEvent<PersonSchema>) => {
     }
   } catch (e) {
     toast.add({
-      title: `Error ${person ? "updating" : "creating"} ${type}`,
+      title: "Error creating player",
       description: (e as Error).message,
       icon: icons.error,
       color: "error"
@@ -78,31 +83,28 @@ const onSubmit = async (event: FormSubmitEvent<PersonSchema>) => {
 
 <template>
   <u-modal
-    :title="person ? `Edit ${person.first_name} ${person.last_name}` : `Create ${type}`"
+    title="Create Player"
     v-model:open="open"
-    :ui="{ footer: '*:rounded-md!' }"
   >
     <u-button
-      :icon="person ? ICONS.edit : icons.plus"
+      :icon="icons.plus"
+      label="Create Player"
       block
-      size="xs"
-      :label="person ? `${person.first_name} ${person.last_name}` : `Create ${type}`"
-      :color="person && !person.last_name ? 'warning' : undefined"
     />
 
     <template #body>
       <u-form
-        id="person-form"
-        :schema="personSchema"
+        id="player-form"
+        :schema="schema"
         :state
         @submit="onSubmit"
         @error="onError"
       >
-        <div class="grid grid-cols-2 gap-5 items-center **:rounded-md!">
+        <div class="grid grid-cols-2 gap-5 items-center">
           <form-field
             v-for="field in formFields"
             :key="field.label"
-            :field="field"
+            :field
             v-model="state[field.key]"
           />
         </div>
@@ -111,7 +113,7 @@ const onSubmit = async (event: FormSubmitEvent<PersonSchema>) => {
 
     <template #footer="{ close }">
       <u-button
-        form="person-form"
+        form="tournament-form"
         type="submit"
         label="Save"
         :icon="uploading ? ICONS.uploading : icons.check"
@@ -119,17 +121,17 @@ const onSubmit = async (event: FormSubmitEvent<PersonSchema>) => {
       />
       <u-button
         label="Reset"
-        @click="handleReset"
         :icon="icons.reload"
+        @click="handleReset"
         block
         color="warning"
       />
       <u-button
         label="Cancel"
-        color="error"
+        :icon="icons.error"
         @click="close"
-        :icon="icons.close"
         block
+        color="error"
       />
     </template>
   </u-modal>

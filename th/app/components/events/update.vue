@@ -19,7 +19,7 @@ defineShortcuts({
   meta_shift_e: () => (event ? set(open, !get(open)) : undefined)
 })
 
-const state = reactive<Partial<EventSchema>>({
+const state = reactive<Partial<EventInput>>({
   id: event?.id,
   edition: Number(edId),
   tour: event?.tour,
@@ -56,25 +56,25 @@ const formFields: FormFieldInterface<EventSchema>[] = [
     required: true
   },
   { label: "Level", key: "level", type: "radio", items: ["Tour", "Challenger", "ITF"], required: true },
-  { label: "Sponsor Name", key: "sponsor_name", type: "text" },
-  { label: "Category", key: "category", type: "text" },
+  { label: "Sponsor Name", key: "sponsor_name", type: "text", class: "col-span-2" },
+  { label: "Official Site Link", key: "site_link", type: "textarea", class: "col-span-2" },
   { label: "Start Date", key: "start_date", type: "date" },
   { label: "End Date", key: "end_date", type: "date" },
+  { label: "Category", key: "category", type: "text" },
   { label: "Surface", key: "surface", type: "select", items: SURFACE_OPTIONS },
   { label: "Currency", key: "currency", type: "radio", items: CURRENCY_OPTIONS },
   { label: "Prize Money", key: "pm", type: "currency" },
   { label: "Total Financial Commitment", key: "tfc", type: "currency" },
   { label: "Venues", key: "venues", type: "search", subType: "venues" },
-  { label: "Supervisors", key: "supervisors", type: "search", subType: "supervisors" },
+  { label: "Supervisors", key: "supervisors", type: "search", subType: "supervisors", multiple: true, class: "col-span-2" },
   { label: "Singles Draw Type", key: "s_draw", type: "select", items: DRAW_OPTIONS },
   { label: "Doubles Draw Type", key: "d_draw", type: "select", items: DRAW_OPTIONS },
   { label: "Qualifying Singles Draw Type", key: "qs_draw", type: "select", items: DRAW_OPTIONS },
   { label: "Qualifying Doubles Draw Type", key: "qd_draw", type: "select", items: DRAW_OPTIONS },
-  { label: "Singles Draw Link", key: "s_link", type: "textarea" },
-  { label: "Doubles Draw Link", key: "d_link", type: "textarea" },
-  { label: "Qualifying Singles Draw Link", key: "qs_link", type: "textarea" },
-  { label: "Qualifying Doubles Draw Link", key: "qd_link", type: "textarea" },
-  { label: "Official Site Link", key: "site_link", type: "textarea" }
+  { label: "Singles Draw Link", key: "s_link", type: "textarea", class: "col-span-2" },
+  { label: "Doubles Draw Link", key: "d_link", type: "textarea", class: "col-span-2" },
+  { label: "Qualifying Singles Draw Link", key: "qs_link", type: "textarea", class: "col-span-2" },
+  { label: "Qualifying Doubles Draw Link", key: "qd_link", type: "textarea", class: "col-span-2" }
 ]
 
 const handleReset = () => {
@@ -114,11 +114,11 @@ const onError = (event: FormErrorEvent) => {
   })
 }
 
-const onSubmit = async (event: FormSubmitEvent<EventSchema>) => {
+const onSubmit = async (form: FormSubmitEvent<EventSchema>) => {
   set(uploading, true)
   try {
     const response = await $fetch(`/api/events/${event ? "update" : "create"}`, {
-      query: event.data
+      query: form.data
     })
 
     if ((response as any).ok) {
@@ -131,11 +131,6 @@ const onSubmit = async (event: FormSubmitEvent<EventSchema>) => {
       set(open, false)
       if (refresh) {
         refresh()
-      } else {
-        await navigateTo({
-          name: "event",
-          params: { id, name, year, edId, tour: event.data.tour }
-        })
       }
     } else {
       toast.add({
@@ -162,7 +157,6 @@ const onSubmit = async (event: FormSubmitEvent<EventSchema>) => {
   <u-modal
     :title="event ? `Edit ${event.edition.tournament.name} ${year} ${tour}` : 'Create Event'"
     v-model:open="open"
-    fullscreen
   >
     <u-button
       :icon="event ? ICONS.edit : icons.plus"
@@ -178,17 +172,13 @@ const onSubmit = async (event: FormSubmitEvent<EventSchema>) => {
         @submit="onSubmit"
         @error="onError"
       >
-        <div class="grid grid-cols-4 gap-5 items-center">
-          <template
+        <div class="grid grid-cols-2 gap-5 items-center">
+          <form-field
             v-for="field in formFields"
             :key="field.label"
-          >
-            <form-field
-              v-if="field.key"
-              :field
-              v-model="state[field.key]"
-            />
-          </template>
+            :field
+            v-model="state[field.key]"
+          />
         </div>
       </u-form>
     </template>
@@ -200,7 +190,6 @@ const onSubmit = async (event: FormSubmitEvent<EventSchema>) => {
         label="Save"
         :icon="uploading ? ICONS.uploading : icons.check"
         block
-        class="!rounded-md"
       />
       <u-button
         label="Reset"
@@ -208,7 +197,6 @@ const onSubmit = async (event: FormSubmitEvent<EventSchema>) => {
         @click="handleReset"
         block
         color="warning"
-        class="!rounded-md"
       />
       <u-button
         label="Cancel"
@@ -216,7 +204,6 @@ const onSubmit = async (event: FormSubmitEvent<EventSchema>) => {
         @click="close"
         block
         color="error"
-        class="!rounded-md"
       />
     </template>
   </u-modal>

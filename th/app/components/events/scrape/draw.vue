@@ -16,7 +16,7 @@ defineShortcuts({
   meta_shift_d: () => set(open, !get(open))
 })
 
-const state = reactive<Partial<ScrapeSchema>>({
+const state = reactive<Partial<ScrapeInput>>({
   year: Number(year),
   type: "Singles",
   draw: "Main"
@@ -124,7 +124,6 @@ const onSubmit = async (event: FormSubmitEvent<ScrapeSchema>) => {
         label="Save"
         :icon="scraping ? ICONS.uploading : icons.check"
         block
-        class="!rounded-md"
       />
       <u-button
         label="Reset"
@@ -132,7 +131,6 @@ const onSubmit = async (event: FormSubmitEvent<ScrapeSchema>) => {
         @click="handleReset"
         block
         color="warning"
-        class="!rounded-md"
       />
       <u-button
         label="Cancel"
@@ -140,7 +138,6 @@ const onSubmit = async (event: FormSubmitEvent<ScrapeSchema>) => {
         @click="close"
         block
         color="error"
-        class="!rounded-md"
       />
     </template>
   </u-modal>

@@ -26,8 +26,8 @@ export default defineEventHandler(async event => {
   )
 
   console.log(
-    `Notifications for tournaments: `,
-    summary.gqlStatusObjects.filter(s => !["00000", "01N51"].includes(s.gqlStatus))
+    `Notifications for tournament: `,
+    summary.gqlStatusObjects.filter(s => s.gqlStatus !== "00000" && !s.gqlStatus.startsWith("01N5"))
   )
 
   const results = records[0].get("tournament")
@@ -39,7 +39,7 @@ export default defineEventHandler(async event => {
     }
   })
 
-  results["updated_at"] = results["updated_at"].toStandardDate().toISOString().slice(0, 10)
+  results["updated_at"] = results["updated_at"]?.toStandardDate().toISOString().slice(0, 10)
 
   return results
 })

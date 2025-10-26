@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import type { BreadcrumbItem } from "@nuxt/ui"
+
 const { count, status, editions } = defineProps<{
   tournament: TournamentInterface
   editions: EditionInterface[]
   status: APIStatusType
   count: number
   resetFilters: () => void
+  refresh: () => void
 }>()
 const selectedTab = defineModel<string>()
 const skip = defineModel<number>("skip")
@@ -42,6 +45,11 @@ onMounted(() => {
     }
   )
 })
+
+const breadcrumbs: BreadcrumbItem[] = [
+  { icon: ICONS.home, to: { name: "home" } },
+  { label: "Tournaments", icon: ICONS.tournament, to: { name: "tournaments" } }
+]
 </script>
 
 <template>
@@ -51,13 +59,12 @@ onMounted(() => {
         <u-page-aside>
           <dev-only>
             <tournaments-update :tournament />
-            <editions-update />
+            <editions-update :refresh />
           </dev-only>
           <u-badge
             color="success"
             :label="`Updated: ${useDateFormat(tournament.updated_at, 'DD MMMM YYYY').value}`"
             class="w-full justify-center"
-            size="lg"
           />
           <u-tabs
             v-if="!COUNTRY_DRAWS.includes(id as string)"
@@ -112,21 +119,24 @@ onMounted(() => {
 
       <u-page-header :title="tournament.name">
         <template #headline>
-          <div class="flex items-center gap-2">
-            <u-badge
-              v-for="tour in tournament.tours"
-              :key="tour"
-              :label="TourEnum[tour]"
-              :color="tour"
-            />
-          </div>
+          <u-breadcrumb :items="breadcrumbs" />
         </template>
 
         <template #description>
-          <div>
-            <span v-if="tournament?.established">{{ tournament.established }}</span>
-            <span v-if="tournament?.established && !tournament.abolished"> - present</span>
-            <span v-else-if="tournament?.abolished && tournament.established !== tournament.abolished"> - {{ tournament.abolished }}</span>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <u-badge
+                v-for="tour in tournament.tours"
+                :key="tour"
+                :label="TourEnum[tour]"
+                :color="tour"
+              />
+            </div>
+            <div>
+              <span v-if="tournament?.established">{{ tournament.established }}</span>
+              <span v-if="tournament?.established && !tournament.abolished"> - present</span>
+              <span v-else-if="tournament?.abolished && tournament.established !== tournament.abolished"> - {{ tournament.abolished }}</span>
+            </div>
           </div>
         </template>
 
@@ -315,11 +325,23 @@ onMounted(() => {
           />
         </u-page-grid>
 
-        <cards-empty
+        <u-empty
           v-else
+          title="No editions found"
           :icon="ICONS.noEdition"
-          message="No editions found"
-        />
+          description="If you think this is an error, refresh the page. Otherwise, please be patient as we continue to add more data."
+        >
+          <template #actions>
+            <u-button
+              label="Refresh"
+              :icon="icons.reload"
+              @click="reloadNuxtApp()"
+            />
+            <dev-only>
+              <editions-update :refresh />
+            </dev-only>
+          </template>
+        </u-empty>
       </u-page-body>
     </u-page>
   </u-container>

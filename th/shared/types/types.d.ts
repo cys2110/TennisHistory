@@ -182,7 +182,19 @@ declare global {
     doubles: EntryInterface | null
   }
 
+  type WLType = {
+    singles: {
+      wl: string
+      titles: number
+    }
+    doubles: {
+      wl: string
+      titles: number
+    }
+  }
+
   interface PlayerInterface extends PersonInterface {
+    age: number
     bh?: "One" | "Two"
     ch_doubles?: number
     ch_singles?: number
@@ -196,6 +208,8 @@ declare global {
     former_countries?: CountryInterface[]
     height?: number
     hof?: number
+    max_year: number
+    min_year: number
     official_link?: string
     pm: number
     retired?: number
@@ -206,14 +220,33 @@ declare global {
     turned_pro?: number
     updated_at: string
     wiki_link?: string
+    years: number[]
+
+    wl: {
+      label: string
+      total: WLType
+      main: WLType
+      qualifying: {
+        singles: string
+        doubles: string
+      }
+    }[]
+
+    h2h: {
+      opponent: PlayerInterface
+      matches: number
+      wins: number
+    }[]
   }
 
   interface PersonInterface {
     country: CountryInterface
     first_name: string
     id: string
+    labels: string[]
     last_name: string
     rank: number
+    years?: string
   }
 
   interface SurfaceInterface {
@@ -231,8 +264,10 @@ declare global {
 
   interface CountryInterface {
     alpha2?: string
+    end_date?: string
     id: string
     name: string
+    start_date?: string
   }
 
   type SelectOptionsType = {
@@ -243,6 +278,12 @@ declare global {
   interface FiltersInterface {
     abolished: number | undefined
     established: number | undefined
+    coaches: SelectOptionsType[]
+    countries: SelectOptionsType[]
+    max_year: number | undefined
+    min_year: number | undefined
+    players: SelectOptionsType[]
+    status: string | undefined
     tournaments: SelectOptionsType[]
     tours: (keyof typeof TourEnum)[]
     winners: SelectOptionsType[]

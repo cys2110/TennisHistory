@@ -18,13 +18,15 @@ export default defineEventHandler(async event => {
       MATCH (t:Tournament {id: $id})
       OPTIONAL MATCH (t)-[e2:ESTABLISHED]->(e1:Year)
       OPTIONAL MATCH (t)-[a2:ABOLISHED]->(a1:Year)
-      SET t.name = $name, t.website = $website
+      SET t.name = $name, t.website = $website, t.updated_at = date()
       CALL (t, e1, e2) {
         WHEN $established IS NOT NULL THEN {
           MATCH (y:Year {id: $established})
           CALL (*) {
-            WHEN e1 IS NOT NULL AND e1.id <> y.id THEN DELETE e2
-            ELSE MERGE (t)-[:ESTABLISHED]->(y)
+            WHEN e1 IS NOT NULL AND e1.id <> y.id THEN {
+              MERGE (t)-[:ESTABLISHED]->(y)
+              DELETE e2
+            }
           }
         }
         WHEN $established IS NULL AND e1 IS NOT NULL THEN DELETE e2
@@ -33,8 +35,10 @@ export default defineEventHandler(async event => {
         WHEN $abolished IS NOT NULL THEN {
           MATCH (y:Year {id: $abolished})
           CALL (*) {
-            WHEN a1 IS NOT NULL AND a1.id <> y.id THEN DELETE a2
-            ELSE MERGE (t)-[:ABOLISHED]->(y)
+            WHEN a1 IS NOT NULL AND a1.id <> y.id THEN {
+              MERGE (t)-[:ABOLISHED]->(y)
+              DELETE a2
+            }
           }
         }
         WHEN $abolished IS NULL AND a1 IS NOT NULL THEN DELETE a2
@@ -52,6 +56,11 @@ export default defineEventHandler(async event => {
       website: website || null,
       tours: tours ? (Array.isArray(tours) ? tours : [tours]) : []
     }
+  )
+
+  console.log(
+    `Notifications for tournament update: `,
+    summary.gqlStatusObjects.filter(s => s.gqlStatus !== "00000" && !s.gqlStatus.startsWith("01N5"))
   )
 
   if (Object.values(summary.counters.updates()).every(v => v === 0)) {

@@ -7,6 +7,7 @@ const { count, status, editions } = defineProps<{
   status: APIStatusType
   count: number
   resetFilters: () => void
+  refresh: () => void
 }>()
 const selectedTab = defineModel<string>()
 const skip = defineModel<number>("skip")
@@ -93,18 +94,25 @@ const handleSelect = async (e: Event, row: TableRow<EditionInterface>) => {
       <dev-only>
         <div class="w-full flex justify-center items-center gap-1">
           <tournaments-update :tournament />
-          <editions-update />
+          <editions-update :refresh />
         </div>
       </dev-only>
-      <div class="flex justify-center items-center gap-1">
+      <div class="w-full flex items-center gap-1">
         <u-badge
           v-for="tour in tournament.tours"
           :key="tour"
           :label="TourEnum[tour]"
           :color="tour"
+          class="w-full justify-center"
         />
       </div>
-      <div class="w-full flex justify-center">
+      <u-badge
+        v-if="!mdAndDown"
+        color="success"
+        :label="`Updated: ${useDateFormat(tournament.updated_at, 'DD MMMM YYYY').value}`"
+        class="w-full justify-center"
+      />
+      <div class="w-full flex justify-center items-center">
         <u-tabs
           v-if="!COUNTRY_DRAWS.includes(id as string)"
           v-model="selectedTab"
@@ -112,16 +120,11 @@ const handleSelect = async (e: Event, row: TableRow<EditionInterface>) => {
             { label: 'Winners', value: 'winners' },
             { label: 'Numbers', value: 'numbers' }
           ]"
+          size="xs"
           variant="link"
         />
       </div>
-      <u-badge
-        v-if="!mdAndDown"
-        color="success"
-        :label="`Updated: ${useDateFormat(tournament.updated_at, 'DD MMMM YYYY').value}`"
-        class="w-full"
-        size="lg"
-      />
+
       <u-button
         label="Reset Filters"
         :icon="ICONS.noFilter"
@@ -150,10 +153,23 @@ const handleSelect = async (e: Event, row: TableRow<EditionInterface>) => {
       </template>
 
       <template #empty>
-        <table-empty
-          message="No editions found"
+        <u-empty
+          title="No editions found"
           :icon="ICONS.noEdition"
-        />
+          description="If you think this is an error, refresh the page. Otherwise, please be patient as we continue to add more data."
+          class="mx-2"
+        >
+          <template #actions>
+            <u-button
+              label="Refresh"
+              :icon="icons.reload"
+              @click="reloadNuxtApp()"
+            />
+            <dev-only>
+              <editions-update :refresh />
+            </dev-only>
+          </template>
+        </u-empty>
       </template>
 
       <template #year-header>

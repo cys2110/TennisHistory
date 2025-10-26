@@ -15,7 +15,7 @@ export default defineEventHandler(async event => {
     skip: int(skip),
     tours,
     years: years.map((y: string) => int(y)),
-    winners: winners ? (Array.isArray(winners) ? winners.map((w: SelectOptionsType) => w.value) : [winners.value]) : []
+    winners: Array.isArray(winners) ? winners.map((w: SelectOptionsType) => w.value) : [winners.value]
   }
 
   const { records, summary } = await useDriver().executeQuery(
@@ -47,17 +47,9 @@ export default defineEventHandler(async event => {
       CALL (e) {
         OPTIONAL MATCH (e)<-[:EVENT_OF]-(event:Event)<-[:ROUND_OF]-(:Round {round: 'Final'})<-[:PLAYED]-(:Match)<-[:SCORED]-(:Winner)<-[:SCORED]-(f:Entry)<-[:ENTERED]-(p:Player)-[:REPRESENTS]->(country:Country)
         CALL (p, country, e, event) {
-          OPTIONAL MATCH (p)-[cdate:REPRESENTED]->(country1:Country)
+          OPTIONAL MATCH (p)-[cdate:REPRESENTED WHERE cdate.start_date <= coalesce(event.start_date, e.start_date) AND cdate.end_date > coalesce(event.start_date, e.start_date)]->(country1:Country)
           CALL (*) {
-            WHEN country1 IS NOT NULL AND ((
-              e.start_date IS NOT NULL AND cdate.start_date <= e.start_date
-              AND cdate.end_date > e.start_date
-            ) OR (
-              event.start_date IS NOT NULL AND cdate.start_date <= event.start_date
-              AND cdate.end_date > event.start_date
-            )) THEN {
-              RETURN properties(country1) AS playerCountry
-            }
+            WHEN country1 IS NOT NULL THEN RETURN properties(country1) AS playerCountry
             ELSE RETURN properties(country) AS playerCountry
           }
           RETURN playerCountry
@@ -80,7 +72,7 @@ export default defineEventHandler(async event => {
 
   console.log(
     `Notifications for editions: `,
-    summary.gqlStatusObjects.filter(s => !["00000", "01N51"].includes(s.gqlStatus))
+    summary.gqlStatusObjects.filter(s => s.gqlStatus !== "00000" && !s.gqlStatus.startsWith("01N5"))
   )
 
   if (!records?.[0]?.get("edition") || Object.keys(records[0]?.get("edition")).length === 0) {

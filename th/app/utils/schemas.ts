@@ -2,10 +2,12 @@ import * as z from "zod"
 
 export const editionSchema = z.object({
   id: z.number("Please enter an edition ID").int("Edition ID must be a number").positive("Edition ID must be a positive number"),
-  tournament: z.object({
-    value: z.number("Please enter a tournament ID").int("Tournament ID must be a number").positive("Tournament ID must be a positive number"),
-    label: z.string("Please enter a tournament name")
-  }),
+  tournament: z
+    .object({
+      value: z.number("Please enter a tournament ID").int("Tournament ID must be a number").positive("Tournament ID must be a positive number"),
+      label: z.string("Please enter a tournament name")
+    })
+    .transform(({ value, label }) => value),
   tours: z.array(z.literal(Object.keys(TourEnum), "Please select a valid tour")),
   year: z.number("Please enter a valid year").int("Please enter a valid year").positive("Please enter a valid year"),
   start_date: z.unknown().optional(),
@@ -13,10 +15,12 @@ export const editionSchema = z.object({
   surface: z.string().optional(),
   venues: z
     .array(
-      z.object({
-        value: z.string("Please enter a valid venue ID"),
-        label: z.string("Please enter a valid venue label")
-      })
+      z
+        .object({
+          value: z.string("Please enter a valid venue ID"),
+          label: z.string("Please enter a valid venue label")
+        })
+        .transform(({ value, label }) => value)
     )
     .optional(),
   currency: z.literal(Object.keys(CurrencyEnum), "Please select a valid currency").optional(),
@@ -28,6 +32,7 @@ export const editionSchema = z.object({
   category: z.string("Please enter a valid category").optional()
 })
 
+export type EditionInput = z.input<typeof editionSchema>
 export type EditionSchema = z.infer<typeof editionSchema>
 
 export const entrySchema = z.object({
@@ -87,25 +92,31 @@ export const entryInfoSchema = z.object({
 export type EntryInfoSchema = z.infer<typeof entryInfoSchema>
 
 export const eventSchema = z.object({
-  id: z.string("Please enter an event ID"),
+  id: z.string("Please enter an event ID").optional(),
   edition: z.number("Please enter a valid edition ID").int("Edition ID must be a number").positive("Edition ID must be a positive number"),
   tour: z.literal(Object.keys(TourEnum), "Please select a valid tour"),
   level: z.literal(["Tour", "Challenger", "ITF"], "Please select a valid level"),
   surface: z.string().optional(),
   category: z.string().optional(),
   sponsor_name: z.string().optional(),
-  venues: z.array(
-    z.object({
-      value: z.string("Please enter a valid venue ID"),
-      label: z.string("Please enter a valid venue label")
-    })
-  ),
+  venues: z
+    .array(
+      z
+        .object({
+          value: z.string("Please enter a valid venue ID"),
+          label: z.string("Please enter a valid venue label")
+        })
+        .transform(({ value, label }) => value)
+    )
+    .optional(),
   supervisors: z
     .array(
-      z.object({
-        value: z.string(),
-        label: z.string()
-      })
+      z
+        .object({
+          value: z.string(),
+          label: z.string()
+        })
+        .transform(({ value, label }) => value)
     )
     .optional(),
   currency: z.literal(Object.keys(CurrencyEnum), "Please select a valid currency").optional(),
@@ -132,6 +143,7 @@ export const eventSchema = z.object({
   site_link: z.url("Please enter a valid URL").optional()
 })
 
+export type EventInput = z.input<typeof eventSchema>
 export type EventSchema = z.infer<typeof eventSchema>
 
 export const matchSchema = z.object({
@@ -193,6 +205,73 @@ export const personSchema = z.object({
 
 export type PersonSchema = z.infer<typeof personSchema>
 
+export const playerSchema = z.object({
+  id: z.string(),
+  first_name: z.string("Please enter a first name"),
+  last_name: z.string("Please enter a last name"),
+  tour: z.literal(Object.keys(TourEnum), "Please select a valid tour"),
+  country: z
+    .object({
+      value: z.string("Please enter a valid country ID"),
+      label: z.string("Please enter a valid country name"),
+      start_date: z.unknown().optional()
+    })
+    .transform(({ value, label, start_date }) => ({ value, start_date })),
+  former_countries: z.array(
+    z
+      .object({
+        value: z.string("Please enter a valid country ID").optional(),
+        label: z.string("Please enter a valid country name").optional(),
+        start_date: z.unknown().optional(),
+        end_date: z.unknown().optional()
+      })
+      .transform(({ value, label, start_date, end_date }) => ({ value, start_date, end_date }))
+  ),
+  current_singles: z.number("Please enter a valid rank").optional(),
+  current_doubles: z.number("Please enter a valid rank").optional(),
+  ch_singles: z.number("Please enter a valid rank").optional(),
+  ch_doubles: z.number("Please enter a valid rank").optional(),
+  singles_ch_date: z.unknown().optional(),
+  doubles_ch_date: z.unknown().optional(),
+  dob: z.unknown().optional(),
+  dod: z.unknown().optional(),
+  turned_pro: z.number("Please enter a valid year").int("Please enter a valid year").optional(),
+  retired: z.number("Please enter a valid year").int("Please enter a valid year").optional(),
+  rh: z.literal(["Right", "Left"], "Please enter valid playing hand information").optional(),
+  bh: z.literal(["One", "Two"], "Please enter valid backhand information").optional(),
+  coaches: z.array(
+    z
+      .object({
+        value: z.string("Please enter a valid coach ID").optional(),
+        label: z.string("Please enter a valid coach name").optional(),
+        years: z.string().optional()
+      })
+      .transform(({ value, label, years }) => ({ value, years }))
+  ),
+  former_coaches: z.array(
+    z
+      .object({
+        value: z.string("Please enter a valid coach ID").optional(),
+        label: z.string("Please enter a valid coach name").optional(),
+        years: z.string().optional()
+      })
+      .transform(({ value, label, years }) => ({ value, years }))
+  ),
+  site_link: z.url("Please enter a valid URL").optional(),
+  wiki_link: z.url("Please enter a valid URL").optional(),
+  official_link: z.url("Please enter a valid URL").optional(),
+  height: z.number("Please enter a valid height").int("Height must be a number").positive("Height must be a positive number").optional(),
+  pm: z
+    .number("Please enter a valid prize money amount")
+    .int("Prize money must be a number")
+    .positive("Prize money must be a positive number")
+    .optional(),
+  hof: z.number("Please enter a valid year").int("Please enter a valid year").optional()
+})
+
+export type PlayerInput = z.input<typeof playerSchema>
+export type PlayerSchema = z.infer<typeof playerSchema>
+
 export const roundSchema = z.object({
   id: z.string().optional(),
   edition: z.number("Please enter a valid edition ID").int("Edition ID must be a number").positive("Edition ID must be a positive number").optional(),
@@ -200,13 +279,9 @@ export const roundSchema = z.object({
   draw: z.literal(["Main", "Qualifying"], "Please select a valid draw type"),
   type: z.literal(["Singles", "Doubles"], "Please select a valid match type"),
   round: z.string("Please enter a round name"),
-  number: z.number("Please enter a valid round number").int("Round number must be a number").positive("Round number must be a positive number"),
-  pm: z
-    .number("Please enter a valid prize money amount")
-    .int("Prize money must be a number")
-    .positive("Prize money must be a positive number")
-    .optional(),
-  points: z.number("Please enter a valid points amount").int("Points must be a number").positive("Points must be a positive number").optional()
+  number: z.number("Please enter a valid round number").int("Round number must be a number"),
+  pm: z.number("Please enter a valid prize money amount").int("Prize money must be a number").optional(),
+  points: z.number("Please enter a valid points amount").int("Points must be a number").optional()
 })
 
 export type RoundSchema = z.infer<typeof roundSchema>
@@ -226,10 +301,11 @@ export const scrapeSchema = z.object({
   sets: z.string().optional(),
   eid: z.string().optional(),
   wid: z.number().optional(),
-  draw_range: z.array(z.string()).optional(),
-  skip: z.array(z.string()).optional()
+  draw_range: z.array(z.string().transform(s => parseInt(s, 10))).optional(),
+  skip: z.array(z.string().transform(s => parseInt(s, 10))).optional()
 })
 
+export type ScrapeInput = z.input<typeof scrapeSchema>
 export type ScrapeSchema = z.infer<typeof scrapeSchema>
 
 export const seedSchema = z.object({
@@ -262,10 +338,13 @@ export const venueSchema = z.object({
   id: z.string().optional(),
   name: z.string().optional(),
   city: z.string("Please enter a city"),
-  country: z.object({
-    value: z.string(),
-    label: z.string()
-  })
+  country: z
+    .object({
+      value: z.string(),
+      label: z.string()
+    })
+    .transform(({ value, label }) => value)
 })
 
+export type VenueInput = z.input<typeof venueSchema>
 export type VenueSchema = z.infer<typeof venueSchema>

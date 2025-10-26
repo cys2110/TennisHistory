@@ -132,7 +132,6 @@ const onSubmit = async (event: FormSubmitEvent<TournamentSchema>) => {
         label="Save"
         :icon="uploading ? ICONS.uploading : icons.check"
         block
-        class="!rounded-md"
       />
       <u-button
         label="Reset"
@@ -140,7 +139,6 @@ const onSubmit = async (event: FormSubmitEvent<TournamentSchema>) => {
         @click="handleReset"
         block
         color="warning"
-        class="!rounded-md"
       />
       <u-button
         label="Cancel"
@@ -148,7 +146,6 @@ const onSubmit = async (event: FormSubmitEvent<TournamentSchema>) => {
         @click="close"
         block
         color="error"
-        class="!rounded-md"
       />
     </template>
   </u-modal>

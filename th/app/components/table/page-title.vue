@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { BreadcrumbItem } from "@nuxt/ui"
 
-const { name, params } = useRoute() as any
+const { name, params, query } = useRoute() as any
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: useSSRWidth() })
 const mdAndUp = breakpoints.greaterOrEqual("md")
 const {
@@ -10,6 +10,16 @@ const {
 
 const apiRoute = computed(() => {
   switch (name) {
+    case "player":
+    case "activity":
+    case "titles-and-finals":
+    case "wl-index":
+    case "stats":
+    case "record":
+      return {
+        route: `/api/players/overview?id=${params.id}`,
+        key: `player-overview-${params.id}`
+      }
     case "tournament":
     case "edition":
     case "event":
@@ -40,6 +50,28 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => {
   const crumbs: BreadcrumbItem[] = [{ label: "Home", icon: ICONS.home, to: { name: "home" } }]
 
   switch (name) {
+    case "players":
+    case "player":
+    case "activity":
+    case "titles-and-finals":
+    case "wl-index":
+    case "stats":
+    case "record":
+      crumbs.push({ label: "Players", icon: ICONS.player, to: { name: "players" } })
+      if (name !== "players") {
+        const currentPage = PLAYER_PAGES.find(page => page.name === name)
+        crumbs.push(
+          {
+            label: data.value.first_name ? `${data.value.first_name} ${data.value.last_name}` : capitalCase(params.name),
+            to: { name: "player", params: { id: params.id, name: params.name } }
+          },
+          {
+            label: currentPage?.label || capitalCase(name as string),
+            icon: currentPage?.icon
+          }
+        )
+      }
+      break
     case "tournaments":
     case "tournament":
     case "edition":
@@ -101,6 +133,10 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => {
 
 const pageTitle = computed(() => {
   switch (name) {
+    case "h2h":
+      return "Head to Head"
+    case "years":
+      return `Years - ${query.year ?? new Date().getFullYear()}`
     default:
       return capitalCase(name)
   }
@@ -139,10 +175,10 @@ const pageTitle = computed(() => {
             }`
       }}</div>
     </div>
-    <!-- <div v-if="['player', 'activity', 'titles-and-finals', 'wl-index', 'stats', 'record'].includes(name)">
+    <div v-else-if="['player', 'activity', 'titles-and-finals', 'wl-index', 'stats', 'record'].includes(name)">
       <div>{{ PLAYER_PAGES.find(page => page.name === name)?.label }}</div>
       <div class="truncate">{{ data ? `${data.first_name} ${data.last_name}` : params && "name" in params ? capitalCase(params.name) : "" }}</div>
-    </div> -->
+    </div>
     <template>{{ pageTitle }}</template>
   </div>
 </template>

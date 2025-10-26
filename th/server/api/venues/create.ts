@@ -2,7 +2,7 @@ export default defineEventHandler(async event => {
   interface QueryProps {
     name: string
     city: string
-    country: SelectOptionsType
+    country: string
   }
 
   const { name, city, country } = getQuery<QueryProps>(event)
@@ -23,8 +23,13 @@ export default defineEventHandler(async event => {
     {
       name,
       city,
-      country: country.value
+      country
     }
+  )
+
+  console.log(
+    `Notifications for venue creation: `,
+    summary.gqlStatusObjects.filter(s => s.gqlStatus !== "00000" && !s.gqlStatus.startsWith("01N5"))
   )
 
   if (Object.values(summary.counters.updates()).every(v => v === 0)) {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ name: "edition" })
 const {
-  params: { id, name, year, edId }
+  params: { name, year, edId }
 } = useRoute("edition")
 const { viewMode } = useViewMode()
 

@@ -22,8 +22,8 @@ export default defineEventHandler(async event => {
     qs_link: string
     qd_link: string
     site_link: string
-    venues: SelectOptionsType[] | SelectOptionsType
-    supervisors: SelectOptionsType[] | SelectOptionsType
+    venues: string | string[]
+    supervisors: string | string[]
   }
 
   const {
@@ -76,16 +76,17 @@ export default defineEventHandler(async event => {
     start_date: startDate ? NeoDate.fromStandardDate(new Date(startDate.year, startDate.month - 1, startDate.day)) : null,
     end_date: endDate ? NeoDate.fromStandardDate(new Date(endDate.year, endDate.month - 1, endDate.day)) : null,
     tour,
-    venues: venues ? (Array.isArray(venues) ? venues.map(v => v.value) : [venues.value]) : [],
-    supervisors: supervisors ? (Array.isArray(supervisors) ? supervisors.map(s => s.value) : [supervisors.value]) : []
+    venues: venues ? (Array.isArray(venues) ? venues : [venues]) : [],
+    supervisors: supervisors ? (Array.isArray(supervisors) ? supervisors : [supervisors]) : []
   }
 
   const { summary } = await useDriver().executeQuery(
     `/* cypher */
     MATCH (ed:Edition {id: $edition})
-    MERGE (e:$(tour):$($level):Event {id: $id})
+    MERGE (e:$($tour):$($level):Event {id: $id})
     MERGE (e)-[:EVENT_OF]->(ed)
     SET e.site_link = $site_link, e.category = $category, e.sponsor_name = $sponsor_name, e.s_draw = $s_draw, e.d_draw = $d_draw, e.qs_draw = $qs_draw, e.qd_draw = $qd_draw, e.pm = $pm, e.tfc = $tfc, e.currency = $currency, e.start_date = $start_date, e.end_date = $end_date, e.s_link = $s_link, e.d_link = $d_link, e.qs_link = $qs_link, e.qd_link = $qd_link, e.updated_at = date()
+    WITH e
     CALL (e) {
       MATCH (s:Surface {id: $surface})
       MERGE (e)-[:ON_SURFACE]->(s)
@@ -104,7 +105,12 @@ export default defineEventHandler(async event => {
     formattedParams
   )
 
-  if (summary.counters.updates().nodesCreated === 0) {
+  console.log(
+    `Notifications for event creation: `,
+    summary.gqlStatusObjects.filter(s => s.gqlStatus !== "00000" && !s.gqlStatus.startsWith("01N5"))
+  )
+
+  if (Object.values(summary.counters.updates()).every(v => v === 0)) {
     throw createError({ statusCode: 400, statusMessage: "Event could not be created" })
   } else {
     return { ok: true }

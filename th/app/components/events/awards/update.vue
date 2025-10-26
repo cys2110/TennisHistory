@@ -4,6 +4,8 @@ import type { FormErrorEvent, FormSubmitEvent } from "@nuxt/ui"
 const { round, refresh } = defineProps<{
   round?: RoundInterface
   refresh: () => void
+  iconOnly?: boolean
+  block?: boolean
 }>()
 
 const {
@@ -119,7 +121,8 @@ const onSubmit = async (event: FormSubmitEvent<RoundSchema>) => {
   >
     <u-button
       :icon="round ? ICONS.edit : icons.plus"
-      block
+      :label="iconOnly ? undefined : 'Create Round'"
+      :block
     />
 
     <template #body>
@@ -149,7 +152,6 @@ const onSubmit = async (event: FormSubmitEvent<RoundSchema>) => {
         label="Save"
         :icon="uploading ? ICONS.uploading : icons.check"
         block
-        class="!rounded-md"
       />
       <u-button
         label="Reset"
@@ -157,7 +159,6 @@ const onSubmit = async (event: FormSubmitEvent<RoundSchema>) => {
         @click="handleReset"
         block
         color="warning"
-        class="!rounded-md"
       />
       <u-button
         label="Cancel"
@@ -165,7 +166,6 @@ const onSubmit = async (event: FormSubmitEvent<RoundSchema>) => {
         @click="close"
         block
         color="error"
-        class="!rounded-md"
       />
     </template>
   </u-modal>

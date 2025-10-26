@@ -26,7 +26,7 @@ const reset = () => {
 
 watchDeep(filters, reset)
 
-const { data, status, execute } = await useFetch<{ count: number; tournaments: TournamentInterface[] }>("/api/tournaments", {
+const { data, status, execute, refresh } = await useFetch<{ count: number; tournaments: TournamentInterface[] }>("/api/tournaments", {
   query: { skip, filters },
   default: () => ({ count: 0, tournaments: [] }),
   onResponse: ({ response }) => {
@@ -49,6 +49,7 @@ execute()
       v-model:filters="filters"
       :resetFilters
       :count="data.count"
+      :refresh
     />
     <tournaments-table
       v-else
@@ -58,6 +59,7 @@ execute()
       v-model:filters="filters"
       :resetFilters
       :count="data.count"
+      :refresh
     />
   </div>
 </template>

@@ -6,9 +6,13 @@ const { status, count, tournaments } = defineProps<{
   resetFilters: () => void
   count: number
   status: APIStatusType
+  refresh: () => void
 }>()
 const skip = defineModel<number>("skip")
 const filters = defineModel<Partial<FiltersInterface>>("filters")
+const {
+  ui: { icons }
+} = useAppConfig()
 const table = useTemplateRef<any>("table")
 const initialised = ref(false)
 
@@ -76,10 +80,23 @@ const handleSelect = async (e: Event, row: TableRow<TournamentInterface>) => {
         <table-loading />
       </template>
       <template #empty>
-        <table-empty
-          message="No tournaments found"
+        <u-empty
+          title="No tournaments found"
           :icon="ICONS.noTournament"
-        />
+          description="If you think this is an error, refresh the page. Otherwise, please be patient as we continue to add more data."
+          class="mx-2"
+        >
+          <template #actions>
+            <u-button
+              label="Refresh"
+              :icon="icons.reload"
+              @click="reloadNuxtApp()"
+            />
+            <dev-only>
+              <tournaments-update :refresh />
+            </dev-only>
+          </template>
+        </u-empty>
       </template>
 
       <template #tours-header>

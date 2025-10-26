@@ -15,7 +15,7 @@ export default defineEventHandler(async event => {
     `/* cypher */
       CYPHER 25
       MERGE (t:Tournament:$($tours) {id: $id, name: $name})
-      SET t.website = $website
+      SET t.website = $website, t.updated_at = date()
       CALL (t) {
         WHEN $established IS NOT NULL THEN {
           MATCH (y:Year {id: $established})
@@ -39,7 +39,12 @@ export default defineEventHandler(async event => {
     }
   )
 
-  if (summary.counters.updates().nodesCreated === 0) {
+  console.log(
+    `Notifications for tournament creation: `,
+    summary.gqlStatusObjects.filter(s => s.gqlStatus !== "00000" && !s.gqlStatus.startsWith("01N5"))
+  )
+
+  if (Object.values(summary.counters.updates()).every(v => v === 0)) {
     throw createError({ statusCode: 400, statusMessage: "Tournament could not be created" })
   } else {
     return { ok: true }

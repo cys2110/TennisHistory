@@ -1,5 +1,7 @@
 <script setup lang="ts">
-defineProps<{
+import type { BreadcrumbItem } from "@nuxt/ui"
+
+const { edition } = defineProps<{
   edition: EditionInterface
   events: EventInterface[]
   status: APIStatusType
@@ -14,6 +16,12 @@ const {
 } = useAppConfig()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: useSSRWidth() })
 const mdAndDown = breakpoints.smallerOrEqual("md")
+
+const breadcrumbs: BreadcrumbItem[] = [
+  { icon: ICONS.home, to: { name: "home" } },
+  { label: "Tournaments", to: { name: "tournaments" }, icon: ICONS.tournament },
+  { label: edition.tournament.name, to: { name: "tournament", params: { id, name } } }
+]
 </script>
 
 <template>
@@ -39,8 +47,12 @@ const mdAndDown = breakpoints.smallerOrEqual("md")
         </u-page-aside>
       </template>
 
-      <u-page-header :title="`${edition.tournament.name} ${year}`">
+      <u-page-header :title="year">
         <template #headline>
+          <u-breadcrumb :items="breadcrumbs" />
+        </template>
+
+        <template #description>
           <div class="flex items-center gap-2">
             <u-badge
               v-for="tour in edition.tours"
@@ -80,6 +92,8 @@ const mdAndDown = breakpoints.smallerOrEqual("md")
       </u-page-header>
 
       <u-page-body>
+        <editions-overview :edition />
+
         <u-page-grid v-if="events.length || status === 'pending'">
           <u-page-card
             v-if="events.length"
@@ -153,7 +167,7 @@ const mdAndDown = breakpoints.smallerOrEqual("md")
                   <div>{{ event.tfc.toLocaleString("en-GB", { style: "currency", currency: event.currency }) }}</div>
                 </div>
 
-                <div v-if="event.winners.length">
+                <div v-if="event.winners.length && event.winners[0]?.team[0]?.country">
                   <div>Winners</div>
                   <div>
                     <div
@@ -187,11 +201,23 @@ const mdAndDown = breakpoints.smallerOrEqual("md")
           />
         </u-page-grid>
 
-        <cards-empty
+        <u-empty
           v-else
+          title="No events found"
           :icon="ICONS.noEvent"
-          message="No events found"
-        />
+          description="If you think this is an error, refresh the page. Otherwise, please be patient as we continue to add more data."
+        >
+          <template #actions>
+            <u-button
+              label="Refresh"
+              :icon="icons.reload"
+              @click="reloadNuxtApp()"
+            />
+            <dev-only>
+              <events-update :refresh />
+            </dev-only>
+          </template>
+        </u-empty>
       </u-page-body>
     </u-page>
   </u-container>

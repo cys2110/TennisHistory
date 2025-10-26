@@ -28,7 +28,7 @@ const reset = () => {
 
 watchDeep(filters, reset)
 
-const { data, status, execute } = await useFetch<{ count: number; editions: EditionInterface[] }>("/api/editions", {
+const { data, status, execute, refresh } = await useFetch<{ count: number; editions: EditionInterface[] }>("/api/editions", {
   query: { skip, filters, id },
   default: () => ({ count: 0, editions: [] }),
   onResponse: ({ response }) => {
@@ -51,6 +51,7 @@ execute()
     :status
     :count="data.count"
     :resetFilters
+    :refresh
   />
 
   <tournaments-winners-table
@@ -63,5 +64,6 @@ execute()
     :status
     :count="data.count"
     :resetFilters
+    :refresh
   />
 </template>

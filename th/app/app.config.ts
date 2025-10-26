@@ -77,6 +77,7 @@ export default defineAppConfig({
     },
     dashboardSidebar: { slots: { header: "justify-center font-cursive lg:text-lg xl:text-xl 2xl:text-2xl" } },
     dropdownMenu: { slots: { content: "max-h-80 !min-w-fit border border-primary", item: "cursor-pointer" } },
+    empty: { slots: { actions: "flex-nowrap" } },
     footerColumns: { slots: { center: "xl:col-span-3" } },
     formField: { slots: { label: "font-semibold" }, defaultVariants: { size: "sm" } },
     header: { slots: { container: "max-w-full", title: "font-cursive" } },

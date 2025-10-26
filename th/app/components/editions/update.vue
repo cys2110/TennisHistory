@@ -19,7 +19,7 @@ defineShortcuts({
   meta_shift_e: () => (edition ? set(open, !get(open)) : undefined)
 })
 
-const state = reactive<Partial<EditionSchema>>({
+const state = reactive<Partial<EditionInput>>({
   id: edition?.id,
   tournament: edition?.tournament
     ? {
@@ -58,15 +58,15 @@ const formFields: FormFieldInterface<EditionSchema>[] = [
     required: true
   },
   { label: "Year", key: "year", type: "selectMenu", items: ALL_YEARS, required: true },
+  { label: "Sponsor Name", key: "sponsor_name", type: "text", class: "col-span-2" },
   { label: "Start Date", key: "start_date", type: "date" },
   { label: "End Date", key: "end_date", type: "date" },
-  { label: "Sponsor Name", key: "sponsor_name", type: "text" },
   { label: "Surface", key: "surface", type: "select", items: SURFACE_OPTIONS },
+  { label: "Venues", key: "venues", type: "search", subType: "venues", multiple: true },
   { label: "Currency", key: "currency", type: "checkbox", items: CURRENCY_OPTIONS },
   { label: "Total Financial Commitment", key: "tfc", type: "currency" },
-  { label: "Venues", key: "venues", type: "search", subType: "venues", multiple: true, class: "col-span-2" },
   { label: "Category", key: "category", type: "text" },
-  { label: "Draw Type", key: "draw_type", type: "text" },
+  { label: "Draw Type", key: "draw_type", type: "select", items: DRAW_OPTIONS },
   { label: "Draw Link", key: "draw_link", type: "textarea", class: "col-span-2" },
   { label: "Wikipedia Link", key: "wiki_link", type: "textarea", class: "col-span-2" }
 ]
@@ -125,11 +125,6 @@ const onSubmit = async (event: FormSubmitEvent<EditionSchema>) => {
       set(open, false)
       if (refresh) {
         refresh()
-      } else {
-        await navigateTo({
-          name: "edition",
-          params: { id: event.data.tournament.value, name: kebabCase(event.data.tournament.label), year: event.data.year, edId: event.data.id }
-        })
       }
     } else {
       toast.add({
@@ -190,7 +185,6 @@ const onSubmit = async (event: FormSubmitEvent<EditionSchema>) => {
         label="Save"
         :icon="uploading ? ICONS.uploading : icons.check"
         block
-        class="!rounded-md"
       />
       <u-button
         label="Reset"
@@ -198,7 +192,6 @@ const onSubmit = async (event: FormSubmitEvent<EditionSchema>) => {
         @click="handleReset"
         block
         color="warning"
-        class="!rounded-md"
       />
       <u-button
         label="Cancel"
@@ -206,7 +199,6 @@ const onSubmit = async (event: FormSubmitEvent<EditionSchema>) => {
         @click="close"
         block
         color="error"
-        class="!rounded-md"
       />
     </template>
   </u-modal>

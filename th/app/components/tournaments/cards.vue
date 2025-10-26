@@ -4,9 +4,14 @@ const { status, count, tournaments } = defineProps<{
   resetFilters: () => void
   count: number
   status: APIStatusType
+  refresh: () => void
 }>()
 const skip = defineModel<number>("skip")
 const filters = defineModel<Partial<FiltersInterface>>("filters")
+
+const {
+  ui: { icons }
+} = useAppConfig()
 const breakpoints = useBreakpoints(breakpointsTailwind, { ssrWidth: useSSRWidth() })
 const mdAndDown = breakpoints.smallerOrEqual("md")
 const grid = useTemplateRef<HTMLDivElement>("grid")
@@ -17,6 +22,7 @@ onMounted(() => {
   useInfiniteScroll(
     grid.value,
     () => {
+      // Ensure reset filters doesn't immediately trigger load more
       if (!get(initialised)) {
         set(initialised, true)
         return
@@ -141,7 +147,7 @@ onMounted(() => {
 
       <u-page-body>
         <u-page-grid
-          v-if="tournaments.length || status === 'pending'"
+          v-if="(tournaments.length && status === 'success') || status === 'pending'"
           ref="grid"
         >
           <u-page-card
@@ -177,11 +183,23 @@ onMounted(() => {
           />
         </u-page-grid>
 
-        <cards-empty
+        <u-empty
           v-else
+          title="No tournaments found"
           :icon="ICONS.noTournament"
-          message="No tournaments found"
-        />
+          description="If you think this is an error, refresh the page. Otherwise, please be patient as we continue to add more data."
+        >
+          <template #actions>
+            <u-button
+              label="Refresh"
+              :icon="icons.reload"
+              @click="reloadNuxtApp()"
+            />
+            <dev-only>
+              <tournaments-update :refresh />
+            </dev-only>
+          </template>
+        </u-empty>
       </u-page-body>
     </u-page>
   </u-container>

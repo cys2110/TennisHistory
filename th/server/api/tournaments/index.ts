@@ -57,7 +57,7 @@ export default defineEventHandler(async event => {
 
   console.log(
     `Notifications for tournaments: `,
-    summary.gqlStatusObjects.filter(s => !["00000", "01N51"].includes(s.gqlStatus))
+    summary.gqlStatusObjects.filter(s => s.gqlStatus !== "00000" && !s.gqlStatus.startsWith("01N5"))
   )
 
   if (!records?.[0]?.get("tournament") || Object.keys(records[0]?.get("tournament")).length === 0) {

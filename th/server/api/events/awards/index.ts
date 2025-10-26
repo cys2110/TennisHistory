@@ -21,8 +21,8 @@ export default defineEventHandler(async query => {
   )
 
   console.log(
-    `Notifications for events: `,
-    summary.gqlStatusObjects.filter(s => !["00000", "01N51", "01N52"].includes(s.gqlStatus))
+    `Notifications for rounds: `,
+    summary.gqlStatusObjects.filter(s => s.gqlStatus !== "00000" && !s.gqlStatus.startsWith("01N5"))
   )
 
   const results = records.map(record => {

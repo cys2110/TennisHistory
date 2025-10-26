@@ -10,7 +10,6 @@ const {
   <u-input
     v-model="modelValue"
     :type
-    :class="{ 'w-fit max-w-30': !block }"
     placeholder=""
     :ui="{ base: 'peer' }"
   >

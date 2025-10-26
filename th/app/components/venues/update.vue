@@ -10,7 +10,7 @@ const {
 const open = ref(false)
 const uploading = ref(false)
 
-const state = reactive<Partial<VenueSchema>>({
+const state = reactive<Partial<VenueInput>>({
   id: venue?.id,
   name: venue?.name,
   city: venue?.city,
@@ -30,16 +30,13 @@ const formFields: FormFieldInterface<VenueSchema>[] = [
 
 const handleReset = () => {
   state.name = venue?.name
-  state.city = venue?.city ?? ""
+  state.city = venue?.city
   state.country = venue?.country
     ? {
         value: venue.country.id,
         label: venue.country.name
       }
-    : {
-        value: "",
-        label: ""
-      }
+    : undefined
 }
 
 const onError = (event: FormErrorEvent) => {
@@ -136,7 +133,6 @@ const onSubmit = async (event: FormSubmitEvent<VenueSchema>) => {
         label="Save"
         :icon="uploading ? ICONS.uploading : icons.check"
         block
-        class="!rounded-md"
       />
 
       <u-button
@@ -145,7 +141,6 @@ const onSubmit = async (event: FormSubmitEvent<VenueSchema>) => {
         :icon="icons.reload"
         block
         color="warning"
-        class="!rounded-md"
       />
 
       <u-button
@@ -154,7 +149,6 @@ const onSubmit = async (event: FormSubmitEvent<VenueSchema>) => {
         @click="close"
         :icon="icons.close"
         block
-        class="!rounded-md"
       />
     </template>
   </u-modal>

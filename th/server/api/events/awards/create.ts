@@ -34,7 +34,12 @@ export default defineEventHandler(async event => {
     formattedParams
   )
 
-  if (summary.counters.updates().nodesCreated === 0) {
+  console.log(
+    `Notifications for round creation: `,
+    summary.gqlStatusObjects.filter(s => s.gqlStatus !== "00000" && !s.gqlStatus.startsWith("01N5"))
+  )
+
+  if (Object.values(summary.counters.updates()).every(v => v === 0)) {
     throw createError({ statusCode: 400, statusMessage: "Round could not be created" })
   } else {
     return { ok: true }

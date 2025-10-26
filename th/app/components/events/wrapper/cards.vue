@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DropdownMenuItem, PageLink } from "@nuxt/ui"
+import type { BreadcrumbItem, DropdownMenuItem, PageLink } from "@nuxt/ui"
 
 const {
   name: routeName,
@@ -16,9 +16,10 @@ const { data: event } = await useFetch<EventInterface>("/api/events/event", {
   query: { id: `${edId}-${tour}` }
 })
 
+const currentPage = computed(() => EVENT_PAGES.find(page => page.name === routeName))
+
 useHead({
-  title: () =>
-    `${EVENT_PAGES.find(page => page.name === routeName)?.label} | ${event.value?.edition.tournament.name ?? capitalCase(name)} ${year} ${tour}`
+  title: () => `${currentPage.value?.label} | ${event.value?.edition.tournament.name ?? capitalCase(name)} ${year} ${tour}`
 })
 
 const toc = [
@@ -28,6 +29,13 @@ const toc = [
   { label: "Entry Information", to: "#entry-info", icon: icons.info },
   { label: "Entries", to: "#entries", icon: ICONS.player }
 ]
+
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
+  { icon: ICONS.home, to: { name: "home" } },
+  { label: "Tournaments", to: { name: "tournaments" }, icon: ICONS.tournament },
+  { label: event.value?.edition.tournament.name ?? capitalCase(name), to: { name: "tournament", params: { id, name } } },
+  { label: year, to: { name: "edition", params: { id, name, year, edId } } }
+])
 </script>
 
 <template>
@@ -73,11 +81,12 @@ const toc = [
         </u-page-aside>
       </template>
 
-      <u-page-header
-        :title="`${event?.edition.tournament.name} ${year}`"
-        :description="EVENT_PAGES.find(page => page.name === routeName)!.label"
-      >
+      <u-page-header :title="currentPage?.label">
         <template #headline>
+          <u-breadcrumb :items="breadcrumbs" />
+        </template>
+
+        <template #description>
           <div
             v-if="event"
             class="flex items-center gap-2"

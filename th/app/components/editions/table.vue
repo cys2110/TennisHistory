@@ -10,6 +10,9 @@ defineProps<{
 const {
   params: { id, name, edId, year }
 } = useRoute("edition")
+const {
+  ui: { icons }
+} = useAppConfig()
 
 const columns: TableColumn<EventInterface>[] = [
   { accessorKey: "tour", header: "Tour" },
@@ -61,18 +64,17 @@ const handleSelect = async (e: Event, row: TableRow<EventInterface>) => {
         <editions-update :edition />
         <events-update :refresh />
       </dev-only>
-      <div class="flex items-center gap-2 w-full">
-        <u-badge
-          v-for="tour in edition.tours"
-          :key="tour"
-          :label="TourEnum[tour]"
-          :color="tour"
-        />
-      </div>
+      <u-badge
+        v-for="tour in edition.tours"
+        :key="tour"
+        :label="TourEnum[tour]"
+        :color="tour"
+        class="w-full justify-center"
+      />
       <u-badge
         color="success"
         :label="`Updated: ${useDateFormat(edition.updated_at, 'DD MMMM YYYY').value}`"
-        class="w-full"
+        class="w-full justify-center"
       />
     </template>
 
@@ -93,10 +95,23 @@ const handleSelect = async (e: Event, row: TableRow<EventInterface>) => {
       </template>
 
       <template #empty>
-        <table-empty
+        <u-empty
+          title="No events found"
           :icon="ICONS.noEvent"
-          message="No events found"
-        />
+          description="If you think this is an error, refresh the page. Otherwise, please be patient as we continue to add more data."
+          class="mx-2"
+        >
+          <template #actions>
+            <u-button
+              label="Refresh"
+              :icon="icons.reload"
+              @click="reloadNuxtApp()"
+            />
+            <dev-only>
+              <events-update :refresh />
+            </dev-only>
+          </template>
+        </u-empty>
       </template>
 
       <template #tour-cell="{ row }">
@@ -137,7 +152,7 @@ const handleSelect = async (e: Event, row: TableRow<EventInterface>) => {
 
       <template #winners-cell="{ row }">
         <div
-          v-if="row.original.winners?.length"
+          v-if="row.original.winners?.length && row.original.winners[0]?.team[0]?.country"
           v-for="winner in row.original.winners"
           :key="winner.type"
           class="flex items-center gap-2"

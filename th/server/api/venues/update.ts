@@ -3,7 +3,7 @@ export default defineEventHandler(async event => {
     id: string
     name: string
     city: string
-    country: SelectOptionsType
+    country: string
   }
 
   const { id, name, city, country } = getQuery<QueryProps>(event)
@@ -26,8 +26,13 @@ export default defineEventHandler(async event => {
       id,
       name: name || null,
       city: city,
-      country: country.value
+      country: country
     }
+  )
+
+  console.log(
+    `Notifications for venue update: `,
+    summary.gqlStatusObjects.filter(s => s.gqlStatus !== "00000" && !s.gqlStatus.startsWith("01N5"))
   )
 
   if (Object.values(summary.counters.updates()).every(v => v === 0)) {

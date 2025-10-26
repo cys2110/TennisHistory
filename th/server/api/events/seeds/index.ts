@@ -57,6 +57,7 @@ export default defineEventHandler(async event => {
 
   const results = records.filter(Boolean).map(r => {
     const seed = r.get("seed")
+    if (!seed) return null
     const numberKeys = ["seed", "rank", "q_seed"]
     for (const key of numberKeys) {
       if (seed[key]) seed[key] = seed[key].toInt()
@@ -65,5 +66,5 @@ export default defineEventHandler(async event => {
     return seed
   })
 
-  return results
+  return results.filter(Boolean)
 })

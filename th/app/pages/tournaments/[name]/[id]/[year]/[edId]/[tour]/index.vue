@@ -2,8 +2,7 @@
 definePageMeta({ name: "event" })
 const { viewMode } = useViewMode()
 const {
-  name: routeName,
-  params: { tour, edId, name, year }
+  params: { tour, edId, name }
 } = useRoute("event")
 
 const { data: event } = await useFetch<EventInterface>("/api/events/event", {
